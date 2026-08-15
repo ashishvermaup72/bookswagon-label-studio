@@ -1,806 +1,1251 @@
-<!-- =====================================================
-     COCOBLUE PO WORKSPACE
-====================================================== -->
+<!DOCTYPE html>
+<html lang="en">
 
-<section
-    class="tool-workspace"
-    id="cocoblue-workspace"
->
+<head>
+    <meta charset="UTF-8">
 
-    <div class="workspace-header">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-        <div>
+    <title>BooksWagon Label Studio</title>
 
-            <span class="workspace-kicker">
-                COCOBLUE PO
-            </span>
+    <meta
+        name="description"
+        content="BooksWagon PO and ISBN label generation workspace."
+    >
 
-            <h2>
-                CocoBlue PO Label Generator
-            </h2>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-            <p>
-                Generate sticker pages or address labels
-                from PO information.
-            </p>
+<body>
+
+    <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
+
+    <div class="top-bar">
+        <span>BOOKSWAGON LABEL STUDIO</span>
+        <span>Professional Printing Workspace</span>
+    </div>
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="site-header">
+
+        <div class="header-inner">
+
+            <a href="#home" class="brand">
+
+                <div class="brand-text">
+                    <strong>BOOKSWAGON</strong>
+                    <span>LABEL STUDIO</span>
+                </div>
+
+            </a>
+
+
+            <nav class="main-nav">
+
+                <a href="#home">Home</a>
+                <a href="#tools">Tools</a>
+                <a href="#features">Features</a>
+                <a href="#contact">Contact</a>
+
+            </nav>
+
+
+            <a
+                href="mailto:ashish.varma@bookswagon.in"
+                class="contact-button"
+            >
+                Contact Us
+            </a>
 
         </div>
 
-
-        <button
-            type="button"
-            class="workspace-back-button"
-            id="closeCocoBlue"
-        >
-            Back to Tools
-        </button>
-
-    </div>
+    </header>
 
 
+    <!-- =====================================================
+         HOME
+    ====================================================== -->
 
-    <!-- ===============================================
-         TOOL MODE
-    ================================================ -->
+    <main id="home">
 
-    <div class="workspace-tabs">
+        <section class="hero-section">
 
-        <button
-            type="button"
-            class="workspace-tab active"
-            id="cocoblueStickerTab"
-        >
-            Sticker Page
-        </button>
+            <div class="hero-inner">
+
+                <div class="hero-content">
+
+                    <span class="hero-label">
+                        BOOKSWAGON PRINTING WORKSPACE
+                    </span>
+
+                    <h1>
+                        Simple tools for
+                        <span>everyday label work.</span>
+                    </h1>
+
+                    <p>
+                        Generate PO labels, address labels
+                        and ISBN barcodes from one
+                        professional browser workspace.
+                    </p>
+
+                    <div class="hero-actions">
+
+                        <a
+                            href="#tools"
+                            class="hero-primary"
+                        >
+                            Explore Tools
+                        </a>
+
+                        <a
+                            href="#features"
+                            class="hero-secondary"
+                        >
+                            View Features
+                        </a>
+
+                    </div>
+
+                    <div class="hero-points">
+
+                        <span>✓ PDF Ready</span>
+                        <span>✓ Excel Upload</span>
+                        <span>✓ Bulk Processing</span>
+                        <span>✓ No Installation</span>
+
+                    </div>
+
+                </div>
 
 
-        <button
-            type="button"
-            class="workspace-tab"
-            id="cocoblueAddressTab"
-        >
-            Address Print
-        </button>
+                <div class="hero-visual">
 
-    </div>
+                    <div class="book-stack">
 
+                        <div class="book back-book"></div>
 
+                        <div class="book middle-book"></div>
 
-    <!-- ===============================================
-         STICKER PAGE
-    ================================================ -->
+                        <div class="book front-book">
 
-    <div
-        id="cocoblueStickerWorkspace"
-        class="workspace-content"
-    >
-
-        <div class="workspace-grid">
-
-
-            <!-- LEFT CONTROLS -->
-
-            <div class="workspace-controls">
-
-
-                <!-- PO INPUT -->
-
-                <div class="workspace-card">
-
-                    <div class="workspace-card-title">
-
-                        <span>
-                            01
-                        </span>
-
-                        <div>
-
-                            <h3>
-                                PO Input
-                            </h3>
-
-                            <p>
-                                Manual entry or Excel upload
-                            </p>
+                            <span>BOOKSWAGON</span>
+                            <strong>LABEL</strong>
+                            <small>STUDIO</small>
 
                         </div>
 
                     </div>
 
+                </div>
 
-                    <div class="workspace-input-tabs">
+            </div>
 
-                        <button
-                            type="button"
-                            class="active"
-                            id="cocoblueManualBtn"
-                        >
-                            Manual Entry
-                        </button>
+        </section>
 
 
-                        <button
-                            type="button"
-                            id="cocoblueExcelBtn"
-                        >
-                            Excel Upload
-                        </button>
+        <!-- =================================================
+             TOOLS
+        ================================================== -->
 
-                    </div>
+        <section
+            class="tools-section"
+            id="tools"
+        >
+
+            <div class="section-heading">
+
+                <span>WORKSPACE</span>
+
+                <h2>Choose your tool</h2>
+
+                <p>
+                    Select the operation you want to perform.
+                </p>
+
+            </div>
 
 
+            <div class="tool-grid">
 
-                    <!-- Manual PO -->
 
-                    <div
-                        id="cocoblueManualArea"
-                    >
+                <!-- COCOBLUE -->
 
-                        <div class="cocoblue-po-grid">
+                <article class="tool-card">
 
-                            <input
-                                type="text"
-                                class="cocoblue-po-input"
-                                placeholder="PO 01"
-                            >
+                    <div class="tool-number">01</div>
 
-                            <input
-                                type="text"
-                                class="cocoblue-po-input"
-                                placeholder="PO 02"
-                            >
+                    <div class="tool-icon">C</div>
 
-                            <input
-                                type="text"
-                                class="cocoblue-po-input"
-                                placeholder="PO 03"
-                            >
+                    <h3>CocoBlue PO</h3>
 
-                            <input
-                                type="text"
-                                class="cocoblue-po-input"
-                                placeholder="PO 04"
-                            >
+                    <p>
+                        Create PO sticker pages and
+                        address labels.
+                    </p>
 
-                            <input
-                                type="text"
-                                class="cocoblue-po-input"
-                                placeholder="PO 05"
-                            >
+                    <div class="tool-features">
 
-                            <input
-                                type="text"
-                                class="cocoblue-po-input"
-                                placeholder="PO 06"
-                            >
-
-                            <input
-                                type="text"
-                                class="cocoblue-po-input"
-                                placeholder="PO 07"
-                            >
-
-                            <input
-                                type="text"
-                                class="cocoblue-po-input"
-                                placeholder="PO 08"
-                            >
-
-                            <input
-                                type="text"
-                                class="cocoblue-po-input"
-                                placeholder="PO 09"
-                            >
-
-                            <input
-                                type="text"
-                                class="cocoblue-po-input"
-                                placeholder="PO 10"
-                            >
-
-                        </div>
+                        <span>PO Number</span>
+                        <span>Excel Upload</span>
+                        <span>Sticker Page</span>
+                        <span>Address Print</span>
 
                     </div>
 
-
-
-                    <!-- Excel -->
-
-                    <div
-                        id="cocoblueExcelArea"
-                        class="hidden"
+                    <button
+                        type="button"
+                        class="tool-button"
+                        data-open-tool="cocoblue"
                     >
+                        Open CocoBlue PO
+                    </button>
 
-                        <label
-                            for="cocoblueExcelFile"
-                            class="workspace-upload-box"
-                        >
-
-                            <span>
-                                +
-                            </span>
-
-                            <strong>
-                                Upload Excel File
-                            </strong>
-
-                            <small>
-                                Excel file should contain PO numbers
-                            </small>
-
-                        </label>
+                </article>
 
 
-                        <input
-                            type="file"
-                            id="cocoblueExcelFile"
-                            accept=".xlsx,.xls,.csv"
-                            hidden
-                        >
+                <!-- OTHER PO -->
+
+                <article class="tool-card">
+
+                    <div class="tool-number">02</div>
+
+                    <div class="tool-icon">P</div>
+
+                    <h3>Other PO</h3>
+
+                    <p>
+                        Generate PO and box labels with
+                        flexible box layouts.
+                    </p>
+
+                    <div class="tool-features">
+
+                        <span>PO Number</span>
+                        <span>Box Number</span>
+                        <span>Excel Upload</span>
+                        <span>Address Print</span>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="tool-button"
+                        data-open-tool="otherpo"
+                    >
+                        Open Other PO
+                    </button>
+
+                </article>
 
 
-                        <p
-                            id="cocoblueExcelStatus"
-                            class="workspace-file-status"
-                        >
-                            No file selected
+                <!-- ISBN -->
+
+                <article class="tool-card">
+
+                    <div class="tool-number">03</div>
+
+                    <div class="tool-icon">#</div>
+
+                    <h3>ISBN Barcode Generator</h3>
+
+                    <p>
+                        Generate book barcodes with ISBN,
+                        title and optional edition.
+                    </p>
+
+                    <div class="tool-features">
+
+                        <span>Manual Max 10</span>
+                        <span>Excel Upload</span>
+                        <span>ISBN Barcode</span>
+                        <span>Bulk PDF</span>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="tool-button"
+                        data-open-tool="isbn"
+                    >
+                        Open ISBN Generator
+                    </button>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             COMMON FEATURES
+        ================================================== -->
+
+        <section
+            class="features-section"
+            id="features"
+        >
+
+            <div class="section-heading centered">
+
+                <span>COMMON FEATURES</span>
+
+                <h2>
+                    One workspace, multiple workflows.
+                </h2>
+
+            </div>
+
+
+            <div class="feature-grid">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">PDF</div>
+
+                    <h3>Multiple Page Sizes</h3>
+
+                    <p>
+                        4 × 6 inch, A4, 70 × 35 mm
+                        and custom sizes.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">XLS</div>
+
+                    <h3>Manual & Bulk Input</h3>
+
+                    <p>
+                        Manual entry or Excel upload
+                        for bulk processing.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">✦</div>
+
+                    <h3>Custom Design</h3>
+
+                    <p>
+                        Border styles, fonts and
+                        font size controls.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">WEB</div>
+
+                    <h3>Browser Based</h3>
+
+                    <p>
+                        No Python or heavy local
+                        software required.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TOOL WORKSPACE CONTAINER
+        ================================================== -->
+
+        <section
+            class="workspace-section"
+            id="workspaceSection"
+        >
+
+            <!-- =============================================
+                 COCOBLUE
+            ============================================== -->
+
+            <div
+                class="tool-workspace"
+                id="cocoblueWorkspace"
+            >
+
+                <div class="workspace-header">
+
+                    <div>
+
+                        <span>COCOBLUE PO</span>
+
+                        <h2>
+                            CocoBlue PO
+                        </h2>
+
+                        <p>
+                            Sticker page and address printing.
                         </p>
 
                     </div>
 
-                </div>
-
-
-
-                <!-- PAGE SETTINGS -->
-
-                <div class="workspace-card">
-
-                    <div class="workspace-card-title">
-
-                        <span>
-                            02
-                        </span>
-
-                        <div>
-
-                            <h3>
-                                Page Settings
-                            </h3>
-
-                            <p>
-                                Select your print format
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="workspace-page-size-grid">
-
-                        <button
-                            type="button"
-                            class="cocoblue-page-size active"
-                            data-size="4x6"
-                        >
-                            <strong>
-                                4 × 6
-                            </strong>
-
-                            <small>
-                                Inch
-                            </small>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="cocoblue-page-size"
-                            data-size="a4"
-                        >
-                            <strong>
-                                A4
-                            </strong>
-
-                            <small>
-                                210 × 297 mm
-                            </small>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="cocoblue-page-size"
-                            data-size="70x35"
-                        >
-                            <strong>
-                                70 × 35
-                            </strong>
-
-                            <small>
-                                mm
-                            </small>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="cocoblue-page-size"
-                            data-size="custom"
-                        >
-                            <strong>
-                                Custom
-                            </strong>
-
-                            <small>
-                                Your size
-                            </small>
-
-                        </button>
-
-                    </div>
-
-
-                    <div
-                        id="cocoblueCustomSize"
-                        class="cocoblue-custom-size hidden"
+                    <button
+                        type="button"
+                        class="back-button"
+                        data-close-tool
                     >
+                        Back to Tools
+                    </button>
 
-                        <input
-                            type="number"
-                            id="cocoblueWidth"
-                            placeholder="Width (mm)"
-                            min="1"
-                        >
+                </div>
 
-                        <input
-                            type="number"
-                            id="cocoblueHeight"
-                            placeholder="Height (mm)"
-                            min="1"
-                        >
+
+                <div class="workspace-tabs">
+
+                    <button
+                        type="button"
+                        class="workspace-tab active"
+                        data-cocoblue-mode="sticker"
+                    >
+                        Sticker Page
+                    </button>
+
+                    <button
+                        type="button"
+                        class="workspace-tab"
+                        data-cocoblue-mode="address"
+                    >
+                        Address Print
+                    </button>
+
+                </div>
+
+
+                <!-- COCOBLUE STICKER -->
+
+                <div
+                    class="tool-mode"
+                    id="cocoblueStickerMode"
+                >
+
+                    <div class="workspace-grid">
+
+
+                        <div class="workspace-controls">
+
+
+                            <!-- PO -->
+
+                            <div class="workspace-card">
+
+                                <div class="card-title">
+
+                                    <span>01</span>
+
+                                    <div>
+                                        <h3>PO Input</h3>
+
+                                        <p>
+                                            Manual or Excel
+                                        </p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mini-tabs">
+
+                                    <button
+                                        type="button"
+                                        class="mini-tab active"
+                                        data-coco-input="manual"
+                                    >
+                                        Manual
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="mini-tab"
+                                        data-coco-input="excel"
+                                    >
+                                        Excel
+                                    </button>
+
+                                </div>
+
+
+                                <div id="cocoManualArea">
+
+                                    <div class="po-grid">
+
+                                        <input class="coco-po" placeholder="PO 01">
+                                        <input class="coco-po" placeholder="PO 02">
+                                        <input class="coco-po" placeholder="PO 03">
+                                        <input class="coco-po" placeholder="PO 04">
+                                        <input class="coco-po" placeholder="PO 05">
+                                        <input class="coco-po" placeholder="PO 06">
+                                        <input class="coco-po" placeholder="PO 07">
+                                        <input class="coco-po" placeholder="PO 08">
+                                        <input class="coco-po" placeholder="PO 09">
+                                        <input class="coco-po" placeholder="PO 10">
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    id="cocoExcelArea"
+                                    class="hidden"
+                                >
+
+                                    <label
+                                        for="cocoExcel"
+                                        class="upload-box"
+                                    >
+                                        <strong>
+                                            Upload Excel
+                                        </strong>
+
+                                        <small>
+                                            First column = PO number
+                                        </small>
+                                    </label>
+
+                                    <input
+                                        id="cocoExcel"
+                                        type="file"
+                                        accept=".xlsx,.xls,.csv"
+                                        hidden
+                                    >
+
+                                    <div
+                                        id="cocoExcelStatus"
+                                        class="file-status"
+                                    >
+                                        No file selected
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PAGE -->
+
+                            <div class="workspace-card">
+
+                                <div class="card-title">
+
+                                    <span>02</span>
+
+                                    <div>
+                                        <h3>Page Settings</h3>
+
+                                        <p>
+                                            Select print size
+                                        </p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="page-grid">
+
+                                    <button
+                                        type="button"
+                                        class="page-choice active"
+                                        data-coco-size="4x6"
+                                    >
+                                        <strong>4 × 6</strong>
+                                        <small>inch</small>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="page-choice"
+                                        data-coco-size="a4"
+                                    >
+                                        <strong>A4</strong>
+                                        <small>210 × 297 mm</small>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="page-choice"
+                                        data-coco-size="70x35"
+                                    >
+                                        <strong>70 × 35</strong>
+                                        <small>mm</small>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="page-choice"
+                                        data-coco-size="custom"
+                                    >
+                                        <strong>Custom</strong>
+                                        <small>mm</small>
+                                    </button>
+
+                                </div>
+
+
+                                <div
+                                    id="cocoCustomSize"
+                                    class="custom-grid hidden"
+                                >
+
+                                    <input
+                                        id="cocoCustomWidth"
+                                        type="number"
+                                        placeholder="Width mm"
+                                        min="1"
+                                    >
+
+                                    <input
+                                        id="cocoCustomHeight"
+                                        type="number"
+                                        placeholder="Height mm"
+                                        min="1"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- STICKER -->
+
+                            <div class="workspace-card">
+
+                                <div class="card-title">
+
+                                    <span>03</span>
+
+                                    <div>
+                                        <h3>Sticker Settings</h3>
+
+                                        <p>
+                                            Control repetition
+                                        </p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="four-fields">
+
+                                    <div>
+                                        <label>Labels / Page</label>
+
+                                        <select id="cocoLabelsPerPage">
+
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                            <option>6</option>
+                                            <option>7</option>
+                                            <option>8</option>
+                                            <option>9</option>
+                                            <option>10</option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <div>
+                                        <label>Pages / PO</label>
+
+                                        <select id="cocoPagesPerPO">
+
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                            <option>6</option>
+                                            <option>7</option>
+                                            <option>8</option>
+                                            <option>9</option>
+                                            <option>10</option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- DESIGN -->
+
+                            <div class="workspace-card">
+
+                                <div class="card-title">
+
+                                    <span>04</span>
+
+                                    <div>
+                                        <h3>Design</h3>
+
+                                        <p>
+                                            Border and typography
+                                        </p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="setting-row">
+
+                                    <div>
+                                        <strong>Border</strong>
+
+                                        <small>
+                                            Enable page border
+                                        </small>
+                                    </div>
+
+                                    <label class="switch">
+                                        <input
+                                            type="checkbox"
+                                            id="cocoBorder"
+                                        >
+                                        <span></span>
+                                    </label>
+
+                                </div>
+
+
+                                <div class="two-fields">
+
+                                    <div>
+                                        <label>Border Design</label>
+
+                                        <select id="cocoBorderStyle">
+
+                                            <option value="solid-dark">
+                                                Dark Solid
+                                            </option>
+
+                                            <option value="solid-medium">
+                                                Medium Solid
+                                            </option>
+
+                                            <option value="solid-light">
+                                                Light Solid
+                                            </option>
+
+                                            <option value="double">
+                                                Double
+                                            </option>
+
+                                            <option value="dashed">
+                                                Dashed
+                                            </option>
+
+                                            <option value="dotted">
+                                                Dotted
+                                            </option>
+
+                                            <option value="bold">
+                                                Bold
+                                            </option>
+
+                                        </select>
+                                    </div>
+
+
+                                    <div>
+                                        <label>Font</label>
+
+                                        <select id="cocoFont">
+
+                                            <option>Arial</option>
+                                            <option>Calibri</option>
+                                            <option>Georgia</option>
+                                            <option>Verdana</option>
+                                            <option>Times New Roman</option>
+                                            <option>Trebuchet MS</option>
+                                            <option>Tahoma</option>
+                                            <option>Courier New</option>
+
+                                        </select>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="two-fields">
+
+                                    <div>
+
+                                        <label>
+                                            Font Size
+                                        </label>
+
+                                        <select id="cocoFontSize">
+
+                                            <option>10</option>
+                                            <option>12</option>
+                                            <option>14</option>
+                                            <option>16</option>
+                                            <option>18</option>
+                                            <option>20</option>
+                                            <option>22</option>
+                                            <option>24</option>
+                                            <option>26</option>
+                                            <option>28</option>
+                                            <option>30</option>
+                                            <option>32</option>
+                                            <option>34</option>
+                                            <option>36</option>
+                                            <option>38</option>
+                                            <option>40</option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label>
+                                            Weight
+                                        </label>
+
+                                        <select id="cocoFontWeight">
+
+                                            <option value="normal">
+                                                Regular
+                                            </option>
+
+                                            <option value="bold">
+                                                Bold
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <!-- COCO PREVIEW -->
+
+                        <aside class="preview-panel">
+
+                            <div class="preview-heading">
+
+                                <div>
+                                    <span>LIVE PREVIEW</span>
+                                    <h3>CocoBlue Sticker</h3>
+                                </div>
+
+                                <span id="cocoSummary">
+                                    0 pages
+                                </span>
+
+                            </div>
+
+
+                            <div class="preview-stage">
+
+                                <div
+                                    id="cocoPreview"
+                                    class="paper-preview"
+                                >
+
+                                    <strong
+                                        id="cocoPreviewPO"
+                                    >
+                                        BWG123
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="preview-info">
+
+                                <div>
+                                    <span>Page</span>
+                                    <strong id="cocoSizeSummary">
+                                        4 × 6 inch
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>Labels/Page</span>
+                                    <strong id="cocoLabelsSummary">
+                                        1
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>Pages</span>
+                                    <strong id="cocoPagesSummary">
+                                        1
+                                    </strong>
+                                </div>
+
+                            </div>
+
+
+                            <div class="action-row">
+
+                                <button
+                                    type="button"
+                                    class="secondary-button"
+                                    id="cocoReset"
+                                >
+                                    Reset
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="primary-button"
+                                    id="cocoGenerate"
+                                >
+                                    Generate PDF
+                                </button>
+
+                            </div>
+
+
+                            <p
+                                id="cocoStatus"
+                                class="status-text"
+                            >
+                                Ready
+                            </p>
+
+                        </aside>
 
                     </div>
 
                 </div>
 
 
+                <!-- COCO ADDRESS -->
 
-                <!-- BOX / REPEAT -->
+                <div
+                    class="tool-mode hidden"
+                    id="cocoblueAddressMode"
+                >
 
-                <div class="workspace-card">
+                    <div class="workspace-grid">
 
-                    <div class="workspace-card-title">
+                        <div class="workspace-controls">
 
-                        <span>
-                            03
-                        </span>
+                            <div class="workspace-card">
 
-                        <div>
+                                <div class="card-title">
 
-                            <h3>
-                                Sticker Layout
-                            </h3>
+                                    <span>01</span>
 
-                            <p>
-                                Control box and page repetition
+                                    <div>
+                                        <h3>Address</h3>
+                                        <p>From and To</p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="two-fields">
+
+                                    <div>
+                                        <label>From Address</label>
+
+                                        <textarea
+                                            id="cocoFrom"
+                                            rows="8"
+                                            placeholder="Sender address..."
+                                        ></textarea>
+                                    </div>
+
+
+                                    <div>
+                                        <label>To Address</label>
+
+                                        <textarea
+                                            id="cocoTo"
+                                            rows="8"
+                                            placeholder="Receiver address..."
+                                        ></textarea>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="workspace-card">
+
+                                <div class="card-title">
+
+                                    <span>02</span>
+
+                                    <div>
+                                        <h3>Page & Design</h3>
+                                        <p>Address label settings</p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="page-grid">
+
+                                    <button
+                                        type="button"
+                                        class="page-choice active"
+                                        data-coco-address-size="4x6"
+                                    >
+                                        <strong>4 × 6</strong>
+                                        <small>inch</small>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="page-choice"
+                                        data-coco-address-size="a4"
+                                    >
+                                        <strong>A4</strong>
+                                        <small>210 × 297 mm</small>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="page-choice"
+                                        data-coco-address-size="70x35"
+                                    >
+                                        <strong>70 × 35</strong>
+                                        <small>mm</small>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="page-choice"
+                                        data-coco-address-size="custom"
+                                    >
+                                        <strong>Custom</strong>
+                                        <small>mm</small>
+                                    </button>
+
+                                </div>
+
+
+                                <div class="setting-row">
+
+                                    <div>
+                                        <strong>Border</strong>
+                                        <small>Enable border</small>
+                                    </div>
+
+                                    <label class="switch">
+
+                                        <input
+                                            type="checkbox"
+                                            id="cocoAddressBorder"
+                                        >
+
+                                        <span></span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <div class="two-fields">
+
+                                    <div>
+
+                                        <label>
+                                            Border
+                                        </label>
+
+                                        <select
+                                            id="cocoAddressBorderStyle"
+                                        >
+                                            <option value="solid-dark">
+                                                Dark Solid
+                                            </option>
+
+                                            <option value="solid-medium">
+                                                Medium Solid
+                                            </option>
+
+                                            <option value="solid-light">
+                                                Light Solid
+                                            </option>
+
+                                            <option value="double">
+                                                Double
+                                            </option>
+
+                                            <option value="dashed">
+                                                Dashed
+                                            </option>
+
+                                            <option value="dotted">
+                                                Dotted
+                                            </option>
+
+                                            <option value="bold">
+                                                Bold
+                                            </option>
+                                        </select>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label>
+                                            Font
+                                        </label>
+
+                                        <select
+                                            id="cocoAddressFont"
+                                        >
+
+                                            <option>Arial</option>
+                                            <option>Calibri</option>
+                                            <option>Georgia</option>
+                                            <option>Verdana</option>
+                                            <option>Times New Roman</option>
+                                            <option>Trebuchet MS</option>
+                                            <option>Tahoma</option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label>
+                                        Font Size
+                                    </label>
+
+                                    <select
+                                        id="cocoAddressFontSize"
+                                    >
+                                        <option>10</option>
+                                        <option>12</option>
+                                        <option>14</option>
+                                        <option>16</option>
+                                        <option>18</option>
+                                        <option>20</option>
+                                        <option>22</option>
+                                        <option>24</option>
+                                        <option>26</option>
+                                        <option>28</option>
+                                        <option>30</option>
+                                        <option>32</option>
+                                        <option>34</option>
+                                        <option>36</option>
+                                        <option>38</option>
+                                        <option>40</option>
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <aside class="preview-panel">
+
+                            <div class="preview-heading">
+
+                                <div>
+                                    <span>LIVE PREVIEW</span>
+                                    <h3>Address Label</h3>
+                                </div>
+
+                            </div>
+
+
+                            <div class="preview-stage">
+
+                                <div
+                                    id="cocoAddressPreview"
+                                    class="address-preview"
+                                >
+
+                                    <div id="cocoFromPreview">
+                                        FROM
+                                    </div>
+
+                                    <hr>
+
+                                    <div id="cocoToPreview">
+                                        TO
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="action-row">
+
+                                <button
+                                    type="button"
+                                    class="secondary-button"
+                                    id="cocoAddressReset"
+                                >
+                                    Reset
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="primary-button"
+                                    id="cocoAddressGenerate"
+                                >
+                                    Generate PDF
+                                </button>
+
+                            </div>
+
+
+                            <p
+                                id="cocoAddressStatus"
+                                class="status-text"
+                            >
+                                Ready
                             </p>
 
-                        </div>
-
-                    </div>
-
-
-                    <div class="cocoblue-settings-grid">
-
-
-                        <div>
-
-                            <label>
-                                Start Box
-                            </label>
-
-                            <input
-                                type="number"
-                                id="cocoblueStartBox"
-                                value="1"
-                                min="1"
-                            >
-
-                        </div>
-
-
-                        <div>
-
-                            <label>
-                                End Box
-                            </label>
-
-                            <input
-                                type="number"
-                                id="cocoblueEndBox"
-                                value="10"
-                                min="1"
-                            >
-
-                        </div>
-
-
-                        <div>
-
-                            <label>
-                                Labels / Page
-                            </label>
-
-                            <select
-                                id="cocoblueLabelsPerPage"
-                            >
-
-                                <option value="1">
-                                    1
-                                </option>
-
-                                <option value="2">
-                                    2
-                                </option>
-
-                                <option value="3">
-                                    3
-                                </option>
-
-                                <option value="4">
-                                    4
-                                </option>
-
-                                <option value="5">
-                                    5
-                                </option>
-
-                                <option value="6">
-                                    6
-                                </option>
-
-                                <option value="7">
-                                    7
-                                </option>
-
-                                <option value="8">
-                                    8
-                                </option>
-
-                                <option value="9">
-                                    9
-                                </option>
-
-                                <option value="10">
-                                    10
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div>
-
-                            <label>
-                                Page Count
-                            </label>
-
-                            <select
-                                id="cocobluePageCount"
-                            >
-
-                                <option value="1">
-                                    1
-                                </option>
-
-                                <option value="2">
-                                    2
-                                </option>
-
-                                <option value="3">
-                                    3
-                                </option>
-
-                                <option value="4">
-                                    4
-                                </option>
-
-                                <option value="5">
-                                    5
-                                </option>
-
-                                <option value="6">
-                                    6
-                                </option>
-
-                                <option value="7">
-                                    7
-                                </option>
-
-                                <option value="8">
-                                    8
-                                </option>
-
-                                <option value="9">
-                                    9
-                                </option>
-
-                                <option value="10">
-                                    10
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- DESIGN -->
-
-                <div class="workspace-card">
-
-                    <div class="workspace-card-title">
-
-                        <span>
-                            04
-                        </span>
-
-                        <div>
-
-                            <h3>
-                                Label Design
-                            </h3>
-
-                            <p>
-                                Border and typography controls
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Border toggle -->
-
-                    <div class="workspace-setting-row">
-
-                        <div>
-
-                            <strong>
-                                Page Border
-                            </strong>
-
-                            <small>
-                                Show border on the printed page
-                            </small>
-
-                        </div>
-
-
-                        <label
-                            class="workspace-switch"
-                        >
-
-                            <input
-                                type="checkbox"
-                                id="cocoblueBorderEnabled"
-                            >
-
-                            <span></span>
-
-                        </label>
-
-                    </div>
-
-
-
-                    <div class="workspace-two-column">
-
-                        <div>
-
-                            <label>
-                                Border Design
-                            </label>
-
-                            <select
-                                id="cocoblueBorderStyle"
-                            >
-
-                                <option value="dark">
-                                    Dark Solid
-                                </option>
-
-                                <option value="medium">
-                                    Medium Solid
-                                </option>
-
-                                <option value="light">
-                                    Light Solid
-                                </option>
-
-                                <option value="double">
-                                    Double
-                                </option>
-
-                                <option value="dashed">
-                                    Dashed
-                                </option>
-
-                                <option value="dot">
-                                    Dotted
-                                </option>
-
-                                <option value="bold">
-                                    Bold
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div>
-
-                            <label>
-                                Font
-                            </label>
-
-                            <select
-                                id="cocoblueFont"
-                            >
-
-                                <option value="Arial">
-                                    Arial
-                                </option>
-
-                                <option value="Calibri">
-                                    Calibri
-                                </option>
-
-                                <option value="Georgia">
-                                    Georgia
-                                </option>
-
-                                <option value="Verdana">
-                                    Verdana
-                                </option>
-
-                                <option value="Times New Roman">
-                                    Times New Roman
-                                </option>
-
-                                <option value="Trebuchet MS">
-                                    Trebuchet MS
-                                </option>
-
-                                <option value="Tahoma">
-                                    Tahoma
-                                </option>
-
-                                <option value="Courier New">
-                                    Courier New
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <div class="workspace-two-column">
-
-                        <div>
-
-                            <label>
-                                Font Size
-                            </label>
-
-                            <select
-                                id="cocoblueFontSize"
-                            >
-
-                                <option value="10">
-                                    10
-                                </option>
-
-                                <option value="12">
-                                    12
-                                </option>
-
-                                <option value="14">
-                                    14
-                                </option>
-
-                                <option value="16">
-                                    16
-                                </option>
-
-                                <option value="18">
-                                    18
-                                </option>
-
-                                <option value="20">
-                                    20
-                                </option>
-
-                                <option value="22">
-                                    22
-                                </option>
-
-                                <option value="24">
-                                    24
-                                </option>
-
-                                <option value="26">
-                                    26
-                                </option>
-
-                                <option value="28">
-                                    28
-                                </option>
-
-                                <option value="30">
-                                    30
-                                </option>
-
-                                <option value="32">
-                                    32
-                                </option>
-
-                                <option value="34">
-                                    34
-                                </option>
-
-                                <option value="36">
-                                    36
-                                </option>
-
-                                <option value="38">
-                                    38
-                                </option>
-
-                                <option value="40">
-                                    40
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div>
-
-                            <label>
-                                Font Weight
-                            </label>
-
-                            <select
-                                id="cocoblueFontWeight"
-                            >
-
-                                <option value="normal">
-                                    Regular
-                                </option>
-
-                                <option value="bold">
-                                    Bold
-                                </option>
-
-                            </select>
-
-                        </div>
+                        </aside>
 
                     </div>
 
@@ -809,677 +1254,1676 @@
             </div>
 
 
+            <!-- =============================================
+                 OTHER PO
+            ============================================== -->
 
-            <!-- RIGHT PREVIEW -->
+            <div
+                class="tool-workspace"
+                id="otherpoWorkspace"
+            >
 
-            <div class="workspace-preview">
-
-                <div class="workspace-preview-header">
-
-                    <div>
-
-                        <span>
-                            LIVE PREVIEW
-                        </span>
-
-                        <h3>
-                            Sticker Page
-                        </h3>
-
-                    </div>
-
+                <div class="workspace-header">
 
                     <div>
 
-                        <button
-                            type="button"
-                            id="cocoblueZoomOut"
-                        >
-                            −
-                        </button>
+                        <span>OTHER PO</span>
 
-                        <span
-                            id="cocoblueZoomValue"
-                        >
-                            100%
-                        </span>
+                        <h2>Other PO</h2>
 
-                        <button
-                            type="button"
-                            id="cocoblueZoomIn"
-                        >
-                            +
-                        </button>
+                        <p>
+                            PO, box and address labels.
+                        </p>
 
                     </div>
+
+                    <button
+                        type="button"
+                        class="back-button"
+                        data-close-tool
+                    >
+                        Back to Tools
+                    </button>
 
                 </div>
 
+
+                <div class="workspace-tabs">
+
+                    <button
+                        type="button"
+                        class="workspace-tab active"
+                        data-other-mode="sticker"
+                    >
+                        Sticker Page
+                    </button>
+
+                    <button
+                        type="button"
+                        class="workspace-tab"
+                        data-other-mode="address"
+                    >
+                        Address Print
+                    </button>
+
+                </div>
 
 
                 <div
-                    class="workspace-preview-canvas"
+                    id="otherStickerMode"
+                    class="tool-mode"
                 >
 
-                    <div
-                        id="cocoblueStickerPreview"
-                        class="cocoblue-label-preview"
-                    >
+                    <div class="workspace-grid">
 
-                        <div
-                            id="cocobluePreviewPO"
-                            class="cocoblue-preview-po"
-                        >
-                            BWG123
+
+                        <div class="workspace-controls">
+
+
+                            <div class="workspace-card">
+
+                                <div class="card-title">
+
+                                    <span>01</span>
+
+                                    <div>
+                                        <h3>PO Input</h3>
+                                        <p>Manual or Excel</p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mini-tabs">
+
+                                    <button
+                                        type="button"
+                                        class="mini-tab active"
+                                        data-other-input="manual"
+                                    >
+                                        Manual
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="mini-tab"
+                                        data-other-input="excel"
+                                    >
+                                        Excel
+                                    </button>
+
+                                </div>
+
+
+                                <div id="otherManualArea">
+
+                                    <div class="po-grid">
+
+                                        <input class="other-po" placeholder="PO 01">
+                                        <input class="other-po" placeholder="PO 02">
+                                        <input class="other-po" placeholder="PO 03">
+                                        <input class="other-po" placeholder="PO 04">
+                                        <input class="other-po" placeholder="PO 05">
+                                        <input class="other-po" placeholder="PO 06">
+                                        <input class="other-po" placeholder="PO 07">
+                                        <input class="other-po" placeholder="PO 08">
+                                        <input class="other-po" placeholder="PO 09">
+                                        <input class="other-po" placeholder="PO 10">
+
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    id="otherExcelArea"
+                                    class="hidden"
+                                >
+
+                                    <label
+                                        class="upload-box"
+                                        for="otherExcel"
+                                    >
+
+                                        <strong>
+                                            Upload Excel
+                                        </strong>
+
+                                        <small>
+                                            PO number in first column
+                                        </small>
+
+                                    </label>
+
+                                    <input
+                                        type="file"
+                                        id="otherExcel"
+                                        accept=".xlsx,.xls,.csv"
+                                        hidden
+                                    >
+
+                                    <div
+                                        id="otherExcelStatus"
+                                        class="file-status"
+                                    >
+                                        No file selected
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="workspace-card">
+
+                                <div class="card-title">
+
+                                    <span>02</span>
+
+                                    <div>
+                                        <h3>Box Layout</h3>
+                                        <p>Control the box sequence</p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="layout-buttons">
+
+                                    <label class="layout-option active">
+
+                                        <input
+                                            type="radio"
+                                            name="otherLayout"
+                                            value="same"
+                                            checked
+                                        >
+
+                                        <span>
+                                            <strong>Repeat Same Box</strong>
+                                            <small>
+                                                BOX 1 repeated
+                                            </small>
+                                        </span>
+
+                                    </label>
+
+
+                                    <label class="layout-option">
+
+                                        <input
+                                            type="radio"
+                                            name="otherLayout"
+                                            value="sequential"
+                                        >
+
+                                        <span>
+                                            <strong>Sequential Boxes</strong>
+                                            <small>
+                                                BOX 1 → BOX 2 → BOX 3
+                                            </small>
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <div class="four-fields">
+
+                                    <div>
+
+                                        <label>
+                                            Start Box
+                                        </label>
+
+                                        <input
+                                            id="otherStartBox"
+                                            type="number"
+                                            value="1"
+                                            min="1"
+                                        >
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label>
+                                            End Box
+                                        </label>
+
+                                        <input
+                                            id="otherEndBox"
+                                            type="number"
+                                            value="10"
+                                            min="1"
+                                        >
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label>
+                                            Labels/Page
+                                        </label>
+
+                                        <select id="otherLabelsPerPage">
+
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                            <option>6</option>
+                                            <option>7</option>
+                                            <option>8</option>
+                                            <option>9</option>
+                                            <option>10</option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label>
+                                            Page Count
+                                        </label>
+
+                                        <select id="otherPageCount">
+
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                            <option>6</option>
+                                            <option>7</option>
+                                            <option>8</option>
+                                            <option>9</option>
+                                            <option>10</option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="workspace-card">
+
+                                <div class="card-title">
+
+                                    <span>03</span>
+
+                                    <div>
+                                        <h3>Page & Design</h3>
+                                        <p>Print settings</p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="page-grid">
+
+                                    <button
+                                        type="button"
+                                        class="page-choice active"
+                                        data-other-size="4x6"
+                                    >
+                                        <strong>4 × 6</strong>
+                                        <small>inch</small>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="page-choice"
+                                        data-other-size="a4"
+                                    >
+                                        <strong>A4</strong>
+                                        <small>210 × 297 mm</small>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="page-choice"
+                                        data-other-size="70x35"
+                                    >
+                                        <strong>70 × 35</strong>
+                                        <small>mm</small>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="page-choice"
+                                        data-other-size="custom"
+                                    >
+                                        <strong>Custom</strong>
+                                        <small>mm</small>
+                                    </button>
+
+                                </div>
+
+
+                                <div
+                                    id="otherCustomSize"
+                                    class="custom-grid hidden"
+                                >
+
+                                    <input
+                                        id="otherCustomWidth"
+                                        type="number"
+                                        placeholder="Width mm"
+                                    >
+
+                                    <input
+                                        id="otherCustomHeight"
+                                        type="number"
+                                        placeholder="Height mm"
+                                    >
+
+                                </div>
+
+
+                                <div class="setting-row">
+
+                                    <div>
+                                        <strong>Border</strong>
+                                        <small>
+                                            Enable page border
+                                        </small>
+                                    </div>
+
+                                    <label class="switch">
+                                        <input
+                                            type="checkbox"
+                                            id="otherBorder"
+                                        >
+                                        <span></span>
+                                    </label>
+
+                                </div>
+
+
+                                <div class="two-fields">
+
+                                    <div>
+
+                                        <label>Border</label>
+
+                                        <select id="otherBorderStyle">
+
+                                            <option value="solid-dark">
+                                                Dark Solid
+                                            </option>
+
+                                            <option value="solid-medium">
+                                                Medium Solid
+                                            </option>
+
+                                            <option value="solid-light">
+                                                Light Solid
+                                            </option>
+
+                                            <option value="double">
+                                                Double
+                                            </option>
+
+                                            <option value="dashed">
+                                                Dashed
+                                            </option>
+
+                                            <option value="dotted">
+                                                Dotted
+                                            </option>
+
+                                            <option value="bold">
+                                                Bold
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label>Font</label>
+
+                                        <select id="otherFont">
+
+                                            <option>Arial</option>
+                                            <option>Calibri</option>
+                                            <option>Georgia</option>
+                                            <option>Verdana</option>
+                                            <option>Times New Roman</option>
+                                            <option>Trebuchet MS</option>
+                                            <option>Tahoma</option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label>Font Size</label>
+
+                                    <select id="otherFontSize">
+
+                                        <option>10</option>
+                                        <option>12</option>
+                                        <option>14</option>
+                                        <option>16</option>
+                                        <option>18</option>
+                                        <option>20</option>
+                                        <option>22</option>
+                                        <option>24</option>
+                                        <option>26</option>
+                                        <option>28</option>
+                                        <option>30</option>
+                                        <option>32</option>
+                                        <option>34</option>
+                                        <option>36</option>
+                                        <option>38</option>
+                                        <option>40</option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
                         </div>
 
 
+                        <aside class="preview-panel">
+
+                            <div class="preview-heading">
+
+                                <div>
+                                    <span>LIVE PREVIEW</span>
+                                    <h3>Other PO</h3>
+                                </div>
+
+                            </div>
+
+
+                            <div class="preview-stage">
+
+                                <div
+                                    id="otherPreview"
+                                    class="paper-preview"
+                                >
+
+                                    <strong id="otherPreviewPO">
+                                        BWG123
+                                    </strong>
+
+                                    <strong id="otherPreviewBox">
+                                        BOX 1
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="preview-info">
+
+                                <div>
+                                    <span>Page</span>
+                                    <strong id="otherSizeSummary">
+                                        4 × 6 inch
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>Labels/Page</span>
+                                    <strong id="otherLabelsSummary">
+                                        1
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>Pages</span>
+                                    <strong id="otherPagesSummary">
+                                        1
+                                    </strong>
+                                </div>
+
+                            </div>
+
+
+                            <div class="action-row">
+
+                                <button
+                                    class="secondary-button"
+                                    id="otherReset"
+                                >
+                                    Reset
+                                </button>
+
+                                <button
+                                    class="primary-button"
+                                    id="otherGenerate"
+                                >
+                                    Generate PDF
+                                </button>
+
+                            </div>
+
+
+                            <p
+                                id="otherStatus"
+                                class="status-text"
+                            >
+                                Ready
+                            </p>
+
+                        </aside>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OTHER ADDRESS -->
+
+                <div
+                    id="otherAddressMode"
+                    class="tool-mode hidden"
+                >
+
+                    <div class="workspace-grid">
+
+                        <div class="workspace-controls">
+
+                            <div class="workspace-card">
+
+                                <div class="card-title">
+
+                                    <span>01</span>
+
+                                    <div>
+                                        <h3>Address</h3>
+                                        <p>From and To</p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="two-fields">
+
+                                    <div>
+
+                                        <label>
+                                            From Address
+                                        </label>
+
+                                        <textarea
+                                            id="otherFrom"
+                                            rows="8"
+                                            placeholder="Sender address..."
+                                        ></textarea>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label>
+                                            To Address
+                                        </label>
+
+                                        <textarea
+                                            id="otherTo"
+                                            rows="8"
+                                            placeholder="Receiver address..."
+                                        ></textarea>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="workspace-card">
+
+                                <div class="card-title">
+
+                                    <span>02</span>
+
+                                    <div>
+                                        <h3>
+                                            Page & Design
+                                        </h3>
+
+                                        <p>
+                                            Address label settings
+                                        </p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="page-grid">
+
+                                    <button
+                                        class="page-choice active"
+                                        data-other-address-size="4x6"
+                                    >
+                                        <strong>4 × 6</strong>
+                                        <small>inch</small>
+                                    </button>
+
+                                    <button
+                                        class="page-choice"
+                                        data-other-address-size="a4"
+                                    >
+                                        <strong>A4</strong>
+                                        <small>210 × 297 mm</small>
+                                    </button>
+
+                                    <button
+                                        class="page-choice"
+                                        data-other-address-size="70x35"
+                                    >
+                                        <strong>70 × 35</strong>
+                                        <small>mm</small>
+                                    </button>
+
+                                    <button
+                                        class="page-choice"
+                                        data-other-address-size="custom"
+                                    >
+                                        <strong>Custom</strong>
+                                        <small>mm</small>
+                                    </button>
+
+                                </div>
+
+
+                                <div class="setting-row">
+
+                                    <div>
+                                        <strong>Border</strong>
+                                        <small>
+                                            Enable border
+                                        </small>
+                                    </div>
+
+                                    <label class="switch">
+
+                                        <input
+                                            id="otherAddressBorder"
+                                            type="checkbox"
+                                        >
+
+                                        <span></span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <div class="two-fields">
+
+                                    <div>
+
+                                        <label>
+                                            Border
+                                        </label>
+
+                                        <select
+                                            id="otherAddressBorderStyle"
+                                        >
+
+                                            <option value="solid-dark">
+                                                Dark Solid
+                                            </option>
+
+                                            <option value="solid-medium">
+                                                Medium Solid
+                                            </option>
+
+                                            <option value="solid-light">
+                                                Light Solid
+                                            </option>
+
+                                            <option value="double">
+                                                Double
+                                            </option>
+
+                                            <option value="dashed">
+                                                Dashed
+                                            </option>
+
+                                            <option value="dotted">
+                                                Dotted
+                                            </option>
+
+                                            <option value="bold">
+                                                Bold
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label>
+                                            Font
+                                        </label>
+
+                                        <select
+                                            id="otherAddressFont"
+                                        >
+
+                                            <option>Arial</option>
+                                            <option>Calibri</option>
+                                            <option>Georgia</option>
+                                            <option>Verdana</option>
+                                            <option>Times New Roman</option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label>
+                                        Font Size
+                                    </label>
+
+                                    <select
+                                        id="otherAddressFontSize"
+                                    >
+
+                                        <option>10</option>
+                                        <option>12</option>
+                                        <option>14</option>
+                                        <option>16</option>
+                                        <option>18</option>
+                                        <option>20</option>
+                                        <option>22</option>
+                                        <option>24</option>
+                                        <option>26</option>
+                                        <option>28</option>
+                                        <option>30</option>
+                                        <option>32</option>
+                                        <option>34</option>
+                                        <option>36</option>
+                                        <option>38</option>
+                                        <option>40</option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <aside class="preview-panel">
+
+                            <div class="preview-heading">
+
+                                <div>
+                                    <span>LIVE PREVIEW</span>
+                                    <h3>Address Label</h3>
+                                </div>
+
+                            </div>
+
+
+                            <div class="preview-stage">
+
+                                <div
+                                    id="otherAddressPreview"
+                                    class="address-preview"
+                                >
+
+                                    <div id="otherFromPreview">
+                                        FROM
+                                    </div>
+
+                                    <hr>
+
+                                    <div id="otherToPreview">
+                                        TO
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="action-row">
+
+                                <button
+                                    class="secondary-button"
+                                    id="otherAddressReset"
+                                >
+                                    Reset
+                                </button>
+
+                                <button
+                                    class="primary-button"
+                                    id="otherAddressGenerate"
+                                >
+                                    Generate PDF
+                                </button>
+
+                            </div>
+
+
+                            <p
+                                id="otherAddressStatus"
+                                class="status-text"
+                            >
+                                Ready
+                            </p>
+
+                        </aside>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 ISBN
+            ============================================== -->
+
+            <div
+                class="tool-workspace"
+                id="isbnWorkspace"
+            >
+
+                <div class="workspace-header">
+
+                    <div>
+
+                        <span>ISBN BARCODE</span>
+
+                        <h2>
+                            ISBN Barcode Generator
+                        </h2>
+
+                        <p>
+                            Generate ISBN/EAN-13 book labels.
+                        </p>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="back-button"
+                        data-close-tool
+                    >
+                        Back to Tools
+                    </button>
+
+                </div>
+
+
+                <div class="workspace-tabs">
+
+                    <button
+                        class="workspace-tab active"
+                        data-isbn-input="manual"
+                    >
+                        Manual Entry
+                    </button>
+
+                    <button
+                        class="workspace-tab"
+                        data-isbn-input="excel"
+                    >
+                        Excel Upload
+                    </button>
+
+                </div>
+
+
+                <div class="workspace-grid">
+
+                    <div class="workspace-controls">
+
+
+                        <!-- ISBN MANUAL -->
+
                         <div
-                            id="cocobluePreviewBox"
-                            class="cocoblue-preview-box"
+                            class="workspace-card"
+                            id="isbnManualCard"
                         >
-                            BOX 1
+
+                            <div class="card-title">
+
+                                <span>01</span>
+
+                                <div>
+
+                                    <h3>
+                                        Book Details
+                                    </h3>
+
+                                    <p>
+                                        ISBN and title are mandatory
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="isbn-grid">
+
+                                <div class="isbn-row">
+
+                                    <input
+                                        class="isbn-manual"
+                                        data-row="0"
+                                        placeholder="ISBN 1"
+                                    >
+
+                                    <input
+                                        class="title-manual"
+                                        data-row="0"
+                                        placeholder="Book Name 1"
+                                    >
+
+                                    <input
+                                        class="edition-manual"
+                                        data-row="0"
+                                        placeholder="Edition 1"
+                                    >
+
+                                </div>
+
+
+                                <div class="isbn-row">
+
+                                    <input
+                                        class="isbn-manual"
+                                        data-row="1"
+                                        placeholder="ISBN 2"
+                                    >
+
+                                    <input
+                                        class="title-manual"
+                                        data-row="1"
+                                        placeholder="Book Name 2"
+                                    >
+
+                                    <input
+                                        class="edition-manual"
+                                        data-row="1"
+                                        placeholder="Edition 2"
+                                    >
+
+                                </div>
+
+
+                                <div class="isbn-row">
+
+                                    <input
+                                        class="isbn-manual"
+                                        data-row="2"
+                                        placeholder="ISBN 3"
+                                    >
+
+                                    <input
+                                        class="title-manual"
+                                        data-row="2"
+                                        placeholder="Book Name 3"
+                                    >
+
+                                    <input
+                                        class="edition-manual"
+                                        data-row="2"
+                                        placeholder="Edition 3"
+                                    >
+
+                                </div>
+
+
+                                <div class="isbn-row">
+
+                                    <input
+                                        class="isbn-manual"
+                                        data-row="3"
+                                        placeholder="ISBN 4"
+                                    >
+
+                                    <input
+                                        class="title-manual"
+                                        data-row="3"
+                                        placeholder="Book Name 4"
+                                    >
+
+                                    <input
+                                        class="edition-manual"
+                                        data-row="3"
+                                        placeholder="Edition 4"
+                                    >
+
+                                </div>
+
+
+                                <div class="isbn-row">
+
+                                    <input
+                                        class="isbn-manual"
+                                        data-row="4"
+                                        placeholder="ISBN 5"
+                                    >
+
+                                    <input
+                                        class="title-manual"
+                                        data-row="4"
+                                        placeholder="Book Name 5"
+                                    >
+
+                                    <input
+                                        class="edition-manual"
+                                        data-row="4"
+                                        placeholder="Edition 5"
+                                    >
+
+                                </div>
+
+
+                                <div class="isbn-row">
+
+                                    <input
+                                        class="isbn-manual"
+                                        data-row="5"
+                                        placeholder="ISBN 6"
+                                    >
+
+                                    <input
+                                        class="title-manual"
+                                        data-row="5"
+                                        placeholder="Book Name 6"
+                                    >
+
+                                    <input
+                                        class="edition-manual"
+                                        data-row="5"
+                                        placeholder="Edition 6"
+                                    >
+
+                                </div>
+
+
+                                <div class="isbn-row">
+
+                                    <input
+                                        class="isbn-manual"
+                                        data-row="6"
+                                        placeholder="ISBN 7"
+                                    >
+
+                                    <input
+                                        class="title-manual"
+                                        data-row="6"
+                                        placeholder="Book Name 7"
+                                    >
+
+                                    <input
+                                        class="edition-manual"
+                                        data-row="6"
+                                        placeholder="Edition 7"
+                                    >
+
+                                </div>
+
+
+                                <div class="isbn-row">
+
+                                    <input
+                                        class="isbn-manual"
+                                        data-row="7"
+                                        placeholder="ISBN 8"
+                                    >
+
+                                    <input
+                                        class="title-manual"
+                                        data-row="7"
+                                        placeholder="Book Name 8"
+                                    >
+
+                                    <input
+                                        class="edition-manual"
+                                        data-row="7"
+                                        placeholder="Edition 8"
+                                    >
+
+                                </div>
+
+
+                                <div class="isbn-row">
+
+                                    <input
+                                        class="isbn-manual"
+                                        data-row="8"
+                                        placeholder="ISBN 9"
+                                    >
+
+                                    <input
+                                        class="title-manual"
+                                        data-row="8"
+                                        placeholder="Book Name 9"
+                                    >
+
+                                    <input
+                                        class="edition-manual"
+                                        data-row="8"
+                                        placeholder="Edition 9"
+                                    >
+
+                                </div>
+
+
+                                <div class="isbn-row">
+
+                                    <input
+                                        class="isbn-manual"
+                                        data-row="9"
+                                        placeholder="ISBN 10"
+                                    >
+
+                                    <input
+                                        class="title-manual"
+                                        data-row="9"
+                                        placeholder="Book Name 10"
+                                    >
+
+                                    <input
+                                        class="edition-manual"
+                                        data-row="9"
+                                        placeholder="Edition 10"
+                                    >
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ISBN EXCEL -->
+
+                        <div
+                            class="workspace-card hidden"
+                            id="isbnExcelCard"
+                        >
+
+                            <div class="card-title">
+
+                                <span>01</span>
+
+                                <div>
+                                    <h3>Excel Upload</h3>
+
+                                    <p>
+                                        ISBN | Book Name | Edition
+                                    </p>
+                                </div>
+
+                            </div>
+
+
+                            <label
+                                class="upload-box"
+                                for="isbnExcel"
+                            >
+
+                                <strong>
+                                    Upload Excel File
+                                </strong>
+
+                                <small>
+                                    Column 1 = ISBN<br>
+                                    Column 2 = Book Name<br>
+                                    Column 3 = Edition
+                                </small>
+
+                            </label>
+
+
+                            <input
+                                id="isbnExcel"
+                                type="file"
+                                accept=".xlsx,.xls,.csv"
+                                hidden
+                            >
+
+
+                            <div
+                                id="isbnExcelStatus"
+                                class="file-status"
+                            >
+                                No file selected
+                            </div>
+
+                        </div>
+
+
+                        <!-- ISBN DESIGN -->
+
+                        <div class="workspace-card">
+
+                            <div class="card-title">
+
+                                <span>02</span>
+
+                                <div>
+
+                                    <h3>
+                                        Barcode Settings
+                                    </h3>
+
+                                    <p>
+                                        Label design
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="two-fields">
+
+                                <div>
+
+                                    <label>
+                                        Page Size
+                                    </label>
+
+                                    <select id="isbnPageSize">
+
+                                        <option value="4x6">
+                                            4 × 6 inch
+                                        </option>
+
+                                        <option value="a4">
+                                            A4
+                                        </option>
+
+                                        <option value="70x35">
+                                            70 × 35 mm
+                                        </option>
+
+                                        <option value="custom">
+                                            Custom
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label>
+                                        Font Size
+                                    </label>
+
+                                    <select id="isbnFontSize">
+
+                                        <option>10</option>
+                                        <option>12</option>
+                                        <option>14</option>
+                                        <option>16</option>
+                                        <option>18</option>
+                                        <option>20</option>
+                                        <option>22</option>
+                                        <option>24</option>
+                                        <option>26</option>
+                                        <option>28</option>
+                                        <option>30</option>
+                                        <option>32</option>
+                                        <option>34</option>
+                                        <option>36</option>
+                                        <option>38</option>
+                                        <option>40</option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="setting-row">
+
+                                <div>
+
+                                    <strong>
+                                        Page Border
+                                    </strong>
+
+                                    <small>
+                                        Add border
+                                    </small>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input
+                                        id="isbnBorder"
+                                        type="checkbox"
+                                    >
+
+                                    <span></span>
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="two-fields">
+
+                                <div>
+
+                                    <label>
+                                        Border Design
+                                    </label>
+
+                                    <select id="isbnBorderStyle">
+
+                                        <option value="solid-dark">
+                                            Dark Solid
+                                        </option>
+
+                                        <option value="solid-medium">
+                                            Medium Solid
+                                        </option>
+
+                                        <option value="solid-light">
+                                            Light Solid
+                                        </option>
+
+                                        <option value="double">
+                                            Double
+                                        </option>
+
+                                        <option value="dashed">
+                                            Dashed
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label>
+                                        Labels / Page
+                                    </label>
+
+                                    <select id="isbnLabelsPerPage">
+
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                        <option>6</option>
+                                        <option>8</option>
+                                        <option>9</option>
+                                        <option>10</option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
                         </div>
 
                     </div>
 
+
+                    <!-- ISBN PREVIEW -->
+
+                    <aside class="preview-panel">
+
+                        <div class="preview-heading">
+
+                            <div>
+
+                                <span>LIVE PREVIEW</span>
+
+                                <h3>
+                                    ISBN Barcode
+                                </h3>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="preview-stage">
+
+                            <div
+                                id="isbnPreview"
+                                class="isbn-preview"
+                            >
+
+                                <div
+                                    id="isbnBarcode"
+                                    class="barcode-preview"
+                                >
+                                </div>
+
+                                <strong
+                                    id="isbnPreviewNumber"
+                                >
+                                    9780000000000
+                                </strong>
+
+                                <strong
+                                    id="isbnPreviewTitle"
+                                >
+                                    Book Title
+                                </strong>
+
+                                <span
+                                    id="isbnPreviewEdition"
+                                >
+                                    N
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="action-row">
+
+                            <button
+                                class="secondary-button"
+                                id="isbnReset"
+                            >
+                                Reset
+                            </button>
+
+                            <button
+                                class="primary-button"
+                                id="isbnGenerate"
+                            >
+                                Generate PDF
+                            </button>
+
+                        </div>
+
+
+                        <p
+                            id="isbnStatus"
+                            class="status-text"
+                        >
+                            Ready
+                        </p>
+
+                    </aside>
+
                 </div>
 
+            </div>
+
+        </section>
 
 
-                <div class="workspace-preview-summary">
+        <!-- =================================================
+             CONTACT
+        ================================================== -->
 
-                    <div>
+        <section
+            class="contact-section"
+            id="contact"
+        >
 
-                        <span>
-                            Page Size
-                        </span>
+            <div>
 
-                        <strong
-                            id="cocoblueSummarySize"
-                        >
-                            4 × 6 inch
-                        </strong>
+                <span>NEED HELP?</span>
 
-                    </div>
+                <h2>
+                    Contact the workspace owner.
+                </h2>
 
-
-                    <div>
-
-                        <span>
-                            Labels / Page
-                        </span>
-
-                        <strong
-                            id="cocoblueSummaryLabels"
-                        >
-                            1
-                        </strong>
-
-                    </div>
-
-
-                    <div>
-
-                        <span>
-                            Pages
-                        </span>
-
-                        <strong
-                            id="cocoblueSummaryPages"
-                        >
-                            1
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="workspace-actions">
-
-                    <button
-                        type="button"
-                        id="cocoblueReset"
-                        class="workspace-reset-button"
-                    >
-                        Reset
-                    </button>
-
-
-                    <button
-                        type="button"
-                        id="cocoblueGeneratePDF"
-                        class="workspace-generate-button"
-                    >
-                        Generate PDF
-                    </button>
-
-                </div>
-
-
-                <p
-                    id="cocoblueStatus"
-                    class="workspace-status"
-                >
-                    Ready to generate
+                <p>
+                    For questions, feedback or improvements.
                 </p>
+
+            </div>
+
+
+            <a
+                href="mailto:ashish.varma@bookswagon.in"
+                class="email-button"
+            >
+                ashish.varma@bookswagon.in
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="site-footer">
+
+        <div class="footer-inner">
+
+            <div class="footer-brand">
+
+                <div>
+
+                    <strong>
+                        BooksWagon Label Studio
+                    </strong>
+
+                    <p>
+                        Internal label generation workspace.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <strong>Tools</strong>
+
+                <a href="#tools">
+                    CocoBlue PO
+                </a>
+
+                <a href="#tools">
+                    Other PO
+                </a>
+
+                <a href="#tools">
+                    ISBN Barcode Generator
+                </a>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <strong>Workspace</strong>
+
+                <a href="#features">
+                    Features
+                </a>
+
+                <a href="#contact">
+                    Contact Us
+                </a>
+
+                <a href="mailto:ashish.varma@bookswagon.in">
+                    Email
+                </a>
 
             </div>
 
         </div>
 
-    </div>
 
-
-
-    <!-- ===============================================
-         ADDRESS PRINT
-    ================================================ -->
-
-    <div
-        id="cocoblueAddressWorkspace"
-        class="workspace-content hidden"
-    >
-
-        <div class="workspace-grid">
-
-
-            <!-- ADDRESS CONTROLS -->
-
-            <div class="workspace-controls">
-
-
-                <div class="workspace-card">
-
-                    <div class="workspace-card-title">
-
-                        <span>
-                            01
-                        </span>
-
-                        <div>
-
-                            <h3>
-                                Address Details
-                            </h3>
-
-                            <p>
-                                Enter From and To address
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="address-form-grid">
-
-
-                        <div>
-
-                            <label>
-                                From Address
-                            </label>
-
-                            <textarea
-                                id="cocoblueFromAddress"
-                                rows="7"
-                                placeholder="Enter sender address..."
-                            ></textarea>
-
-                        </div>
-
-
-                        <div>
-
-                            <label>
-                                To Address
-                            </label>
-
-                            <textarea
-                                id="cocoblueToAddress"
-                                rows="7"
-                                placeholder="Enter receiver address..."
-                            ></textarea>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="workspace-card">
-
-                    <div class="workspace-card-title">
-
-                        <span>
-                            02
-                        </span>
-
-                        <div>
-
-                            <h3>
-                                Page Settings
-                            </h3>
-
-                            <p>
-                                Address label paper size
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="workspace-page-size-grid">
-
-                        <button
-                            type="button"
-                            class="cocoblue-address-page-size active"
-                            data-size="4x6"
-                        >
-                            <strong>
-                                4 × 6
-                            </strong>
-
-                            <small>
-                                Inch
-                            </small>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="cocoblue-address-page-size"
-                            data-size="a4"
-                        >
-                            <strong>
-                                A4
-                            </strong>
-
-                            <small>
-                                210 × 297 mm
-                            </small>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="cocoblue-address-page-size"
-                            data-size="70x35"
-                        >
-                            <strong>
-                                70 × 35
-                            </strong>
-
-                            <small>
-                                mm
-                            </small>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="cocoblue-address-page-size"
-                            data-size="custom"
-                        >
-                            <strong>
-                                Custom
-                            </strong>
-
-                            <small>
-                                Your size
-                            </small>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="workspace-card">
-
-                    <div class="workspace-card-title">
-
-                        <span>
-                            03
-                        </span>
-
-                        <div>
-
-                            <h3>
-                                Address Design
-                            </h3>
-
-                            <p>
-                                Border and font controls
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="workspace-setting-row">
-
-                        <div>
-
-                            <strong>
-                                Page Border
-                            </strong>
-
-                            <small>
-                                Enable border on address label
-                            </small>
-
-                        </div>
-
-
-                        <label
-                            class="workspace-switch"
-                        >
-
-                            <input
-                                type="checkbox"
-                                id="cocoblueAddressBorder"
-                            >
-
-                            <span></span>
-
-                        </label>
-
-                    </div>
-
-
-                    <div class="workspace-two-column">
-
-                        <div>
-
-                            <label>
-                                Border Design
-                            </label>
-
-                            <select
-                                id="cocoblueAddressBorderStyle"
-                            >
-
-                                <option value="dark">
-                                    Dark Solid
-                                </option>
-
-                                <option value="medium">
-                                    Medium Solid
-                                </option>
-
-                                <option value="light">
-                                    Light Solid
-                                </option>
-
-                                <option value="double">
-                                    Double
-                                </option>
-
-                                <option value="dashed">
-                                    Dashed
-                                </option>
-
-                                <option value="dot">
-                                    Dotted
-                                </option>
-
-                                <option value="bold">
-                                    Bold
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div>
-
-                            <label>
-                                Font
-                            </label>
-
-                            <select
-                                id="cocoblueAddressFont"
-                            >
-
-                                <option value="Arial">
-                                    Arial
-                                </option>
-
-                                <option value="Calibri">
-                                    Calibri
-                                </option>
-
-                                <option value="Georgia">
-                                    Georgia
-                                </option>
-
-                                <option value="Verdana">
-                                    Verdana
-                                </option>
-
-                                <option value="Times New Roman">
-                                    Times New Roman
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="workspace-two-column">
-
-                        <div>
-
-                            <label>
-                                Font Size
-                            </label>
-
-                            <select
-                                id="cocoblueAddressFontSize"
-                            >
-
-                                <option value="10">
-                                    10
-                                </option>
-
-                                <option value="12">
-                                    12
-                                </option>
-
-                                <option value="14">
-                                    14
-                                </option>
-
-                                <option value="16">
-                                    16
-                                </option>
-
-                                <option value="18">
-                                    18
-                                </option>
-
-                                <option value="20">
-                                    20
-                                </option>
-
-                                <option value="22">
-                                    22
-                                </option>
-
-                                <option value="24">
-                                    24
-                                </option>
-
-                                <option value="26">
-                                    26
-                                </option>
-
-                                <option value="28">
-                                    28
-                                </option>
-
-                                <option value="30">
-                                    30
-                                </option>
-
-                                <option value="32">
-                                    32
-                                </option>
-
-                                <option value="34">
-                                    34
-                                </option>
-
-                                <option value="36">
-                                    36
-                                </option>
-
-                                <option value="38">
-                                    38
-                                </option>
-
-                                <option value="40">
-                                    40
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div>
-
-                            <label>
-                                Font Weight
-                            </label>
-
-                            <select
-                                id="cocoblueAddressWeight"
-                            >
-
-                                <option value="normal">
-                                    Regular
-                                </option>
-
-                                <option value="bold">
-                                    Bold
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- ADDRESS PREVIEW -->
-
-            <div class="workspace-preview">
-
-                <div class="workspace-preview-header">
-
-                    <div>
-
-                        <span>
-                            LIVE PREVIEW
-                        </span>
-
-                        <h3>
-                            Address Label
-                        </h3>
-
-                    </div>
-
-                </div>
-
-
-
-                <div
-                    class="workspace-preview-canvas"
-                >
-
-                    <div
-                        id="cocoblueAddressPreview"
-                        class="cocoblue-address-preview"
-                    >
-
-                        <div
-                            id="cocobluePreviewFrom"
-                            class="address-from"
-                        >
-                            FROM
-                        </div>
-
-
-                        <div
-                            id="cocobluePreviewTo"
-                            class="address-to"
-                        >
-                            TO
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <div
-                    class="workspace-actions"
-                >
-
-                    <button
-                        type="button"
-                        id="cocoblueAddressReset"
-                        class="workspace-reset-button"
-                    >
-                        Reset
-                    </button>
-
-
-                    <button
-                        type="button"
-                        id="cocoblueAddressPDF"
-                        class="workspace-generate-button"
-                    >
-                        Generate PDF
-                    </button>
-
-                </div>
-
-
-                <p
-                    id="cocoblueAddressStatus"
-                    class="workspace-status"
-                >
-                    Ready to generate
-                </p>
-
-            </div>
+        <div class="footer-bottom">
+
+            <span>
+                © 2026 BooksWagon Label Studio
+            </span>
+
+            <span>
+                Designed & Developed by
+                <strong>
+                    Ashish Verma
+                </strong>
+            </span>
 
         </div>
 
-    </div>
+    </footer>
 
-</section>
+
+    <!-- =====================================================
+         LIBRARIES
+    ====================================================== -->
+
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
