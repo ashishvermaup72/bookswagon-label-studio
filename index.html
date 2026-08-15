@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -14,14 +13,13 @@
 
     <meta
         name="description"
-        content="BooksWagon PO, address label and ISBN barcode generation workspace."
+        content="BooksWagon professional PO, box, address and ISBN label generation workspace."
     >
 
     <link
         rel="stylesheet"
         href="style.css"
     >
-
 </head>
 
 
@@ -29,52 +27,30 @@
 
 
     <!-- =====================================================
-         TOP BAR
+         TOP NAV
     ====================================================== -->
 
-    <div class="top-bar">
+    <header class="top-nav">
 
-        <span>
-            BOOKSWAGON LABEL STUDIO
-        </span>
-
-        <span>
-            PROFESSIONAL PRINTING WORKSPACE
-        </span>
-
-    </div>
-
-
-
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
-
-    <header class="site-header">
-
-        <div class="header-inner">
+        <div class="nav-inner">
 
             <a
                 href="#home"
                 class="brand"
             >
 
-                <div class="brand-text">
+                <span class="brand-mark">
+                    ▣
+                </span>
 
-                    <strong>
-                        BOOKSWAGON
-                    </strong>
-
-                    <span>
-                        LABEL STUDIO
-                    </span>
-
-                </div>
+                <span class="brand-name">
+                    BooksWagon
+                </span>
 
             </a>
 
 
-            <nav class="main-nav">
+            <nav class="nav-links">
 
                 <a href="#home">
                     Home
@@ -96,8 +72,8 @@
 
 
             <a
-                class="contact-button"
                 href="mailto:ashish.varma@bookswagon.in"
+                class="nav-contact"
             >
                 Contact Us
             </a>
@@ -109,41 +85,39 @@
 
 
     <!-- =====================================================
-         MAIN
+         HERO
     ====================================================== -->
 
     <main id="home">
 
+        <section class="hero">
 
-        <!-- =================================================
-             HERO
-        ================================================== -->
+            <div class="hero-glow glow-one"></div>
+            <div class="hero-glow glow-two"></div>
 
-        <section class="hero-section">
 
             <div class="hero-inner">
 
 
-                <div class="hero-content">
+                <div class="hero-copy">
 
-                    <span class="hero-label">
-                        BOOKSWAGON PRINTING WORKSPACE
-                    </span>
+                    <div class="eyebrow">
+                        BOOKSWAGON LABEL WORKSPACE
+                    </div>
 
 
                     <h1>
-                        Professional tools for
+                        Smart tools for
                         <span>
-                            everyday label work.
+                            book operations.
                         </span>
                     </h1>
 
 
                     <p>
-                        Generate PO labels,
-                        address labels and
-                        ISBN barcodes from
-                        one browser workspace.
+                        Create PO labels, box labels,
+                        address labels and ISBN barcodes
+                        from one clean browser workspace.
                     </p>
 
 
@@ -151,7 +125,7 @@
 
                         <a
                             href="#tools"
-                            class="hero-primary"
+                            class="btn-primary"
                         >
                             Explore Tools
                         </a>
@@ -159,7 +133,7 @@
 
                         <a
                             href="#features"
-                            class="hero-secondary"
+                            class="btn-outline"
                         >
                             View Features
                         </a>
@@ -167,22 +141,22 @@
                     </div>
 
 
-                    <div class="hero-points">
-
-                        <span>
-                            ✓ PDF Ready
-                        </span>
+                    <div class="hero-meta">
 
                         <span>
                             ✓ Excel Upload
                         </span>
 
                         <span>
-                            ✓ Bulk Processing
+                            ✓ Bulk PDFs
                         </span>
 
                         <span>
-                            ✓ Separate PO PDFs
+                            ✓ ZIP Download
+                        </span>
+
+                        <span>
+                            ✓ Browser Based
                         </span>
 
                     </div>
@@ -190,28 +164,39 @@
                 </div>
 
 
-                <div class="hero-visual">
 
-                    <div class="book-stack">
+                <!-- BOOK VISUAL -->
 
-                        <div class="book back-book"></div>
+                <div class="hero-book-area">
 
-                        <div class="book middle-book"></div>
+                    <div class="book-shadow"></div>
 
-                        <div class="book front-book">
 
-                            <span>
-                                BOOKSWAGON
-                            </span>
+                    <div class="book book-back">
 
-                            <strong>
-                                LABEL
-                            </strong>
+                        <div class="book-cover-title">
+                            LABEL
+                        </div>
 
-                            <small>
-                                STUDIO
-                            </small>
+                        <div class="book-cover-sub">
+                            WORKFLOW
+                        </div>
 
+                    </div>
+
+
+                    <div class="book book-front">
+
+                        <div class="book-mini">
+                            BOOKSWAGON
+                        </div>
+
+                        <div class="book-main">
+                            LABEL
+                        </div>
+
+                        <div class="book-accent">
+                            STUDIO
                         </div>
 
                     </div>
@@ -224,46 +209,49 @@
 
 
 
-        <!-- =================================================
+        <!-- =====================================================
              TOOLS
-        ================================================== -->
+        ====================================================== -->
 
         <section
             class="tools-section"
             id="tools"
         >
 
-            <div class="section-heading">
+            <div class="section-head">
 
-                <span>
+                <div class="section-kicker">
                     WORKSPACE
-                </span>
+                </div>
 
                 <h2>
                     Choose your tool
                 </h2>
 
                 <p>
-                    Select the operation you want to perform.
+                    Pick a workflow and start generating labels.
                 </p>
 
             </div>
 
 
-            <div class="tool-grid">
+            <div class="tool-cards">
 
 
                 <!-- COCOBLUE -->
 
                 <article class="tool-card">
 
-                    <div class="tool-number">
-                        01
-                    </div>
+                    <div class="tool-top">
 
+                        <span class="tool-index">
+                            01
+                        </span>
 
-                    <div class="tool-icon">
-                        C
+                        <span class="tool-symbol">
+                            C
+                        </span>
+
                     </div>
 
 
@@ -273,20 +261,20 @@
 
 
                     <p>
-                        Generate PO sticker labels,
+                        Generate PO labels, box labels,
                         address labels and separate
-                        PO PDFs.
+                        PO PDF files.
                     </p>
 
 
-                    <div class="tool-features">
+                    <div class="tool-tags">
 
                         <span>
-                            PO Number
+                            PO
                         </span>
 
                         <span>
-                            Excel Upload
+                            Excel
                         </span>
 
                         <span>
@@ -294,11 +282,7 @@
                         </span>
 
                         <span>
-                            Address Print
-                        </span>
-
-                        <span>
-                            ZIP Download
+                            Address
                         </span>
 
                     </div>
@@ -306,10 +290,13 @@
 
                     <button
                         type="button"
-                        class="tool-button"
+                        class="tool-open"
                         data-open-tool="cocoblue"
                     >
                         Open CocoBlue PO
+                        <span>
+                            →
+                        </span>
                     </button>
 
                 </article>
@@ -320,13 +307,16 @@
 
                 <article class="tool-card">
 
-                    <div class="tool-number">
-                        02
-                    </div>
+                    <div class="tool-top">
 
+                        <span class="tool-index">
+                            02
+                        </span>
 
-                    <div class="tool-icon">
-                        P
+                        <span class="tool-symbol">
+                            P
+                        </span>
+
                     </div>
 
 
@@ -336,31 +326,28 @@
 
 
                     <p>
-                        Generate repeated or sequential
-                        box labels and address labels.
+                        Generate unlimited box ranges,
+                        repeated labels, sequential labels
+                        and address PDFs.
                     </p>
 
 
-                    <div class="tool-features">
-
-                        <span>
-                            PO Number
-                        </span>
+                    <div class="tool-tags">
 
                         <span>
                             Unlimited Range
                         </span>
 
                         <span>
-                            Excel Upload
+                            Excel
                         </span>
 
                         <span>
-                            Cutting Guide
+                            Cutting
                         </span>
 
                         <span>
-                            ZIP Download
+                            ZIP
                         </span>
 
                     </div>
@@ -368,10 +355,13 @@
 
                     <button
                         type="button"
-                        class="tool-button"
+                        class="tool-open"
                         data-open-tool="otherpo"
                     >
                         Open Other PO
+                        <span>
+                            →
+                        </span>
                     </button>
 
                 </article>
@@ -382,13 +372,16 @@
 
                 <article class="tool-card">
 
-                    <div class="tool-number">
-                        03
-                    </div>
+                    <div class="tool-top">
 
+                        <span class="tool-index">
+                            03
+                        </span>
 
-                    <div class="tool-icon">
-                        #
+                        <span class="tool-symbol">
+                            #
+                        </span>
+
                     </div>
 
 
@@ -398,27 +391,27 @@
 
 
                     <p>
-                        Generate book barcodes with
-                        ISBN, title and optional edition.
+                        Generate ISBN barcodes with
+                        book name and optional edition.
                     </p>
 
 
-                    <div class="tool-features">
+                    <div class="tool-tags">
 
                         <span>
-                            Manual Max 10
+                            ISBN
                         </span>
 
                         <span>
-                            Excel Upload
+                            Manual
                         </span>
 
                         <span>
-                            ISBN Barcode
+                            Excel
                         </span>
 
                         <span>
-                            Bulk PDF
+                            PDF
                         </span>
 
                     </div>
@@ -426,10 +419,13 @@
 
                     <button
                         type="button"
-                        class="tool-button"
+                        class="tool-open"
                         data-open-tool="isbn"
                     >
                         Open ISBN Generator
+                        <span>
+                            →
+                        </span>
                     </button>
 
                 </article>
@@ -440,25 +436,28 @@
 
 
 
-        <!-- =================================================
+        <!-- =====================================================
              FEATURES
-        ================================================== -->
+        ====================================================== -->
 
         <section
             class="features-section"
             id="features"
         >
 
-            <div class="section-heading centered">
+            <div class="section-head centered">
 
-                <span>
-                    COMMON FEATURES
-                </span>
-
+                <div class="section-kicker">
+                    WHY THIS WORKSPACE
+                </div>
 
                 <h2>
-                    Flexible printing controls.
+                    Everything stays simple.
                 </h2>
+
+                <p>
+                    Fast controls for real printing work.
+                </p>
 
             </div>
 
@@ -466,43 +465,42 @@
             <div class="feature-grid">
 
 
-                <div class="feature-card">
+                <div class="feature-box">
 
                     <div class="feature-icon">
                         PDF
                     </div>
 
                     <h3>
-                        Page Sizes
+                        Print Ready
                     </h3>
 
                     <p>
-                        4 × 6 inch, A4,
-                        70 × 35 mm and Custom.
+                        Multiple paper sizes with live preview.
                     </p>
 
                 </div>
 
 
-                <div class="feature-card">
+                <div class="feature-box">
 
                     <div class="feature-icon">
                         BOX
                     </div>
 
                     <h3>
-                        Unlimited Box Range
+                        Unlimited Range
                     </h3>
 
                     <p>
-                        Enter any start and
-                        end box number.
+                        No 1–200 restriction. Enter the range
+                        you actually need.
                     </p>
 
                 </div>
 
 
-                <div class="feature-card">
+                <div class="feature-box">
 
                     <div class="feature-icon">
                         ✓
@@ -514,25 +512,25 @@
 
                     <p>
                         Cutting guide, tax border,
-                        page border and other options.
+                        box highlight and page border.
                     </p>
 
                 </div>
 
 
-                <div class="feature-card">
+                <div class="feature-box">
 
                     <div class="feature-icon">
                         ZIP
                     </div>
 
                     <h3>
-                        Separate PO PDFs
+                        Smart Download
                     </h3>
 
                     <p>
-                        One PDF per PO,
-                        optionally packaged as ZIP.
+                        One PDF downloads directly.
+                        Multiple PDFs become one ZIP.
                     </p>
 
                 </div>
@@ -543,9 +541,9 @@
 
 
 
-        <!-- =================================================
+        <!-- =====================================================
              WORKSPACE
-        ================================================== -->
+        ====================================================== -->
 
         <section
             class="workspace-section"
@@ -562,11 +560,11 @@
                 id="cocoblueWorkspace"
             >
 
-                <div class="workspace-header">
+                <div class="workspace-titlebar">
 
                     <div>
 
-                        <span>
+                        <span class="workspace-kicker">
                             COCOBLUE PO
                         </span>
 
@@ -575,7 +573,8 @@
                         </h2>
 
                         <p>
-                            Sticker pages and address printing.
+                            Build box labels, sticker pages
+                            or address labels.
                         </p>
 
                     </div>
@@ -583,14 +582,13 @@
 
                     <button
                         type="button"
-                        class="back-button"
+                        class="workspace-back"
                         data-close-tool
                     >
-                        Back to Tools
+                        ← Back
                     </button>
 
                 </div>
-
 
 
                 <div class="workspace-tabs">
@@ -619,21 +617,21 @@
                 <!-- COCO STICKER -->
 
                 <div
-                    class="tool-mode"
                     id="cocoblueStickerMode"
+                    class="tool-mode"
                 >
 
-                    <div class="workspace-grid">
+                    <div class="workspace-columns">
 
 
-                        <div class="workspace-controls">
+                        <div class="control-column">
 
 
-                            <!-- PO INPUT -->
+                            <!-- PO -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         01
@@ -646,7 +644,7 @@
                                         </h3>
 
                                         <p>
-                                            Enter PO number only.
+                                            Manual entry or Excel upload.
                                         </p>
 
                                     </div>
@@ -661,7 +659,7 @@
                                         class="mini-tab active"
                                         data-coco-input="manual"
                                     >
-                                        Manual Entry
+                                        Manual
                                     </button>
 
 
@@ -670,7 +668,7 @@
                                         class="mini-tab"
                                         data-coco-input="excel"
                                     >
-                                        Excel Upload
+                                        Excel
                                     </button>
 
                                 </div>
@@ -682,61 +680,51 @@
 
                                         <input
                                             class="coco-po"
-                                            type="text"
                                             placeholder="PO Number 01"
                                         >
 
                                         <input
                                             class="coco-po"
-                                            type="text"
                                             placeholder="PO Number 02"
                                         >
 
                                         <input
                                             class="coco-po"
-                                            type="text"
                                             placeholder="PO Number 03"
                                         >
 
                                         <input
                                             class="coco-po"
-                                            type="text"
                                             placeholder="PO Number 04"
                                         >
 
                                         <input
                                             class="coco-po"
-                                            type="text"
                                             placeholder="PO Number 05"
                                         >
 
                                         <input
                                             class="coco-po"
-                                            type="text"
                                             placeholder="PO Number 06"
                                         >
 
                                         <input
                                             class="coco-po"
-                                            type="text"
                                             placeholder="PO Number 07"
                                         >
 
                                         <input
                                             class="coco-po"
-                                            type="text"
                                             placeholder="PO Number 08"
                                         >
 
                                         <input
                                             class="coco-po"
-                                            type="text"
                                             placeholder="PO Number 09"
                                         >
 
                                         <input
                                             class="coco-po"
-                                            type="text"
                                             placeholder="PO Number 10"
                                         >
 
@@ -752,7 +740,7 @@
 
                                     <label
                                         for="cocoExcel"
-                                        class="upload-box"
+                                        class="upload-area"
                                     >
 
                                         <strong>
@@ -768,8 +756,8 @@
 
 
                                     <input
-                                        type="file"
                                         id="cocoExcel"
+                                        type="file"
                                         accept=".xlsx,.xls,.csv"
                                         hidden
                                     >
@@ -788,11 +776,11 @@
 
 
 
-                            <!-- PAGE SIZE -->
+                            <!-- PAGE -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         02
@@ -801,11 +789,11 @@
                                     <div>
 
                                         <h3>
-                                            Page Settings
+                                            Page Size
                                         </h3>
 
                                         <p>
-                                            Preview changes with size.
+                                            Preview changes with selection.
                                         </p>
 
                                     </div>
@@ -813,13 +801,14 @@
                                 </div>
 
 
-                                <div class="page-grid">
+                                <div class="size-grid">
 
                                     <button
                                         type="button"
-                                        class="page-choice active"
+                                        class="size-btn active"
                                         data-coco-size="4x6"
                                     >
+
                                         <strong>
                                             4 × 6
                                         </strong>
@@ -827,14 +816,16 @@
                                         <small>
                                             inch
                                         </small>
+
                                     </button>
 
 
                                     <button
                                         type="button"
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-coco-size="a4"
                                     >
+
                                         <strong>
                                             A4
                                         </strong>
@@ -842,14 +833,16 @@
                                         <small>
                                             210 × 297 mm
                                         </small>
+
                                     </button>
 
 
                                     <button
                                         type="button"
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-coco-size="70x35"
                                     >
+
                                         <strong>
                                             70 × 35
                                         </strong>
@@ -857,14 +850,16 @@
                                         <small>
                                             mm
                                         </small>
+
                                     </button>
 
 
                                     <button
                                         type="button"
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-coco-size="custom"
                                     >
+
                                         <strong>
                                             Custom
                                         </strong>
@@ -872,6 +867,7 @@
                                         <small>
                                             mm
                                         </small>
+
                                     </button>
 
                                 </div>
@@ -879,7 +875,7 @@
 
                                 <div
                                     id="cocoCustomSize"
-                                    class="custom-grid hidden"
+                                    class="custom-size hidden"
                                 >
 
                                     <input
@@ -900,11 +896,11 @@
 
 
 
-                            <!-- BOX SETTINGS -->
+                            <!-- BOX RANGE -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         03
@@ -913,11 +909,12 @@
                                     <div>
 
                                         <h3>
-                                            Box Settings
+                                            Box Range
                                         </h3>
 
                                         <p>
-                                            No fixed maximum range.
+                                            No fixed maximum.
+                                            Enter any valid range.
                                         </p>
 
                                     </div>
@@ -925,7 +922,7 @@
                                 </div>
 
 
-                                <div class="four-fields">
+                                <div class="range-grid">
 
 
                                     <div>
@@ -934,9 +931,11 @@
                                             Start Box
                                         </label>
 
+                                        <!-- NO MAX -->
                                         <input
                                             id="cocoStartBox"
                                             type="number"
+                                            inputmode="numeric"
                                             value="1"
                                         >
 
@@ -949,13 +948,20 @@
                                             End Box
                                         </label>
 
+                                        <!-- NO MAX -->
                                         <input
                                             id="cocoEndBox"
                                             type="number"
+                                            inputmode="numeric"
                                             value="200"
                                         >
 
                                     </div>
+
+                                </div>
+
+
+                                <div class="range-grid">
 
 
                                     <div>
@@ -1049,15 +1055,20 @@
 
                                 </div>
 
+
+                                <div class="range-note">
+                                    Unlimited range enabled.
+                                </div>
+
                             </div>
 
 
 
-                            <!-- CHECKBOX OPTIONS -->
+                            <!-- OPTIONS -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         04
@@ -1070,7 +1081,7 @@
                                         </h3>
 
                                         <p>
-                                            Checkbox controls.
+                                            Use checkboxes only.
                                         </p>
 
                                     </div>
@@ -1078,9 +1089,7 @@
                                 </div>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="cocoVertical"
@@ -1095,9 +1104,7 @@
                                 </label>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="cocoCutting"
@@ -1112,9 +1119,7 @@
                                 </label>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="cocoBoxHighlight"
@@ -1129,9 +1134,7 @@
                                 </label>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="cocoTaxBorder"
@@ -1145,9 +1148,7 @@
                                 </label>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="cocoBorder"
@@ -1166,9 +1167,9 @@
 
                             <!-- DESIGN -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         05
@@ -1177,11 +1178,11 @@
                                     <div>
 
                                         <h3>
-                                            Border & Text
+                                            Typography & Border
                                         </h3>
 
                                         <p>
-                                            Multiple design options.
+                                            Customize the label look.
                                         </p>
 
                                     </div>
@@ -1189,7 +1190,7 @@
                                 </div>
 
 
-                                <div class="two-fields">
+                                <div class="field-row">
 
                                     <div>
 
@@ -1303,7 +1304,7 @@
                                 </div>
 
 
-                                <div class="two-fields">
+                                <div class="field-row">
 
                                     <div>
 
@@ -1315,22 +1316,69 @@
                                             id="cocoFontSize"
                                         >
 
-                                            <option>10</option>
-                                            <option>12</option>
-                                            <option>14</option>
-                                            <option>16</option>
-                                            <option>18</option>
-                                            <option>20</option>
-                                            <option>22</option>
-                                            <option>24</option>
-                                            <option>26</option>
-                                            <option>28</option>
-                                            <option>30</option>
-                                            <option>32</option>
-                                            <option>34</option>
-                                            <option>36</option>
-                                            <option>38</option>
-                                            <option>40</option>
+                                            <option>
+                                                10
+                                            </option>
+
+                                            <option>
+                                                12
+                                            </option>
+
+                                            <option>
+                                                14
+                                            </option>
+
+                                            <option>
+                                                16
+                                            </option>
+
+                                            <option>
+                                                18
+                                            </option>
+
+                                            <option>
+                                                20
+                                            </option>
+
+                                            <option>
+                                                22
+                                            </option>
+
+                                            <option>
+                                                24
+                                            </option>
+
+                                            <option>
+                                                26
+                                            </option>
+
+                                            <option>
+                                                28
+                                            </option>
+
+                                            <option>
+                                                30
+                                            </option>
+
+                                            <option>
+                                                32
+                                            </option>
+
+                                            <option>
+                                                34
+                                            </option>
+
+                                            <option>
+                                                36
+                                            </option>
+
+                                            <option>
+                                                38
+                                            </option>
+
+                                            <option>
+                                                40
+                                            </option>
 
                                         </select>
 
@@ -1340,7 +1388,7 @@
                                     <div>
 
                                         <label>
-                                            Font Weight
+                                            Weight
                                         </label>
 
                                         <select
@@ -1367,9 +1415,9 @@
 
                             <!-- DOWNLOAD -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         06
@@ -1382,7 +1430,7 @@
                                         </h3>
 
                                         <p>
-                                            Separate PDF per PO.
+                                            Smart direct or ZIP download.
                                         </p>
 
                                     </div>
@@ -1390,34 +1438,35 @@
                                 </div>
 
 
-                                <label
-                                    class="check-option"
-                                >
-
-                                    <input
-                                        id="cocoZip"
-                                        type="checkbox"
-                                        checked
-                                    >
-
-                                    <span>
-                                        ZIP when multiple PO PDFs
-                                    </span>
-
-                                </label>
-
-
-                                <div
-                                    class="file-name-preview"
-                                >
-
-                                    <span>
-                                        File format:
-                                    </span>
+                                <div class="download-info">
 
                                     <strong>
-                                        PO_BOXSTART-BOXEND_DATE_TIME.pdf
+                                        One PO
                                     </strong>
+
+                                    <span>
+                                        Direct PDF download
+                                    </span>
+
+                                </div>
+
+
+                                <div class="download-info">
+
+                                    <strong>
+                                        Multiple PO
+                                    </strong>
+
+                                    <span>
+                                        One ZIP containing separate PDFs
+                                    </span>
+
+                                </div>
+
+
+                                <div class="filename-preview">
+
+                                    PO_BOXSTART-BOXEND_DATE_TIME.pdf
 
                                 </div>
 
@@ -1428,11 +1477,11 @@
 
 
 
-                        <!-- COCO PREVIEW -->
+                        <!-- PREVIEW -->
 
                         <aside class="preview-panel">
 
-                            <div class="preview-heading">
+                            <div class="preview-top">
 
                                 <div>
 
@@ -1441,16 +1490,15 @@
                                     </span>
 
                                     <h3>
-                                        Label Preview
+                                        Box Label
                                     </h3>
 
                                 </div>
 
-
                                 <span
                                     id="cocoSummary"
                                 >
-                                    1 page
+                                    1 box
                                 </span>
 
                             </div>
@@ -1474,10 +1522,9 @@
 
 
                                         <span
-                                            id="cocoPreviewDotted"
                                             class="preview-dotted-line"
                                         >
-                                            . . . . .
+                                            . . . . . . .
                                         </span>
 
 
@@ -1503,7 +1550,7 @@
                             </div>
 
 
-                            <div class="preview-info">
+                            <div class="preview-stats">
 
                                 <div>
 
@@ -1523,7 +1570,7 @@
                                 <div>
 
                                     <span>
-                                        Boxes
+                                        Range
                                     </span>
 
                                     <strong
@@ -1550,11 +1597,12 @@
                             </div>
 
 
-                            <div class="action-row">
+                            <div class="preview-actions">
 
                                 <button
                                     id="cocoReset"
-                                    class="secondary-button"
+                                    type="button"
+                                    class="btn-soft"
                                 >
                                     Reset
                                 </button>
@@ -1562,7 +1610,8 @@
 
                                 <button
                                     id="cocoGenerate"
-                                    class="primary-button"
+                                    type="button"
+                                    class="btn-blue"
                                 >
                                     Generate PDFs
                                 </button>
@@ -1572,7 +1621,7 @@
 
                             <p
                                 id="cocoStatus"
-                                class="status-text"
+                                class="preview-status"
                             >
                                 Ready
                             </p>
@@ -1588,19 +1637,19 @@
                 <!-- COCO ADDRESS -->
 
                 <div
-                    class="tool-mode hidden"
                     id="cocoblueAddressMode"
+                    class="tool-mode hidden"
                 >
 
-                    <div class="workspace-grid">
+                    <div class="workspace-columns">
 
 
-                        <div class="workspace-controls">
+                        <div class="control-column">
 
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         01
@@ -1621,7 +1670,7 @@
                                 </div>
 
 
-                                <div class="two-fields">
+                                <div class="field-row">
 
                                     <div>
 
@@ -1657,9 +1706,9 @@
                             </div>
 
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         02
@@ -1672,7 +1721,7 @@
                                         </h3>
 
                                         <p>
-                                            Address label settings.
+                                            Same page-size controls.
                                         </p>
 
                                     </div>
@@ -1680,13 +1729,12 @@
                                 </div>
 
 
-                                <div class="page-grid">
+                                <div class="size-grid">
 
                                     <button
-                                        class="page-choice active"
+                                        class="size-btn active"
                                         data-coco-address-size="4x6"
                                     >
-
                                         <strong>
                                             4 × 6
                                         </strong>
@@ -1694,31 +1742,27 @@
                                         <small>
                                             inch
                                         </small>
-
                                     </button>
 
 
                                     <button
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-coco-address-size="a4"
                                     >
-
                                         <strong>
                                             A4
                                         </strong>
 
                                         <small>
-                                            210 × 297 mm
+                                            210 × 297
                                         </small>
-
                                     </button>
 
 
                                     <button
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-coco-address-size="70x35"
                                     >
-
                                         <strong>
                                             70 × 35
                                         </strong>
@@ -1726,15 +1770,13 @@
                                         <small>
                                             mm
                                         </small>
-
                                     </button>
 
 
                                     <button
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-coco-address-size="custom"
                                     >
-
                                         <strong>
                                             Custom
                                         </strong>
@@ -1742,15 +1784,12 @@
                                         <small>
                                             mm
                                         </small>
-
                                     </button>
 
                                 </div>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="cocoAddressBorder"
@@ -1764,9 +1803,7 @@
                                 </label>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="cocoAddressTaxBorder"
@@ -1780,7 +1817,7 @@
                                 </label>
 
 
-                                <div class="two-fields">
+                                <div class="field-row">
 
                                     <div>
 
@@ -1818,26 +1855,6 @@
 
                                             <option value="bold">
                                                 Bold
-                                            </option>
-
-                                            <option value="double-dark">
-                                                Double Dark
-                                            </option>
-
-                                            <option value="inner">
-                                                Inner Frame
-                                            </option>
-
-                                            <option value="outer">
-                                                Outer Frame
-                                            </option>
-
-                                            <option value="triple">
-                                                Triple
-                                            </option>
-
-                                            <option value="text-box">
-                                                Text Box
                                             </option>
 
                                         </select>
@@ -1892,22 +1909,69 @@
                                         id="cocoAddressFontSize"
                                     >
 
-                                        <option>10</option>
-                                        <option>12</option>
-                                        <option>14</option>
-                                        <option>16</option>
-                                        <option>18</option>
-                                        <option>20</option>
-                                        <option>22</option>
-                                        <option>24</option>
-                                        <option>26</option>
-                                        <option>28</option>
-                                        <option>30</option>
-                                        <option>32</option>
-                                        <option>34</option>
-                                        <option>36</option>
-                                        <option>38</option>
-                                        <option>40</option>
+                                        <option>
+                                            10
+                                        </option>
+
+                                        <option>
+                                            12
+                                        </option>
+
+                                        <option>
+                                            14
+                                        </option>
+
+                                        <option>
+                                            16
+                                        </option>
+
+                                        <option>
+                                            18
+                                        </option>
+
+                                        <option>
+                                            20
+                                        </option>
+
+                                        <option>
+                                            22
+                                        </option>
+
+                                        <option>
+                                            24
+                                        </option>
+
+                                        <option>
+                                            26
+                                        </option>
+
+                                        <option>
+                                            28
+                                        </option>
+
+                                        <option>
+                                            30
+                                        </option>
+
+                                        <option>
+                                            32
+                                        </option>
+
+                                        <option>
+                                            34
+                                        </option>
+
+                                        <option>
+                                            36
+                                        </option>
+
+                                        <option>
+                                            38
+                                        </option>
+
+                                        <option>
+                                            40
+                                        </option>
 
                                     </select>
 
@@ -1915,15 +1979,12 @@
 
                             </div>
 
-
                         </div>
 
 
-                        <aside
-                            class="preview-panel"
-                        >
+                        <aside class="preview-panel">
 
-                            <div class="preview-heading">
+                            <div class="preview-top">
 
                                 <div>
 
@@ -1976,11 +2037,12 @@
                             </div>
 
 
-                            <div class="action-row">
+                            <div class="preview-actions">
 
                                 <button
                                     id="cocoAddressReset"
-                                    class="secondary-button"
+                                    type="button"
+                                    class="btn-soft"
                                 >
                                     Reset
                                 </button>
@@ -1988,7 +2050,8 @@
 
                                 <button
                                     id="cocoAddressGenerate"
-                                    class="primary-button"
+                                    type="button"
+                                    class="btn-blue"
                                 >
                                     Generate PDF
                                 </button>
@@ -1998,7 +2061,7 @@
 
                             <p
                                 id="cocoAddressStatus"
-                                class="status-text"
+                                class="preview-status"
                             >
                                 Ready
                             </p>
@@ -2022,11 +2085,11 @@
                 id="otherpoWorkspace"
             >
 
-                <div class="workspace-header">
+                <div class="workspace-titlebar">
 
                     <div>
 
-                        <span>
+                        <span class="workspace-kicker">
                             OTHER PO
                         </span>
 
@@ -2035,7 +2098,7 @@
                         </h2>
 
                         <p>
-                            Repeated and sequential box labels.
+                            Unlimited box range with smart downloads.
                         </p>
 
                     </div>
@@ -2043,10 +2106,10 @@
 
                     <button
                         type="button"
-                        class="back-button"
+                        class="workspace-back"
                         data-close-tool
                     >
-                        Back to Tools
+                        ← Back
                     </button>
 
                 </div>
@@ -2072,25 +2135,24 @@
                 </div>
 
 
-
                 <!-- OTHER STICKER -->
 
                 <div
-                    class="tool-mode"
                     id="otherStickerMode"
+                    class="tool-mode"
                 >
 
-                    <div class="workspace-grid">
+                    <div class="workspace-columns">
 
 
-                        <div class="workspace-controls">
+                        <div class="control-column">
 
 
                             <!-- PO -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         01
@@ -2117,7 +2179,7 @@
                                         class="mini-tab active"
                                         data-other-input="manual"
                                     >
-                                        Manual Entry
+                                        Manual
                                     </button>
 
 
@@ -2125,15 +2187,13 @@
                                         class="mini-tab"
                                         data-other-input="excel"
                                     >
-                                        Excel Upload
+                                        Excel
                                     </button>
 
                                 </div>
 
 
-                                <div
-                                    id="otherManualArea"
-                                >
+                                <div id="otherManualArea">
 
                                     <div class="po-grid">
 
@@ -2199,7 +2259,7 @@
 
                                     <label
                                         for="otherExcel"
-                                        class="upload-box"
+                                        class="upload-area"
                                     >
 
                                         <strong>
@@ -2235,11 +2295,11 @@
 
 
 
-                            <!-- BOX -->
+                            <!-- BOX RANGE -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         02
@@ -2248,11 +2308,11 @@
                                     <div>
 
                                         <h3>
-                                            Box Settings
+                                            Box Range
                                         </h3>
 
                                         <p>
-                                            No fixed maximum.
+                                            Unlimited — no hardcoded 200 limit.
                                         </p>
 
                                     </div>
@@ -2260,62 +2320,7 @@
                                 </div>
 
 
-                                <div class="layout-buttons">
-
-                                    <label
-                                        class="layout-option"
-                                    >
-
-                                        <input
-                                            type="radio"
-                                            name="otherLayout"
-                                            value="same"
-                                            checked
-                                        >
-
-                                        <span>
-
-                                            <strong>
-                                                Repeat Same Box
-                                            </strong>
-
-                                            <small>
-                                                Repeat selected box.
-                                            </small>
-
-                                        </span>
-
-                                    </label>
-
-
-                                    <label
-                                        class="layout-option"
-                                    >
-
-                                        <input
-                                            type="radio"
-                                            name="otherLayout"
-                                            value="sequential"
-                                        >
-
-                                        <span>
-
-                                            <strong>
-                                                Sequential Boxes
-                                            </strong>
-
-                                            <small>
-                                                BOX NO. 1 → BOX NO. 2...
-                                            </small>
-
-                                        </span>
-
-                                    </label>
-
-                                </div>
-
-
-                                <div class="four-fields">
+                                <div class="range-grid">
 
                                     <div>
 
@@ -2326,6 +2331,7 @@
                                         <input
                                             id="otherStartBox"
                                             type="number"
+                                            inputmode="numeric"
                                             value="1"
                                         >
 
@@ -2341,11 +2347,16 @@
                                         <input
                                             id="otherEndBox"
                                             type="number"
+                                            inputmode="numeric"
                                             value="200"
                                         >
 
                                     </div>
 
+                                </div>
+
+
+                                <div class="range-grid">
 
                                     <div>
 
@@ -2438,15 +2449,20 @@
 
                                 </div>
 
+
+                                <div class="range-note">
+                                    Any positive range is accepted.
+                                </div>
+
                             </div>
 
 
 
                             <!-- OPTIONS -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         03
@@ -2467,9 +2483,7 @@
                                 </div>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="otherCutting"
@@ -2484,9 +2498,7 @@
                                 </label>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="otherBoxHighlight"
@@ -2501,9 +2513,7 @@
                                 </label>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="otherTaxBorder"
@@ -2517,9 +2527,7 @@
                                 </label>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="otherBorder"
@@ -2536,11 +2544,11 @@
 
 
 
-                            <!-- PAGE -->
+                            <!-- SIZE -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         04
@@ -2553,7 +2561,7 @@
                                         </h3>
 
                                         <p>
-                                            Live page preview.
+                                            Live preview support.
                                         </p>
 
                                     </div>
@@ -2561,12 +2569,13 @@
                                 </div>
 
 
-                                <div class="page-grid">
+                                <div class="size-grid">
 
                                     <button
-                                        class="page-choice active"
+                                        class="size-btn active"
                                         data-other-size="4x6"
                                     >
+
                                         <strong>
                                             4 × 6
                                         </strong>
@@ -2574,27 +2583,31 @@
                                         <small>
                                             inch
                                         </small>
+
                                     </button>
 
 
                                     <button
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-other-size="a4"
                                     >
+
                                         <strong>
                                             A4
                                         </strong>
 
                                         <small>
-                                            210 × 297 mm
+                                            210 × 297
                                         </small>
+
                                     </button>
 
 
                                     <button
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-other-size="70x35"
                                     >
+
                                         <strong>
                                             70 × 35
                                         </strong>
@@ -2602,13 +2615,15 @@
                                         <small>
                                             mm
                                         </small>
+
                                     </button>
 
 
                                     <button
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-other-size="custom"
                                     >
+
                                         <strong>
                                             Custom
                                         </strong>
@@ -2616,6 +2631,7 @@
                                         <small>
                                             mm
                                         </small>
+
                                     </button>
 
                                 </div>
@@ -2623,7 +2639,7 @@
 
                                 <div
                                     id="otherCustomSize"
-                                    class="custom-grid hidden"
+                                    class="custom-size hidden"
                                 >
 
                                     <input
@@ -2641,9 +2657,7 @@
                                 </div>
 
 
-                                <div
-                                    class="two-fields"
-                                >
+                                <div class="field-row">
 
                                     <div>
 
@@ -2742,10 +2756,6 @@
                                                 Trebuchet MS
                                             </option>
 
-                                            <option>
-                                                Tahoma
-                                            </option>
-
                                         </select>
 
                                     </div>
@@ -2763,22 +2773,69 @@
                                         id="otherFontSize"
                                     >
 
-                                        <option>10</option>
-                                        <option>12</option>
-                                        <option>14</option>
-                                        <option>16</option>
-                                        <option>18</option>
-                                        <option>20</option>
-                                        <option>22</option>
-                                        <option>24</option>
-                                        <option>26</option>
-                                        <option>28</option>
-                                        <option>30</option>
-                                        <option>32</option>
-                                        <option>34</option>
-                                        <option>36</option>
-                                        <option>38</option>
-                                        <option>40</option>
+                                        <option>
+                                            10
+                                        </option>
+
+                                        <option>
+                                            12
+                                        </option>
+
+                                        <option>
+                                            14
+                                        </option>
+
+                                        <option>
+                                            16
+                                        </option>
+
+                                        <option>
+                                            18
+                                        </option>
+
+                                        <option>
+                                            20
+                                        </option>
+
+                                        <option>
+                                            22
+                                        </option>
+
+                                        <option>
+                                            24
+                                        </option>
+
+                                        <option>
+                                            26
+                                        </option>
+
+                                        <option>
+                                            28
+                                        </option>
+
+                                        <option>
+                                            30
+                                        </option>
+
+                                        <option>
+                                            32
+                                        </option>
+
+                                        <option>
+                                            34
+                                        </option>
+
+                                        <option>
+                                            36
+                                        </option>
+
+                                        <option>
+                                            38
+                                        </option>
+
+                                        <option>
+                                            40
+                                        </option>
 
                                     </select>
 
@@ -2790,9 +2847,9 @@
 
                             <!-- DOWNLOAD -->
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         05
@@ -2805,7 +2862,7 @@
                                         </h3>
 
                                         <p>
-                                            Separate PDF per PO.
+                                            Automatic single/multiple handling.
                                         </p>
 
                                     </div>
@@ -2813,30 +2870,28 @@
                                 </div>
 
 
-                                <label
-                                    class="check-option"
-                                >
-
-                                    <input
-                                        id="otherZip"
-                                        type="checkbox"
-                                        checked
-                                    >
-
-                                    <span>
-                                        ZIP when multiple PO PDFs
-                                    </span>
-
-                                </label>
-
-
-                                <div
-                                    class="file-name-preview"
-                                >
+                                <div class="download-info">
 
                                     <strong>
-                                        PO_BOXSTART-BOXEND_DATE_TIME.pdf
+                                        1 PO
                                     </strong>
+
+                                    <span>
+                                        Direct PDF
+                                    </span>
+
+                                </div>
+
+
+                                <div class="download-info">
+
+                                    <strong>
+                                        2+ PO
+                                    </strong>
+
+                                    <span>
+                                        Automatic ZIP
+                                    </span>
 
                                 </div>
 
@@ -2851,7 +2906,7 @@
 
                         <aside class="preview-panel">
 
-                            <div class="preview-heading">
+                            <div class="preview-top">
 
                                 <div>
 
@@ -2860,7 +2915,7 @@
                                     </span>
 
                                     <h3>
-                                        Other PO
+                                        Box Label
                                     </h3>
 
                                 </div>
@@ -2888,7 +2943,7 @@
                                         <span
                                             class="preview-dotted-line"
                                         >
-                                            . . . . .
+                                            . . . . . . .
                                         </span>
 
 
@@ -2900,9 +2955,7 @@
                                         </strong>
 
 
-                                        <span
-                                            class="preview-scissor"
-                                        >
+                                        <span class="preview-scissor">
                                             ✂
                                         </span>
 
@@ -2913,7 +2966,7 @@
                             </div>
 
 
-                            <div class="preview-info">
+                            <div class="preview-stats">
 
                                 <div>
 
@@ -2933,7 +2986,7 @@
                                 <div>
 
                                     <span>
-                                        Boxes
+                                        Range
                                     </span>
 
                                     <strong
@@ -2960,11 +3013,12 @@
                             </div>
 
 
-                            <div class="action-row">
+                            <div class="preview-actions">
 
                                 <button
                                     id="otherReset"
-                                    class="secondary-button"
+                                    type="button"
+                                    class="btn-soft"
                                 >
                                     Reset
                                 </button>
@@ -2972,7 +3026,8 @@
 
                                 <button
                                     id="otherGenerate"
-                                    class="primary-button"
+                                    type="button"
+                                    class="btn-blue"
                                 >
                                     Generate PDFs
                                 </button>
@@ -2982,7 +3037,7 @@
 
                             <p
                                 id="otherStatus"
-                                class="status-text"
+                                class="preview-status"
                             >
                                 Ready
                             </p>
@@ -3002,15 +3057,15 @@
                     class="tool-mode hidden"
                 >
 
-                    <div class="workspace-grid">
+                    <div class="workspace-columns">
 
 
-                        <div class="workspace-controls">
+                        <div class="control-column">
 
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         01
@@ -3031,7 +3086,7 @@
                                 </div>
 
 
-                                <div class="two-fields">
+                                <div class="field-row">
 
                                     <div>
 
@@ -3067,9 +3122,9 @@
                             </div>
 
 
-                            <div class="workspace-card">
+                            <div class="control-card">
 
-                                <div class="card-title">
+                                <div class="card-heading">
 
                                     <span>
                                         02
@@ -3078,11 +3133,11 @@
                                     <div>
 
                                         <h3>
-                                            Page & Design
+                                            Address Design
                                         </h3>
 
                                         <p>
-                                            Address label settings.
+                                            Page, border and tax settings.
                                         </p>
 
                                     </div>
@@ -3090,12 +3145,13 @@
                                 </div>
 
 
-                                <div class="page-grid">
+                                <div class="size-grid">
 
                                     <button
-                                        class="page-choice active"
+                                        class="size-btn active"
                                         data-other-address-size="4x6"
                                     >
+
                                         <strong>
                                             4 × 6
                                         </strong>
@@ -3103,27 +3159,31 @@
                                         <small>
                                             inch
                                         </small>
+
                                     </button>
 
 
                                     <button
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-other-address-size="a4"
                                     >
+
                                         <strong>
                                             A4
                                         </strong>
 
                                         <small>
-                                            210 × 297 mm
+                                            210 × 297
                                         </small>
+
                                     </button>
 
 
                                     <button
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-other-address-size="70x35"
                                     >
+
                                         <strong>
                                             70 × 35
                                         </strong>
@@ -3131,13 +3191,15 @@
                                         <small>
                                             mm
                                         </small>
+
                                     </button>
 
 
                                     <button
-                                        class="page-choice"
+                                        class="size-btn"
                                         data-other-address-size="custom"
                                     >
+
                                         <strong>
                                             Custom
                                         </strong>
@@ -3145,14 +3207,13 @@
                                         <small>
                                             mm
                                         </small>
+
                                     </button>
 
                                 </div>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="otherAddressBorder"
@@ -3166,9 +3227,7 @@
                                 </label>
 
 
-                                <label
-                                    class="check-option"
-                                >
+                                <label class="check-row">
 
                                     <input
                                         id="otherAddressTaxBorder"
@@ -3182,7 +3241,7 @@
                                 </label>
 
 
-                                <div class="two-fields">
+                                <div class="field-row">
 
                                     <div>
 
@@ -3274,22 +3333,69 @@
                                         id="otherAddressFontSize"
                                     >
 
-                                        <option>10</option>
-                                        <option>12</option>
-                                        <option>14</option>
-                                        <option>16</option>
-                                        <option>18</option>
-                                        <option>20</option>
-                                        <option>22</option>
-                                        <option>24</option>
-                                        <option>26</option>
-                                        <option>28</option>
-                                        <option>30</option>
-                                        <option>32</option>
-                                        <option>34</option>
-                                        <option>36</option>
-                                        <option>38</option>
-                                        <option>40</option>
+                                        <option>
+                                            10
+                                        </option>
+
+                                        <option>
+                                            12
+                                        </option>
+
+                                        <option>
+                                            14
+                                        </option>
+
+                                        <option>
+                                            16
+                                        </option>
+
+                                        <option>
+                                            18
+                                        </option>
+
+                                        <option>
+                                            20
+                                        </option>
+
+                                        <option>
+                                            22
+                                        </option>
+
+                                        <option>
+                                            24
+                                        </option>
+
+                                        <option>
+                                            26
+                                        </option>
+
+                                        <option>
+                                            28
+                                        </option>
+
+                                        <option>
+                                            30
+                                        </option>
+
+                                        <option>
+                                            32
+                                        </option>
+
+                                        <option>
+                                            34
+                                        </option>
+
+                                        <option>
+                                            36
+                                        </option>
+
+                                        <option>
+                                            38
+                                        </option>
+
+                                        <option>
+                                            40
+                                        </option>
 
                                     </select>
 
@@ -3297,13 +3403,12 @@
 
                             </div>
 
-
                         </div>
 
 
                         <aside class="preview-panel">
 
-                            <div class="preview-heading">
+                            <div class="preview-top">
 
                                 <div>
 
@@ -3331,7 +3436,6 @@
                                         FROM
                                     </strong>
 
-
                                     <div
                                         id="otherFromPreview"
                                     >
@@ -3346,7 +3450,6 @@
                                         TO
                                     </strong>
 
-
                                     <div
                                         id="otherToPreview"
                                     >
@@ -3358,11 +3461,12 @@
                             </div>
 
 
-                            <div class="action-row">
+                            <div class="preview-actions">
 
                                 <button
                                     id="otherAddressReset"
-                                    class="secondary-button"
+                                    type="button"
+                                    class="btn-soft"
                                 >
                                     Reset
                                 </button>
@@ -3370,7 +3474,8 @@
 
                                 <button
                                     id="otherAddressGenerate"
-                                    class="primary-button"
+                                    type="button"
+                                    class="btn-blue"
                                 >
                                     Generate PDF
                                 </button>
@@ -3380,7 +3485,7 @@
 
                             <p
                                 id="otherAddressStatus"
-                                class="status-text"
+                                class="preview-status"
                             >
                                 Ready
                             </p>
@@ -3404,11 +3509,11 @@
                 id="isbnWorkspace"
             >
 
-                <div class="workspace-header">
+                <div class="workspace-titlebar">
 
                     <div>
 
-                        <span>
+                        <span class="workspace-kicker">
                             ISBN BARCODE GENERATOR
                         </span>
 
@@ -3417,8 +3522,7 @@
                         </h2>
 
                         <p>
-                            ISBN and Book Name mandatory.
-                            Edition optional.
+                            ISBN and Book Name are mandatory.
                         </p>
 
                     </div>
@@ -3426,10 +3530,10 @@
 
                     <button
                         type="button"
-                        class="back-button"
+                        class="workspace-back"
                         data-close-tool
                     >
-                        Back to Tools
+                        ← Back
                     </button>
 
                 </div>
@@ -3441,7 +3545,7 @@
                         class="workspace-tab active"
                         data-isbn-input="manual"
                     >
-                        Manual Entry
+                        Manual
                     </button>
 
 
@@ -3449,26 +3553,24 @@
                         class="workspace-tab"
                         data-isbn-input="excel"
                     >
-                        Excel Upload
+                        Excel
                     </button>
 
                 </div>
 
 
-                <div class="workspace-grid">
+                <div class="workspace-columns">
 
 
-                    <div class="workspace-controls">
+                    <div class="control-column">
 
-
-                        <!-- MANUAL -->
 
                         <div
-                            class="workspace-card"
                             id="isbnManualCard"
+                            class="control-card"
                         >
 
-                            <div class="card-title">
+                            <div class="card-heading">
 
                                 <span>
                                     01
@@ -3481,7 +3583,7 @@
                                     </h3>
 
                                     <p>
-                                        Maximum 10 manual entries.
+                                        Maximum 10 manual records.
                                     </p>
 
                                 </div>
@@ -3491,6 +3593,8 @@
 
                             <div class="isbn-grid">
 
+
+                                <!-- 1 -->
 
                                 <div class="isbn-row">
 
@@ -3512,6 +3616,8 @@
                                 </div>
 
 
+                                <!-- 2 -->
+
                                 <div class="isbn-row">
 
                                     <input
@@ -3531,6 +3637,8 @@
 
                                 </div>
 
+
+                                <!-- 3 -->
 
                                 <div class="isbn-row">
 
@@ -3552,6 +3660,8 @@
                                 </div>
 
 
+                                <!-- 4 -->
+
                                 <div class="isbn-row">
 
                                     <input
@@ -3571,6 +3681,8 @@
 
                                 </div>
 
+
+                                <!-- 5 -->
 
                                 <div class="isbn-row">
 
@@ -3592,6 +3704,8 @@
                                 </div>
 
 
+                                <!-- 6 -->
+
                                 <div class="isbn-row">
 
                                     <input
@@ -3611,6 +3725,8 @@
 
                                 </div>
 
+
+                                <!-- 7 -->
 
                                 <div class="isbn-row">
 
@@ -3632,6 +3748,8 @@
                                 </div>
 
 
+                                <!-- 8 -->
+
                                 <div class="isbn-row">
 
                                     <input
@@ -3652,6 +3770,8 @@
                                 </div>
 
 
+                                <!-- 9 -->
+
                                 <div class="isbn-row">
 
                                     <input
@@ -3671,6 +3791,8 @@
 
                                 </div>
 
+
+                                <!-- 10 -->
 
                                 <div class="isbn-row">
 
@@ -3697,14 +3819,14 @@
 
 
 
-                        <!-- EXCEL -->
+                        <!-- ISBN EXCEL -->
 
                         <div
-                            class="workspace-card hidden"
                             id="isbnExcelCard"
+                            class="control-card hidden"
                         >
 
-                            <div class="card-title">
+                            <div class="card-heading">
 
                                 <span>
                                     01
@@ -3727,7 +3849,7 @@
 
                             <label
                                 for="isbnExcel"
-                                class="upload-box"
+                                class="upload-area"
                             >
 
                                 <strong>
@@ -3735,16 +3857,9 @@
                                 </strong>
 
                                 <small>
-
-                                    Column 1:
-                                    ISBN<br>
-
-                                    Column 2:
-                                    Book Name<br>
-
-                                    Column 3:
-                                    Edition
-
+                                    Column 1 — ISBN<br>
+                                    Column 2 — Book Name<br>
+                                    Column 3 — Edition
                                 </small>
 
                             </label>
@@ -3769,11 +3884,11 @@
 
 
 
-                        <!-- ISBN DESIGN -->
+                        <!-- ISBN OPTIONS -->
 
-                        <div class="workspace-card">
+                        <div class="control-card">
 
-                            <div class="card-title">
+                            <div class="card-heading">
 
                                 <span>
                                     02
@@ -3786,7 +3901,7 @@
                                     </h3>
 
                                     <p>
-                                        Page, border and text controls.
+                                        Page and design options.
                                     </p>
 
                                 </div>
@@ -3794,13 +3909,12 @@
                             </div>
 
 
-                            <div class="page-grid">
+                            <div class="size-grid">
 
                                 <button
-                                    class="page-choice active"
+                                    class="size-btn active"
                                     data-isbn-size="4x6"
                                 >
-
                                     <strong>
                                         4 × 6
                                     </strong>
@@ -3808,31 +3922,27 @@
                                     <small>
                                         inch
                                     </small>
-
                                 </button>
 
 
                                 <button
-                                    class="page-choice"
+                                    class="size-btn"
                                     data-isbn-size="a4"
                                 >
-
                                     <strong>
                                         A4
                                     </strong>
 
                                     <small>
-                                        210 × 297 mm
+                                        210 × 297
                                     </small>
-
                                 </button>
 
 
                                 <button
-                                    class="page-choice"
+                                    class="size-btn"
                                     data-isbn-size="70x35"
                                 >
-
                                     <strong>
                                         70 × 35
                                     </strong>
@@ -3840,15 +3950,13 @@
                                     <small>
                                         mm
                                     </small>
-
                                 </button>
 
 
                                 <button
-                                    class="page-choice"
+                                    class="size-btn"
                                     data-isbn-size="custom"
                                 >
-
                                     <strong>
                                         Custom
                                     </strong>
@@ -3856,15 +3964,12 @@
                                     <small>
                                         mm
                                     </small>
-
                                 </button>
 
                             </div>
 
 
-                            <label
-                                class="check-option"
-                            >
+                            <label class="check-row">
 
                                 <input
                                     id="isbnBorder"
@@ -3878,9 +3983,7 @@
                             </label>
 
 
-                            <label
-                                class="check-option"
-                            >
+                            <label class="check-row">
 
                                 <input
                                     id="isbnTaxBorder"
@@ -3894,7 +3997,7 @@
                             </label>
 
 
-                            <div class="two-fields">
+                            <div class="field-row">
 
                                 <div>
 
@@ -3949,22 +4052,69 @@
                                         id="isbnFontSize"
                                     >
 
-                                        <option>10</option>
-                                        <option>12</option>
-                                        <option>14</option>
-                                        <option>16</option>
-                                        <option>18</option>
-                                        <option>20</option>
-                                        <option>22</option>
-                                        <option>24</option>
-                                        <option>26</option>
-                                        <option>28</option>
-                                        <option>30</option>
-                                        <option>32</option>
-                                        <option>34</option>
-                                        <option>36</option>
-                                        <option>38</option>
-                                        <option>40</option>
+                                        <option>
+                                            10
+                                        </option>
+
+                                        <option>
+                                            12
+                                        </option>
+
+                                        <option>
+                                            14
+                                        </option>
+
+                                        <option>
+                                            16
+                                        </option>
+
+                                        <option>
+                                            18
+                                        </option>
+
+                                        <option>
+                                            20
+                                        </option>
+
+                                        <option>
+                                            22
+                                        </option>
+
+                                        <option>
+                                            24
+                                        </option>
+
+                                        <option>
+                                            26
+                                        </option>
+
+                                        <option>
+                                            28
+                                        </option>
+
+                                        <option>
+                                            30
+                                        </option>
+
+                                        <option>
+                                            32
+                                        </option>
+
+                                        <option>
+                                            34
+                                        </option>
+
+                                        <option>
+                                            36
+                                        </option>
+
+                                        <option>
+                                            38
+                                        </option>
+
+                                        <option>
+                                            40
+                                        </option>
 
                                     </select>
 
@@ -3973,7 +4123,7 @@
                             </div>
 
 
-                            <div class="two-fields">
+                            <div class="field-row">
 
                                 <div>
 
@@ -4071,11 +4221,9 @@
 
                     <!-- ISBN PREVIEW -->
 
-                    <aside
-                        class="preview-panel"
-                    >
+                    <aside class="preview-panel">
 
-                        <div class="preview-heading">
+                        <div class="preview-top">
 
                             <div>
 
@@ -4131,11 +4279,12 @@
                         </div>
 
 
-                        <div class="action-row">
+                        <div class="preview-actions">
 
                             <button
                                 id="isbnReset"
-                                class="secondary-button"
+                                type="button"
+                                class="btn-soft"
                             >
                                 Reset
                             </button>
@@ -4143,7 +4292,8 @@
 
                             <button
                                 id="isbnGenerate"
-                                class="primary-button"
+                                type="button"
+                                class="btn-blue"
                             >
                                 Generate PDF
                             </button>
@@ -4153,7 +4303,7 @@
 
                         <p
                             id="isbnStatus"
-                            class="status-text"
+                            class="preview-status"
                         >
                             Ready
                         </p>
@@ -4168,9 +4318,9 @@
 
 
 
-        <!-- =================================================
+        <!-- =====================================================
              CONTACT
-        ================================================== -->
+        ====================================================== -->
 
         <section
             class="contact-section"
@@ -4179,32 +4329,29 @@
 
             <div>
 
-                <span>
+                <div class="section-kicker">
                     NEED HELP?
-                </span>
-
+                </div>
 
                 <h2>
                     Contact the workspace owner.
                 </h2>
 
-
                 <p>
-                    For questions, feedback or improvements.
+                    Questions, feedback or improvements.
                 </p>
 
             </div>
 
 
             <a
-                class="email-button"
                 href="mailto:ashish.varma@bookswagon.in"
+                class="contact-email"
             >
                 ashish.varma@bookswagon.in
             </a>
 
         </section>
-
 
     </main>
 
@@ -4214,11 +4361,12 @@
          FOOTER
     ====================================================== -->
 
-    <footer class="site-footer">
+    <footer class="footer">
 
         <div class="footer-inner">
 
-            <div class="footer-brand">
+
+            <div>
 
                 <strong>
                     BooksWagon Label Studio
@@ -4231,7 +4379,7 @@
             </div>
 
 
-            <div class="footer-column">
+            <div class="footer-links">
 
                 <strong>
                     Tools
@@ -4246,13 +4394,13 @@
                 </a>
 
                 <a href="#tools">
-                    ISBN Barcode Generator
+                    ISBN Generator
                 </a>
 
             </div>
 
 
-            <div class="footer-column">
+            <div class="footer-links">
 
                 <strong>
                     Workspace
@@ -4263,7 +4411,7 @@
                 </a>
 
                 <a href="#contact">
-                    Contact Us
+                    Contact
                 </a>
 
                 <a
@@ -4283,7 +4431,6 @@
                 © 2026 BooksWagon Label Studio
             </span>
 
-
             <span>
                 Designed & Developed by
                 <strong>
@@ -4301,14 +4448,22 @@
          LIBRARIES
     ====================================================== -->
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js"
+    ></script>
 
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script
+        src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"
+    ></script>
+
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+    ></script>
+
 
     <script src="app.js"></script>
-
 
 </body>
 
