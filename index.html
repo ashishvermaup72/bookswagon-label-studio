@@ -16,28 +16,33 @@
   <title>Books Label Studio</title>
 
   <!-- =========================
-       CSS
+       MAIN CSS
   ========================== -->
   <link rel="stylesheet" href="style.css">
 
   <!-- =========================
-       External Libraries
+       EXTERNAL LIBRARIES
   ========================== -->
+
+  <!-- Excel -->
   <script
     src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
     defer
   ></script>
 
+  <!-- Barcode -->
   <script
     src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
     defer
   ></script>
 
+  <!-- QR Code -->
   <script
     src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"
     defer
   ></script>
 
+  <!-- PDF -->
   <script
     src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
     defer
@@ -47,7 +52,7 @@
 <body>
 
   <!-- =====================================================
-       TOAST
+       TOAST CONTAINER
   ====================================================== -->
 
   <div id="toastContainer"></div>
@@ -67,6 +72,7 @@
       >
         Books Label Studio
       </a>
+
 
       <nav class="nav">
 
@@ -91,6 +97,7 @@
           ABOUT
         </a>
 
+
         <button
           type="button"
           class="lang-btn active"
@@ -98,6 +105,7 @@
         >
           EN
         </button>
+
 
         <button
           type="button"
@@ -115,10 +123,15 @@
 
 
   <!-- =====================================================
-       HERO
+       MAIN
   ====================================================== -->
 
   <main id="home">
+
+
+    <!-- ===================================================
+         HERO
+    ==================================================== -->
 
     <section class="hero">
 
@@ -130,17 +143,20 @@
             BOOKS LABEL STUDIO
           </div>
 
+
           <h1>
             Professional
             <span>Label</span>
             Tools
           </h1>
 
+
           <p data-i18n="heroText">
             Create professional PO labels, ISBN barcodes
             and address stickers with flexible page sizes,
             Excel upload and print controls.
           </p>
+
 
           <div class="hero-buttons">
 
@@ -152,6 +168,7 @@
             >
               OPEN STUDIO
             </button>
+
 
             <a
               href="#support"
@@ -174,11 +191,13 @@
               BOOKS
             </div>
 
+
             <h2>
               LABEL
               <br>
               STUDIO
             </h2>
+
 
             <small>
               PRINT • LABEL • BARCODE
@@ -206,11 +225,15 @@
 
         <div class="section-heading">
 
-          <span>TOOLS</span>
+          <span>
+            TOOLS
+          </span>
+
 
           <h2 data-i18n="chooseTool">
             Choose your label tool
           </h2>
+
 
           <p data-i18n="chooseText">
             Select a category to start.
@@ -221,7 +244,10 @@
 
         <div class="tool-grid">
 
-          <!-- COCO BLUE -->
+
+          <!-- ===========================================
+               COCO BLUE PO
+          ============================================ -->
 
           <button
             type="button"
@@ -233,25 +259,40 @@
               01
             </div>
 
+
             <h3>
               Coco Blue PO
             </h3>
+
 
             <p>
               Create Coco Blue PO and Box labels
               using Individual, Multiple or Excel Upload.
             </p>
 
+
             <div class="tags">
-              <span>INDIVIDUAL</span>
-              <span>MULTIPLE</span>
-              <span>EXCEL</span>
+
+              <span>
+                INDIVIDUAL
+              </span>
+
+              <span>
+                MULTIPLE
+              </span>
+
+              <span>
+                EXCEL
+              </span>
+
             </div>
 
           </button>
 
 
-          <!-- OTHER PO -->
+          <!-- ===========================================
+               OTHER PO
+          ============================================ -->
 
           <button
             type="button"
@@ -263,25 +304,40 @@
               02
             </div>
 
+
             <h3>
               Other PO
             </h3>
+
 
             <p>
               Generate Other PO labels with Box Number,
               repetition, copies and Excel support.
             </p>
 
+
             <div class="tags">
-              <span>INDIVIDUAL</span>
-              <span>MULTIPLE</span>
-              <span>EXCEL</span>
+
+              <span>
+                INDIVIDUAL
+              </span>
+
+              <span>
+                MULTIPLE
+              </span>
+
+              <span>
+                EXCEL
+              </span>
+
             </div>
 
           </button>
 
 
-          <!-- ISBN -->
+          <!-- ===========================================
+               ISBN BARCODE
+          ============================================ -->
 
           <button
             type="button"
@@ -293,25 +349,40 @@
               03
             </div>
 
+
             <h3>
               ISBN Barcode
             </h3>
+
 
             <p>
               Generate barcode labels using ISBN,
               Book Title and optional Edition.
             </p>
 
+
             <div class="tags">
-              <span>MANUAL</span>
-              <span>EXCEL</span>
-              <span>BARCODE</span>
+
+              <span>
+                MANUAL
+              </span>
+
+              <span>
+                EXCEL
+              </span>
+
+              <span>
+                BARCODE
+              </span>
+
             </div>
 
           </button>
 
 
-          <!-- ADDRESS -->
+          <!-- ===========================================
+               ADDRESS STICKER
+          ============================================ -->
 
           <button
             type="button"
@@ -323,19 +394,32 @@
               04
             </div>
 
+
             <h3>
               Address Sticker
             </h3>
+
 
             <p>
               Print From and To address stickers
               manually or through Excel.
             </p>
 
+
             <div class="tags">
-              <span>FROM</span>
-              <span>TO</span>
-              <span>EXCEL</span>
+
+              <span>
+                FROM
+              </span>
+
+              <span>
+                TO
+              </span>
+
+              <span>
+                EXCEL
+              </span>
+
             </div>
 
           </button>
@@ -361,7 +445,9 @@
         <div class="workspace-card">
 
 
-          <!-- WORKSPACE HEADER -->
+          <!-- =============================================
+               WORKSPACE HEADER
+          ============================================== -->
 
           <div class="workspace-header">
 
@@ -371,15 +457,18 @@
                 LABEL STUDIO
               </div>
 
+
               <h2 id="workspaceTitle">
                 Coco Blue PO
               </h2>
+
 
               <p id="workspaceDescription">
                 Coco Blue PO and Box label generator.
               </p>
 
             </div>
+
 
             <button
               type="button"
@@ -412,6 +501,7 @@
                 INDIVIDUAL
               </button>
 
+
               <button
                 type="button"
                 class="subtool"
@@ -419,6 +509,7 @@
               >
                 MULTIPLE
               </button>
+
 
               <button
                 type="button"
@@ -438,6 +529,7 @@
             <div
               id="isbnSubTools"
               class="subtools"
+              style="display:none;"
             >
 
               <button
@@ -447,6 +539,7 @@
               >
                 MANUAL
               </button>
+
 
               <button
                 type="button"
@@ -466,6 +559,7 @@
             <div
               id="addressSubTools"
               class="subtools"
+              style="display:none;"
             >
 
               <button
@@ -475,6 +569,7 @@
               >
                 MANUAL
               </button>
+
 
               <button
                 type="button"
@@ -499,11 +594,13 @@
                   1
                 </div>
 
+
                 <div>
 
                   <h3>
                     Page Settings
                   </h3>
+
 
                   <p>
                     Select page size and orientation.
@@ -521,9 +618,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="pageSize">
                     Page Size
                   </label>
+
 
                   <select id="pageSize">
 
@@ -531,13 +629,16 @@
                       4 × 6 Inches
                     </option>
 
+
                     <option value="70x35">
                       70 × 35 mm
                     </option>
 
+
                     <option value="A4">
                       A4
                     </option>
+
 
                     <option value="CUSTOM">
                       Custom Size
@@ -552,15 +653,17 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="orientation">
                     Orientation
                   </label>
+
 
                   <select id="orientation">
 
                     <option value="portrait">
                       Portrait
                     </option>
+
 
                     <option value="landscape">
                       Landscape
@@ -575,9 +678,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="customWidth">
                     Custom Width (mm)
                   </label>
+
 
                   <input
                     id="customWidth"
@@ -595,9 +699,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="customHeight">
                     Custom Height (mm)
                   </label>
+
 
                   <input
                     id="customHeight"
@@ -616,7 +721,7 @@
 
 
             <!-- =================================================
-                 COCO / OTHER PO SECTION
+                 PO SECTION
             ================================================== -->
 
             <div
@@ -630,11 +735,13 @@
                   2
                 </div>
 
+
                 <div>
 
                   <h3>
                     PO Numbers
                   </h3>
+
 
                   <p>
                     Add up to 40 PO numbers manually,
@@ -646,7 +753,9 @@
               </div>
 
 
-              <!-- INDIVIDUAL -->
+              <!-- ============================================
+                   INDIVIDUAL PO
+              ============================================= -->
 
               <div id="individualInput">
 
@@ -658,7 +767,9 @@
               </div>
 
 
-              <!-- MULTIPLE -->
+              <!-- ============================================
+                   MULTIPLE PO
+              ============================================= -->
 
               <div
                 id="multipleInput"
@@ -667,9 +778,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="multiplePO">
                     Multiple PO Numbers
                   </label>
+
 
                   <textarea
                     id="multiplePO"
@@ -681,7 +793,9 @@
               </div>
 
 
-              <!-- EXCEL -->
+              <!-- ============================================
+                   PO EXCEL
+              ============================================= -->
 
               <div
                 id="poExcelInput"
@@ -694,10 +808,12 @@
                     PO Excel Upload
                   </h4>
 
+
                   <p>
                     First column should contain PO numbers.
                     Multiple rows are supported.
                   </p>
+
 
                   <input
                     id="poExcelFile"
@@ -705,10 +821,12 @@
                     accept=".xlsx,.xls,.csv"
                   >
 
+
                   <div
                     id="poExcelStatus"
                     class="excel-status"
                   ></div>
+
 
                   <div
                     id="poExcelPreview"
@@ -723,7 +841,7 @@
 
 
             <!-- =================================================
-                 BOX REPEAT SETTINGS
+                 BOX SETTINGS
             ================================================== -->
 
             <div
@@ -737,11 +855,13 @@
                   3
                 </div>
 
+
                 <div>
 
                   <h3>
                     Box Repeat Settings
                   </h3>
+
 
                   <p>
                     No artificial limit on Box, Repeat or Copies.
@@ -757,9 +877,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="startBox">
                     Start Box Number
                   </label>
+
 
                   <input
                     id="startBox"
@@ -773,9 +894,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="endBox">
                     End Box Number
                   </label>
+
 
                   <input
                     id="endBox"
@@ -789,9 +911,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="repeatCount">
                     Repeat Count
                   </label>
+
 
                   <input
                     id="repeatCount"
@@ -805,9 +928,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="copies">
                     Copies
                   </label>
+
 
                   <input
                     id="copies"
@@ -821,9 +945,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="labelsPerPage">
                     Labels Per Page
                   </label>
+
 
                   <input
                     id="labelsPerPage"
@@ -837,15 +962,17 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="pageFlow">
                     Page Flow
                   </label>
+
 
                   <select id="pageFlow">
 
                     <option value="same-po">
                       Same PO First
                     </option>
+
 
                     <option value="sequential">
                       Sequential
@@ -875,11 +1002,13 @@
                   4
                 </div>
 
+
                 <div>
 
                   <h3>
                     Label Features
                   </h3>
+
 
                   <p>
                     Select what should appear on the label.
@@ -895,7 +1024,10 @@
 
                 <!-- PO NUMBER -->
 
-                <label class="feature-checkbox">
+                <label
+                  id="printPOWrap"
+                  class="feature-checkbox"
+                >
 
                   <input
                     id="printPO"
@@ -903,7 +1035,9 @@
                     checked
                   >
 
+
                   <span class="custom-check"></span>
+
 
                   <span class="checkbox-text">
                     PO Number
@@ -914,7 +1048,10 @@
 
                 <!-- BOX NUMBER -->
 
-                <label class="feature-checkbox">
+                <label
+                  id="printBoxWrap"
+                  class="feature-checkbox"
+                >
 
                   <input
                     id="printBox"
@@ -922,7 +1059,9 @@
                     checked
                   >
 
+
                   <span class="custom-check"></span>
+
 
                   <span class="checkbox-text">
                     Box Number
@@ -931,7 +1070,7 @@
                 </label>
 
 
-                <!-- NEW PO + BOX -->
+                <!-- PO + BOX -->
 
                 <label
                   id="poPlusBoxWrap"
@@ -943,7 +1082,9 @@
                     type="checkbox"
                   >
 
+
                   <span class="custom-check"></span>
+
 
                   <span class="checkbox-text">
                     PO Number + Box Number
@@ -954,14 +1095,19 @@
 
                 <!-- COMBINED BORDER -->
 
-                <label class="feature-checkbox">
+                <label
+                  id="combinedBorderWrap"
+                  class="feature-checkbox"
+                >
 
                   <input
                     id="combinedBorder"
                     type="checkbox"
                   >
 
+
                   <span class="custom-check"></span>
+
 
                   <span class="checkbox-text">
                     Combined Border
@@ -982,7 +1128,9 @@
                     type="checkbox"
                   >
 
+
                   <span class="custom-check"></span>
+
 
                   <span class="checkbox-text">
                     PO Border
@@ -1003,7 +1151,9 @@
                     type="checkbox"
                   >
 
+
                   <span class="custom-check"></span>
+
 
                   <span class="checkbox-text">
                     Box Border
@@ -1014,14 +1164,19 @@
 
                 <!-- CUT LINE -->
 
-                <label class="feature-checkbox">
+                <label
+                  id="cutLineWrap"
+                  class="feature-checkbox"
+                >
 
                   <input
                     id="cutLine"
                     type="checkbox"
                   >
 
+
                   <span class="custom-check"></span>
+
 
                   <span class="checkbox-text">
                     Cut Line
@@ -1030,16 +1185,21 @@
                 </label>
 
 
-                <!-- SCISSOR -->
+                <!-- SCISSOR MARK -->
 
-                <label class="feature-checkbox">
+                <label
+                  id="scissorMarkWrap"
+                  class="feature-checkbox"
+                >
 
                   <input
                     id="scissorMark"
                     type="checkbox"
                   >
 
+
                   <span class="custom-check"></span>
+
 
                   <span class="checkbox-text">
                     Scissor Mark
@@ -1050,7 +1210,10 @@
 
                 <!-- PAGE BORDER -->
 
-                <label class="feature-checkbox">
+                <label
+                  id="pageBorderWrap"
+                  class="feature-checkbox"
+                >
 
                   <input
                     id="pageBorder"
@@ -1058,7 +1221,9 @@
                     checked
                   >
 
+
                   <span class="custom-check"></span>
+
 
                   <span class="checkbox-text">
                     Page Border
@@ -1069,7 +1234,9 @@
               </div>
 
 
-              <!-- BORDER SETTINGS -->
+              <!-- ===========================================
+                   BORDER SETTINGS
+              ============================================ -->
 
               <div
                 class="form-grid"
@@ -1078,9 +1245,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="borderStyle">
                     Border Style
                   </label>
+
 
                   <select id="borderStyle">
 
@@ -1088,9 +1256,11 @@
                       Solid
                     </option>
 
+
                     <option value="dashed">
                       Dashed
                     </option>
+
 
                     <option value="dotted">
                       Dotted
@@ -1103,9 +1273,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="borderSize">
                     Border Width
                   </label>
+
 
                   <select id="borderSize">
 
@@ -1113,12 +1284,14 @@
                       Thin
                     </option>
 
+
                     <option
                       value="medium"
                       selected
                     >
                       Medium
                     </option>
+
 
                     <option value="thick">
                       Thick
@@ -1131,9 +1304,10 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="borderColor">
                     Border Color
                   </label>
+
 
                   <input
                     id="borderColor"
@@ -1163,11 +1337,13 @@
                   5
                 </div>
 
+
                 <div>
 
                   <h3>
                     PO Number Font
                   </h3>
+
 
                   <p>
                     Separate font settings for PO Number.
@@ -1182,29 +1358,38 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="poFontFamily">
                     Font Family
                   </label>
 
-                  <select id="poFontFamily"></select>
+
+                  <select
+                    id="poFontFamily"
+                  ></select>
 
                 </div>
+
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="poFontSize">
                     Font Size
                   </label>
 
-                  <select id="poFontSize"></select>
+
+                  <select
+                    id="poFontSize"
+                  ></select>
 
                 </div>
+
 
                 <div class="form-field">
 
                   <label>
                     Font Style
                   </label>
+
 
                   <div class="font-actions">
 
@@ -1216,6 +1401,7 @@
                       B
                     </button>
 
+
                     <button
                       type="button"
                       class="font-toggle"
@@ -1223,6 +1409,7 @@
                     >
                       I
                     </button>
+
 
                     <button
                       type="button"
@@ -1234,17 +1421,20 @@
 
                   </div>
 
+
                   <input
                     id="poBold"
                     type="checkbox"
                     hidden
                   >
 
+
                   <input
                     id="poItalic"
                     type="checkbox"
                     hidden
                   >
+
 
                   <input
                     id="poUnderline"
@@ -1274,11 +1464,13 @@
                   6
                 </div>
 
+
                 <div>
 
                   <h3>
                     Box Number Font
                   </h3>
+
 
                   <p>
                     Separate font settings for Box Number.
@@ -1293,29 +1485,38 @@
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="boxFontFamily">
                     Font Family
                   </label>
 
-                  <select id="boxFontFamily"></select>
+
+                  <select
+                    id="boxFontFamily"
+                  ></select>
 
                 </div>
+
 
                 <div class="form-field">
 
-                  <label>
+                  <label for="boxFontSize">
                     Font Size
                   </label>
 
-                  <select id="boxFontSize"></select>
+
+                  <select
+                    id="boxFontSize"
+                  ></select>
 
                 </div>
+
 
                 <div class="form-field">
 
                   <label>
                     Font Style
                   </label>
+
 
                   <div class="font-actions">
 
@@ -1327,6 +1528,7 @@
                       B
                     </button>
 
+
                     <button
                       type="button"
                       class="font-toggle"
@@ -1334,6 +1536,7 @@
                     >
                       I
                     </button>
+
 
                     <button
                       type="button"
@@ -1345,17 +1548,20 @@
 
                   </div>
 
+
                   <input
                     id="boxBold"
                     type="checkbox"
                     hidden
                   >
 
+
                   <input
                     id="boxItalic"
                     type="checkbox"
                     hidden
                   >
+
 
                   <input
                     id="boxUnderline"
@@ -1371,7 +1577,7 @@
 
 
             <!-- =================================================
-                 ISBN
+                 ISBN SECTION
             ================================================== -->
 
             <div
@@ -1386,11 +1592,13 @@
                   2
                 </div>
 
+
                 <div>
 
                   <h3>
                     ISBN Barcode
                   </h3>
+
 
                   <p>
                     ISBN and Title are mandatory.
@@ -1402,15 +1610,18 @@
               </div>
 
 
+              <!-- ISBN MANUAL -->
+
               <div id="isbnManual">
 
                 <div class="form-grid">
 
                   <div class="form-field">
 
-                    <label>
+                    <label for="isbnValue">
                       ISBN *
                     </label>
+
 
                     <input
                       id="isbnValue"
@@ -1420,11 +1631,13 @@
 
                   </div>
 
+
                   <div class="form-field">
 
-                    <label>
+                    <label for="isbnTitle">
                       Book Title *
                     </label>
+
 
                     <input
                       id="isbnTitle"
@@ -1434,11 +1647,13 @@
 
                   </div>
 
+
                   <div class="form-field">
 
-                    <label>
+                    <label for="isbnEdition">
                       Edition
                     </label>
+
 
                     <input
                       id="isbnEdition"
@@ -1453,6 +1668,8 @@
               </div>
 
 
+              <!-- ISBN EXCEL -->
+
               <div
                 id="isbnExcel"
                 style="display:none;"
@@ -1464,11 +1681,13 @@
                     ISBN Excel Upload
                   </h4>
 
+
                   <p>
                     Required headers:
                     ISBN, Title.
                     Edition is optional.
                   </p>
+
 
                   <input
                     id="isbnExcelFile"
@@ -1476,10 +1695,12 @@
                     accept=".xlsx,.xls,.csv"
                   >
 
+
                   <div
                     id="isbnExcelStatus"
                     class="excel-status"
                   ></div>
+
 
                   <div
                     id="isbnExcelPreview"
@@ -1491,6 +1712,8 @@
               </div>
 
 
+              <!-- ISBN PREVIEW -->
+
               <div class="isbn-preview">
 
                 <div
@@ -1500,10 +1723,12 @@
                   Book Title
                 </div>
 
+
                 <div
                   id="isbnPreviewEdition"
                   class="isbn-preview-edition"
                 ></div>
+
 
                 <svg
                   id="isbnBarcode"
@@ -1516,7 +1741,7 @@
 
 
             <!-- =================================================
-                 ADDRESS
+                 ADDRESS SECTION
             ================================================== -->
 
             <div
@@ -1531,11 +1756,13 @@
                   2
                 </div>
 
+
                 <div>
 
                   <h3>
                     Address Sticker
                   </h3>
+
 
                   <p>
                     From and To are completely separate.
@@ -1546,7 +1773,9 @@
               </div>
 
 
-              <!-- ADDRESS MANUAL -->
+              <!-- ===========================================
+                   ADDRESS MANUAL
+              ============================================ -->
 
               <div id="addressManual">
 
@@ -1561,11 +1790,13 @@
                       FROM ADDRESS
                     </h4>
 
+
                     <div class="form-field">
 
-                      <label>
+                      <label for="fromName">
                         From Name
                       </label>
+
 
                       <input
                         id="fromName"
@@ -1575,13 +1806,16 @@
 
                     </div>
 
+
                     <br>
+
 
                     <div class="form-field">
 
-                      <label>
+                      <label for="fromAddress">
                         From Address
                       </label>
+
 
                       <textarea
                         id="fromAddress"
@@ -1597,9 +1831,10 @@
 
                         <div class="form-field">
 
-                          <label>
+                          <label for="fromFontFamily">
                             Font
                           </label>
+
 
                           <select
                             id="fromFontFamily"
@@ -1607,11 +1842,13 @@
 
                         </div>
 
+
                         <div class="form-field">
 
-                          <label>
+                          <label for="fromFontSize">
                             Font Size
                           </label>
+
 
                           <select
                             id="fromFontSize"
@@ -1632,6 +1869,7 @@
                           B
                         </button>
 
+
                         <button
                           type="button"
                           class="font-toggle"
@@ -1639,6 +1877,7 @@
                         >
                           I
                         </button>
+
 
                         <button
                           type="button"
@@ -1650,17 +1889,20 @@
 
                       </div>
 
+
                       <input
                         id="fromBold"
                         type="checkbox"
                         hidden
                       >
 
+
                       <input
                         id="fromItalic"
                         type="checkbox"
                         hidden
                       >
+
 
                       <input
                         id="fromUnderline"
@@ -1674,9 +1916,10 @@
                         style="margin-top:12px;"
                       >
 
-                        <label>
+                        <label for="fromBorderStyle">
                           From Border
                         </label>
+
 
                         <select
                           id="fromBorderStyle"
@@ -1686,13 +1929,16 @@
                             None
                           </option>
 
+
                           <option value="solid">
                             Solid
                           </option>
 
+
                           <option value="dashed">
                             Dashed
                           </option>
+
 
                           <option value="dotted">
                             Dotted
@@ -1715,11 +1961,13 @@
                       TO ADDRESS
                     </h4>
 
+
                     <div class="form-field">
 
-                      <label>
+                      <label for="toName">
                         To Name
                       </label>
+
 
                       <input
                         id="toName"
@@ -1729,13 +1977,16 @@
 
                     </div>
 
+
                     <br>
+
 
                     <div class="form-field">
 
-                      <label>
+                      <label for="toAddress">
                         To Address
                       </label>
+
 
                       <textarea
                         id="toAddress"
@@ -1751,9 +2002,10 @@
 
                         <div class="form-field">
 
-                          <label>
+                          <label for="toFontFamily">
                             Font
                           </label>
+
 
                           <select
                             id="toFontFamily"
@@ -1761,11 +2013,13 @@
 
                         </div>
 
+
                         <div class="form-field">
 
-                          <label>
+                          <label for="toFontSize">
                             Font Size
                           </label>
+
 
                           <select
                             id="toFontSize"
@@ -1786,6 +2040,7 @@
                           B
                         </button>
 
+
                         <button
                           type="button"
                           class="font-toggle"
@@ -1793,6 +2048,7 @@
                         >
                           I
                         </button>
+
 
                         <button
                           type="button"
@@ -1804,17 +2060,20 @@
 
                       </div>
 
+
                       <input
                         id="toBold"
                         type="checkbox"
                         hidden
                       >
 
+
                       <input
                         id="toItalic"
                         type="checkbox"
                         hidden
                       >
+
 
                       <input
                         id="toUnderline"
@@ -1828,9 +2087,10 @@
                         style="margin-top:12px;"
                       >
 
-                        <label>
+                        <label for="toBorderStyle">
                           To Border
                         </label>
+
 
                         <select
                           id="toBorderStyle"
@@ -1840,13 +2100,16 @@
                             None
                           </option>
 
+
                           <option value="solid">
                             Solid
                           </option>
 
+
                           <option value="dashed">
                             Dashed
                           </option>
+
 
                           <option value="dotted">
                             Dotted
@@ -1865,7 +2128,9 @@
               </div>
 
 
-              <!-- ADDRESS EXCEL -->
+              <!-- ===========================================
+                   ADDRESS EXCEL
+              ============================================ -->
 
               <div
                 id="addressExcel"
@@ -1878,11 +2143,13 @@
                     Address Excel Upload
                   </h4>
 
+
                   <p>
                     Required headers:
                     From and To.
                     Multiple rows are supported.
                   </p>
+
 
                   <input
                     id="addressExcelFile"
@@ -1890,10 +2157,12 @@
                     accept=".xlsx,.xls,.csv"
                   >
 
+
                   <div
                     id="addressExcelStatus"
                     class="excel-status"
                   ></div>
+
 
                   <div
                     id="addressExcelPreview"
@@ -1905,21 +2174,24 @@
               </div>
 
 
-              <!-- ADDRESS PREVIEW -->
+              <!-- ===========================================
+                   ADDRESS PREVIEW
+              ============================================ -->
 
               <div class="address-preview">
 
-                <div
-                  class="address-preview-side"
-                >
+
+                <div class="address-preview-side">
 
                   <small>
                     FROM
                   </small>
 
+
                   <strong id="previewFromName">
                     From Name
                   </strong>
+
 
                   <div id="previewFromAddress">
                     From Address
@@ -1928,17 +2200,17 @@
                 </div>
 
 
-                <div
-                  class="address-preview-side"
-                >
+                <div class="address-preview-side">
 
                   <small>
                     TO
                   </small>
 
+
                   <strong id="previewToName">
                     To Name
                   </strong>
+
 
                   <div id="previewToAddress">
                     To Address
@@ -1952,7 +2224,7 @@
 
 
             <!-- =================================================
-                 PREVIEW
+                 PO LIVE PREVIEW
             ================================================== -->
 
             <div
@@ -1966,11 +2238,13 @@
                   7
                 </div>
 
+
                 <div>
 
                   <h3>
                     Live Preview
                   </h3>
+
 
                   <p>
                     Preview changes automatically with page size.
@@ -1988,6 +2262,9 @@
                   class="preview-page"
                 >
 
+
+                  <!-- LABEL 1 -->
+
                   <div
                     id="previewLabel1"
                     class="preview-label"
@@ -2003,6 +2280,8 @@
 
                   </div>
 
+
+                  <!-- LABEL 2 -->
 
                   <div
                     id="previewLabel2"
@@ -2041,6 +2320,7 @@
                 RESET
               </button>
 
+
               <button
                 type="button"
                 id="generateButton"
@@ -2077,9 +2357,11 @@
             ABOUT
           </span>
 
+
           <h2>
             Books Label Studio
           </h2>
+
 
           <p>
             A dedicated workspace for PO labels,
@@ -2112,20 +2394,24 @@
               SUPPORT
             </div>
 
+
             <h2>
               Contact
             </h2>
+
 
             <p>
               For support and application-related queries,
               use the contact details below.
             </p>
 
+
             <a
               href="mailto:ashish.verma@bookswagon.in"
             >
               ashish.verma@bookswagon.in
             </a>
+
 
             <a
               href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
@@ -2135,6 +2421,7 @@
               Open Location in Google Maps
             </a>
 
+
             <div class="created">
               Books Label Studio
             </div>
@@ -2142,15 +2429,19 @@
           </div>
 
 
+          <!-- QR CODES -->
+
           <div class="qr-grid">
 
-            <!-- LOCATION QR -->
+
+            <!-- LOCATION -->
 
             <div class="qr-card">
 
               <h4>
                 LOCATION QR
               </h4>
+
 
               <div
                 id="locationQR"
@@ -2160,13 +2451,14 @@
             </div>
 
 
-            <!-- EMAIL QR -->
+            <!-- EMAIL -->
 
             <div class="qr-card">
 
               <h4>
                 EMAIL QR
               </h4>
+
 
               <div
                 id="emailQR"
@@ -2200,11 +2492,13 @@
           Books Label Studio
         </strong>
 
+
         <p>
           Professional label generation tools.
         </p>
 
       </div>
+
 
       <div>
 
@@ -2221,7 +2515,7 @@
 
 
   <!-- =====================================================
-       JS
+       MAIN JAVASCRIPT
   ====================================================== -->
 
   <script src="script.js"></script>
