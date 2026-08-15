@@ -1,1042 +1,1017 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>BooksWagon Label Studio</title>
-
-<!-- Libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<!-- JsBarcode = REAL BARCODE, NOT QR -->
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-
-<!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<!-- QR Code for office/email support -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-<!-- ZIP -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
-<style>
-/* =========================================================
-   GLOBAL
-========================================================= */
-
-:root{
-    --navy:#203d72;
-    --dark:#132b54;
-    --yellow:#ffc83d;
-    --bg:#f4f6f9;
-    --white:#ffffff;
-    --text:#172033;
-    --muted:#6b7483;
-    --border:#dce2ea;
-    --green:#149c60;
-    --red:#d83d3d;
-    --shadow:0 10px 30px rgba(20,45,85,.10);
+:root {
+    --blue: #203d72;
+    --dark: #132b54;
+    --yellow: #ffc83d;
+    --bg: #f3f5f8;
+    --white: #ffffff;
+    --text: #172033;
+    --muted: #6d7787;
+    --border: #d9e0e8;
+    --green: #159b61;
+    --red: #d63d3d;
+    --shadow: 0 10px 30px rgba(20, 45, 85, 0.10);
 }
 
-*{
-    box-sizing:border-box;
+* {
+    box-sizing: border-box;
 }
 
-html{
-    scroll-behavior:smooth;
+html {
+    scroll-behavior: smooth;
 }
 
-body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:Arial,Helvetica,sans-serif;
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 button,
 input,
 select,
-textarea{
-    font:inherit;
+textarea {
+    font: inherit;
 }
 
-button{
-    cursor:pointer;
+button {
+    cursor: pointer;
 }
 
-a{
-    text-decoration:none;
-    color:inherit;
+a {
+    text-decoration: none;
 }
 
-.container{
-    width:min(1180px,calc(100% - 30px));
-    margin:auto;
+.container {
+    width: min(1180px, calc(100% - 30px));
+    margin: auto;
 }
 
-
-/* =========================================================
+/* =====================================================
    HEADER
-========================================================= */
+===================================================== */
 
-.topbar{
-    position:sticky;
-    top:0;
-    z-index:1000;
-    background:var(--navy);
-    border-bottom:3px solid var(--yellow);
-    box-shadow:0 4px 15px rgba(0,0,0,.15);
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--blue);
+    border-bottom: 3px solid var(--yellow);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
-.topbar-inner{
-    min-height:68px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+.topbar-inner {
+    min-height: 66px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.brand{
-    color:#fff;
-    font-size:22px;
-    font-weight:900;
+.brand {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
 }
 
-.nav{
-    display:flex;
-    gap:25px;
+.nav {
+    display: flex;
+    gap: 24px;
 }
 
-.nav a{
-    color:#fff;
-    font-size:11px;
-    font-weight:800;
+.nav a {
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
 }
 
-
-/* =========================================================
+/* =====================================================
    HERO
-========================================================= */
+===================================================== */
 
-.hero{
-    background:var(--navy);
-    color:#fff;
-    padding:65px 0 80px;
+.hero {
+    background: var(--blue);
+    color: #fff;
+    padding: 60px 0 75px;
 }
 
-.hero-grid{
-    display:grid;
-    grid-template-columns:1.1fr .9fr;
-    gap:50px;
-    align-items:center;
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 50px;
+    align-items: center;
 }
 
-.kicker{
-    color:var(--yellow);
-    font-size:10px;
-    font-weight:900;
-    letter-spacing:2px;
+.kicker {
+    color: var(--yellow);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
 }
 
-.hero h1{
-    margin:12px 0;
-    font-family:Georgia,"Times New Roman",serif;
-    font-size:clamp(42px,6vw,68px);
-    line-height:1;
+.hero h1 {
+    margin: 12px 0;
+    font-family: Georgia, serif;
+    font-size: clamp(42px, 6vw, 68px);
+    line-height: 1;
 }
 
-.hero h1 span{
-    color:var(--yellow);
+.hero h1 span {
+    color: var(--yellow);
 }
 
-.hero p{
-    max-width:620px;
-    color:rgba(255,255,255,.75);
-    font-size:13px;
-    line-height:1.8;
+.hero p {
+    max-width: 620px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 13px;
+    line-height: 1.8;
 }
 
-.hero-buttons{
-    display:flex;
-    gap:10px;
-    margin-top:25px;
+.hero-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
 }
 
-.btn{
-    min-height:42px;
-    padding:0 17px;
-    border:0;
-    border-radius:5px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:10px;
-    font-weight:900;
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.btn {
+    min-height: 42px;
+    padding: 0 17px;
+    border: 0;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 900;
 }
 
-.btn-primary{
-    background:var(--yellow);
-    color:var(--dark);
+.btn-primary {
+    background: var(--yellow);
+    color: var(--dark);
 }
 
-.btn-secondary{
-    background:#eef1f5;
-    color:var(--navy);
+.btn-secondary {
+    background: #eef1f5;
+    color: var(--blue);
 }
 
-.btn-outline{
-    background:transparent;
-    color:#fff;
-    border:1px solid rgba(255,255,255,.4);
+.btn-outline {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.book-preview{
-    width:220px;
-    height:300px;
-    margin:auto;
-    padding:25px;
-    background:#f8f5e9;
-    color:var(--navy);
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    text-align:center;
-    box-shadow:20px 25px 50px rgba(0,0,0,.3);
-    transform:rotate(-2deg);
+.btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
 }
 
-.book-preview h2{
-    font-family:Georgia,"Times New Roman",serif;
-    font-size:28px;
+/* =====================================================
+   BOOK PREVIEW
+===================================================== */
+
+.book-preview {
+    width: 220px;
+    height: 300px;
+    margin: auto;
+    padding: 25px;
+    background: #f8f5e9;
+    color: var(--blue);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    box-shadow: 20px 25px 50px rgba(0, 0, 0, 0.3);
+    transform: rotate(-2deg);
 }
 
-
-/* =========================================================
-   SECTIONS
-========================================================= */
-
-.section{
-    padding:70px 0;
+.book-preview h2 {
+    font-family: Georgia, serif;
+    font-size: 28px;
 }
 
-.section-heading{
-    margin-bottom:30px;
+/* =====================================================
+   SECTION
+===================================================== */
+
+.section {
+    padding: 65px 0;
 }
 
-.section-heading span{
-    color:var(--navy);
-    font-size:9px;
-    font-weight:900;
-    letter-spacing:1.5px;
+.section-heading {
+    margin-bottom: 28px;
 }
 
-.section-heading h2{
-    margin:6px 0;
-    color:var(--navy);
-    font-family:Georgia,"Times New Roman",serif;
-    font-size:34px;
+.section-heading span {
+    color: var(--blue);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
 }
 
-.section-heading p{
-    color:var(--muted);
-    font-size:12px;
+.section-heading h2 {
+    margin: 6px 0;
+    color: var(--blue);
+    font-family: Georgia, serif;
+    font-size: 34px;
 }
 
+.section-heading p {
+    color: var(--muted);
+    font-size: 12px;
+}
 
-/* =========================================================
+/* =====================================================
    TOOL CARDS
-========================================================= */
+===================================================== */
 
-.tool-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:16px;
+.tool-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
 }
 
-.tool-card{
-    width:100%;
-    padding:24px;
-    background:#fff;
-    border:1px solid var(--border);
-    border-top:4px solid var(--yellow);
-    box-shadow:var(--shadow);
-    text-align:left;
-    transition:.2s;
+.tool-card {
+    width: 100%;
+    padding: 23px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--yellow);
+    box-shadow: var(--shadow);
+    text-align: left;
+    transition: 0.2s ease;
 }
 
-.tool-card:hover{
-    transform:translateY(-4px);
+.tool-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 35px rgba(20, 45, 85, 0.15);
 }
 
-.tool-number{
-    color:#b68b00;
-    font-size:9px;
-    font-weight:900;
+.tool-card:active {
+    transform: translateY(-1px);
 }
 
-.tool-card h3{
-    margin:9px 0;
-    color:var(--navy);
-    font-family:Georgia,"Times New Roman",serif;
-    font-size:21px;
+.tool-number {
+    color: #b68b00;
+    font-size: 9px;
+    font-weight: 900;
 }
 
-.tool-card p{
-    color:var(--muted);
-    font-size:10px;
-    line-height:1.7;
+.tool-card h3 {
+    margin: 9px 0;
+    color: var(--blue);
+    font-family: Georgia, serif;
+    font-size: 21px;
 }
 
-.tags{
-    display:flex;
-    flex-wrap:wrap;
-    gap:5px;
-    margin-top:15px;
+.tool-card p {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.7;
 }
 
-.tags span{
-    padding:4px 7px;
-    background:#eef2f7;
-    color:var(--navy);
-    font-size:8px;
-    font-weight:900;
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 14px;
 }
 
+.tags span {
+    padding: 4px 7px;
+    background: #eef2f7;
+    color: var(--blue);
+    font-size: 8px;
+    font-weight: 900;
+}
 
-/* =========================================================
+/* =====================================================
    WORKSPACE
-========================================================= */
+===================================================== */
 
-.workspace{
-    display:none;
-    padding:30px 0 70px;
+.workspace {
+    display: none;
+    padding: 25px 0 70px;
 }
 
-.workspace.active{
-    display:block;
+.workspace.active {
+    display: block;
 }
 
-.workspace-card{
-    overflow:hidden;
-    background:#fff;
-    border:1px solid var(--border);
-    box-shadow:var(--shadow);
+.workspace-card {
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
 }
 
-.workspace-header{
-    padding:25px 28px;
-    background:var(--navy);
-    color:#fff;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:20px;
+.workspace-header {
+    padding: 24px 28px;
+    background: var(--blue);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.workspace-header h2{
-    margin:5px 0;
-    font-family:Georgia,"Times New Roman",serif;
-    font-size:27px;
+.workspace-header h2 {
+    margin: 5px 0;
+    font-family: Georgia, serif;
+    font-size: 27px;
 }
 
-.workspace-header p{
-    margin:0;
-    color:rgba(255,255,255,.7);
-    font-size:10px;
+.workspace-header p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 10px;
 }
 
-.workspace-body{
-    padding:28px;
+.workspace-body {
+    padding: 28px;
 }
 
-
-/* =========================================================
+/* =====================================================
    TOOL SELECTOR
-========================================================= */
+===================================================== */
 
-.tool-selector{
-    display:flex;
-    flex-wrap:wrap;
-    gap:7px;
-    margin-bottom:25px;
+.tool-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 20px;
 }
 
-.tool-select-btn{
-    padding:10px 16px;
-    background:#fff;
-    border:1px solid var(--border);
-    border-radius:4px;
-    color:var(--muted);
-    font-size:10px;
-    font-weight:900;
+.tool-select-btn,
+.input-tab {
+    padding: 9px 13px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 900;
+    transition: 0.15s ease;
 }
 
-.tool-select-btn.active{
-    background:var(--navy);
-    color:#fff;
-    border-color:var(--navy);
+.tool-select-btn:hover,
+.input-tab:hover {
+    border-color: var(--blue);
 }
 
-
-/* =========================================================
-   CONFIG
-========================================================= */
-
-.config-section{
-    padding:25px 0;
-    border-bottom:1px solid var(--border);
+.tool-select-btn.active,
+.input-tab.active {
+    background: var(--blue);
+    color: #fff;
+    border-color: var(--blue);
 }
 
-.section-title{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    margin-bottom:17px;
+/* =====================================================
+   CONFIG SECTIONS
+===================================================== */
+
+.config-section {
+    padding: 25px 0;
+    border-bottom: 1px solid var(--border);
 }
 
-.step{
-    width:28px;
-    height:28px;
-    min-width:28px;
-    display:grid;
-    place-items:center;
-    border-radius:50%;
-    background:var(--yellow);
-    color:var(--dark);
-    font-size:9px;
-    font-weight:900;
+.section-title {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 17px;
 }
 
-.section-title h3{
-    margin:0;
-    color:var(--navy);
-    font-size:14px;
+.step {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--yellow);
+    color: var(--dark);
+    font-size: 9px;
+    font-weight: 900;
 }
 
-.section-title p{
-    margin:3px 0 0;
-    color:var(--muted);
-    font-size:10px;
+.section-title h3 {
+    margin: 0;
+    color: var(--blue);
+    font-size: 14px;
 }
 
-
-/* =========================================================
-   FORM
-========================================================= */
-
-.form-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px;
+.section-title p {
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: 10px;
 }
 
-.form-field label{
-    display:block;
-    margin-bottom:5px;
-    color:var(--muted);
-    font-size:9px;
-    font-weight:900;
+/* =====================================================
+   FORMS
+===================================================== */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 900;
 }
 
 input,
 select,
-textarea{
-    width:100%;
-    min-height:40px;
-    padding:9px 10px;
-    background:#fff;
-    color:var(--text);
-    border:1px solid #ccd3dd;
-    border-radius:4px;
-    outline:none;
+textarea {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 10px;
+    background: #fff;
+    color: var(--text);
+    border: 1px solid #ccd3dd;
+    border-radius: 4px;
+    outline: none;
 }
 
 input:focus,
 select:focus,
-textarea:focus{
-    border-color:var(--navy);
-    box-shadow:0 0 0 3px rgba(32,61,114,.08);
+textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(32, 61, 114, 0.08);
 }
 
-textarea{
-    min-height:110px;
-    resize:vertical;
-}
-
-
-/* =========================================================
-   LOCKED CONTROLS
-========================================================= */
-
-.locked{
-    opacity:.45;
-    pointer-events:none;
-    background:#edf0f4 !important;
+textarea {
+    min-height: 110px;
+    resize: vertical;
 }
 
 input:disabled,
-select:disabled{
-    cursor:not-allowed;
-    opacity:.55;
-    background:#edf0f4;
+select:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    background: #edf0f4;
 }
 
+/* =====================================================
+   PO GRID
+===================================================== */
 
-/* =========================================================
-   INPUT TABS
-========================================================= */
-
-.input-tabs{
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-    margin-bottom:14px;
+.po-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
 }
 
-.input-tab{
-    padding:9px 13px;
-    background:#fff;
-    border:1px solid var(--border);
-    border-radius:4px;
-    color:var(--muted);
-    font-size:9px;
-    font-weight:900;
+.po-field {
+    position: relative;
 }
 
-.input-tab.active{
-    background:var(--navy);
-    color:#fff;
+.po-field span {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9aa3b2;
+    font-size: 8px;
+    font-weight: 900;
+    pointer-events: none;
 }
 
-
-/* =========================================================
-   INPUT PANELS
-========================================================= */
-
-.input-panel{
-    display:none;
+.po-field input {
+    padding-left: 38px;
 }
 
-.input-panel.active{
-    display:block;
-}
-
-
-/* =========================================================
-   PO GRID — 20 OPTIONS
-========================================================= */
-
-.po-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:9px;
-}
-
-.po-field{
-    position:relative;
-}
-
-.po-field span{
-    position:absolute;
-    left:9px;
-    top:50%;
-    transform:translateY(-50%);
-    color:#9aa3b2;
-    font-size:8px;
-    font-weight:900;
-    pointer-events:none;
-}
-
-.po-field input{
-    padding-left:38px;
-}
-
-
-/* =========================================================
+/* =====================================================
    EXCEL
-========================================================= */
+===================================================== */
 
-.excel-box{
-    padding:22px;
-    background:#f8fafc;
-    border:1px dashed #aeb8c6;
+.excel-box {
+    padding: 22px;
+    background: #f8fafc;
+    border: 1px dashed #aeb8c6;
+    border-radius: 5px;
 }
 
-.excel-box h4{
-    margin:0 0 7px;
-    color:var(--navy);
-    font-size:13px;
+.excel-box h4 {
+    margin: 0 0 7px;
+    color: var(--blue);
+    font-size: 13px;
 }
 
-.excel-box p{
-    margin:0 0 15px;
-    color:var(--muted);
-    font-size:10px;
-    line-height:1.7;
+.excel-box p {
+    margin: 0 0 15px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.7;
 }
 
-.excel-status{
-    margin-top:10px;
-    color:var(--green);
-    font-size:10px;
-    font-weight:900;
+.excel-status {
+    margin-top: 10px;
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 900;
 }
 
-.excel-preview{
-    max-height:240px;
-    overflow:auto;
-    margin-top:15px;
-    border:1px solid var(--border);
+.excel-preview {
+    max-height: 240px;
+    overflow: auto;
+    margin-top: 15px;
 }
 
-.excel-preview:empty{
-    display:none;
-}
-
-.excel-preview table{
-    width:100%;
-    border-collapse:collapse;
+.excel-preview table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .excel-preview th,
-.excel-preview td{
-    padding:8px;
-    border:1px solid var(--border);
-    text-align:left;
-    font-size:9px;
-    white-space:nowrap;
+.excel-preview td {
+    padding: 8px;
+    border: 1px solid var(--border);
+    font-size: 9px;
+    text-align: left;
 }
 
-.excel-preview th{
-    background:var(--navy);
-    color:#fff;
-    position:sticky;
-    top:0;
+.excel-preview th {
+    position: sticky;
+    top: 0;
+    background: var(--blue);
+    color: #fff;
 }
 
-
-/* =========================================================
+/* =====================================================
    ADDRESS
-========================================================= */
+===================================================== */
 
-.address-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
+.address-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
-.address-card{
-    padding:18px;
-    background:#f8fafc;
-    border:1px solid var(--border);
+.address-card {
+    padding: 18px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 5px;
 }
 
-.address-card h4{
-    margin:0 0 12px;
-    color:var(--navy);
-    font-size:12px;
+.address-card h4 {
+    margin: 0 0 12px;
+    color: var(--blue);
+    font-size: 12px;
 }
 
-.address-card textarea{
-    min-height:130px;
-}
-
-
-/* =========================================================
-   ADDRESS STICKER
-========================================================= */
-
-.address-sticker-preview{
-    width:min(100%,650px);
-    min-height:300px;
-    margin:25px auto;
-    padding:28px;
-    background:#fff;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
-    align-items:center;
-    border:2px solid #111827;
-    box-shadow:var(--shadow);
-}
-
-.address-side{
-    padding:20px;
-}
-
-.address-side:first-child{
-    border-right:1px dashed #888;
-}
-
-.address-side small{
-    display:block;
-    margin-bottom:8px;
-    color:#888;
-    font-size:9px;
-    font-weight:900;
-}
-
-.address-side strong{
-    display:block;
-    margin-bottom:10px;
-    color:var(--navy);
-    font-size:18px;
-}
-
-.address-side div{
-    white-space:pre-line;
-    font-size:11px;
-    line-height:1.6;
-}
-
-
-/* =========================================================
-   ISBN
-========================================================= */
-
-.isbn-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
-}
-
-.isbn-card{
-    padding:18px;
-    background:#f8fafc;
-    border:1px solid var(--border);
-}
-
-.isbn-card h4{
-    margin:0 0 12px;
-    color:var(--navy);
-    font-size:12px;
-}
-
-.isbn-card small{
-    color:var(--muted);
-    font-size:9px;
-    line-height:1.6;
-}
-
-.isbn-barcode-preview{
-    margin:25px auto;
-    padding:25px;
-    min-height:220px;
-    max-width:600px;
-    background:#fff;
-    border:1px solid var(--border);
-    box-shadow:var(--shadow);
-    text-align:center;
-}
-
-.isbn-barcode-preview .book-title{
-    margin-top:12px;
-    color:var(--navy);
-    font-weight:900;
-    font-size:15px;
-}
-
-.isbn-barcode-preview .edition{
-    margin-top:5px;
-    color:var(--muted);
-    font-size:10px;
-}
-
-#isbnBarcode{
-    max-width:100%;
-    height:auto;
-}
-
-
-/* =========================================================
+/* =====================================================
    CHECKBOXES
-========================================================= */
+===================================================== */
 
-.checkbox-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:8px;
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
 }
 
-.feature-checkbox{
-    min-height:44px;
-    padding:9px 12px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    border:1px solid var(--border);
-    background:#fff;
-    cursor:pointer;
-    user-select:none;
+.feature-checkbox {
+    position: relative;
+    min-height: 44px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border);
+    background: #fff;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 4px;
+    transition: 0.15s ease;
 }
 
-.feature-checkbox input{
-    position:absolute;
-    opacity:0;
-    pointer-events:none;
+.feature-checkbox:hover {
+    border-color: var(--blue);
+    background: #fafbfd;
 }
 
-.custom-check{
-    width:18px;
-    height:18px;
-    min-width:18px;
-    position:relative;
-    border:2px solid #aab3c0;
-    border-radius:3px;
-    background:#fff;
+.feature-checkbox input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
 }
 
-.feature-checkbox input:checked + .custom-check{
-    background:var(--navy);
-    border-color:var(--navy);
+.custom-check {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    position: relative;
+    border: 2px solid #aab3c0;
+    border-radius: 3px;
+    background: #fff;
+    transition: 0.15s ease;
 }
 
-.feature-checkbox input:checked + .custom-check::after{
-    content:"✓";
-    position:absolute;
-    inset:0;
-    display:grid;
-    place-items:center;
-    color:var(--yellow);
-    font-size:12px;
-    font-weight:900;
+.feature-checkbox input:checked + .custom-check {
+    background: var(--blue);
+    border-color: var(--blue);
 }
 
-.checkbox-text{
-    font-size:10px;
-    font-weight:800;
+.feature-checkbox input:checked + .custom-check::after {
+    content: "✓";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--yellow);
+    font-size: 12px;
+    font-weight: 900;
 }
 
+.checkbox-text {
+    font-size: 10px;
+    font-weight: 800;
+}
 
-/* =========================================================
+/* =====================================================
+   ISBN
+===================================================== */
+
+.isbn-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.isbn-card {
+    padding: 18px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+}
+
+.isbn-card h4 {
+    margin: 0 0 12px;
+    color: var(--blue);
+    font-size: 12px;
+}
+
+.isbn-barcode-preview {
+    margin: 25px auto;
+    padding: 25px;
+    max-width: 600px;
+    min-height: 220px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.isbn-barcode-preview svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.book-title {
+    margin-top: 12px;
+    color: var(--blue);
+    font-weight: 900;
+}
+
+.edition {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* =====================================================
+   ADDRESS STICKER PREVIEW
+===================================================== */
+
+.address-sticker-preview {
+    width: min(100%, 700px);
+    min-height: 300px;
+    margin: 25px auto;
+    padding: 25px;
+    background: #fff;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    border: 2px solid #111827;
+}
+
+.address-side {
+    padding: 20px;
+}
+
+.address-side:first-child {
+    border-right: 1px dashed #777;
+}
+
+.address-side small {
+    display: block;
+    margin-bottom: 8px;
+    color: #888;
+    font-size: 9px;
+    font-weight: 900;
+}
+
+.address-side strong {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--blue);
+    font-size: 18px;
+}
+
+.address-side div {
+    white-space: pre-line;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* =====================================================
    PREVIEW
-========================================================= */
+===================================================== */
 
-.preview-section{
-    margin-top:28px;
-    padding:25px;
-    background:#eef1f5;
-    border:1px solid var(--border);
+.preview-section {
+    margin-top: 28px;
+    padding: 25px;
+    background: #eef1f5;
+    border: 1px solid var(--border);
 }
 
-.preview-page{
-    width:min(100%,600px);
-    min-height:420px;
-    margin:auto;
-    padding:30px;
-    background:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+.preview-page {
+    width: min(100%, 650px);
+    min-height: 430px;
+    margin: auto;
+    padding: 20px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
-.preview-content{
-    width:85%;
-    padding:20px;
-    text-align:center;
+.preview-label {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 20px;
+    text-align: center;
 }
 
-.preview-po,
-.preview-box{
-    min-width:180px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    padding:12px 22px;
-    margin:5px;
-    font-size:18px;
-    font-weight:700;
+.preview-label.half {
+    border-bottom: 1px dashed #777;
 }
 
-.preview-cut{
-    margin:12px 0;
-    font-size:12px;
-    letter-spacing:2px;
+.preview-inner {
+    width: 90%;
+    padding: 25px;
 }
 
-.hidden-preview{
-    display:none!important;
+.preview-po {
+    color: var(--blue);
+    font-size: 28px;
+    font-weight: 900;
+    word-break: break-word;
 }
 
+.preview-box {
+    margin-top: 15px;
+    font-size: 22px;
+    font-weight: 800;
+}
 
-/* =========================================================
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.workspace-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+/* =====================================================
    SUPPORT
-========================================================= */
+===================================================== */
 
-.support-card{
-    padding:30px;
-    background:#fff;
-    border:1px solid var(--border);
-    box-shadow:var(--shadow);
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:40px;
+.support-card {
+    padding: 30px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
 }
 
-.support-card h2{
-    margin:5px 0 10px;
-    color:var(--navy);
-    font-family:Georgia,"Times New Roman",serif;
-    font-size:30px;
+.support-card h2 {
+    margin: 5px 0 10px;
+    color: var(--blue);
+    font-family: Georgia, serif;
+    font-size: 30px;
 }
 
-.address-link,
-.email-link{
-    display:block;
-    color:var(--navy);
-    font-size:11px;
-    font-weight:800;
-    line-height:1.8;
+.support-card p {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.7;
 }
 
-.created{
-    margin-top:20px;
-    color:var(--muted);
-    font-size:10px;
+.support-card a {
+    display: block;
+    color: var(--blue);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.8;
 }
 
-.created strong{
-    color:var(--navy);
+.created {
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 10px;
 }
 
-.qr-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
+.created strong {
+    color: var(--blue);
 }
 
-.qr-card{
-    padding:15px;
-    background:#f7f8fa;
-    border:1px solid var(--border);
-    text-align:center;
+.qr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
 }
 
-.qr-card h4{
-    margin:0 0 10px;
-    color:var(--navy);
-    font-size:10px;
+.qr-card {
+    padding: 15px;
+    background: #f7f8fa;
+    border: 1px solid var(--border);
+    text-align: center;
 }
 
-.qr-code{
-    width:140px;
-    height:140px;
-    margin:auto;
-    display:grid;
-    place-items:center;
-    background:#fff;
+.qr-card h4 {
+    margin: 0 0 10px;
+    color: var(--blue);
+    font-size: 10px;
 }
 
+.qr-code {
+    width: 140px;
+    height: 140px;
+    margin: auto;
+    display: grid;
+    place-items: center;
+    background: #fff;
+}
 
-/* =========================================================
+.qr-code img,
+.qr-code canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* =====================================================
    FOOTER
-========================================================= */
+===================================================== */
 
-footer{
-    background:var(--navy);
-    color:#fff;
-    border-top:5px solid var(--yellow);
+footer {
+    background: var(--blue);
+    color: #fff;
+    border-top: 5px solid var(--yellow);
 }
 
-.footer-grid{
-    padding:35px 0;
-    display:grid;
-    grid-template-columns:1.4fr 1fr 1fr;
-    gap:30px;
+.footer-grid {
+    padding: 35px 0;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 30px;
 }
 
-.footer-brand{
-    font-size:20px;
-    font-weight:900;
+.footer-brand {
+    font-size: 20px;
+    font-weight: 900;
 }
 
-.footer-grid strong{
-    color:var(--yellow);
-    font-size:10px;
+.footer-grid strong {
+    color: var(--yellow);
+    font-size: 10px;
 }
 
 .footer-grid p,
-.footer-grid a{
-    color:rgba(255,255,255,.68);
-    font-size:10px;
-    line-height:1.7;
+.footer-grid a {
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 10px;
+    line-height: 1.7;
 }
 
-.footer-bottom{
-    padding:13px 0;
-    border-top:1px solid rgba(255,255,255,.1);
-    color:rgba(255,255,255,.5);
-    font-size:9px;
-    display:flex;
-    justify-content:space-between;
+.footer-bottom {
+    padding: 13px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 9px;
+    display: flex;
+    justify-content: space-between;
 }
 
-
-/* =========================================================
+/* =====================================================
    TOAST
-========================================================= */
+===================================================== */
 
-#toastContainer{
-    position:fixed;
-    top:82px;
-    right:18px;
-    z-index:99999;
-    width:min(350px,calc(100vw - 30px));
+#toastContainer {
+    position: fixed;
+    top: 80px;
+    right: 18px;
+    z-index: 99999;
+    width: min(350px, calc(100vw - 30px));
+    pointer-events: none;
 }
 
-.toast{
-    padding:13px 15px;
-    margin-bottom:8px;
-    background:#fff;
-    border:1px solid var(--border);
-    border-left:4px solid var(--green);
-    box-shadow:var(--shadow);
-    color:var(--green);
-    font-size:10px;
-    font-weight:800;
+.toast {
+    padding: 13px 15px;
+    margin-bottom: 8px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green);
+    box-shadow: var(--shadow);
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 800;
+    animation: toastIn 0.2s ease;
 }
 
-.toast.error{
-    color:var(--red);
-    border-left-color:var(--red);
+.toast.error {
+    color: var(--red);
+    border-left-color: var(--red);
 }
 
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media(max-width:1050px){
-
-    .tool-grid{
-        grid-template-columns:repeat(2,1fr);
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(15px);
     }
 
-    .po-grid{
-        grid-template-columns:repeat(3,1fr);
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
-@media(max-width:900px){
+/* =====================================================
+   MOBILE
+===================================================== */
 
-    .hero-grid{
-        grid-template-columns:1fr;
+@media (max-width: 1050px) {
+
+    .tool-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    .form-grid{
-        grid-template-columns:repeat(2,1fr);
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    .support-card{
-        grid-template-columns:1fr;
+    .po-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
-@media(max-width:650px){
+@media (max-width: 800px) {
 
-    .nav{
-        display:none;
+    .hero-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .support-card {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .isbn-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .container {
+        width: min(100% - 20px, 1180px);
+    }
+
+    .nav {
+        display: none;
     }
 
     .tool-grid,
@@ -1044,5734 +1019,57 @@ footer{
     .po-grid,
     .checkbox-grid,
     .address-grid,
-    .isbn-grid,
     .address-sticker-preview,
-    .footer-grid{
-        grid-template-columns:1fr;
+    .footer-grid {
+        grid-template-columns: 1fr;
     }
 
-    .workspace-body{
-        padding:18px;
+    .workspace-body {
+        padding: 18px;
     }
 
-    .workspace-header{
-        flex-direction:column;
-        align-items:flex-start;
+    .workspace-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
     }
 
-    .workspace-actions{
-        flex-direction:column;
+    .address-side:first-child {
+        border-right: 0;
+        border-bottom: 1px dashed #777;
     }
 
-    .workspace-actions .btn{
-        width:100%;
+    .qr-grid {
+        grid-template-columns: 1fr;
     }
 
-    .address-side:first-child{
-        border-right:0;
-        border-bottom:1px dashed #888;
+    .workspace-actions {
+        flex-direction: column;
     }
 
-    .qr-grid{
-        grid-template-columns:1fr;
+    .workspace-actions .btn {
+        width: 100%;
     }
-}
-</style>
-</head>
 
-
-<body>
-
-<!-- =========================================================
-HEADER
-========================================================= -->
-
-<header class="topbar">
-
-<div class="container topbar-inner">
-
-<div class="brand">
-    BooksWagon
-</div>
-
-<nav class="nav">
-    <a href="#tools">Tools</a>
-    <a href="#support">Support</a>
-</nav>
-
-</div>
-
-</header>
-
-
-<!-- =========================================================
-HERO
-========================================================= -->
-
-<section class="hero">
-
-<div class="container hero-grid">
-
-<div>
-
-<div class="kicker">
-BOOKSWAGON LABEL STUDIO
-</div>
-
-<h1>
-Professional
-<span>Labels.</span>
-</h1>
-
-<p>
-Create PO labels, ISBN barcodes and
-From / To address stickers with Excel
-bulk upload support.
-</p>
-
-<div class="hero-buttons">
-
-<a
-    href="#tools"
-    class="btn btn-primary"
->
-Start Creating
-</a>
-
-<a
-    href="#support"
-    class="btn btn-outline"
->
-Support
-</a>
-
-</div>
-
-</div>
-
-
-<div>
-
-<div class="book-preview">
-
-<div>BOOKSWAGON</div>
-
-<h2>
-LABEL<br>
-STUDIO
-</h2>
-
-<div style="font-size:60px">
-◈
-</div>
-
-<div>
-PO • BOX • ISBN • ADDRESS
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =========================================================
-TOOLS
-========================================================= -->
-
-<section
-    id="tools"
-    class="section"
->
-
-<div class="container">
-
-<div class="section-heading">
-
-<span>
-LABEL TOOLS
-</span>
-
-<h2>
-Choose your workflow.
-</h2>
-
-<p>
-Four separate tools with their own Excel workflows.
-</p>
-
-</div>
-
-
-<div class="tool-grid">
-
-
-<!-- COCO BLUE -->
-
-<button
-    class="tool-card"
-    data-tool="Coco Blue PO"
->
-
-<span class="tool-number">
-01
-</span>
-
-<h3>
-Coco Blue PO
-</h3>
-
-<p>
-PO and Box label generation with
-Excel upload and address support.
-</p>
-
-<div class="tags">
-<span>20 PO</span>
-<span>EXCEL</span>
-<span>BOX</span>
-<span>ADDRESS</span>
-</div>
-
-</button>
-
-
-<!-- OTHER PO -->
-
-<button
-    class="tool-card"
-    data-tool="Other PO"
->
-
-<span class="tool-number">
-02
-</span>
-
-<h3>
-Other PO
-</h3>
-
-<p>
-Other PO label generation with
-Excel upload and From / To support.
-</p>
-
-<div class="tags">
-<span>20 PO</span>
-<span>EXCEL</span>
-<span>BOX</span>
-<span>ADDRESS</span>
-</div>
-
-</button>
-
-
-<!-- ISBN BARCODE -->
-
-<button
-    class="tool-card"
-    data-tool="ISBN Barcode"
->
-
-<span class="tool-number">
-03
-</span>
-
-<h3>
-ISBN Barcode
-</h3>
-
-<p>
-Generate real barcodes from ISBN,
-Book Title and optional Edition.
-</p>
-
-<div class="tags">
-<span>BARCODE</span>
-<span>EXCEL</span>
-<span>TITLE</span>
-<span>EDITION</span>
-</div>
-
-</button>
-
-
-<!-- ADDRESS -->
-
-<button
-    class="tool-card"
-    data-tool="Address Sticker"
->
-
-<span class="tool-number">
-04
-</span>
-
-<h3>
-Address Sticker
-</h3>
-
-<p>
-Create From BooksWagon → To
-Customer / Company address stickers.
-</p>
-
-<div class="tags">
-<span>FROM</span>
-<span>TO</span>
-<span>EXCEL</span>
-<span>STICKER</span>
-</div>
-
-</button>
-
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =========================================================
-WORKSPACE
-========================================================= -->
-
-<section
-    id="workspace"
-    class="workspace"
->
-
-<div class="container">
-
-<div class="workspace-card">
-
-
-<div class="workspace-header">
-
-<div>
-
-<div class="kicker">
-BOOKSWAGON
-</div>
-
-<h2 id="workspaceTitle">
-Label Generator
-</h2>
-
-<p id="workspaceDescription">
-Configure your label.
-</p>
-
-</div>
-
-
-<button
-    type="button"
-    id="closeWorkspace"
-    class="btn btn-outline"
->
-Back to Tools
-</button>
-
-</div>
-
-
-<div class="workspace-body">
-
-
-<!-- TOOL SWITCH -->
-
-<div class="tool-selector">
-
-<button
-    class="tool-select-btn"
-    data-select-tool="Coco Blue PO"
->
-Coco Blue PO
-</button>
-
-<button
-    class="tool-select-btn"
-    data-select-tool="Other PO"
->
-Other PO
-</button>
-
-<button
-    class="tool-select-btn"
-    data-select-tool="ISBN Barcode"
->
-ISBN Barcode
-</button>
-
-<button
-    class="tool-select-btn"
-    data-select-tool="Address Sticker"
->
-Address Sticker
-</button>
-
-</div>
-
-
-<!-- =======================================================
-PO / ISBN INPUT
-======================================================= -->
-
-<section
-    id="poInputSection"
-    class="config-section"
->
-
-<div class="section-title">
-
-<span class="step">
-01
-</span>
-
-<div>
-
-<h3>
-Input
-</h3>
-
-<p>
-Enter manually or upload Excel.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="input-tabs">
-
-
-<button
-    class="input-tab active"
-    data-input="individual"
->
-Individual
-</button>
-
-
-<button
-    class="input-tab"
-    data-input="multiple"
->
-Multiple
-</button>
-
-
-<button
-    class="input-tab"
-    data-input="excel"
->
-Excel Upload
-</button>
-
-
-</div>
-
-
-<!-- INDIVIDUAL PO -->
-
-<div
-    id="individualInput"
-    class="input-panel active"
->
-
-<div
-    id="poGrid"
-    class="po-grid"
->
-</div>
-
-</div>
-
-
-<!-- MULTIPLE PO -->
-
-<div
-    id="multipleInput"
-    class="input-panel"
->
-
-<textarea
-    id="multiplePO"
-    placeholder="Paste multiple PO numbers here.
-
-PO10001
-PO10002
-PO10003
-PO10004"
-></textarea>
-
-</div>
-
-
-<!-- PO EXCEL -->
-
-<div
-    id="poExcelInput"
-    class="input-panel"
->
-
-<div class="excel-box">
-
-<h4>
-PO Excel Upload
-</h4>
-
-<p>
-For Coco Blue and Other PO, the first
-column should contain PO numbers.
-</p>
-
-<input
-    type="file"
-    id="poExcelFile"
-    accept=".xlsx,.xls,.csv"
->
-
-<div
-    id="poExcelStatus"
-    class="excel-status"
->
-No Excel file selected.
-</div>
-
-<div
-    id="poExcelPreview"
-    class="excel-preview"
->
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-ISBN BARCODE
-======================================================= -->
-
-<section
-    id="isbnSection"
-    class="config-section"
-    style="display:none"
->
-
-<div class="section-title">
-
-<span class="step">
-01
-</span>
-
-<div>
-
-<h3>
-ISBN Barcode Generator
-</h3>
-
-<p>
-Real barcode generator — not QR code.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="input-tabs">
-
-<button
-    class="input-tab active"
-    data-isbn-input="manual"
->
-Manual
-</button>
-
-<button
-    class="input-tab"
-    data-isbn-input="excel"
->
-Excel Upload
-</button>
-
-</div>
-
-
-<!-- ISBN MANUAL -->
-
-<div
-    id="isbnManual"
-    class="input-panel active"
->
-
-<div class="isbn-grid">
-
-<div class="isbn-card">
-
-<h4>
-ISBN *
-</h4>
-
-<input
-    id="manualISBN"
-    type="text"
-    placeholder="Any alphanumeric ISBN"
->
-
-<small>
-ISBN is mandatory. No fixed character
-length is enforced.
-</small>
-
-</div>
-
-
-<div class="isbn-card">
-
-<h4>
-Book Title *
-</h4>
-
-<input
-    id="manualTitle"
-    type="text"
-    placeholder="Book title"
->
-
-<small>
-Book title is mandatory.
-</small>
-
-</div>
-
-
-<div class="isbn-card">
-
-<h4>
-Edition
-</h4>
-
-<input
-    id="manualEdition"
-    type="text"
-    placeholder="Optional"
->
-
-<small>
-Edition is optional.
-</small>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ISBN EXCEL -->
-
-<div
-    id="isbnExcel"
-    class="input-panel"
->
-
-<div class="excel-box">
-
-<h4>
-ISBN Barcode Excel Upload
-</h4>
-
-<p>
-
-<strong>Required columns:</strong>
-
-<br><br>
-
-Column A:
-<strong>ISBN</strong> — mandatory
-
-<br>
-
-Column B:
-<strong>Title</strong> — mandatory
-
-<br>
-
-Column C:
-<strong>Edition</strong> — optional
-
-<br><br>
-
-Example:
-
-<br>
-
-ISBN | Title | Edition
-
-<br>
-
-ABC123 | Book Name | 2nd
-
-<br>
-
-9780000000000 | Another Book |
-
-</p>
-
-
-<input
-    type="file"
-    id="isbnExcelFile"
-    accept=".xlsx,.xls,.csv"
->
-
-<div
-    id="isbnExcelStatus"
-    class="excel-status"
->
-No ISBN Excel file selected.
-</div>
-
-<div
-    id="isbnExcelPreview"
-    class="excel-preview"
->
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ISBN BARCODE PREVIEW -->
-
-<div class="isbn-barcode-preview">
-
-<svg
-    id="isbnBarcode"
->
-</svg>
-
-<div
-    id="isbnPreviewTitle"
-    class="book-title"
->
-Book Title
-</div>
-
-<div
-    id="isbnPreviewEdition"
-    class="edition"
->
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-COCO BLUE / OTHER PO ADDRESS
-======================================================= -->
-
-<section
-    id="poAddressSection"
-    class="config-section"
->
-
-<div class="section-title">
-
-<span class="step">
-02
-</span>
-
-<div>
-
-<h3>
-From / To Address
-</h3>
-
-<p>
-Available for Coco Blue PO and Other PO.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="address-grid">
-
-
-<div class="address-card">
-
-<h4>
-FROM — BOOKSWAGON
-</h4>
-
-<input
-    id="fromName"
-    value="BooksWagon"
->
-
-<br><br>
-
-<textarea
-    id="fromAddress"
->Ground Floor, 2/14, Ansari Rd, Old Delhi, Daryaganj, Delhi, 110002</textarea>
-
-</div>
-
-
-<div class="address-card">
-
-<h4>
-TO — CUSTOMER / COMPANY
-</h4>
-
-<input
-    id="toName"
-    placeholder="XYZ Company"
->
-
-<br><br>
-
-<textarea
-    id="toAddress"
-    placeholder="Customer / Company address"
-></textarea>
-
-</div>
-
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-ADDRESS STICKER
-======================================================= -->
-
-<section
-    id="addressSection"
-    class="config-section"
-    style="display:none"
->
-
-<div class="section-title">
-
-<span class="step">
-01
-</span>
-
-<div>
-
-<h3>
-Address Sticker
-</h3>
-
-<p>
-Upload multiple From / To addresses.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="input-tabs">
-
-<button
-    class="input-tab active"
-    data-address-mode="manual"
->
-Manual
-</button>
-
-<button
-    class="input-tab"
-    data-address-mode="excel"
->
-Excel Upload
-</button>
-
-</div>
-
-
-<!-- MANUAL ADDRESS -->
-
-<div
-    id="addressManual"
-    class="input-panel active"
->
-
-<div class="address-grid">
-
-<div class="address-card">
-
-<h4>
-FROM
-</h4>
-
-<input
-    id="stickerFromName"
-    value="BooksWagon"
->
-
-<br><br>
-
-<textarea
-    id="stickerFromAddress"
->Ground Floor, 2/14, Ansari Rd, Old Delhi, Daryaganj, Delhi, 110002</textarea>
-
-</div>
-
-
-<div class="address-card">
-
-<h4>
-TO
-</h4>
-
-<input
-    id="stickerToName"
-    placeholder="XYZ Company"
->
-
-<br><br>
-
-<textarea
-    id="stickerToAddress"
-    placeholder="Customer / Company address"
-></textarea>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ADDRESS EXCEL -->
-
-<div
-    id="addressExcel"
-    class="input-panel"
->
-
-<div class="excel-box">
-
-<h4>
-Address Excel Upload
-</h4>
-
-<p>
-
-<strong>Exactly two columns:</strong>
-
-<br><br>
-
-Column A:
-<strong>From</strong>
-
-<br>
-
-Column B:
-<strong>To</strong>
-
-<br><br>
-
-Each row creates one separate
-From → To address sticker.
-
-<br><br>
-
-Example:
-
-<br>
-
-From | To
-
-<br>
-
-BooksWagon Address | XYZ Company Address
-
-<br>
-
-BooksWagon Address | ABC Company Address
-
-</p>
-
-
-<input
-    type="file"
-    id="addressExcelFile"
-    accept=".xlsx,.xls,.csv"
->
-
-<div
-    id="addressExcelStatus"
-    class="excel-status"
->
-No Address Excel selected.
-</div>
-
-<div
-    id="addressExcelPreview"
-    class="excel-preview"
->
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ADDRESS PREVIEW -->
-
-<div
-    id="addressPreview"
-    class="address-sticker-preview"
->
-
-<div class="address-side">
-
-<small>
-FROM
-</small>
-
-<strong id="previewFromName">
-BooksWagon
-</strong>
-
-<div id="previewFromAddress">
-Ground Floor, 2/14, Ansari Rd,
-Old Delhi, Daryaganj,
-Delhi, 110002
-</div>
-
-</div>
-
-
-<div class="address-side">
-
-<small>
-TO
-</small>
-
-<strong id="previewToName">
-XYZ Company
-</strong>
-
-<div id="previewToAddress">
-Customer / Company Address
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-BOX NUMBER
-======================================================= -->
-
-<section
-    id="boxSection"
-    class="config-section"
->
-
-<div class="section-title">
-
-<span class="step">
-03
-</span>
-
-<div>
-
-<h3>
-Box Number
-</h3>
-
-<p>
-Box range for PO labels.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="form-grid">
-
-<div class="form-field">
-
-<label>
-Start Box
-</label>
-
-<input
-    id="startBox"
-    type="number"
-    value="1"
-    min="1"
->
-
-</div>
-
-
-<div class="form-field">
-
-<label>
-End Box
-</label>
-
-<input
-    id="endBox"
-    type="number"
-    value="200"
-    min="1"
->
-
-</div>
-
-
-<div class="form-field">
-
-<label>
-Copies
-</label>
-
-<input
-    id="copies"
-    type="number"
-    value="1"
-    min="1"
->
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-PRINT CONTENT
-======================================================= -->
-
-<section
-    id="printSection"
-    class="config-section"
->
-
-<div class="section-title">
-
-<span class="step">
-04
-</span>
-
-<div>
-
-<h3>
-Print Content
-</h3>
-
-<p>
-Choose exactly what you want printed.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="checkbox-grid">
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="printPO"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-PO Number Only
-</span>
-
-</label>
-
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="printBox"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Box Number Only
-</span>
-
-</label>
-
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="printPOBox"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-PO Number + Box Number
-</span>
-
-</label>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-PAGE SIZE
-======================================================= -->
-
-<section
-    id="pageSection"
-    class="config-section"
->
-
-<div class="section-title">
-
-<span class="step">
-05
-</span>
-
-<div>
-
-<h3>
-Page Size & Orientation
-</h3>
-
-<p>
-Choose one standard size or Custom.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="form-grid">
-
-<div class="form-field">
-
-<label>
-Page Size
-</label>
-
-<select id="pageSize">
-
-<option value="4x6">
-4 × 6 Inches
-</option>
-
-<option value="70x25">
-70 × 25 mm
-</option>
-
-<option value="A4">
-A4
-</option>
-
-<option value="CUSTOM">
-Custom
-</option>
-
-</select>
-
-</div>
-
-
-<div class="form-field">
-
-<label>
-Orientation
-</label>
-
-<select id="orientation">
-
-<option value="portrait">
-Portrait
-</option>
-
-<option value="landscape">
-Landscape
-</option>
-
-</select>
-
-</div>
-
-
-<div class="form-field">
-
-<label>
-Custom Width mm
-</label>
-
-<input
-    id="customWidth"
-    type="number"
-    value="101.6"
->
-
-</div>
-
-
-<div class="form-field">
-
-<label>
-Custom Height mm
-</label>
-
-<input
-    id="customHeight"
-    type="number"
-    value="152.4"
->
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-BORDERS
-======================================================= -->
-
-<section
-    id="borderSection"
-    class="config-section"
->
-
-<div class="section-title">
-
-<span class="step">
-06
-</span>
-
-<div>
-
-<h3>
-Borders
-</h3>
-
-<p>
-Page, PO and Box border controls.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="checkbox-grid">
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="pageBorder"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Page Border
-</span>
-
-</label>
-
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="poBorder"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-PO Number Border
-</span>
-
-</label>
-
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="boxBorder"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Box Number Border
-</span>
-
-</label>
-
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="combinedBorder"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Combined PO + Box Border
-</span>
-
-</label>
-
-</div>
-
-
-<br>
-
-
-<div class="form-grid">
-
-<div class="form-field">
-
-<label>
-Border Size
-</label>
-
-<select id="borderSize">
-
-<option value="thin">
-Thin
-</option>
-
-<option value="medium" selected>
-Medium
-</option>
-
-<option value="thick">
-Thick
-</option>
-
-</select>
-
-</div>
-
-
-<div class="form-field">
-
-<label>
-Border Style
-</label>
-
-<select id="borderStyle">
-
-<option value="solid">
-Solid
-</option>
-
-<option value="dashed">
-Dashed
-</option>
-
-<option value="dotted">
-Dotted
-</option>
-
-<option value="double">
-Double
-</option>
-
-</select>
-
-</div>
-
-
-<div class="form-field">
-
-<label>
-Border Colour
-</label>
-
-<input
-    type="color"
-    id="borderColor"
-    value="#111827"
->
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-FONT
-======================================================= -->
-
-<section
-    id="fontSection"
-    class="config-section"
->
-
-<div class="section-title">
-
-<span class="step">
-07
-</span>
-
-<div>
-
-<h3>
-Font Style
-</h3>
-
-<p>
-Font, size and formatting.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="form-grid">
-
-<div class="form-field">
-
-<label>
-Font Family
-</label>
-
-<select id="fontFamily">
-
-<option value="helvetica">
-Arial / Helvetica
-</option>
-
-<option value="times">
-Times New Roman
-</option>
-
-<option value="courier">
-Courier
-</option>
-
-</select>
-
-</div>
-
-
-<div class="form-field">
-
-<label>
-Font Size
-</label>
-
-<select id="fontSize">
-
-<option value="10">10</option>
-<option value="12">12</option>
-<option value="14">14</option>
-<option value="16">16</option>
-<option value="18" selected>18</option>
-<option value="20">20</option>
-<option value="24">24</option>
-<option value="28">28</option>
-<option value="32">32</option>
-
-</select>
-
-</div>
-
-</div>
-
-
-<br>
-
-
-<div class="checkbox-grid">
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="fontBold"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Bold
-</span>
-
-</label>
-
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="fontItalic"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Italic
-</span>
-
-</label>
-
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="fontUnderline"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Underline
-</span>
-
-</label>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-CUTTING
-======================================================= -->
-
-<section
-    id="cutSection"
-    class="config-section"
->
-
-<div class="section-title">
-
-<span class="step">
-08
-</span>
-
-<div>
-
-<h3>
-Cutting
-</h3>
-
-<p>
-Cut line and scissor mark.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="checkbox-grid">
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="cutLine"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Cutting Line
-</span>
-
-</label>
-
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="scissorMark"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Scissor Mark ✂
-</span>
-
-</label>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-DOWNLOAD
-======================================================= -->
-
-<section
-    id="downloadSection"
-    class="config-section"
->
-
-<div class="section-title">
-
-<span class="step">
-09
-</span>
-
-<div>
-
-<h3>
-Download
-</h3>
-
-<p>
-Separate PDF, merged PDF or ZIP.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="checkbox-grid">
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="mergePDF"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Merge PDFs
-</span>
-
-</label>
-
-
-<label class="feature-checkbox">
-
-<input
-    type="checkbox"
-    id="zipPDF"
->
-
-<span class="custom-check"></span>
-
-<span class="checkbox-text">
-Separate PDFs in ZIP
-</span>
-
-</label>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-PREVIEW
-======================================================= -->
-
-<section
-    id="previewSection"
-    class="preview-section"
->
-
-<div class="section-heading">
-
-<span>
-LIVE PREVIEW
-</span>
-
-<h2>
-Label Preview
-</h2>
-
-</div>
-
-
-<div
-    id="labelPreview"
-    class="preview-page"
->
-
-<div
-    id="previewContent"
-    class="preview-content"
->
-
-<div
-    id="previewPO"
-    class="preview-po hidden-preview"
->
-PO NUMBER
-</div>
-
-
-<div
-    id="previewCut"
-    class="preview-cut hidden-preview"
->
-· · · · · ✂ · · · · ·
-</div>
-
-
-<div
-    id="previewBox"
-    class="preview-box hidden-preview"
->
-BOX NO. 1
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =======================================================
-ACTIONS
-======================================================= -->
-
-<div class="workspace-actions">
-
-<button
-    id="resetButton"
-    type="button"
-    class="btn btn-secondary"
->
-Reset
-</button>
-
-<button
-    id="generateButton"
-    type="button"
-    class="btn btn-primary"
->
-Generate
-</button>
-
-</div>
-
-
-</div>
-</div>
-</div>
-
-</section>
-
-
-<!-- =========================================================
-SUPPORT
-========================================================= -->
-
-<section
-    id="support"
-    class="section"
->
-
-<div class="container">
-
-<div class="support-card">
-
-<div>
-
-<div class="kicker">
-SUPPORT
-</div>
-
-<h2>
-BooksWagon
-</h2>
-
-
-<a
-    class="address-link"
-    href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
-    target="_blank"
-    rel="noopener"
->
-Ground Floor, 2/14, Ansari Rd,
-Old Delhi, Daryaganj,
-Delhi, 110002
-</a>
-
-
-<a
-    class="email-link"
-    href="mailto:ashish.verma@bookswagon.in"
->
-ashish.verma@bookswagon.in
-</a>
-
-
-<div class="created">
-Created by
-<strong>Ashish Verma</strong>
-</div>
-
-</div>
-
-
-<div class="qr-grid">
-
-<div class="qr-card">
-
-<h4>
-Office Location
-</h4>
-
-<div
-    id="addressQR"
-    class="qr-code"
-></div>
-
-</div>
-
-
-<div class="qr-card">
-
-<h4>
-Official Email
-</h4>
-
-<div
-    id="emailQR"
-    class="qr-code"
-></div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =========================================================
-FOOTER
-========================================================= -->
-
-<footer>
-
-<div class="container">
-
-<div class="footer-grid">
-
-<div>
-
-<div class="footer-brand">
-BooksWagon
-</div>
-
-<p>
-Label Studio
-</p>
-
-</div>
-
-
-<div>
-
-<strong>
-OFFICE
-</strong>
-
-<p>
-Ground Floor, 2/14, Ansari Rd,
-Old Delhi, Daryaganj,
-Delhi, 110002
-</p>
-
-</div>
-
-
-<div>
-
-<strong>
-EMAIL
-</strong>
-
-<p>
-<a href="mailto:ashish.verma@bookswagon.in">
-ashish.verma@bookswagon.in
-</a>
-</p>
-
-</div>
-
-</div>
-
-
-<div class="footer-bottom">
-
-<span>
-© 2026 BooksWagon Label Studio
-</span>
-
-<span>
-Created by Ashish Verma
-</span>
-
-</div>
-
-</div>
-
-</footer>
-
-
-<div id="toastContainer"></div>
-
-
-<!-- =========================================================
-JAVASCRIPT
-========================================================= -->
-
-<script>
-
-"use strict";
-
-
-/* =========================================================
-   GLOBAL STATE
-========================================================= */
-
-const CONFIG = {
-
-    email:
-        "ashish.verma@bookswagon.in",
-
-    address:
-        "Ground Floor, 2/14, Ansari Rd, Old Delhi, Daryaganj, Delhi, 110002",
-
-    maps:
-        "https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
-};
-
-
-let currentTool =
-    "Coco Blue PO";
-
-let poExcelRows = [];
-
-let isbnExcelRows = [];
-
-let addressExcelRows = [];
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function $(selector){
-
-    return document.querySelector(selector);
-}
-
-
-function $$(selector){
-
-    return [
-        ...document.querySelectorAll(selector)
-    ];
-}
-
-
-function toast(
-    message,
-    type="success"
-){
-
-    const box =
-        $("#toastContainer");
-
-    const item =
-        document.createElement("div");
-
-    item.className =
-        type === "error"
-            ? "toast error"
-            : "toast";
-
-    item.textContent =
-        message;
-
-    box.appendChild(item);
-
-    setTimeout(
-        () => item.remove(),
-        2800
-    );
-}
-
-
-function escapeHTML(value){
-
-    return String(value ?? "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-}
-
-
-function safeFileName(value){
-
-    return String(value || "LABEL")
-        .replace(
-            /[^a-z0-9_-]+/gi,
-            "_"
-        )
-        .slice(0,80);
-}
-
-
-/* =========================================================
-   CREATE 20 PO INPUTS
-========================================================= */
-
-function createPOInputs(){
-
-    const grid =
-        $("#poGrid");
-
-    grid.innerHTML = "";
-
-    for(
-        let i=1;
-        i<=20;
-        i++
-    ){
-
-        const wrapper =
-            document.createElement("div");
-
-        wrapper.className =
-            "po-field";
-
-        const number =
-            document.createElement("span");
-
-        number.textContent =
-            `PO ${i}`;
-
-        const input =
-            document.createElement("input");
-
-        input.type =
-            "text";
-
-        input.className =
-            "po-input";
-
-        input.placeholder =
-            `PO Number ${i}`;
-
-        wrapper.append(
-            number,
-            input
-        );
-
-        grid.appendChild(
-            wrapper
-        );
+    .hero {
+        padding: 45px 0 55px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+    }
+
+    .book-preview {
+        width: 190px;
+        height: 260px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 7px;
     }
 }
-
-
-/* =========================================================
-   LIST PARSER
-========================================================= */
-
-function parseList(value){
-
-    return String(value || "")
-        .split(/[\n,;|]+/)
-        .map(
-            item =>
-                item.trim()
-        )
-        .filter(Boolean);
-}
-
-
-/* =========================================================
-   GET PO VALUES
-========================================================= */
-
-function getPOValues(){
-
-    const manual =
-        $$(".po-input")
-        .map(
-            input =>
-                input.value.trim()
-        )
-        .filter(Boolean);
-
-
-    const multiple =
-        parseList(
-            $("#multiplePO")?.value
-        );
-
-
-    const excel =
-        poExcelRows
-        .map(
-            row => {
-
-                const keys =
-                    Object.keys(row);
-
-                if(!keys.length)
-                    return "";
-
-                return String(
-                    row[keys[0]] || ""
-                ).trim();
-            }
-        )
-        .filter(Boolean);
-
-
-    return [
-        ...new Set([
-            ...manual,
-            ...multiple,
-            ...excel
-        ])
-    ];
-}
-
-
-/* =========================================================
-   EXCEL TABLE
-========================================================= */
-
-function renderExcelTable(
-    rows,
-    target
-){
-
-    const box =
-        $(target);
-
-    if(
-        !rows ||
-        !rows.length
-    ){
-
-        box.innerHTML = "";
-
-        return;
-    }
-
-    const columns =
-        Object.keys(rows[0]);
-
-    let html =
-        "<table><thead><tr>";
-
-    columns.forEach(
-        column => {
-
-            html +=
-                `<th>${escapeHTML(column)}</th>`;
-        }
-    );
-
-    html +=
-        "</tr></thead><tbody>";
-
-
-    rows.slice(
-        0,
-        30
-    ).forEach(
-        row => {
-
-            html += "<tr>";
-
-            columns.forEach(
-                column => {
-
-                    html +=
-                        `<td>${escapeHTML(row[column])}</td>`;
-                }
-            );
-
-            html += "</tr>";
-        }
-    );
-
-
-    html +=
-        "</tbody></table>";
-
-    box.innerHTML =
-        html;
-}
-
-
-/* =========================================================
-   PO EXCEL
-========================================================= */
-
-$("#poExcelFile")
-?.addEventListener(
-    "change",
-    async function(){
-
-        const file =
-            this.files[0];
-
-        if(!file)
-            return;
-
-        try{
-
-            const buffer =
-                await file.arrayBuffer();
-
-            const workbook =
-                XLSX.read(
-                    buffer,
-                    {
-                        type:"array"
-                    }
-                );
-
-            const sheet =
-                workbook.Sheets[
-                    workbook.SheetNames[0]
-                ];
-
-            poExcelRows =
-                XLSX.utils.sheet_to_json(
-                    sheet,
-                    {
-                        defval:""
-                    }
-                );
-
-            $("#poExcelStatus")
-                .textContent =
-                `${poExcelRows.length} row(s) loaded successfully.`;
-
-            renderExcelTable(
-                poExcelRows,
-                "#poExcelPreview"
-            );
-
-            toast(
-                `${poExcelRows.length} PO row(s) loaded.`
-            );
-
-            updatePOPreview();
-
-        }catch(error){
-
-            console.error(error);
-
-            toast(
-                "Unable to read PO Excel.",
-                "error"
-            );
-        }
-    }
-);
-
-
-/* =========================================================
-   ISBN EXCEL
-========================================================= */
-
-$("#isbnExcelFile")
-?.addEventListener(
-    "change",
-    async function(){
-
-        const file =
-            this.files[0];
-
-        if(!file)
-            return;
-
-        try{
-
-            const buffer =
-                await file.arrayBuffer();
-
-            const workbook =
-                XLSX.read(
-                    buffer,
-                    {
-                        type:"array"
-                    }
-                );
-
-            const sheet =
-                workbook.Sheets[
-                    workbook.SheetNames[0]
-                ];
-
-            isbnExcelRows =
-                XLSX.utils.sheet_to_json(
-                    sheet,
-                    {
-                        defval:""
-                    }
-                );
-
-
-            $("#isbnExcelStatus")
-                .textContent =
-                `${isbnExcelRows.length} ISBN row(s) loaded successfully.`;
-
-
-            renderExcelTable(
-                isbnExcelRows,
-                "#isbnExcelPreview"
-            );
-
-
-            toast(
-                `${isbnExcelRows.length} ISBN row(s) loaded.`
-            );
-
-
-            updateISBNPreview();
-
-        }catch(error){
-
-            console.error(error);
-
-            toast(
-                "Unable to read ISBN Excel.",
-                "error"
-            );
-        }
-    }
-);
-
-
-/* =========================================================
-   ADDRESS EXCEL
-
-   A = FROM
-   B = TO
-========================================================= */
-
-$("#addressExcelFile")
-?.addEventListener(
-    "change",
-    async function(){
-
-        const file =
-            this.files[0];
-
-        if(!file)
-            return;
-
-        try{
-
-            const buffer =
-                await file.arrayBuffer();
-
-            const workbook =
-                XLSX.read(
-                    buffer,
-                    {
-                        type:"array"
-                    }
-                );
-
-            const sheet =
-                workbook.Sheets[
-                    workbook.SheetNames[0]
-                ];
-
-
-            const rows =
-                XLSX.utils.sheet_to_json(
-                    sheet,
-                    {
-                        header:1,
-                        defval:""
-                    }
-                );
-
-
-            if(
-                rows.length < 2
-            ){
-
-                throw new Error(
-                    "Address Excel needs From and To columns."
-                );
-            }
-
-
-            const headers =
-                rows[0].map(
-                    value =>
-                        String(value)
-                        .trim()
-                        .toLowerCase()
-                );
-
-
-            let fromIndex =
-                headers.indexOf("from");
-
-            let toIndex =
-                headers.indexOf("to");
-
-
-            /*
-             * Fallback:
-             * A = From
-             * B = To
-             */
-
-            if(fromIndex < 0)
-                fromIndex = 0;
-
-            if(toIndex < 0)
-                toIndex = 1;
-
-
-            addressExcelRows =
-                rows
-                .slice(1)
-                .map(
-                    row => ({
-
-                        From:
-                            String(
-                                row[fromIndex] || ""
-                            ).trim(),
-
-                        To:
-                            String(
-                                row[toIndex] || ""
-                            ).trim()
-
-                    })
-                )
-                .filter(
-                    row =>
-                        row.From ||
-                        row.To
-                );
-
-
-            $("#addressExcelStatus")
-                .textContent =
-                `${addressExcelRows.length} address row(s) loaded successfully.`;
-
-
-            const previewRows =
-                addressExcelRows.map(
-                    row => ({
-                        From:row.From,
-                        To:row.To
-                    })
-                );
-
-
-            renderExcelTable(
-                previewRows,
-                "#addressExcelPreview"
-            );
-
-
-            if(
-                addressExcelRows.length
-            ){
-
-                $("#stickerFromAddress")
-                    .value =
-                    addressExcelRows[0].From;
-
-                $("#stickerToAddress")
-                    .value =
-                    addressExcelRows[0].To;
-
-                updateAddressPreview();
-            }
-
-
-            toast(
-                `${addressExcelRows.length} address sticker row(s) loaded.`
-            );
-
-
-        }catch(error){
-
-            console.error(error);
-
-            toast(
-                error.message ||
-                "Unable to read Address Excel.",
-                "error"
-            );
-        }
-    }
-);
-
-
-/* =========================================================
-   TOOL OPEN
-========================================================= */
-
-function openTool(tool){
-
-    currentTool =
-        tool;
-
-
-    $("#workspace")
-        .classList.add("active");
-
-
-    $("#workspaceTitle")
-        .textContent =
-        `${tool} Generator`;
-
-
-    $("#workspaceDescription")
-        .textContent =
-        getToolDescription(tool);
-
-
-    $$(".tool-select-btn")
-    .forEach(
-        button => {
-
-            button.classList.toggle(
-                "active",
-                button.dataset.selectTool === tool
-            );
-        }
-    );
-
-
-    configureTool();
-
-
-    $("#workspace")
-        .scrollIntoView({
-            behavior:"smooth",
-            block:"start"
-        });
-}
-
-
-function getToolDescription(tool){
-
-    if(
-        tool === "Coco Blue PO"
-    ){
-
-        return "Coco Blue PO and Box labels with Excel upload.";
-    }
-
-    if(
-        tool === "Other PO"
-    ){
-
-        return "Other PO labels with Excel upload.";
-    }
-
-    if(
-        tool === "ISBN Barcode"
-    ){
-
-        return "Generate real ISBN barcodes with optional Edition.";
-    }
-
-    return "Create From → To address stickers.";
-}
-
-
-/* =========================================================
-   CONFIGURE TOOL
-========================================================= */
-
-function configureTool(){
-
-    const isISBN =
-        currentTool === "ISBN Barcode";
-
-    const isAddress =
-        currentTool === "Address Sticker";
-
-
-    $("#poInputSection")
-        .style.display =
-        isAddress || isISBN
-            ? "none"
-            : "";
-
-
-    $("#isbnSection")
-        .style.display =
-        isISBN
-            ? ""
-            : "none";
-
-
-    $("#poAddressSection")
-        .style.display =
-        (
-            currentTool === "Coco Blue PO" ||
-            currentTool === "Other PO"
-        )
-            ? ""
-            : "none";
-
-
-    $("#addressSection")
-        .style.display =
-        isAddress
-            ? ""
-            : "none";
-
-
-    $("#boxSection")
-        .style.display =
-        (
-            currentTool === "Coco Blue PO" ||
-            currentTool === "Other PO"
-        )
-            ? ""
-            : "none";
-
-
-    $("#printSection")
-        .style.display =
-        isAddress || isISBN
-            ? "none"
-            : "";
-
-
-    $("#pageSection")
-        .style.display =
-        "";
-
-
-    $("#borderSection")
-        .style.display =
-        isAddress || isISBN
-            ? "none"
-            : "";
-
-
-    $("#fontSection")
-        .style.display =
-        isAddress || isISBN
-            ? "none"
-            : "";
-
-
-    $("#cutSection")
-        .style.display =
-        isAddress || isISBN
-            ? "none"
-            : "";
-
-
-    $("#downloadSection")
-        .style.display =
-        "";
-
-
-    $("#previewSection")
-        .style.display =
-        isAddress
-            ? "none"
-            : "";
-
-
-    updatePageSizeLock();
-
-    updatePOPreview();
-
-    updateISBNPreview();
-
-    updateAddressPreview();
-}
-
-
-/* =========================================================
-   TOOL BUTTONS
-========================================================= */
-
-$$(".tool-card")
-.forEach(
-    card => {
-
-        card.addEventListener(
-            "click",
-            () =>
-                openTool(
-                    card.dataset.tool
-                )
-        );
-    }
-);
-
-
-$$(".tool-select-btn")
-.forEach(
-    button => {
-
-        button.addEventListener(
-            "click",
-            () =>
-                openTool(
-                    button.dataset.selectTool
-                )
-        );
-    }
-);
-
-
-$("#closeWorkspace")
-?.addEventListener(
-    "click",
-    () => {
-
-        $("#workspace")
-            .classList.remove(
-                "active"
-            );
-
-        $("#tools")
-            .scrollIntoView({
-                behavior:"smooth"
-            });
-    }
-);
-
-
-/* =========================================================
-   PO INPUT TABS
-========================================================= */
-
-$$("[data-input]")
-.forEach(
-    button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const mode =
-                    button.dataset.input;
-
-
-                $$("[data-input]")
-                .forEach(
-                    item =>
-                        item.classList.toggle(
-                            "active",
-                            item === button
-                        )
-                );
-
-
-                $("#individualInput")
-                    .classList.toggle(
-                        "active",
-                        mode === "individual"
-                    );
-
-
-                $("#multipleInput")
-                    .classList.toggle(
-                        "active",
-                        mode === "multiple"
-                    );
-
-
-                $("#poExcelInput")
-                    .classList.toggle(
-                        "active",
-                        mode === "excel"
-                    );
-            }
-        );
-    }
-);
-
-
-/* =========================================================
-   ISBN INPUT TABS
-========================================================= */
-
-$$("[data-isbn-input]")
-.forEach(
-    button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const mode =
-                    button.dataset.isbnInput;
-
-
-                $$("[data-isbn-input]")
-                .forEach(
-                    item =>
-                        item.classList.toggle(
-                            "active",
-                            item === button
-                        )
-                );
-
-
-                $("#isbnManual")
-                    .classList.toggle(
-                        "active",
-                        mode === "manual"
-                    );
-
-
-                $("#isbnExcel")
-                    .classList.toggle(
-                        "active",
-                        mode === "excel"
-                    );
-            }
-        );
-    }
-);
-
-
-/* =========================================================
-   ADDRESS INPUT TABS
-========================================================= */
-
-$$("[data-address-mode]")
-.forEach(
-    button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const mode =
-                    button.dataset.addressMode;
-
-
-                $$("[data-address-mode]")
-                .forEach(
-                    item =>
-                        item.classList.toggle(
-                            "active",
-                            item === button
-                        )
-                );
-
-
-                $("#addressManual")
-                    .classList.toggle(
-                        "active",
-                        mode === "manual"
-                    );
-
-
-                $("#addressExcel")
-                    .classList.toggle(
-                        "active",
-                        mode === "excel"
-                    );
-            }
-        );
-    }
-);
-
-
-/* =========================================================
-   CHECKBOXES
-========================================================= */
-
-$$(".feature-checkbox input")
-.forEach(
-    checkbox => {
-
-        checkbox.addEventListener(
-            "change",
-            () => {
-
-                /*
-                 * No confirmation.
-                 * Direct enable / disable.
-                 */
-
-                updatePOPreview();
-            }
-        );
-    }
-);
-
-
-/* =========================================================
-   PAGE SIZE LOCKING
-========================================================= */
-
-function updatePageSizeLock(){
-
-    const size =
-        $("#pageSize").value;
-
-
-    const custom =
-        size === "CUSTOM";
-
-
-    $("#customWidth").disabled =
-        !custom;
-
-    $("#customHeight").disabled =
-        !custom;
-
-
-    /*
-     * When standard size selected:
-     * Custom width/height locked.
-     *
-     * When Custom selected:
-     * Standard size becomes Custom and
-     * custom dimensions unlock.
-     */
-
-    $("#customWidth")
-        .classList.toggle(
-            "locked",
-            !custom
-        );
-
-
-    $("#customHeight")
-        .classList.toggle(
-            "locked",
-            !custom
-        );
-}
-
-
-$("#pageSize")
-?.addEventListener(
-    "change",
-    updatePageSizeLock
-);
-
-
-/* =========================================================
-   PAGE FORMAT
-========================================================= */
-
-function getPageFormat(){
-
-    const size =
-        $("#pageSize").value;
-
-
-    if(
-        size === "4x6"
-    ){
-
-        return [
-            101.6,
-            152.4
-        ];
-    }
-
-
-    if(
-        size === "70x25"
-    ){
-
-        return [
-            70,
-            25
-        ];
-    }
-
-
-    if(
-        size === "A4"
-    ){
-
-        return "a4";
-    }
-
-
-    return [
-        Number(
-            $("#customWidth").value
-        ) || 101.6,
-
-        Number(
-            $("#customHeight").value
-        ) || 152.4
-    ];
-}
-
-
-/* =========================================================
-   PRINT MODE
-========================================================= */
-
-function getPrintMode(){
-
-    const po =
-        $("#printPO").checked;
-
-    const box =
-        $("#printBox").checked;
-
-    const both =
-        $("#printPOBox").checked;
-
-
-    if(
-        both ||
-        (po && box)
-    ){
-
-        return "both";
-    }
-
-
-    if(po)
-        return "po";
-
-
-    if(box)
-        return "box";
-
-
-    return "none";
-}
-
-
-/* =========================================================
-   PO PREVIEW
-========================================================= */
-
-function updatePOPreview(){
-
-    if(
-        currentTool === "ISBN Barcode" ||
-        currentTool === "Address Sticker"
-    ){
-
-        return;
-    }
-
-
-    const list =
-        getPOValues();
-
-
-    const po =
-        list[0] ||
-        "PO NUMBER";
-
-
-    const box =
-        $("#startBox").value ||
-        "1";
-
-
-    const mode =
-        getPrintMode();
-
-
-    $("#previewPO")
-        .textContent =
-        po;
-
-
-    $("#previewBox")
-        .textContent =
-        `BOX NO. ${box}`;
-
-
-    $("#previewPO")
-        .classList.toggle(
-            "hidden-preview",
-            !(
-                mode === "po" ||
-                mode === "both"
-            )
-        );
-
-
-    $("#previewBox")
-        .classList.toggle(
-            "hidden-preview",
-            !(
-                mode === "box" ||
-                mode === "both"
-            )
-        );
-
-
-    $("#previewCut")
-        .classList.toggle(
-            "hidden-preview",
-            !(
-                mode === "both" &&
-                $("#cutLine").checked
-            )
-        );
-
-
-    applyPreviewStyle();
-}
-
-
-/* =========================================================
-   PREVIEW STYLE
-========================================================= */
-
-function applyPreviewStyle(){
-
-    const borderSize =
-        $("#borderSize").value;
-
-
-    const width =
-        borderSize === "thin"
-            ? 1
-            : borderSize === "thick"
-                ? 4
-                : 2;
-
-
-    const style =
-        $("#borderStyle").value;
-
-
-    const color =
-        $("#borderColor").value;
-
-
-    $("#labelPreview").style.border =
-        $("#pageBorder").checked
-            ? `${width}px ${style} ${color}`
-            : "0";
-
-
-    $("#previewPO").style.border =
-        $("#poBorder").checked
-            ? `${width}px ${style} ${color}`
-            : "0";
-
-
-    $("#previewBox").style.border =
-        $("#boxBorder").checked
-            ? `${width}px ${style} ${color}`
-            : "0";
-
-
-    $("#previewContent").style.border =
-        $("#combinedBorder").checked
-            ? `${width}px ${style} ${color}`
-            : "0";
-
-
-    $("#previewContent").style.fontFamily =
-        $("#fontFamily").value === "times"
-            ? "Times New Roman"
-            : $("#fontFamily").value === "courier"
-                ? "Courier New"
-                : "Arial";
-
-
-    $("#previewContent").style.fontSize =
-        `${$("#fontSize").value}px`;
-
-
-    $("#previewContent").style.fontWeight =
-        $("#fontBold").checked
-            ? "900"
-            : "400";
-
-
-    $("#previewContent").style.fontStyle =
-        $("#fontItalic").checked
-            ? "italic"
-            : "normal";
-
-
-    $("#previewContent").style.textDecoration =
-        $("#fontUnderline").checked
-            ? "underline"
-            : "none";
-}
-
-
-/* =========================================================
-   ISBN PREVIEW
-========================================================= */
-
-function getISBNData(){
-
-    if(
-        isbnExcelRows.length
-    ){
-
-        const row =
-            isbnExcelRows[0];
-
-        const keys =
-            Object.keys(row);
-
-
-        return {
-
-            isbn:
-                String(
-                    row[keys[0]] || ""
-                ).trim(),
-
-            title:
-                String(
-                    row[keys[1]] || ""
-                ).trim(),
-
-            edition:
-                String(
-                    row[keys[2]] || ""
-                ).trim()
-        };
-    }
-
-
-    return {
-
-        isbn:
-            $("#manualISBN").value.trim(),
-
-        title:
-            $("#manualTitle").value.trim(),
-
-        edition:
-            $("#manualEdition").value.trim()
-    };
-}
-
-
-function updateISBNPreview(){
-
-    if(
-        currentTool !==
-        "ISBN Barcode"
-    ){
-
-        return;
-    }
-
-
-    const data =
-        getISBNData();
-
-
-    $("#isbnPreviewTitle")
-        .textContent =
-        data.title ||
-        "Book Title";
-
-
-    $("#isbnPreviewEdition")
-        .textContent =
-        data.edition
-            ? `Edition: ${data.edition}`
-            : "";
-
-
-    if(
-        !data.isbn
-    ){
-
-        $("#isbnBarcode")
-            .innerHTML = "";
-
-        return;
-    }
-
-
-    try{
-
-        JsBarcode(
-            "#isbnBarcode",
-            data.isbn,
-            {
-
-                format:"CODE128",
-
-                displayValue:true,
-
-                fontSize:16,
-
-                font:"Arial",
-
-                margin:10,
-
-                height:80,
-
-                width:2
-
-            }
-        );
-
-    }catch(error){
-
-        $("#isbnBarcode")
-            .innerHTML = "";
-
-        console.warn(
-            "Barcode preview error:",
-            error
-        );
-    }
-}
-
-
-/* =========================================================
-   ADDRESS PREVIEW
-========================================================= */
-
-function updateAddressPreview(){
-
-    if(
-        currentTool !==
-        "Address Sticker"
-    ){
-
-        return;
-    }
-
-
-    $("#previewFromName")
-        .textContent =
-        $("#stickerFromName")
-        ?.value ||
-        "BooksWagon";
-
-
-    $("#previewFromAddress")
-        .textContent =
-        $("#stickerFromAddress")
-        ?.value ||
-        CONFIG.address;
-
-
-    $("#previewToName")
-        .textContent =
-        $("#stickerToName")
-        ?.value ||
-        "XYZ Company";
-
-
-    $("#previewToAddress")
-        .textContent =
-        $("#stickerToAddress")
-        ?.value ||
-        "Customer / Company Address";
-}
-
-
-/* =========================================================
-   LIVE INPUT
-========================================================= */
-
-document.addEventListener(
-    "input",
-    function(event){
-
-        if(
-            event.target.matches(
-                "input,textarea,select"
-            )
-        ){
-
-            updatePOPreview();
-
-            updateISBNPreview();
-
-            updateAddressPreview();
-        }
-    }
-);
-
-
-/* =========================================================
-   BORDER DRAW
-========================================================= */
-
-function drawBorder(
-    doc,
-    x,
-    y,
-    w,
-    h
-){
-
-    const style =
-        $("#borderStyle").value;
-
-
-    if(
-        style === "dashed"
-    ){
-
-        doc.setLineDashPattern(
-            [4,3],
-            0
-        );
-
-        doc.rect(
-            x,
-            y,
-            w,
-            h
-        );
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-        return;
-    }
-
-
-    if(
-        style === "dotted"
-    ){
-
-        doc.setLineDashPattern(
-            [1,2],
-            0
-        );
-
-        doc.rect(
-            x,
-            y,
-            w,
-            h
-        );
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-        return;
-    }
-
-
-    if(
-        style === "double"
-    ){
-
-        doc.rect(
-            x,
-            y,
-            w,
-            h
-        );
-
-        doc.rect(
-            x+2,
-            y+2,
-            w-4,
-            h-4
-        );
-
-        return;
-    }
-
-
-    doc.rect(
-        x,
-        y,
-        w,
-        h
-    );
-}
-
-
-/* =========================================================
-   DRAW PO LABEL
-========================================================= */
-
-function drawPOLabel(
-    doc,
-    po,
-    box
-){
-
-    const width =
-        doc.internal.pageSize.getWidth();
-
-    const height =
-        doc.internal.pageSize.getHeight();
-
-
-    const center =
-        width / 2;
-
-
-    const borderSize =
-        $("#borderSize").value;
-
-
-    const lineWidth =
-        borderSize === "thin"
-            ? .5
-            : borderSize === "thick"
-                ? 1.8
-                : 1;
-
-
-    const color =
-        $("#borderColor").value
-            .replace("#","");
-
-
-    const r =
-        parseInt(
-            color.substring(0,2),
-            16
-        );
-
-
-    const g =
-        parseInt(
-            color.substring(2,4),
-            16
-        );
-
-
-    const b =
-        parseInt(
-            color.substring(4,6),
-            16
-        );
-
-
-    doc.setDrawColor(
-        r,g,b
-    );
-
-
-    doc.setLineWidth(
-        lineWidth
-    );
-
-
-    if(
-        $("#pageBorder").checked
-    ){
-
-        drawBorder(
-            doc,
-            5,
-            5,
-            width-10,
-            height-10
-        );
-    }
-
-
-    let font =
-        "helvetica";
-
-
-    if(
-        $("#fontFamily").value === "times"
-    ){
-
-        font =
-            "times";
-    }
-
-
-    if(
-        $("#fontFamily").value === "courier"
-    ){
-
-        font =
-            "courier";
-    }
-
-
-    let fontStyle =
-        "normal";
-
-
-    if(
-        $("#fontBold").checked &&
-        $("#fontItalic").checked
-    ){
-
-        fontStyle =
-            "bolditalic";
-
-    }else if(
-        $("#fontBold").checked
-    ){
-
-        fontStyle =
-            "bold";
-
-    }else if(
-        $("#fontItalic").checked
-    ){
-
-        fontStyle =
-            "italic";
-    }
-
-
-    doc.setFont(
-        font,
-        fontStyle
-    );
-
-
-    doc.setFontSize(
-        Number(
-            $("#fontSize").value
-        ) || 18
-    );
-
-
-    const mode =
-        getPrintMode();
-
-
-    let y =
-        height/2 - 20;
-
-
-    /* PO */
-
-    if(
-        mode === "po" ||
-        mode === "both"
-    ){
-
-        const text =
-            String(po);
-
-
-        const textWidth =
-            doc.getTextWidth(
-                text
-            );
-
-
-        if(
-            $("#poBorder").checked
-        ){
-
-            drawBorder(
-                doc,
-                center -
-                    (textWidth+30)/2,
-                y-13,
-                textWidth+30,
-                26
-            );
-        }
-
-
-        doc.text(
-            text,
-            center,
-            y+5,
-            {
-                align:"center"
-            }
-        );
-
-
-        y += 45;
-    }
-
-
-    /* CUT */
-
-    if(
-        mode === "both" &&
-        $("#cutLine").checked
-    ){
-
-        doc.setLineDashPattern(
-            [4,3],
-            0
-        );
-
-
-        doc.setLineWidth(
-            .5
-        );
-
-
-        doc.line(
-            8,
-            y-10,
-            width-8,
-            y-10
-        );
-
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-
-        if(
-            $("#scissorMark").checked
-        ){
-
-            doc.setFont(
-                "helvetica",
-                "normal"
-            );
-
-            doc.setFontSize(8);
-
-            doc.text(
-                "✂",
-                center,
-                y-5,
-                {
-                    align:"center"
-                }
-            );
-        }
-
-
-        y += 20;
-
-
-        doc.setFont(
-            font,
-            fontStyle
-        );
-
-        doc.setFontSize(
-            Number(
-                $("#fontSize").value
-            ) || 18
-        );
-    }
-
-
-    /* BOX */
-
-    if(
-        mode === "box" ||
-        mode === "both"
-    ){
-
-        const text =
-            `BOX NO. ${box}`;
-
-
-        const textWidth =
-            doc.getTextWidth(
-                text
-            );
-
-
-        if(
-            $("#boxBorder").checked
-        ){
-
-            drawBorder(
-                doc,
-                center -
-                    (textWidth+30)/2,
-                y-13,
-                textWidth+30,
-                26
-            );
-        }
-
-
-        doc.text(
-            text,
-            center,
-            y+5,
-            {
-                align:"center"
-            }
-        );
-    }
-
-
-    /* COMBINED */
-
-    if(
-        $("#combinedBorder").checked
-    ){
-
-        drawBorder(
-            doc,
-            10,
-            height/2-45,
-            width-20,
-            90
-        );
-    }
-}
-
-
-/* =========================================================
-   CREATE PO PDF
-========================================================= */
-
-function createPOPDF(
-    po
-){
-
-    const {
-        jsPDF
-    } =
-        window.jspdf;
-
-
-    const doc =
-        new jsPDF({
-
-            orientation:
-                $("#orientation").value,
-
-            unit:
-                "mm",
-
-            format:
-                getPageFormat()
-        });
-
-
-    const start =
-        Math.max(
-            1,
-            Number(
-                $("#startBox").value
-            ) || 1
-        );
-
-
-    const end =
-        Math.max(
-            start,
-            Number(
-                $("#endBox").value
-            ) || start
-        );
-
-
-    const copies =
-        Math.max(
-            1,
-            Number(
-                $("#copies").value
-            ) || 1
-        );
-
-
-    let first =
-        true;
-
-
-    for(
-        let box=start;
-        box<=end;
-        box++
-    ){
-
-        for(
-            let copy=0;
-            copy<copies;
-            copy++
-        ){
-
-            if(!first){
-
-                doc.addPage();
-            }
-
-            first =
-                false;
-
-
-            drawPOLabel(
-                doc,
-                po,
-                box
-            );
-        }
-    }
-
-
-    return doc;
-}
-
-
-/* =========================================================
-   ISBN BARCODE PDF
-========================================================= */
-
-function createISBNBarcodePDF(
-    row
-){
-
-    const {
-        jsPDF
-    } =
-        window.jspdf;
-
-
-    const doc =
-        new jsPDF({
-
-            orientation:
-                $("#orientation").value,
-
-            unit:"mm",
-
-            format:
-                getPageFormat()
-        });
-
-
-    const width =
-        doc.internal.pageSize.getWidth();
-
-    const height =
-        doc.internal.pageSize.getHeight();
-
-
-    doc.setFont(
-        "helvetica",
-        "bold"
-    );
-
-    doc.setFontSize(16);
-
-    doc.text(
-        row.title,
-        width/2,
-        25,
-        {
-            align:"center"
-        }
-    );
-
-
-    if(
-        row.edition
-    ){
-
-        doc.setFont(
-            "helvetica",
-            "normal"
-        );
-
-        doc.setFontSize(10);
-
-        doc.text(
-            `Edition: ${row.edition}`,
-            width/2,
-            33,
-            {
-                align:"center"
-            }
-        );
-    }
-
-
-    /*
-     * JsBarcode creates SVG.
-     * We render the barcode to a hidden
-     * canvas so jsPDF can insert it.
-     */
-
-    const svg =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "svg"
-        );
-
-
-    JsBarcode(
-        svg,
-        row.isbn,
-        {
-
-            format:"CODE128",
-
-            displayValue:true,
-
-            fontSize:14,
-
-            margin:8,
-
-            height:70,
-
-            width:2
-
-        }
-    );
-
-
-    const serializer =
-        new XMLSerializer();
-
-
-    const svgString =
-        serializer.serializeToString(
-            svg
-        );
-
-
-    const blob =
-        new Blob(
-            [svgString],
-            {
-                type:
-                    "image/svg+xml;charset=utf-8"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    return new Promise(
-        resolve => {
-
-            const image =
-                new Image();
-
-
-            image.onload =
-                function(){
-
-                    const canvas =
-                        document.createElement(
-                            "canvas"
-                        );
-
-
-                    canvas.width =
-                        image.width;
-
-
-                    canvas.height =
-                        image.height;
-
-
-                    const context =
-                        canvas.getContext(
-                            "2d"
-                        );
-
-
-                    context.drawImage(
-                        image,
-                        0,
-                        0
-                    );
-
-
-                    const imageData =
-                        canvas.toDataURL(
-                            "image/png"
-                        );
-
-
-                    const imgWidth =
-                        Math.min(
-                            width-30,
-                            100
-                        );
-
-
-                    const imgHeight =
-                        35;
-
-
-                    doc.addImage(
-                        imageData,
-                        "PNG",
-                        (width-imgWidth)/2,
-                        height/2-10,
-                        imgWidth,
-                        imgHeight
-                    );
-
-
-                    doc.setFont(
-                        "helvetica",
-                        "normal"
-                    );
-
-
-                    doc.setFontSize(
-                        10
-                    );
-
-
-                    doc.text(
-                        row.isbn,
-                        width/2,
-                        height/2+35,
-                        {
-                            align:"center"
-                        }
-                    );
-
-
-                    URL.revokeObjectURL(
-                        url
-                    );
-
-
-                    resolve(doc);
-                };
-
-
-            image.src =
-                url;
-        }
-    );
-}
-
-
-/* =========================================================
-   ADDRESS PDF
-========================================================= */
-
-function createAddressPDF(
-    from,
-    to
-){
-
-    const {
-        jsPDF
-    } =
-        window.jspdf;
-
-
-    const doc =
-        new jsPDF({
-
-            orientation:"landscape",
-
-            unit:"mm",
-
-            format:[
-                152.4,
-                101.6
-            ]
-        });
-
-
-    const width =
-        doc.internal.pageSize.getWidth();
-
-    const height =
-        doc.internal.pageSize.getHeight();
-
-
-    doc.setLineWidth(
-        1
-    );
-
-
-    doc.setDrawColor(
-        17,
-        24,
-        39
-    );
-
-
-    doc.rect(
-        5,
-        5,
-        width-10,
-        height-10
-    );
-
-
-    doc.setLineDashPattern(
-        [3,3],
-        0
-    );
-
-
-    doc.line(
-        width/2,
-        8,
-        width/2,
-        height-8
-    );
-
-
-    doc.setLineDashPattern(
-        [],
-        0
-    );
-
-
-    doc.setFont(
-        "helvetica",
-        "bold"
-    );
-
-    doc.setFontSize(
-        12
-    );
-
-
-    doc.text(
-        "FROM — BOOKSWAGON",
-        12,
-        20
-    );
-
-
-    doc.text(
-        "TO",
-        width/2+8,
-        20
-    );
-
-
-    doc.setFont(
-        "helvetica",
-        "normal"
-    );
-
-
-    doc.setFontSize(
-        9
-    );
-
-
-    const fromLines =
-        doc.splitTextToSize(
-            from ||
-            CONFIG.address,
-            width/2-25
-        );
-
-
-    const toLines =
-        doc.splitTextToSize(
-            to ||
-            "Customer Address",
-            width/2-25
-        );
-
-
-    doc.text(
-        fromLines,
-        12,
-        30
-    );
-
-
-    doc.text(
-        toLines,
-        width/2+8,
-        30
-    );
-
-
-    return doc;
-}
-
-
-/* =========================================================
-   GENERATE ISBN
-========================================================= */
-
-async function generateISBN(){
-
-    let rows =
-        isbnExcelRows;
-
-
-    if(
-        !rows.length
-    ){
-
-        const isbn =
-            $("#manualISBN")
-            .value
-            .trim();
-
-
-        const title =
-            $("#manualTitle")
-            .value
-            .trim();
-
-
-        const edition =
-            $("#manualEdition")
-            .value
-            .trim();
-
-
-        if(
-            !isbn ||
-            !title
-        ){
-
-            toast(
-                "ISBN and Book Title are mandatory.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        rows = [
-            {
-                ISBN:isbn,
-                Title:title,
-                Edition:edition
-            }
-        ];
-    }
-
-
-    const zipMode =
-        $("#zipPDF").checked;
-
-
-    const mergeMode =
-        $("#mergePDF").checked;
-
-
-    const normalized =
-        rows.map(
-            row => {
-
-                const keys =
-                    Object.keys(row);
-
-
-                return {
-
-                    isbn:
-                        String(
-                            row.ISBN ??
-                            row[keys[0]] ??
-                            ""
-                        ).trim(),
-
-                    title:
-                        String(
-                            row.Title ??
-                            row.title ??
-                            row[keys[1]] ??
-                            ""
-                        ).trim(),
-
-                    edition:
-                        String(
-                            row.Edition ??
-                            row.edition ??
-                            row[keys[2]] ??
-                            ""
-                        ).trim()
-                };
-            }
-        );
-
-
-    const valid =
-        normalized.filter(
-            row =>
-                row.isbn &&
-                row.title
-        );
-
-
-    if(
-        valid.length !==
-        normalized.length
-    ){
-
-        toast(
-            "Every ISBN row must contain ISBN and Title.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if(
-        zipMode
-    ){
-
-        const zip =
-            new JSZip();
-
-
-        for(
-            const row of valid
-        ){
-
-            const doc =
-                await createISBNBarcodePDF(
-                    row
-                );
-
-
-            zip.file(
-                `${safeFileName(row.isbn)}.pdf`,
-                doc.output("blob")
-            );
-        }
-
-
-        const blob =
-            await zip.generateAsync({
-                type:"blob"
-            });
-
-
-        downloadBlob(
-            blob,
-            "BooksWagon_ISBN_Barcodes.zip"
-        );
-
-
-        toast(
-            "ISBN barcode ZIP generated."
-        );
-
-        return;
-    }
-
-
-    if(
-        mergeMode
-    ){
-
-        const first =
-            await createISBNBarcodePDF(
-                valid[0]
-            );
-
-
-        for(
-            let i=1;
-            i<valid.length;
-            i++
-        ){
-
-            const doc =
-                await createISBNBarcodePDF(
-                    valid[i]
-                );
-
-
-            /*
-             * For simplicity and reliability,
-             * merged ISBN generation uses the
-             * first PDF as the base and recreates
-             * pages using the same page dimensions.
-             */
-
-            const pageCount =
-                doc.internal.getNumberOfPages();
-
-
-            for(
-                let page=0;
-                page<pageCount;
-                page++
-            ){
-
-                first.addPage();
-            }
-        }
-
-
-        /*
-         * Recreate properly below.
-         */
-
-        const {
-            jsPDF
-        } =
-            window.jspdf;
-
-
-        const merged =
-            new jsPDF({
-
-                orientation:
-                    $("#orientation").value,
-
-                unit:"mm",
-
-                format:
-                    getPageFormat()
-            });
-
-
-        let firstPage =
-            true;
-
-
-        for(
-            const row of valid
-        ){
-
-            const doc =
-                await createISBNBarcodePDF(
-                    row
-                );
-
-
-            const pages =
-                doc.internal.getNumberOfPages();
-
-
-            /*
-             * jsPDF pages cannot directly be
-             * copied cross-document without
-             * plugins. Therefore generate each
-             * barcode directly in merged document.
-             */
-
-            const width =
-                merged.internal.pageSize.getWidth();
-
-            const height =
-                merged.internal.pageSize.getHeight();
-
-
-            if(!firstPage){
-
-                merged.addPage();
-            }
-
-            firstPage =
-                false;
-
-
-            merged.setFont(
-                "helvetica",
-                "bold"
-            );
-
-            merged.setFontSize(
-                16
-            );
-
-            merged.text(
-                row.title,
-                width/2,
-                25,
-                {
-                    align:"center"
-                }
-            );
-
-
-            if(row.edition){
-
-                merged.setFont(
-                    "helvetica",
-                    "normal"
-                );
-
-                merged.setFontSize(
-                    10
-                );
-
-                merged.text(
-                    `Edition: ${row.edition}`,
-                    width/2,
-                    33,
-                    {
-                        align:"center"
-                    }
-                );
-            }
-
-
-            /*
-             * Barcode rendered using temporary SVG.
-             */
-
-            const svg =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "svg"
-                );
-
-
-            JsBarcode(
-                svg,
-                row.isbn,
-                {
-                    format:"CODE128",
-                    displayValue:true,
-                    fontSize:14,
-                    margin:8,
-                    height:70,
-                    width:2
-                }
-            );
-
-
-            const svgString =
-                new XMLSerializer()
-                    .serializeToString(
-                        svg
-                    );
-
-
-            const blob =
-                new Blob(
-                    [svgString],
-                    {
-                        type:"image/svg+xml"
-                    }
-                );
-
-
-            const url =
-                URL.createObjectURL(
-                    blob
-                );
-
-
-            await new Promise(
-                resolve => {
-
-                    const image =
-                        new Image();
-
-
-                    image.onload =
-                        function(){
-
-                            const canvas =
-                                document.createElement(
-                                    "canvas"
-                                );
-
-
-                            canvas.width =
-                                image.width;
-
-                            canvas.height =
-                                image.height;
-
-
-                            canvas
-                                .getContext("2d")
-                                .drawImage(
-                                    image,
-                                    0,
-                                    0
-                                );
-
-
-                            const imageData =
-                                canvas.toDataURL(
-                                    "image/png"
-                                );
-
-
-                            const imgWidth =
-                                Math.min(
-                                    width-30,
-                                    100
-                                );
-
-
-                            merged.addImage(
-                                imageData,
-                                "PNG",
-                                (width-imgWidth)/2,
-                                height/2-10,
-                                imgWidth,
-                                35
-                            );
-
-
-                            merged.setFont(
-                                "helvetica",
-                                "normal"
-                            );
-
-                            merged.setFontSize(
-                                10
-                            );
-
-                            merged.text(
-                                row.isbn,
-                                width/2,
-                                height/2+35,
-                                {
-                                    align:"center"
-                                }
-                            );
-
-
-                            URL.revokeObjectURL(
-                                url
-                            );
-
-
-                            resolve();
-                        };
-
-
-                    image.src =
-                        url;
-                }
-            );
-        }
-
-
-        merged.save(
-            "BooksWagon_ISBN_Barcodes_Merged.pdf"
-        );
-
-
-        toast(
-            "Merged ISBN barcode PDF generated."
-        );
-
-        return;
-    }
-
-
-    /*
-     * Separate PDFs
-     */
-
-    for(
-        const row of valid
-    ){
-
-        const doc =
-            await createISBNBarcodePDF(
-                row
-            );
-
-
-        doc.save(
-            `${safeFileName(row.isbn)}_Barcode.pdf`
-        );
-    }
-
-
-    toast(
-        `${valid.length} ISBN barcode PDF(s) generated.`
-    );
-}
-
-
-/* =========================================================
-   GENERATE ADDRESS
-========================================================= */
-
-async function generateAddress(){
-
-    if(
-        addressExcelRows.length
-    ){
-
-        if(
-            $("#zipPDF").checked
-        ){
-
-            const zip =
-                new JSZip();
-
-
-            addressExcelRows.forEach(
-                (row,index) => {
-
-                    const doc =
-                        createAddressPDF(
-                            row.From,
-                            row.To
-                        );
-
-
-                    zip.file(
-                        `Address_Sticker_${index+1}.pdf`,
-                        doc.output("blob")
-                    );
-                }
-            );
-
-
-            const blob =
-                await zip.generateAsync({
-                    type:"blob"
-                });
-
-
-            downloadBlob(
-                blob,
-                "BooksWagon_Address_Stickers.zip"
-            );
-
-
-            toast(
-                `${addressExcelRows.length} address stickers generated.`
-            );
-
-            return;
-        }
-
-
-        if(
-            $("#mergePDF").checked
-        ){
-
-            const {
-                jsPDF
-            } =
-                window.jspdf;
-
-
-            const merged =
-                new jsPDF({
-
-                    orientation:"landscape",
-
-                    unit:"mm",
-
-                    format:[
-                        152.4,
-                        101.6
-                    ]
-                });
-
-
-            addressExcelRows.forEach(
-                (row,index) => {
-
-                    if(index > 0){
-
-                        merged.addPage();
-                    }
-
-
-                    drawAddressOnDocument(
-                        merged,
-                        row.From,
-                        row.To
-                    );
-                }
-            );
-
-
-            merged.save(
-                "BooksWagon_Address_Stickers_Merged.pdf"
-            );
-
-
-            toast(
-                "Merged address PDF generated."
-            );
-
-            return;
-        }
-
-
-        addressExcelRows.forEach(
-            (row,index) => {
-
-                const doc =
-                    createAddressPDF(
-                        row.From,
-                        row.To
-                    );
-
-
-                doc.save(
-                    `Address_Sticker_${index+1}.pdf`
-                );
-            }
-        );
-
-
-        toast(
-            `${addressExcelRows.length} address PDFs generated.`
-        );
-
-        return;
-    }
-
-
-    const from =
-        $("#stickerFromAddress")
-        .value
-        .trim();
-
-
-    const to =
-        $("#stickerToAddress")
-        .value
-        .trim();
-
-
-    if(
-        !from ||
-        !to
-    ){
-
-        toast(
-            "Please enter both From and To address.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    const doc =
-        createAddressPDF(
-            from,
-            to
-        );
-
-
-    doc.save(
-        "BooksWagon_Address_Sticker.pdf"
-    );
-
-
-    toast(
-        "Address sticker generated."
-    );
-}
-
-
-/* =========================================================
-   DRAW ADDRESS ON EXISTING PDF
-========================================================= */
-
-function drawAddressOnDocument(
-    doc,
-    from,
-    to
-){
-
-    const width =
-        doc.internal.pageSize.getWidth();
-
-    const height =
-        doc.internal.pageSize.getHeight();
-
-
-    doc.setDrawColor(
-        17,
-        24,
-        39
-    );
-
-    doc.setLineWidth(
-        1
-    );
-
-
-    doc.rect(
-        5,
-        5,
-        width-10,
-        height-10
-    );
-
-
-    doc.setLineDashPattern(
-        [3,3],
-        0
-    );
-
-
-    doc.line(
-        width/2,
-        8,
-        width/2,
-        height-8
-    );
-
-
-    doc.setLineDashPattern(
-        [],
-        0
-    );
-
-
-    doc.setFont(
-        "helvetica",
-        "bold"
-    );
-
-    doc.setFontSize(
-        12
-    );
-
-
-    doc.text(
-        "FROM — BOOKSWAGON",
-        12,
-        20
-    );
-
-
-    doc.text(
-        "TO",
-        width/2+8,
-        20
-    );
-
-
-    doc.setFont(
-        "helvetica",
-        "normal"
-    );
-
-    doc.setFontSize(
-        9
-    );
-
-
-    doc.text(
-        doc.splitTextToSize(
-            from,
-            width/2-25
-        ),
-        12,
-        30
-    );
-
-
-    doc.text(
-        doc.splitTextToSize(
-            to,
-            width/2-25
-        ),
-        width/2+8,
-        30
-    );
-}
-
-
-/* =========================================================
-   GENERATE PO
-========================================================= */
-
-async function generatePO(){
-
-    const values =
-        getPOValues();
-
-
-    if(
-        !values.length
-    ){
-
-        toast(
-            "Please enter or upload at least one PO number.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if(
-        getPrintMode() === "none"
-    ){
-
-        toast(
-            "Select PO Number, Box Number or PO + Box.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    /*
-     * ZIP
-     */
-
-    if(
-        $("#zipPDF").checked
-    ){
-
-        const zip =
-            new JSZip();
-
-
-        values.forEach(
-            po => {
-
-                const doc =
-                    createPOPDF(
-                        po
-                    );
-
-
-                zip.file(
-                    `${safeFileName(po)}.pdf`,
-                    doc.output("blob")
-                );
-            }
-        );
-
-
-        const blob =
-            await zip.generateAsync({
-                type:"blob"
-            });
-
-
-        downloadBlob(
-            blob,
-            `${safeFileName(currentTool)}_Labels.zip`
-        );
-
-
-        toast(
-            "ZIP downloaded."
-        );
-
-        return;
-    }
-
-
-    /*
-     * MERGED
-     */
-
-    if(
-        $("#mergePDF").checked
-    ){
-
-        const {
-            jsPDF
-        } =
-            window.jspdf;
-
-
-        const merged =
-            new jsPDF({
-
-                orientation:
-                    $("#orientation").value,
-
-                unit:"mm",
-
-                format:
-                    getPageFormat()
-            });
-
-
-        let first =
-            true;
-
-
-        const start =
-            Math.max(
-                1,
-                Number(
-                    $("#startBox").value
-                ) || 1
-            );
-
-
-        const end =
-            Math.max(
-                start,
-                Number(
-                    $("#endBox").value
-                ) || start
-            );
-
-
-        const copies =
-            Math.max(
-                1,
-                Number(
-                    $("#copies").value
-                ) || 1
-            );
-
-
-        values.forEach(
-            po => {
-
-                for(
-                    let box=start;
-                    box<=end;
-                    box++
-                ){
-
-                    for(
-                        let copy=0;
-                        copy<copies;
-                        copy++
-                    ){
-
-                        if(!first){
-
-                            merged.addPage();
-                        }
-
-
-                        first =
-                            false;
-
-
-                        drawPOLabel(
-                            merged,
-                            po,
-                            box
-                        );
-                    }
-                }
-            }
-        );
-
-
-        merged.save(
-            `${safeFileName(currentTool)}_MERGED.pdf`
-        );
-
-
-        toast(
-            "Merged PDF downloaded."
-        );
-
-        return;
-    }
-
-
-    /*
-     * SEPARATE PDF
-     */
-
-    values.forEach(
-        po => {
-
-            const doc =
-                createPOPDF(
-                    po
-                );
-
-
-            doc.save(
-                `${safeFileName(po)}_${safeFileName(currentTool)}.pdf`
-            );
-        }
-    );
-
-
-    toast(
-        `${values.length} PDF(s) generated.`
-    );
-}
-
-
-/* =========================================================
-   MAIN GENERATE
-========================================================= */
-
-$("#generateButton")
-?.addEventListener(
-    "click",
-    async function(){
-
-        const button =
-            this;
-
-
-        button.disabled =
-            true;
-
-
-        button.textContent =
-            "Generating...";
-
-
-        try{
-
-            if(
-                currentTool ===
-                "ISBN Barcode"
-            ){
-
-                await generateISBN();
-
-            }else if(
-                currentTool ===
-                "Address Sticker"
-            ){
-
-                await generateAddress();
-
-            }else{
-
-                await generatePO();
-            }
-
-
-        }catch(error){
-
-            console.error(error);
-
-            toast(
-                error.message ||
-                "Generation failed.",
-                "error"
-            );
-
-        }finally{
-
-            button.disabled =
-                false;
-
-            button.textContent =
-                "Generate";
-        }
-    }
-);
-
-
-/* =========================================================
-   DOWNLOAD BLOB
-========================================================= */
-
-function downloadBlob(
-    blob,
-    filename
-){
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    const link =
-        document.createElement("a");
-
-
-    link.href =
-        url;
-
-
-    link.download =
-        filename;
-
-
-    document.body.appendChild(
-        link
-    );
-
-
-    link.click();
-
-
-    link.remove();
-
-
-    setTimeout(
-        () =>
-            URL.revokeObjectURL(
-                url
-            ),
-        1000
-    );
-}
-
-
-/* =========================================================
-   RESET
-========================================================= */
-
-$("#resetButton")
-?.addEventListener(
-    "click",
-    function(){
-
-        $$(".po-input")
-        .forEach(
-            input =>
-                input.value = ""
-        );
-
-
-        $("#multiplePO")
-            .value = "";
-
-
-        $("#manualISBN")
-            .value = "";
-
-
-        $("#manualTitle")
-            .value = "";
-
-
-        $("#manualEdition")
-            .value = "";
-
-
-        $("#startBox")
-            .value = 1;
-
-
-        $("#endBox")
-            .value = 200;
-
-
-        $("#copies")
-            .value = 1;
-
-
-        $("#toName")
-            .value = "";
-
-
-        $("#toAddress")
-            .value = "";
-
-
-        $("#stickerToName")
-            .value = "";
-
-
-        $("#stickerToAddress")
-            .value = "";
-
-
-        $$(".feature-checkbox input")
-        .forEach(
-            checkbox =>
-                checkbox.checked = false
-        );
-
-
-        poExcelRows = [];
-
-        isbnExcelRows = [];
-
-        addressExcelRows = [];
-
-
-        $("#poExcelPreview")
-            .innerHTML = "";
-
-
-        $("#isbnExcelPreview")
-            .innerHTML = "";
-
-
-        $("#addressExcelPreview")
-            .innerHTML = "";
-
-
-        $("#poExcelStatus")
-            .textContent =
-            "No Excel file selected.";
-
-
-        $("#isbnExcelStatus")
-            .textContent =
-            "No ISBN Excel file selected.";
-
-
-        $("#addressExcelStatus")
-            .textContent =
-            "No Address Excel selected.";
-
-
-        updatePOPreview();
-
-        updateISBNPreview();
-
-        updateAddressPreview();
-
-
-        toast(
-            "Settings reset successfully."
-        );
-    }
-);
-
-
-/* =========================================================
-   QR CODES
-========================================================= */
-
-function createQR(
-    elementId,
-    text
-){
-
-    const element =
-        document.getElementById(
-            elementId
-        );
-
-
-    if(!element)
-        return;
-
-
-    element.innerHTML = "";
-
-
-    new QRCode(
-        element,
-        {
-
-            text,
-
-            width:130,
-
-            height:130,
-
-            correctLevel:
-                QRCode.CorrectLevel.M
-
-        }
-    );
-}
-
-
-createQR(
-    "addressQR",
-    CONFIG.maps
-);
-
-
-createQR(
-    "emailQR",
-    `mailto:${CONFIG.email}`
-);
-
-
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-createPOInputs();
-
-openTool(
-    "Coco Blue PO"
-);
-
-updatePageSizeLock();
-
-updatePOPreview();
-
-updateISBNPreview();
-
-updateAddressPreview();
-
-</script>
-
-</body>
-</html>
