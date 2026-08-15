@@ -1,2952 +1,635 @@
 /* =========================================================
    BOOKSWAGON LABEL STUDIO
-   FINAL APP.JS
-   ========================================================= */
-
-"use strict";
-
-
-/* =========================================================
-   GLOBAL CONFIG
+   FINAL STYLE.CSS
 ========================================================= */
 
-const CONFIG = {
-    address:
-        "Ground Floor, 2/14, Ansari Rd, Old Delhi, Daryaganj, Delhi, 110002",
-
-    mapsURL:
-        "https://maps.app.goo.gl/7McYApm1u9x4QSj7A",
-
-    email:
-        "ashish.verma@bookswagon.in",
-
-    maxManualPO:
-        20
-};
-
-
-/* =========================================================
-   SHORTCUTS
-========================================================= */
-
-const $ = (selector, root = document) =>
-    root.querySelector(selector);
-
-const $$ = (selector, root = document) =>
-    [...root.querySelectorAll(selector)];
-
-
-/* =========================================================
-   UTILITY
-========================================================= */
-
-function escapeHTML(value) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        value ?? "";
-
-    return div.innerHTML;
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
+:root {
+    --blue: #1264f5;
+    --blue-dark: #0b55d4;
+    --blue-light: #eff6ff;
 
-function unique(values) {
+    --green: #12b76a;
+    --green-bg: #ecfdf3;
 
-    const seen =
-        new Set();
+    --red: #f04438;
+    --red-bg: #fef3f2;
 
-    return values.filter(value => {
+    --text: #101828;
+    --text-soft: #344054;
+    --muted: #667085;
 
-        const key =
-            String(value)
-                .trim()
-                .toUpperCase();
+    --border: #e4e7ec;
+    --border-dark: #d0d5dd;
 
-        if (!key || seen.has(key)) {
-            return false;
-        }
+    --white: #ffffff;
+    --page: #f7f9fc;
 
-        seen.add(key);
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
 
-        return true;
-    });
-}
+    --shadow-sm:
+        0 4px 14px rgba(16, 24, 40, .06);
 
+    --shadow-md:
+        0 12px 32px rgba(16, 24, 40, .09);
 
-function safeFilename(value) {
-
-    return String(value || "PO")
-        .replace(
-            /[<>:"/\\|?*\x00-\x1F]/g,
-            "_"
-        )
-        .replace(
-            /\s+/g,
-            "_"
-        )
-        .slice(0, 100);
+    --shadow-lg:
+        0 25px 80px rgba(16, 24, 40, .22);
 }
 
 
 /* =========================================================
-   TOAST SYSTEM
+   BASE
 ========================================================= */
 
-function showToast(
-    type,
-    title,
-    message
-) {
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+}
 
-    let container =
-        $("#toastContainer");
+body {
+    margin: 0;
+    min-height: 100vh;
 
+    background: var(--page);
+    color: var(--text);
 
-    if (!container) {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
 
-        container =
-            document.createElement("div");
+    line-height: 1.45;
 
-        container.id =
-            "toastContainer";
+    -webkit-font-smoothing: antialiased;
+}
 
-        document.body.appendChild(
-            container
-        );
-    }
+body.modal-open {
+    overflow: hidden;
+}
 
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
 
-    const toast =
-        document.createElement("div");
+button {
+    border: 0;
+}
 
+a {
+    color: inherit;
+}
 
-    const color =
-        type === "success"
-            ? "#12b76a"
-            : type === "error"
-                ? "#f04438"
-                : "#1264f5";
-
-
-    const border =
-        type === "success"
-            ? "#abefc6"
-            : type === "error"
-                ? "#fecdca"
-                : "#b2ddff";
-
-
-    toast.style.cssText = `
-        pointer-events:auto;
-        margin-bottom:10px;
-        padding:14px 16px;
-        background:#fff;
-        border:1px solid ${border};
-        border-left:4px solid ${color};
-        border-radius:12px;
-        box-shadow:0 15px 40px rgba(16,24,40,.14);
-        opacity:0;
-        transform:translateX(20px);
-        transition:.22s ease;
-    `;
+.hidden {
+    display: none !important;
+}
 
 
-    toast.innerHTML = `
-        <div style="
-            color:${color};
-            font-size:12px;
-            font-weight:900;
-            margin-bottom:4px;
-        ">
-            ${escapeHTML(title)}
-        </div>
+/* =========================================================
+   HEADER
+========================================================= */
 
-        <div style="
-            color:#667085;
-            font-size:11px;
-            line-height:1.5;
-        ">
-            ${escapeHTML(message)}
-        </div>
-    `;
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 5000;
+
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 13px 22px;
+
+    background:
+        rgba(255, 255, 255, .96);
+
+    border-bottom:
+        1px solid var(--border);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.logo {
+    color: var(--blue);
+
+    font-size: 18px;
+    font-weight: 950;
+
+    letter-spacing: -.4px;
+}
+
+.logo span {
+    color: var(--text);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
 
-    container.appendChild(
-        toast
-    );
+/* =========================================================
+   CONTAINER
+========================================================= */
 
-
-    requestAnimationFrame(() => {
-
-        toast.style.opacity =
-            "1";
-
-        toast.style.transform =
-            "translateX(0)";
-    });
-
-
-    setTimeout(() => {
-
-        toast.style.opacity =
-            "0";
-
-        toast.style.transform =
-            "translateX(20px)";
-
-
-        setTimeout(
-            () => toast.remove(),
-            230
+.container {
+    width:
+        min(
+            1180px,
+            calc(100% - 30px)
         );
 
-    }, 3300);
+    margin: 0 auto;
 }
 
 
 /* =========================================================
-   CHECKBOX CONFIRMATION SYSTEM
-   ========================================================= */
+   HERO
+========================================================= */
 
-let pendingCheckbox = null;
-let pendingState = false;
+.hero {
+    padding: 58px 0 40px;
+}
 
+.hero-content {
+    max-width: 800px;
+}
 
-function getFeatureName(
-    checkbox
-) {
+.hero-badge,
+.eyebrow {
+    display: inline-block;
 
-    const label =
-        checkbox.closest(
-            "label"
+    margin-bottom: 9px;
+
+    color: var(--blue);
+
+    font-size: 10px;
+    font-weight: 950;
+
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.hero h1 {
+    margin: 0 0 10px;
+
+    font-size:
+        clamp(
+            34px,
+            6vw,
+            56px
         );
 
+    line-height: 1.03;
 
-    if (label) {
+    letter-spacing: -2px;
 
-        const clone =
-            label.cloneNode(true);
+    font-weight: 950;
+}
+
+.hero p {
+    max-width: 700px;
+
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 14px;
+
+    line-height: 1.75;
+}
 
 
-        clone
-            .querySelectorAll(
-                "input"
+/* =========================================================
+   SECTION HEADING
+========================================================= */
+
+.section-heading {
+    margin-bottom: 22px;
+}
+
+.section-heading h2 {
+    margin:
+        0
+        0
+        7px;
+
+    font-size: 25px;
+
+    letter-spacing: -.7px;
+
+    font-weight: 950;
+}
+
+.section-heading p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   TOOL GRID
+========================================================= */
+
+.tool-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                260px,
+                1fr
             )
-            .forEach(
-                input =>
-                    input.remove()
-            );
-
-
-        const name =
-            clone.textContent
-                .replace(/\s+/g, " ")
-                .trim();
-
-
-        if (name) {
-            return name;
-        }
-    }
-
-
-    return (
-        checkbox.dataset.feature ||
-        checkbox.id ||
-        "this feature"
-    );
-}
-
-
-function openConfirmation(
-    checkbox
-) {
-
-    pendingCheckbox =
-        checkbox;
-
-    pendingState =
-        !checkbox.checked;
-
-
-    const modal =
-        $("#featureConfirmModal");
-
-
-    const title =
-        $("#featureConfirmTitle");
-
-
-    const message =
-        $("#featureConfirmMessage");
-
-
-    const confirmButton =
-        $("#featureConfirmOK");
-
-
-    if (
-        !modal ||
-        !title ||
-        !message ||
-        !confirmButton
-    ) {
-
-        /*
-         * Safety fallback.
-         */
-
-        checkbox.checked =
-            pendingState;
-
-        pendingCheckbox =
-            null;
-
-        return;
-    }
-
-
-    const feature =
-        getFeatureName(
-            checkbox
         );
 
-
-    title.textContent =
-        pendingState
-            ? "Enable Feature?"
-            : "Disable Feature?";
-
-
-    message.textContent =
-        pendingState
-            ? `Are you sure you want to enable "${feature}"?`
-            : `Are you sure you want to disable "${feature}"?`;
-
-
-    confirmButton.textContent =
-        pendingState
-            ? "Yes, Enable"
-            : "Yes, Disable";
-
-
-    confirmButton.style.background =
-        pendingState
-            ? "#1264f5"
-            : "#f04438";
-
-
-    modal.classList.remove(
-        "hidden"
-    );
+    gap: 16px;
 }
 
+.tool-card {
+    position: relative;
 
-function closeConfirmation() {
+    min-height: 235px;
 
-    $("#featureConfirmModal")
-        ?.classList.add(
-            "hidden"
-        );
+    padding: 23px;
 
+    background: var(--white);
 
-    pendingCheckbox =
-        null;
+    border:
+        1px solid var(--border);
 
-    pendingState =
-        false;
+    border-radius:
+        var(--radius-xl);
+
+    cursor: pointer;
+
+    transition:
+        transform .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease;
 }
 
+.tool-card:hover,
+.tool-card:focus-visible {
+    transform: translateY(-4px);
 
-/*
- * IMPORTANT FIX:
- *
- * Capture checkbox CLICK before browser
- * toggles it.
- */
+    border-color:
+        #b2ddff;
 
-document.addEventListener(
-    "click",
-    event => {
+    box-shadow:
+        var(--shadow-md);
 
-        const checkbox =
-            event.target.closest(
-                'input[type="checkbox"]'
-            );
+    outline: none;
+}
 
+.tool-card::after {
+    content: "→";
 
-        if (!checkbox) {
-            return;
-        }
+    position: absolute;
 
+    right: 20px;
+    bottom: 20px;
 
-        /*
-         * Explicit bypass.
-         */
+    width: 34px;
+    height: 34px;
 
-        if (
-            checkbox.dataset.confirmSkip ===
-            "true"
-        ) {
-            return;
-        }
+    display: grid;
+    place-items: center;
 
+    background:
+        var(--blue-light);
 
-        /*
-         * Prevent native checkbox toggle.
-         */
+    color:
+        var(--blue);
 
-        event.preventDefault();
+    border-radius: 50%;
 
-        event.stopPropagation();
+    font-size: 17px;
+    font-weight: 950;
+}
 
+.tool-icon {
+    width: 48px;
+    height: 48px;
 
-        openConfirmation(
-            checkbox
-        );
+    display: grid;
+    place-items: center;
 
-    },
-    true
-);
+    margin-bottom: 18px;
 
+    background:
+        var(--blue-light);
 
-/* =========================================================
-   CONFIRM ENABLE / DISABLE
-========================================================= */
+    color:
+        var(--blue);
 
-$("#featureConfirmOK")
-    ?.addEventListener(
-        "click",
-        () => {
+    border-radius: 12px;
 
-            if (!pendingCheckbox) {
-                closeConfirmation();
-                return;
-            }
+    font-size: 13px;
+    font-weight: 950;
+}
 
+.tool-number {
+    display: block;
 
-            const checkbox =
-                pendingCheckbox;
+    margin-bottom: 5px;
 
+    color: #98a2b3;
 
-            const state =
-                pendingState;
+    font-size: 9px;
+    font-weight: 900;
 
+    letter-spacing: 1px;
+}
 
-            /*
-             * REAL STATE CHANGE
-             */
+.tool-card h3 {
+    margin:
+        0
+        0
+        8px;
 
-            checkbox.checked =
-                state;
+    font-size: 19px;
+    font-weight: 950;
+}
 
+.tool-card p {
+    max-width: 290px;
 
-            /*
-             * Trigger application listeners.
-             */
+    margin: 0;
 
-            checkbox.dispatchEvent(
-                new Event(
-                    "change",
-                    {
-                        bubbles: true
-                    }
-                )
-            );
+    color: var(--muted);
 
+    font-size: 12px;
 
-            const feature =
-                getFeatureName(
-                    checkbox
-                );
+    line-height: 1.65;
+}
 
+.tool-tags {
+    display: flex;
+    flex-wrap: wrap;
 
-            closeConfirmation();
+    gap: 5px;
 
+    margin-top: 16px;
+}
 
-            if (state) {
+.tool-tags span {
+    padding:
+        4px
+        7px;
 
-                showToast(
-                    "success",
-                    "Feature Enabled",
-                    `"${feature}" is now enabled.`
-                );
+    color: var(--text-soft);
 
-            } else {
+    background: #f2f4f7;
 
-                showToast(
-                    "error",
-                    "Feature Disabled",
-                    `"${feature}" is now disabled.`
-                );
-            }
+    border-radius: 5px;
 
-
-            updateAllPreviews();
-        }
-    );
-
-
-$("#featureConfirmCancel")
-    ?.addEventListener(
-        "click",
-        closeConfirmation
-    );
-
-
-$("#featureConfirmModal")
-    ?.addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target.id ===
-                "featureConfirmModal"
-            ) {
-                closeConfirmation();
-            }
-
-        }
-    );
-
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key === "Escape"
-        ) {
-            closeConfirmation();
-        }
-
-    }
-);
-
-
-/* =========================================================
-   REMOVE OLD 1–200 RANGE LIMIT
-========================================================= */
-
-function removeBoxRangeLimit() {
-
-    $$(
-        'input[type="number"]'
-    ).forEach(input => {
-
-        const identity = `
-            ${input.id}
-            ${input.name}
-            ${input.placeholder}
-        `.toLowerCase();
-
-
-        if (
-            identity.includes("box") ||
-            identity.includes("range")
-        ) {
-
-            input.removeAttribute(
-                "max"
-            );
-
-            input.min =
-                "1";
-        }
-
-    });
+    font-size: 8px;
+    font-weight: 900;
 }
 
 
 /* =========================================================
-   RANGE READER
+   FEATURE GRID
 ========================================================= */
 
-function getNumber(
-    selector,
-    fallback = 1
-) {
-
-    const input =
-        $(selector);
-
-
-    if (!input) {
-        return fallback;
-    }
-
-
-    const number =
-        Number(
-            input.value
-        );
-
-
-    if (
-        !Number.isInteger(number) ||
-        number < 1
-    ) {
-
-        return fallback;
-    }
-
-
-    return number;
+.features-section {
+    padding-top: 80px;
 }
 
+.feature-grid {
+    display: grid;
 
-function getBoxRange(
-    startSelector,
-    endSelector
-) {
-
-    const start =
-        getNumber(
-            startSelector,
-            1
-        );
-
-
-    const end =
-        getNumber(
-            endSelector,
-            start
-        );
-
-
-    if (end < start) {
-
-        showToast(
-            "error",
-            "Invalid Box Range",
-            "End Box Number must be greater than or equal to Start Box Number."
-        );
-
-        return null;
-    }
-
-
-    return {
-        start,
-        end
-    };
-}
-
-
-/* =========================================================
-   PO PARSER
-========================================================= */
-
-function parsePOs(
-    values
-) {
-
-    return unique(
-        values
-            .flatMap(
-                value =>
-                    String(value || "")
-                        .split(
-                            /[,\n;]+/
-                        )
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                210px,
+                1fr
             )
-            .map(
-                value =>
-                    value.trim()
-            )
-            .filter(Boolean)
-    );
-}
-
-
-function getPOList(
-    individualSelector,
-    multipleSelector
-) {
-
-    const individual =
-        $$(individualSelector)
-            .map(
-                input =>
-                    input.value.trim()
-            )
-            .filter(Boolean);
-
-
-    const multiple =
-        parsePOs([
-            $(multipleSelector)
-                ?.value || ""
-        ]);
-
-
-    return unique([
-        ...individual,
-        ...multiple
-    ]);
-}
-
-
-/* =========================================================
-   PRINT MODE
-========================================================= */
-
-function getPrintMode(
-    poSelector,
-    boxSelector,
-    bothSelector
-) {
-
-    const po =
-        $(poSelector)?.checked;
-
-    const box =
-        $(boxSelector)?.checked;
-
-    const both =
-        $(bothSelector)?.checked;
-
-
-    if (both) {
-        return "both";
-    }
-
-
-    if (po && box) {
-        return "both";
-    }
-
-
-    if (po) {
-        return "po";
-    }
-
-
-    if (box) {
-        return "box";
-    }
-
-
-    return "none";
-}
-
-
-function validatePrintMode(
-    poSelector,
-    boxSelector,
-    bothSelector
-) {
-
-    const mode =
-        getPrintMode(
-            poSelector,
-            boxSelector,
-            bothSelector
         );
 
+    gap: 12px;
+}
 
-    if (mode === "none") {
+.feature-card {
+    padding: 18px;
 
-        showToast(
-            "error",
-            "Print Option Required",
-            "Please select PO Number, Box Number, or PO + Box Number."
-        );
+    background: var(--white);
 
-        return false;
-    }
+    border:
+        1px solid var(--border);
 
+    border-radius:
+        var(--radius-lg);
+}
 
-    return true;
+.feature-card strong {
+    display: grid;
+
+    width: 34px;
+    height: 34px;
+
+    place-items: center;
+
+    margin-bottom: 12px;
+
+    background:
+        var(--blue-light);
+
+    color:
+        var(--blue);
+
+    border-radius: 8px;
+
+    font-size: 10px;
+    font-weight: 950;
+}
+
+.feature-card h3 {
+    margin:
+        0
+        0
+        5px;
+
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.feature-card p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.55;
 }
 
 
 /* =========================================================
-   PREVIEW
+   WORKSPACE
 ========================================================= */
 
-function buildPreview(
-    po,
-    box,
-    mode,
-    poBorder,
-    boxBorder,
-    combinedBorder,
-    cutting,
-    scissor
-) {
+.tool-workspace {
+    display: none;
 
-    let content =
-        "";
+    margin-top: 45px;
 
+    scroll-margin-top: 90px;
+}
 
-    if (
-        mode === "po" ||
-        mode === "both"
-    ) {
+.tool-workspace.active {
+    display: block;
 
-        content += `
-            <strong
-                class="${
-                    poBorder
-                        ? "preview-item-border"
-                        : ""
-                }"
-            >
-                ${escapeHTML(po)}
-            </strong>
-        `;
+    animation:
+        workspaceIn
+        .22s
+        ease;
+}
+
+@keyframes workspaceIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
 
-
-    if (
-        mode === "both" &&
-        cutting
-    ) {
-
-        content += `
-            <div class="preview-dotted-line">
-                ${
-                    scissor
-                        ? "· · · · · ✂ · · · · ·"
-                        : "· · · · · · · · · ·"
-                }
-            </div>
-        `;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 
+}
 
-    if (
-        mode === "box" ||
-        mode === "both"
-    ) {
+.workspace-card {
+    overflow: hidden;
 
-        content += `
-            <div
-                class="${
-                    boxBorder
-                        ? "preview-box-number"
-                        : ""
-                }"
-            >
-                BOX NO. ${escapeHTML(box)}
-            </div>
-        `;
-    }
+    padding: 25px;
 
+    background: var(--white);
 
-    if (!content) {
+    border:
+        1px solid var(--border);
 
-        content = `
-            <span style="
-                color:#98a2b3;
-                font-size:11px;
-            ">
-                Select a print option
-            </span>
-        `;
-    }
+    border-radius:
+        var(--radius-xl);
 
+    box-shadow:
+        var(--shadow-sm);
+}
 
-    return `
-        <div
-            class="
-                dynamic-label-preview
-                ${
-                    combinedBorder
-                        ? "has-outer-border"
-                        : ""
-                }
-            "
-        >
-            ${content}
-        </div>
-    `;
+.workspace-header {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 18px;
+
+    margin-bottom: 25px;
+
+    padding-bottom: 20px;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+.workspace-header h2 {
+    margin:
+        0
+        0
+        5px;
+
+    font-size: 24px;
+
+    letter-spacing: -.6px;
+
+    font-weight: 950;
+}
+
+.workspace-header p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 12px;
 }
 
 
 /* =========================================================
-   COCO PREVIEW
+   SECTION
 ========================================================= */
 
-function updateCocoPreview() {
+.section {
+    margin-top: 24px;
 
-    const page =
-        $("#cocoPreviewPage");
+    padding-top: 24px;
 
-
-    if (!page) {
-        return;
-    }
-
-
-    const po =
-        getPOList(
-            ".coco-po",
-            "#cocoCommaPO"
-        )[0] ||
-        "PO NUMBER";
-
-
-    const box =
-        $("#cocoStartBox")
-            ?.value ||
-        "1";
-
-
-    const mode =
-        getPrintMode(
-            "#cocoPrintPO",
-            "#cocoPrintBox",
-            "#cocoPrintPOBox"
-        );
-
-
-    page.innerHTML =
-        buildPreview(
-            po,
-            box,
-            mode,
-
-            $("#cocoPOBorder")
-                ?.checked,
-
-            $("#cocoBoxBorder")
-                ?.checked,
-
-            $("#cocoPOBoxOuterBorder")
-                ?.checked,
-
-            $("#cocoCutting")
-                ?.checked,
-
-            $("#cocoScissorLine")
-                ?.checked
-        );
-
-
-    const pageBorder =
-        $("#cocoPageBorder")
-            ?.checked;
-
-
-    page.style.border =
-        pageBorder
-            ? "1.5px solid #101828"
-            : "0";
-
-
-    const summary =
-        $("#cocoBoxSummary");
-
-
-    if (summary) {
-
-        summary.textContent =
-            `${getNumber("#cocoStartBox", 1)}–${getNumber("#cocoEndBox", 200)}`;
-    }
+    border-top:
+        1px solid #eaecf0;
 }
 
-
-/* =========================================================
-   OTHER PO PREVIEW
-========================================================= */
-
-function updateOtherPreview() {
-
-    const page =
-        $("#otherPreviewPage");
-
-
-    if (!page) {
-        return;
-    }
-
-
-    const po =
-        getPOList(
-            ".other-po",
-            "#otherCommaPO"
-        )[0] ||
-        "PO NUMBER";
-
-
-    const box =
-        $("#otherStartBox")
-            ?.value ||
-        "1";
-
-
-    const mode =
-        getPrintMode(
-            "#otherPrintPO",
-            "#otherPrintBox",
-            "#otherPrintPOBox"
-        );
-
-
-    page.innerHTML =
-        buildPreview(
-            po,
-            box,
-            mode,
-
-            $("#otherPOBorder")
-                ?.checked,
-
-            $("#otherBoxBorder")
-                ?.checked,
-
-            $("#otherPOBoxOuterBorder")
-                ?.checked,
-
-            $("#otherCutting")
-                ?.checked,
-
-            true
-        );
-
-
-    const pageBorder =
-        $("#otherPageBorder")
-            ?.checked;
-
-
-    page.style.border =
-        pageBorder
-            ? "1.5px solid #101828"
-            : "0";
+.section:first-of-type {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
 }
 
+.section h3 {
+    margin:
+        0
+        0
+        5px;
 
-/* =========================================================
-   SBMO PREVIEW
-========================================================= */
+    font-size: 14px;
 
-function updateSBMOPreview() {
-
-    const page =
-        $("#sbmoWorkspace .dynamic-page-preview");
-
-
-    if (!page) {
-        return;
-    }
-
-
-    const po =
-        getPOList(
-            ".sbmo-po",
-            "#sbmoCommaPO"
-        )[0] ||
-        "PO NUMBER";
-
-
-    const box =
-        $("#sbmoStartBox")
-            ?.value ||
-        "1";
-
-
-    const mode =
-        getPrintMode(
-            "#sbmoPrintPO",
-            "#sbmoPrintBox",
-            "#sbmoPrintPOBox"
-        );
-
-
-    page.innerHTML =
-        buildPreview(
-            po,
-            box,
-            mode,
-
-            $("#sbmoPOBorder")
-                ?.checked,
-
-            $("#sbmoBoxBorder")
-                ?.checked,
-
-            false,
-
-            $("#sbmoCutting")
-                ?.checked,
-
-            true
-        );
+    font-weight: 950;
 }
 
+.section-help {
+    margin:
+        0
+        0
+        13px;
 
-function updateAllPreviews() {
+    color: var(--muted);
 
-    updateCocoPreview();
-
-    updateOtherPreview();
-
-    updateSBMOPreview();
+    font-size: 10px;
 }
 
+.section small {
+    display: block;
 
-/* =========================================================
-   TOOL NAVIGATION
-========================================================= */
+    margin-top: 7px;
 
-function setupToolNavigation() {
+    color: var(--muted);
 
-    $$("[data-open-tool]")
-        .forEach(card => {
-
-            card.addEventListener(
-                "click",
-                () => {
-
-                    const tool =
-                        card.dataset.openTool;
-
-
-                    $$(".tool-workspace")
-                        .forEach(
-                            workspace =>
-                                workspace.classList.remove(
-                                    "active"
-                                )
-                        );
-
-
-                    const workspace =
-                        $(
-                            `#${tool}Workspace`
-                        );
-
-
-                    if (!workspace) {
-                        return;
-                    }
-
-
-                    workspace.classList.add(
-                        "active"
-                    );
-
-
-                    workspace.scrollIntoView({
-                        behavior:"smooth",
-                        block:"start"
-                    });
-
-                }
-            );
-
-        });
-
-
-    $$("[data-close-tool]")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    $$(".tool-workspace")
-                        .forEach(
-                            workspace =>
-                                workspace.classList.remove(
-                                    "active"
-                                )
-                        );
-
-
-                    $("#tools")
-                        ?.scrollIntoView({
-                            behavior:"smooth"
-                        });
-
-                }
-            );
-
-        });
-}
-
-
-/* =========================================================
-   INPUT TABS
-========================================================= */
-
-function setupInputTabs() {
-
-    $$("[data-coco-input]")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const mode =
-                        button.dataset.cocoInput;
-
-
-                    $("#cocoManualArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "manual"
-                        );
-
-
-                    $("#cocoCommaArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "comma"
-                        );
-
-
-                    $("#cocoExcelArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "excel"
-                        );
-
-
-                    $$("[data-coco-input]")
-                        .forEach(
-                            item =>
-                                item.classList.toggle(
-                                    "active",
-                                    item === button
-                                )
-                        );
-
-                }
-            );
-
-        });
-
-
-    $$("[data-other-input]")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const mode =
-                        button.dataset.otherInput;
-
-
-                    $("#otherManualArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "manual"
-                        );
-
-
-                    $("#otherCommaArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "comma"
-                        );
-
-
-                    $("#otherExcelArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "excel"
-                        );
-
-
-                    $$("[data-other-input]")
-                        .forEach(
-                            item =>
-                                item.classList.toggle(
-                                    "active",
-                                    item === button
-                                )
-                        );
-
-                }
-            );
-
-        });
-}
-
-
-/* =========================================================
-   PDF LIBRARY
-========================================================= */
-
-function getJsPDF() {
-
-    if (
-        !window.jspdf ||
-        !window.jspdf.jsPDF
-    ) {
-
-        throw new Error(
-            "jsPDF library is not loaded."
-        );
-    }
-
-
-    return window.jspdf.jsPDF;
-}
-
-
-/* =========================================================
-   DRAW PDF LABEL
-========================================================= */
-
-function drawLabel(
-    doc,
-    po,
-    box,
-    options
-) {
-
-    const pageWidth =
-        doc.internal.pageSize.getWidth();
-
-    const pageHeight =
-        doc.internal.pageSize.getHeight();
-
-
-    const centerX =
-        pageWidth / 2;
-
-
-    const margin =
-        12;
-
-
-    const mode =
-        options.mode ||
-        "both";
-
-
-    /*
-     * PAGE BORDER
-     */
-
-    if (
-        options.pageBorder
-    ) {
-
-        doc.setDrawColor(
-            17,
-            24,
-            39
-        );
-
-        doc.setLineWidth(
-            0.7
-        );
-
-        doc.rect(
-            6,
-            6,
-            pageWidth - 12,
-            pageHeight - 12
-        );
-    }
-
-
-    /*
-     * COMBINED OUTER BORDER
-     */
-
-    if (
-        options.combinedBorder
-    ) {
-
-        doc.setDrawColor(
-            17,
-            24,
-            39
-        );
-
-        doc.setLineWidth(
-            1.1
-        );
-
-        doc.rect(
-            margin,
-            margin,
-            pageWidth -
-                margin * 2,
-            pageHeight -
-                margin * 2
-        );
-    }
-
-
-    let y =
-        pageHeight * 0.34;
-
-
-    const fontSize =
-        options.fontSize ||
-        16;
-
-
-    doc.setFont(
-        "helvetica",
-        options.bold
-            ? "bold"
-            : "normal"
-    );
-
-
-    doc.setFontSize(
-        fontSize
-    );
-
-
-    /*
-     * PO NUMBER
-     */
-
-    if (
-        mode === "po" ||
-        mode === "both"
-    ) {
-
-        const poText =
-            String(po);
-
-
-        const width =
-            Math.max(
-                65,
-                doc.getTextWidth(
-                    poText
-                ) + 28
-            );
-
-
-        const x =
-            centerX -
-            width / 2;
-
-
-        if (
-            options.poBorder
-        ) {
-
-            doc.setLineWidth(
-                0.8
-            );
-
-            doc.rect(
-                x,
-                y - 15,
-                width,
-                30
-            );
-        }
-
-
-        doc.text(
-            poText,
-            centerX,
-            y + 4,
-            {
-                align:"center"
-            }
-        );
-
-
-        y += 48;
-    }
-
-
-    /*
-     * CUTTING LINE
-     */
-
-    if (
-        mode === "both" &&
-        options.cutting
-    ) {
-
-        const left =
-            margin + 15;
-
-        const right =
-            pageWidth -
-            margin -
-            15;
-
-        const lineY =
-            y - 13;
-
-
-        doc.setDrawColor(
-            80,
-            80,
-            80
-        );
-
-        doc.setLineWidth(
-            0.45
-        );
-
-
-        const dash =
-            4;
-
-        const gap =
-            3;
-
-
-        for (
-            let x = left;
-            x < right;
-            x += dash + gap
-        ) {
-
-            doc.line(
-                x,
-                lineY,
-                Math.min(
-                    x + dash,
-                    right
-                ),
-                lineY
-            );
-        }
-
-
-        if (
-            options.scissor
-        ) {
-
-            doc.setFontSize(
-                10
-            );
-
-
-            doc.text(
-                "✂",
-                centerX,
-                lineY + 3,
-                {
-                    align:"center"
-                }
-            );
-        }
-
-
-        y += 30;
-    }
-
-
-    /*
-     * BOX NUMBER
-     */
-
-    if (
-        mode === "box" ||
-        mode === "both"
-    ) {
-
-        const boxText =
-            `BOX NO. ${box}`;
-
-
-        const width =
-            Math.max(
-                90,
-                doc.getTextWidth(
-                    boxText
-                ) + 30
-            );
-
-
-        const x =
-            centerX -
-            width / 2;
-
-
-        if (
-            options.boxBorder
-        ) {
-
-            doc.setLineWidth(
-                0.8
-            );
-
-            doc.rect(
-                x,
-                y - 15,
-                width,
-                30
-            );
-        }
-
-
-        doc.text(
-            boxText,
-            centerX,
-            y + 4,
-            {
-                align:"center"
-            }
-        );
-    }
-}
-
-
-/* =========================================================
-   CREATE PDF
-========================================================= */
-
-function createPDF(
-    po,
-    start,
-    end,
-    options
-) {
-
-    const JsPDF =
-        getJsPDF();
-
-
-    const doc =
-        new JsPDF({
-            orientation:"portrait",
-            unit:"mm",
-            format:"a4"
-        });
-
-
-    let firstPage =
-        true;
-
-
-    for (
-        let box = start;
-        box <= end;
-        box++
-    ) {
-
-        if (!firstPage) {
-            doc.addPage();
-        }
-
-
-        firstPage =
-            false;
-
-
-        drawLabel(
-            doc,
-            po,
-            box,
-            options
-        );
-    }
-
-
-    return doc;
-}
-
-
-/* =========================================================
-   CREATE MERGED PDF
-========================================================= */
-
-function createMergedPDF(
-    poList,
-    start,
-    end,
-    options
-) {
-
-    const JsPDF =
-        getJsPDF();
-
-
-    const doc =
-        new JsPDF({
-            orientation:"portrait",
-            unit:"mm",
-            format:"a4"
-        });
-
-
-    let firstPage =
-        true;
-
-
-    poList.forEach(po => {
-
-        for (
-            let box = start;
-            box <= end;
-            box++
-        ) {
-
-            if (!firstPage) {
-                doc.addPage();
-            }
-
-
-            firstPage =
-                false;
-
-
-            drawLabel(
-                doc,
-                po,
-                box,
-                options
-            );
-        }
-
-    });
-
-
-    return doc;
-}
-
-
-/* =========================================================
-   ZIP CREATOR
-========================================================= */
-
-async function createZIP(
-    files,
-    filename
-) {
-
-    if (
-        typeof JSZip ===
-        "undefined"
-    ) {
-
-        throw new Error(
-            "JSZip library is not loaded."
-        );
-    }
-
-
-    const zip =
-        new JSZip();
-
-
-    files.forEach(file => {
-
-        zip.file(
-            file.name,
-            file.blob
-        );
-
-    });
-
-
-    const blob =
-        await zip.generateAsync({
-            type:"blob",
-            compression:"DEFLATE",
-            compressionOptions:{
-                level:6
-            }
-        });
-
-
-    downloadBlob(
-        blob,
-        filename
-    );
-}
-
-
-/* =========================================================
-   BLOB DOWNLOAD
-========================================================= */
-
-function downloadBlob(
-    blob,
-    filename
-) {
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-
-    link.href =
-        url;
-
-    link.download =
-        filename;
-
-    link.style.display =
-        "none";
-
-
-    document.body.appendChild(
-        link
-    );
-
-
-    link.click();
-
-
-    link.remove();
-
-
-    setTimeout(
-        () =>
-            URL.revokeObjectURL(
-                url
-            ),
-        1500
-    );
-}
-
-
-/* =========================================================
-   COCO OPTIONS
-========================================================= */
-
-function getCocoOptions() {
-
-    return {
-
-        mode:
-            getPrintMode(
-                "#cocoPrintPO",
-                "#cocoPrintBox",
-                "#cocoPrintPOBox"
-            ),
-
-        pageBorder:
-            $("#cocoPageBorder")
-                ?.checked === true,
-
-        poBorder:
-            $("#cocoPOBorder")
-                ?.checked === true,
-
-        boxBorder:
-            $("#cocoBoxBorder")
-                ?.checked === true,
-
-        combinedBorder:
-            $("#cocoPOBoxOuterBorder")
-                ?.checked === true,
-
-        cutting:
-            $("#cocoCutting")
-                ?.checked === true,
-
-        scissor:
-            $("#cocoScissorLine")
-                ?.checked === true,
-
-        bold:
-            $("#cocoBoldText")
-                ?.checked === true,
-
-        fontSize:
-            16
-    };
-}
-
-
-/* =========================================================
-   OTHER OPTIONS
-========================================================= */
-
-function getOtherOptions() {
-
-    return {
-
-        mode:
-            getPrintMode(
-                "#otherPrintPO",
-                "#otherPrintBox",
-                "#otherPrintPOBox"
-            ),
-
-        pageBorder:
-            $("#otherPageBorder")
-                ?.checked === true,
-
-        poBorder:
-            $("#otherPOBorder")
-                ?.checked === true,
-
-        boxBorder:
-            $("#otherBoxBorder")
-                ?.checked === true,
-
-        combinedBorder:
-            $("#otherPOBoxOuterBorder")
-                ?.checked === true,
-
-        cutting:
-            $("#otherCutting")
-                ?.checked === true,
-
-        scissor:
-            true,
-
-        bold:
-            true,
-
-        fontSize:
-            16
-    };
-}
-
-
-/* =========================================================
-   SBMO OPTIONS
-========================================================= */
-
-function getSBMOOptions() {
-
-    return {
-
-        mode:
-            getPrintMode(
-                "#sbmoPrintPO",
-                "#sbmoPrintBox",
-                "#sbmoPrintPOBox"
-            ),
-
-        pageBorder:
-            true,
-
-        poBorder:
-            $("#sbmoPOBorder")
-                ?.checked === true,
-
-        boxBorder:
-            $("#sbmoBoxBorder")
-                ?.checked === true,
-
-        combinedBorder:
-            false,
-
-        cutting:
-            $("#sbmoCutting")
-                ?.checked === true,
-
-        scissor:
-            true,
-
-        bold:
-            true,
-
-        fontSize:
-            16
-    };
-}
-
-
-/* =========================================================
-   COCO GENERATOR
-========================================================= */
-
-async function generateCoco() {
-
-    try {
-
-        const range =
-            getBoxRange(
-                "#cocoStartBox",
-                "#cocoEndBox"
-            );
-
-
-        if (!range) {
-            return;
-        }
-
-
-        if (
-            !validatePrintMode(
-                "#cocoPrintPO",
-                "#cocoPrintBox",
-                "#cocoPrintPOBox"
-            )
-        ) {
-            return;
-        }
-
-
-        const poList =
-            getPOList(
-                ".coco-po",
-                "#cocoCommaPO"
-            );
-
-
-        if (!poList.length) {
-
-            showToast(
-                "error",
-                "PO Number Required",
-                "Please enter at least one PO number."
-            );
-
-            return;
-        }
-
-
-        const options =
-            getCocoOptions();
-
-
-        const zip =
-            $("#cocoZIP")
-                ?.checked === true;
-
-
-        const merged =
-            $("#cocoMergedPDF")
-                ?.checked === true;
-
-
-        /*
-         * ONE PO
-         * DIRECT PDF
-         */
-
-        if (
-            poList.length === 1 &&
-            !zip &&
-            !merged
-        ) {
-
-            const doc =
-                createPDF(
-                    poList[0],
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `${safeFilename(
-                    poList[0]
-                )}_BOX_${range.start}-${range.end}.pdf`
-            );
-
-
-            showToast(
-                "success",
-                "PDF Downloaded",
-                "The PDF was downloaded directly."
-            );
-
-
-            return;
-        }
-
-
-        /*
-         * MERGED PDF
-         */
-
-        if (
-            merged &&
-            !zip
-        ) {
-
-            const doc =
-                createMergedPDF(
-                    poList,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `BOOKSWAGON_MERGED_${Date.now()}.pdf`
-            );
-
-
-            showToast(
-                "success",
-                "Merged PDF Downloaded",
-                "All selected PO labels are in one PDF."
-            );
-
-
-            return;
-        }
-
-
-        /*
-         * MULTIPLE PDF → ZIP
-         */
-
-        const files = [];
-
-
-        for (
-            const po of poList
-        ) {
-
-            const doc =
-                createPDF(
-                    po,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            files.push({
-
-                name:
-                    `${safeFilename(
-                        po
-                    )}_BOX_${range.start}-${range.end}.pdf`,
-
-                blob:
-                    doc.output(
-                        "blob"
-                    )
-            });
-        }
-
-
-        await createZIP(
-            files,
-            `BOOKSWAGON_PO_LABELS_${Date.now()}.zip`
-        );
-
-
-        showToast(
-            "success",
-            "ZIP Downloaded",
-            `${files.length} PDF file(s) were added to the ZIP.`
-        );
-
-    } catch (error) {
-
-        console.error(
-            "CocoBlue Error:",
-            error
-        );
-
-
-        showToast(
-            "error",
-            "Generation Failed",
-            error.message ||
-            "Unable to generate the PDF."
-        );
-    }
-}
-
-
-/* =========================================================
-   OTHER PO GENERATOR
-========================================================= */
-
-async function generateOther() {
-
-    try {
-
-        const range =
-            getBoxRange(
-                "#otherStartBox",
-                "#otherEndBox"
-            );
-
-
-        if (!range) {
-            return;
-        }
-
-
-        if (
-            !validatePrintMode(
-                "#otherPrintPO",
-                "#otherPrintBox",
-                "#otherPrintPOBox"
-            )
-        ) {
-            return;
-        }
-
-
-        const poList =
-            getPOList(
-                ".other-po",
-                "#otherCommaPO"
-            );
-
-
-        if (!poList.length) {
-
-            showToast(
-                "error",
-                "PO Number Required",
-                "Please enter at least one PO number."
-            );
-
-            return;
-        }
-
-
-        const options =
-            getOtherOptions();
-
-
-        const zip =
-            $("#otherZIP")
-                ?.checked === true;
-
-
-        const merged =
-            $("#otherMergedPDF")
-                ?.checked === true;
-
-
-        if (
-            poList.length === 1 &&
-            !zip &&
-            !merged
-        ) {
-
-            const doc =
-                createPDF(
-                    poList[0],
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `${safeFilename(
-                    poList[0]
-                )}_BOX_${range.start}-${range.end}.pdf`
-            );
-
-
-            showToast(
-                "success",
-                "PDF Downloaded",
-                "The PDF was downloaded directly."
-            );
-
-
-            return;
-        }
-
-
-        if (
-            merged &&
-            !zip
-        ) {
-
-            const doc =
-                createMergedPDF(
-                    poList,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `BOOKSWAGON_OTHER_PO_MERGED_${Date.now()}.pdf`
-            );
-
-
-            showToast(
-                "success",
-                "Merged PDF Downloaded",
-                "All Other PO labels are in one PDF."
-            );
-
-
-            return;
-        }
-
-
-        const files = [];
-
-
-        for (
-            const po of poList
-        ) {
-
-            const doc =
-                createPDF(
-                    po,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            files.push({
-
-                name:
-                    `${safeFilename(
-                        po
-                    )}_BOX_${range.start}-${range.end}.pdf`,
-
-                blob:
-                    doc.output(
-                        "blob"
-                    )
-            });
-        }
-
-
-        await createZIP(
-            files,
-            `BOOKSWAGON_OTHER_PO_${Date.now()}.zip`
-        );
-
-
-        showToast(
-            "success",
-            "ZIP Downloaded",
-            `${files.length} PDF file(s) packed into ZIP.`
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Other PO Error:",
-            error
-        );
-
-
-        showToast(
-            "error",
-            "Generation Failed",
-            error.message ||
-            "Unable to generate the PDF."
-        );
-    }
-}
-
-
-/* =========================================================
-   SBMO GENERATOR
-========================================================= */
-
-async function generateSBMO() {
-
-    try {
-
-        const range =
-            getBoxRange(
-                "#sbmoStartBox",
-                "#sbmoEndBox"
-            );
-
-
-        if (!range) {
-            return;
-        }
-
-
-        if (
-            !validatePrintMode(
-                "#sbmoPrintPO",
-                "#sbmoPrintBox",
-                "#sbmoPrintPOBox"
-            )
-        ) {
-            return;
-        }
-
-
-        const poList =
-            getPOList(
-                ".sbmo-po",
-                "#sbmoCommaPO"
-            );
-
-
-        if (!poList.length) {
-
-            showToast(
-                "error",
-                "PO Number Required",
-                "Please enter at least one PO number."
-            );
-
-            return;
-        }
-
-
-        const options =
-            getSBMOOptions();
-
-
-        const zip =
-            $("#sbmoZIP")
-                ?.checked === true;
-
-
-        const merged =
-            $("#sbmoMergedPDF")
-                ?.checked === true;
-
-
-        if (
-            poList.length === 1 &&
-            !zip &&
-            !merged
-        ) {
-
-            const doc =
-                createPDF(
-                    poList[0],
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `${safeFilename(
-                    poList[0]
-                )}_SBMO_BOX_${range.start}-${range.end}.pdf`
-            );
-
-
-            showToast(
-                "success",
-                "PDF Downloaded",
-                "SBMO PDF downloaded directly."
-            );
-
-
-            return;
-        }
-
-
-        if (
-            merged &&
-            !zip
-        ) {
-
-            const doc =
-                createMergedPDF(
-                    poList,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `BOOKSWAGON_SBMO_MERGED_${Date.now()}.pdf`
-            );
-
-
-            showToast(
-                "success",
-                "Merged PDF Downloaded",
-                "All SBMO labels are in one PDF."
-            );
-
-
-            return;
-        }
-
-
-        const files = [];
-
-
-        for (
-            const po of poList
-        ) {
-
-            const doc =
-                createPDF(
-                    po,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            files.push({
-
-                name:
-                    `${safeFilename(
-                        po
-                    )}_SBMO_BOX_${range.start}-${range.end}.pdf`,
-
-                blob:
-                    doc.output(
-                        "blob"
-                    )
-            });
-        }
-
-
-        await createZIP(
-            files,
-            `BOOKSWAGON_SBMO_${Date.now()}.zip`
-        );
-
-
-        showToast(
-            "success",
-            "ZIP Downloaded",
-            `${files.length} SBMO PDF file(s) packed into ZIP.`
-        );
-
-    } catch (error) {
-
-        console.error(
-            "SBMO Error:",
-            error
-        );
-
-
-        showToast(
-            "error",
-            "Generation Failed",
-            error.message ||
-            "Unable to generate SBMO PDF."
-        );
-    }
-}
-
-
-/* =========================================================
-   ADDRESS PDF
-========================================================= */
-
-function generateAddressPDF() {
-
-    try {
-
-        const JsPDF =
-            getJsPDF();
-
-
-        const doc =
-            new JsPDF({
-                orientation:"portrait",
-                unit:"mm",
-                format:"a4"
-            });
-
-
-        const pageWidth =
-            doc.internal.pageSize
-                .getWidth();
-
-        const pageHeight =
-            doc.internal.pageSize
-                .getHeight();
-
-
-        /*
-         * PAGE BORDER
-         */
-
-        doc.setLineWidth(
-            0.8
-        );
-
-
-        doc.rect(
-            10,
-            10,
-            pageWidth - 20,
-            pageHeight - 20
-        );
-
-
-        /*
-         * TITLE
-         */
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
-
-        doc.setFontSize(
-            18
-        );
-
-
-        doc.text(
-            "BOOKSWAGON OFFICE",
-            pageWidth / 2,
-            32,
-            {
-                align:"center"
-            }
-        );
-
-
-        /*
-         * ADDRESS
-         */
-
-        doc.setFont(
-            "helvetica",
-            "normal"
-        );
-
-
-        doc.setFontSize(
-            11
-        );
-
-
-        const addressLines =
-            doc.splitTextToSize(
-                CONFIG.address,
-                pageWidth - 50
-            );
-
-
-        doc.text(
-            addressLines,
-            25,
-            55
-        );
-
-
-        /*
-         * EMAIL
-         */
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
-
-        doc.text(
-            "Email:",
-            25,
-            85
-        );
-
-
-        doc.setFont(
-            "helvetica",
-            "normal"
-        );
-
-
-        doc.text(
-            CONFIG.email,
-            45,
-            85
-        );
-
-
-        doc.save(
-            "BOOKSWAGON_OFFICE_ADDRESS.pdf"
-        );
-
-
-        showToast(
-            "success",
-            "Address PDF Downloaded",
-            "The office address PDF has been downloaded."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Address PDF Error:",
-            error
-        );
-
-
-        showToast(
-            "error",
-            "Address PDF Failed",
-            error.message ||
-            "Unable to create address PDF."
-        );
-    }
-}
-
-
-/* =========================================================
-   EXCEL IMPORT
-========================================================= */
-
-async function importExcel(
-    file
-) {
-
-    if (!file) {
-        return [];
-    }
-
-
-    if (
-        typeof XLSX ===
-        "undefined"
-    ) {
-
-        throw new Error(
-            "Excel library is not loaded."
-        );
-    }
-
-
-    const buffer =
-        await file.arrayBuffer();
-
-
-    const workbook =
-        XLSX.read(
-            buffer,
-            {
-                type:"array"
-            }
-        );
-
-
-    const sheet =
-        workbook.Sheets[
-            workbook.SheetNames[0]
-        ];
-
-
-    if (!sheet) {
-        return [];
-    }
-
-
-    const rows =
-        XLSX.utils.sheet_to_json(
-            sheet,
-            {
-                header:1,
-                defval:""
-            }
-        );
-
-
-    const values = [];
-
-
-    rows.forEach(row => {
-
-        if (
-            !Array.isArray(row)
-        ) {
-            return;
-        }
-
-
-        row.forEach(cell => {
-
-            const value =
-                String(cell)
-                    .trim();
-
-
-            if (value) {
-                values.push(value);
-            }
-
-        });
-
-    });
-
-
-    return unique(values);
-}
-
-
-async function setupExcel() {
-
-    $("#cocoExcel")
-        ?.addEventListener(
-            "change",
-            async event => {
-
-                try {
-
-                    const values =
-                        await importExcel(
-                            event.target.files[0]
-                        );
-
-
-                    $$(".coco-po")
-                        .forEach(
-                            (input, index) => {
-
-                                input.value =
-                                    values[index] ||
-                                    "";
-
-                            }
-                        );
-
-
-                    $("#cocoExcelStatus")
-                        && (
-                            $("#cocoExcelStatus")
-                                .textContent =
-                                `${Math.min(
-                                    values.length,
-                                    CONFIG.maxManualPO
-                                )} PO(s) loaded.`
-                        );
-
-
-                    updateAllPreviews();
-
-                } catch (error) {
-
-                    showToast(
-                        "error",
-                        "Excel Import Failed",
-                        error.message
-                    );
-                }
-
-            }
-        );
-
-
-    $("#otherExcel")
-        ?.addEventListener(
-            "change",
-            async event => {
-
-                try {
-
-                    const values =
-                        await importExcel(
-                            event.target.files[0]
-                        );
-
-
-                    $$(".other-po")
-                        .forEach(
-                            (input, index) => {
-
-                                input.value =
-                                    values[index] ||
-                                    "";
-
-                            }
-                        );
-
-
-                    $("#otherExcelStatus")
-                        && (
-                            $("#otherExcelStatus")
-                                .textContent =
-                                `${Math.min(
-                                    values.length,
-                                    CONFIG.maxManualPO
-                                )} PO(s) loaded.`
-                        );
-
-
-                    updateAllPreviews();
-
-                } catch (error) {
-
-                    showToast(
-                        "error",
-                        "Excel Import Failed",
-                        error.message
-                    );
-                }
-
-            }
-        );
-}
-
-
-/* =========================================================
-   QR CODE
-========================================================= */
-
-function generateQR(
-    elementId,
-    value
-) {
-
-    const element =
-        document.getElementById(
-            elementId
-        );
-
-
-    if (!element) {
-        return;
-    }
-
-
-    element.innerHTML =
-        "";
-
-
-    if (
-        typeof QRCode ===
-        "undefined"
-    ) {
-
-        element.textContent =
-            "QR library not loaded.";
-
-        return;
-    }
-
-
-    new QRCode(
-        element,
-        {
-            text:value,
-            width:150,
-            height:150,
-            correctLevel:
-                QRCode.CorrectLevel.M
-        }
-    );
-}
-
-
-function setupQRCodes() {
-
-    generateQR(
-        "addressQR",
-        CONFIG.mapsURL
-    );
-
-
-    generateQR(
-        "emailQR",
-        `mailto:${CONFIG.email}`
-    );
+    font-size: 10px;
 }
 
 
@@ -2954,331 +637,1457 @@ function setupQRCodes() {
    BUTTONS
 ========================================================= */
 
-function setupButtons() {
+.btn {
+    min-height: 40px;
 
-    $("#cocoGenerate")
-        ?.addEventListener(
-            "click",
-            generateCoco
-        );
+    padding:
+        0
+        15px;
 
+    display: inline-flex;
 
-    $("#otherGenerate")
-        ?.addEventListener(
-            "click",
-            generateOther
-        );
+    align-items: center;
+    justify-content: center;
 
+    gap: 7px;
 
-    $("#sbmoGenerate")
-        ?.addEventListener(
-            "click",
-            generateSBMO
-        );
+    border-radius:
+        var(--radius-md);
 
+    font-size: 11px;
+    font-weight: 900;
 
-    $("#cocoAddressGenerate")
-        ?.addEventListener(
-            "click",
-            generateAddressPDF
-        );
+    cursor: pointer;
+
+    text-decoration: none;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease,
+        transform .15s ease;
+}
+
+.btn:active {
+    transform:
+        translateY(1px);
+}
+
+.btn-primary {
+    background:
+        var(--blue);
+
+    color:
+        var(--white);
+
+    box-shadow:
+        0 5px 14px
+        rgba(18, 100, 245, .16);
+}
+
+.btn-primary:hover {
+    background:
+        var(--blue-dark);
+}
+
+.btn-secondary {
+    background:
+        var(--white);
+
+    color:
+        var(--text-soft);
+
+    border:
+        1px solid var(--border-dark);
+}
+
+.btn-secondary:hover {
+    background:
+        #f9fafb;
+
+    border-color:
+        #98a2b3;
 }
 
 
 /* =========================================================
-   LIVE PREVIEW
+   INPUT TABS
 ========================================================= */
 
-function setupLivePreview() {
+.input-tabs {
+    display: flex;
+    flex-wrap: wrap;
 
-    document.addEventListener(
-        "input",
-        event => {
+    gap: 7px;
 
-            if (
-                event.target.matches(
-                    "input, textarea, select"
-                )
-            ) {
+    margin-bottom: 13px;
+}
 
-                updateAllPreviews();
+.input-tab {
+    min-height: 38px;
 
-            }
+    padding:
+        0
+        13px;
 
-        }
-    );
+    background:
+        var(--white);
 
+    color:
+        var(--text-soft);
 
-    document.addEventListener(
-        "change",
-        event => {
+    border:
+        1px solid var(--border-dark);
 
-            if (
-                event.target.matches(
-                    "input, textarea, select"
-                )
-            ) {
+    border-radius:
+        var(--radius-sm);
 
-                updateAllPreviews();
+    cursor: pointer;
 
-            }
+    font-size: 10px;
+    font-weight: 900;
 
-        }
-    );
+    transition: .15s ease;
+}
+
+.input-tab:hover {
+    border-color:
+        #98a2b3;
+}
+
+.input-tab.active {
+    background:
+        var(--blue);
+
+    color:
+        var(--white);
+
+    border-color:
+        var(--blue);
 }
 
 
 /* =========================================================
-   PAGE RELOAD → BOTTOM
+   INPUT GRID
 ========================================================= */
 
-function forceBottomOnReload() {
+.input-grid {
+    display: grid;
 
-    if (
-        "scrollRestoration"
-        in history
-    ) {
-
-        history.scrollRestoration =
-            "manual";
-    }
-
-
-    /*
-     * Clear old hash because the browser can
-     * otherwise reopen at an old anchor.
-     */
-
-    if (
-        window.location.hash
-    ) {
-
-        history.replaceState(
-            null,
-            "",
-            window.location.pathname +
-            window.location.search
-        );
-    }
-
-
-    const goBottom =
-        () => {
-
-            window.scrollTo({
-                top:
-                    document.documentElement
-                        .scrollHeight,
-
-                left:0,
-
-                behavior:"instant"
-            });
-        };
-
-
-    /*
-     * Multiple passes because QR codes,
-     * fonts and dynamic content can change
-     * document height after first load.
-     */
-
-    setTimeout(
-        goBottom,
-        50
-    );
-
-    setTimeout(
-        goBottom,
-        250
-    );
-
-    setTimeout(
-        goBottom,
-        700
-    );
-}
-
-
-/* =========================================================
-   RESET BUTTONS
-========================================================= */
-
-function setupResetButtons() {
-
-    $$(".btn").forEach(button => {
-
-        const text =
-            button.textContent
-                .trim()
-                .toLowerCase();
-
-
-        if (
-            text !== "reset"
-        ) {
-            return;
-        }
-
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const workspace =
-                    button.closest(
-                        ".tool-workspace"
-                    );
-
-
-                if (!workspace) {
-                    return;
-                }
-
-
-                $$(
-                    'input[type="text"], textarea',
-                    workspace
-                )
-                .forEach(input => {
-
-                    input.value =
-                        "";
-
-                });
-
-
-                $$(
-                    'input[type="number"]',
-                    workspace
-                )
-                .forEach(input => {
-
-                    input.value =
-                        input.id.includes(
-                            "Start"
-                        )
-                            ? "1"
-                            : "200";
-
-                });
-
-
-                updateAllPreviews();
-
-
-                showToast(
-                    "success",
-                    "Reset Complete",
-                    "The selected tool has been reset."
-                );
-
-            }
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                180px,
+                1fr
+            )
         );
 
-    });
+    gap: 12px;
+}
+
+.field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.field label {
+    color:
+        var(--text-soft);
+
+    font-size: 10px;
+    font-weight: 850;
 }
 
 
 /* =========================================================
-   INITIALIZE
+   INPUTS
 ========================================================= */
 
-function init() {
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="file"],
+input[type="url"],
+textarea,
+select {
+    width: 100%;
 
-    removeBoxRangeLimit();
+    min-height: 40px;
 
-    setupToolNavigation();
+    padding:
+        9px
+        11px;
 
-    setupInputTabs();
+    background:
+        var(--white);
 
-    setupButtons();
+    color:
+        var(--text);
 
-    setupExcel();
+    border:
+        1px solid var(--border-dark);
 
-    setupQRCodes();
+    border-radius:
+        var(--radius-md);
 
-    setupLivePreview();
+    outline: none;
 
-    setupResetButtons();
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease;
+}
 
-    updateAllPreviews();
+textarea {
+    min-height: 105px;
 
-    forceBottomOnReload();
+    resize: vertical;
 
+    line-height: 1.55;
+}
 
-    console.log(
-        "BooksWagon Label Studio loaded."
-    );
+input[type="file"] {
+    padding: 8px;
+}
 
-    console.log(
-        "✓ 20 PO fields"
-    );
+input:focus,
+textarea:focus,
+select:focus {
+    border-color:
+        var(--blue);
 
-    console.log(
-        "✓ Unlimited box range"
-    );
+    box-shadow:
+        0 0 0 3px
+        rgba(18, 100, 245, .10);
+}
 
-    console.log(
-        "✓ Checkbox confirmation"
-    );
+input::placeholder,
+textarea::placeholder {
+    color:
+        #98a2b3;
+}
 
-    console.log(
-        "✓ PO / Box / PO + Box"
-    );
+input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
 
-    console.log(
-        "✓ Individual borders"
-    );
-
-    console.log(
-        "✓ Combined border"
-    );
-
-    console.log(
-        "✓ Direct PDF download"
-    );
-
-    console.log(
-        "✓ ZIP download"
-    );
-
-    console.log(
-        "✓ Merged PDF"
-    );
-
-    console.log(
-        "✓ Address QR"
-    );
-
-    console.log(
-        "✓ Email QR"
-    );
-
-    console.log(
-        "✓ Reload opens at bottom"
-    );
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
 }
 
 
 /* =========================================================
-   START
+   PO GRID — 20 FIELDS
 ========================================================= */
 
-if (
-    document.readyState ===
-    "loading"
+.po-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap: 9px;
+
+    max-height: 450px;
+
+    overflow-y: auto;
+
+    padding:
+        2px
+        5px
+        5px
+        2px;
+}
+
+.po-grid::-webkit-scrollbar {
+    width: 7px;
+}
+
+.po-grid::-webkit-scrollbar-track {
+    background:
+        #f2f4f7;
+
+    border-radius: 10px;
+}
+
+.po-grid::-webkit-scrollbar-thumb {
+    background:
+        #cfd4dc;
+
+    border-radius: 10px;
+}
+
+
+/* =========================================================
+   CHECKBOXES — IMPORTANT
+========================================================= */
+
+.checkbox-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                220px,
+                1fr
+            )
+        );
+
+    gap: 9px;
+}
+
+.check-row {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 47px;
+
+    padding:
+        10px
+        12px;
+
+    background:
+        var(--white);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        var(--radius-md);
+
+    cursor: pointer;
+
+    user-select: none;
+
+    transition:
+        border-color .15s ease,
+        background .15s ease,
+        box-shadow .15s ease;
+}
+
+.check-row:hover {
+    border-color:
+        #b2ddff;
+
+    background:
+        #fcfdff;
+}
+
+
+/*
+ * Custom checkbox
+ */
+
+.check-row input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+
+    position: relative;
+
+    width: 20px;
+    height: 20px;
+
+    min-width: 20px;
+    min-height: 20px;
+
+    margin: 0;
+
+    flex: 0 0 20px;
+
+    background:
+        #ffffff;
+
+    border:
+        2px solid #98a2b3;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    outline: none;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease;
+}
+
+.check-row input[type="checkbox"]:hover {
+    border-color:
+        var(--blue);
+}
+
+.check-row input[type="checkbox"]:focus-visible {
+    box-shadow:
+        0 0 0 3px
+        rgba(18, 100, 245, .13);
+}
+
+
+/*
+ * CHECKED STATE
+ */
+
+.check-row input[type="checkbox"]:checked {
+    background:
+        var(--blue);
+
+    border-color:
+        var(--blue);
+}
+
+.check-row input[type="checkbox"]:checked::after {
+    content: "✓";
+
+    position: absolute;
+
+    inset: 0;
+
+    display: grid;
+
+    place-items: center;
+
+    color:
+        #ffffff;
+
+    font-size: 13px;
+
+    font-weight: 950;
+
+    line-height: 1;
+}
+
+
+/*
+ * Active row
+ */
+
+.check-row:has(
+    input[type="checkbox"]:checked
 ) {
+    background:
+        #f8fbff;
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        init,
-        {
-            once:true
-        }
-    );
+    border-color:
+        #b2ddff;
+}
 
-} else {
+.check-row span {
+    color:
+        var(--text-soft);
 
-    init();
+    font-size: 10px;
+
+    font-weight: 850;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   WORKSPACE ACTIONS
+========================================================= */
+
+.workspace-actions {
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 9px;
+
+    margin-top: 28px;
+
+    padding-top: 20px;
+
+    border-top:
+        1px solid var(--border);
+}
+
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+.preview-section {
+    margin-top: 30px;
+
+    padding-top: 25px;
+
+    border-top:
+        1px solid var(--border);
+}
+
+.preview-section h3 {
+    margin:
+        0
+        0
+        15px;
+
+    font-size: 12px;
+    font-weight: 950;
+
+    letter-spacing: .5px;
+}
+
+.preview-page {
+    position: relative;
+
+    width: 100%;
+
+    min-height: 370px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    background:
+        #ffffff;
+
+    border:
+        1.5px solid #101828;
+
+    box-shadow:
+        var(--shadow-md);
+}
+
+.dynamic-label-preview {
+    width: 85%;
+
+    min-height: 230px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 16px;
+
+    padding: 25px;
+
+    text-align: center;
+}
+
+.preview-item-border,
+.preview-box-number {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 160px;
+    min-height: 44px;
+
+    padding:
+        9px
+        18px;
+
+    color:
+        #111827;
+
+    background:
+        #ffffff;
+
+    border:
+        2px solid #111827;
+
+    border-radius: 2px;
+
+    font-weight: 950;
+}
+
+.preview-item-border {
+    font-size: 16px;
+}
+
+.preview-box-number {
+    font-size: 14px;
+}
+
+.preview-dotted-line {
+    width: 100%;
+
+    color:
+        #111827;
+
+    font-size: 12px;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    text-align: center;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+}
+
+.has-outer-border {
+    padding: 25px;
+
+    border:
+        3px double #111827;
+}
+
+
+/* =========================================================
+   ADDRESS / CONTACT
+========================================================= */
+
+.address-section {
+    margin-top: 70px;
+
+    padding: 30px;
+
+    background:
+        var(--white);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        var(--radius-xl);
+
+    box-shadow:
+        var(--shadow-sm);
+}
+
+.address-layout {
+    display: grid;
+
+    grid-template-columns:
+        1.4fr
+        1fr;
+
+    gap: 30px;
+
+    align-items: start;
+}
+
+.contact-block {
+    margin-bottom: 20px;
+}
+
+.contact-block strong {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color:
+        var(--text-soft);
+
+    font-size: 10px;
+
+    font-weight: 950;
+
+    letter-spacing: .4px;
+}
+
+.address-link {
+    color:
+        var(--blue);
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    line-height: 1.7;
+
+    text-decoration: none;
+}
+
+.address-link:hover {
+    text-decoration:
+        underline;
+}
+
+.contact-note {
+    margin:
+        7px
+        0
+        0;
+
+    color:
+        var(--muted);
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   QR
+========================================================= */
+
+.qr-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                140px,
+                1fr
+            )
+        );
+
+    gap: 14px;
+}
+
+.qr-card {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    padding: 15px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        14px;
+
+    text-align: center;
+}
+
+.qr-card h4 {
+    margin:
+        0
+        0
+        12px;
+
+    font-size: 11px;
+
+    font-weight: 950;
+}
+
+.qr-box {
+    width: 150px;
+    height: 150px;
+
+    display: grid;
+    place-items: center;
+
+    padding: 5px;
+
+    background:
+        #ffffff;
+}
+
+.qr-box img,
+.qr-box canvas {
+    display: block;
+
+    max-width: 140px;
+    max-height: 140px;
+}
+
+.qr-label {
+    margin-top: 9px;
+
+    color:
+        var(--muted);
+
+    font-size: 9px;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+    margin-top: 50px;
+
+    padding:
+        30px
+        0
+        45px;
+
+    border-top:
+        1px solid var(--border);
+
+    color:
+        var(--muted);
+
+    font-size: 10px;
+}
+
+.footer-layout {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    flex-wrap: wrap;
+}
+
+.footer-layout > div {
+    max-width: 300px;
+}
+
+.footer strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color:
+        var(--text);
+
+    font-size: 11px;
+}
+
+.footer-links {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+.footer-links a {
+    color:
+        var(--blue);
+
+    text-decoration: none;
+
+    font-weight: 800;
+}
+
+.footer-links a:hover {
+    text-decoration:
+        underline;
+}
+
+.copyright {
+    margin-top: 25px;
+
+    padding-top: 18px;
+
+    border-top:
+        1px solid var(--border);
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   CONFIRMATION MODAL
+   THIS IS THE IMPORTANT PART
+========================================================= */
+
+.confirm-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 100000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            .55
+        );
+
+    backdrop-filter:
+        blur(6px);
+
+    -webkit-backdrop-filter:
+        blur(6px);
+}
+
+.confirm-modal.hidden {
+    display:
+        none !important;
+}
+
+.confirm-box {
+    width:
+        min(
+            430px,
+            100%
+        );
+
+    padding: 28px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        20px;
+
+    box-shadow:
+        var(--shadow-lg);
+
+    animation:
+        confirmIn
+        .18s
+        ease;
+}
+
+@keyframes confirmIn {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(12px)
+            scale(.97);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+
+}
+
+.confirm-icon {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    margin-bottom: 15px;
+
+    background:
+        var(--blue-light);
+
+    color:
+        var(--blue);
+
+    border-radius: 50%;
+
+    font-size: 18px;
+    font-weight: 950;
+}
+
+.confirm-box h3 {
+    margin:
+        0
+        0
+        7px;
+
+    color:
+        var(--text);
+
+    font-size: 19px;
+
+    font-weight: 950;
+}
+
+.confirm-box p {
+    margin: 0;
+
+    color:
+        var(--muted);
+
+    font-size: 12px;
+
+    line-height: 1.65;
+}
+
+.confirm-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 9px;
+
+    margin-top: 24px;
+}
+
+
+/*
+ * Enable button
+ */
+
+.confirm-enable {
+    background:
+        var(--green) !important;
+
+    color:
+        #ffffff !important;
+}
+
+.confirm-enable:hover {
+    background:
+        #039855 !important;
+}
+
+
+/*
+ * Disable button
+ */
+
+.confirm-disable {
+    background:
+        var(--red) !important;
+
+    color:
+        #ffffff !important;
+}
+
+.confirm-disable:hover {
+    background:
+        #d92d20 !important;
+}
+
+
+/* =========================================================
+   TOP-RIGHT TOAST
+========================================================= */
+
+#toastContainer {
+    position: fixed;
+
+    top: 18px;
+    right: 18px;
+
+    z-index: 200000;
+
+    width:
+        min(
+            380px,
+            calc(100vw - 30px)
+        );
+
+    pointer-events:
+        none;
+}
+
+.confirmation-toast {
+    position: relative;
+
+    margin-bottom: 10px;
+
+    padding:
+        14px
+        16px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid var(--border);
+
+    border-left:
+        4px solid;
+
+    border-radius:
+        12px;
+
+    box-shadow:
+        var(--shadow-md);
+
+    opacity: 0;
+
+    transform:
+        translateX(30px);
+
+    transition:
+        opacity .22s ease,
+        transform .22s ease;
+}
+
+.confirmation-toast.show {
+    opacity: 1;
+
+    transform:
+        translateX(0);
+}
+
+.toast-success {
+    border-left-color:
+        var(--green);
+}
+
+.toast-danger {
+    border-left-color:
+        var(--red);
+}
+
+.toast-title {
+    margin-bottom: 4px;
+
+    font-size: 12px;
+
+    font-weight: 950;
+}
+
+.toast-success .toast-title {
+    color:
+        var(--green);
+}
+
+.toast-danger .toast-title {
+    color:
+        var(--red);
+}
+
+.toast-message {
+    color:
+        var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background:
+        #f2f4f7;
+}
+
+::-webkit-scrollbar-thumb {
+    background:
+        #cfd4dc;
+
+    border-radius:
+        10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background:
+        #98a2b3;
+}
+
+
+/* =========================================================
+   SELECTION
+========================================================= */
+
+::selection {
+    background:
+        #dbeafe;
+
+    color:
+        #101828;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .address-layout {
+        grid-template-columns:
+            1fr;
+    }
+
+    .preview-page {
+        min-height:
+            330px;
+    }
+
+    .po-grid {
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .header {
+        padding:
+            11px
+            14px;
+    }
+
+    .logo {
+        font-size:
+            14px;
+    }
+
+    .header-right {
+        gap: 5px;
+    }
+
+    .header-right .btn {
+        min-height:
+            35px;
+
+        padding:
+            0
+            10px;
+
+        font-size:
+            9px;
+    }
+
+    .container {
+        width:
+            calc(100% - 20px);
+    }
+
+    .hero {
+        padding:
+            38px
+            0
+            28px;
+    }
+
+    .hero h1 {
+        font-size:
+            34px;
+
+        letter-spacing:
+            -1.2px;
+    }
+
+    .workspace-card {
+        padding:
+            17px;
+
+        border-radius:
+            14px;
+    }
+
+    .workspace-header {
+        flex-direction:
+            column;
+    }
+
+    .workspace-header .btn {
+        width:
+            100%;
+    }
+
+    .input-tabs {
+        display:
+            grid;
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .input-tab {
+        width:
+            100%;
+    }
+
+    .po-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+
+    .checkbox-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .preview-page {
+        min-height:
+            290px;
+
+        padding:
+            15px;
+    }
+
+    .dynamic-label-preview {
+        width:
+            100%;
+
+        padding:
+            15px;
+    }
+
+    .address-section {
+        padding:
+            20px;
+    }
+
+    .qr-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .workspace-actions {
+        flex-direction:
+            column-reverse;
+    }
+
+    .workspace-actions .btn {
+        width:
+            100%;
+    }
+
+    .confirm-box {
+        padding:
+            21px;
+    }
+
+    .confirm-actions {
+        flex-direction:
+            column-reverse;
+    }
+
+    .confirm-actions .btn {
+        width:
+            100%;
+    }
+
+    #toastContainer {
+        top:
+            10px;
+
+        right:
+            10px;
+
+        width:
+            calc(100vw - 20px);
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL
+========================================================= */
+
+@media (max-width: 400px) {
+
+    .po-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .tool-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .hero h1 {
+        font-size:
+            30px;
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    body {
+        background:
+            #ffffff;
+    }
+
+    .header,
+    .hero,
+    #tools,
+    #features,
+    .footer,
+    .address-section,
+    .workspace-actions,
+    .confirm-modal,
+    #toastContainer {
+        display:
+            none !important;
+    }
+
+    .tool-workspace {
+        display:
+            block !important;
+
+        margin:
+            0;
+    }
+
+    .workspace-card {
+        padding:
+            0;
+
+        border:
+            0;
+
+        box-shadow:
+            none;
+    }
+
+    .preview-page {
+        box-shadow:
+            none;
+    }
+
 }
