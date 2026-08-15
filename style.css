@@ -3,7 +3,7 @@
   --dark:#132b54;
   --yellow:#ffc83d;
   --bg:#f3f5f8;
-  --white:#fff;
+  --white:#ffffff;
   --text:#172033;
   --muted:#6d7787;
   --border:#d9e0e8;
@@ -38,13 +38,20 @@ button{
   cursor:pointer;
 }
 
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled{
+  cursor:not-allowed;
+}
+
 a{
   text-decoration:none;
 }
 
 
 /* =========================================================
-   COMMON
+   CONTAINER / COMMON
 ========================================================= */
 
 .container{
@@ -70,18 +77,19 @@ a{
 .section-heading h2{
   margin:6px 0;
   color:var(--blue);
-  font-family:Georgia,serif;
+  font-family:Georgia,"Times New Roman",serif;
   font-size:34px;
 }
 
 .section-heading p{
   color:var(--muted);
   font-size:12px;
+  line-height:1.7;
 }
 
 
 /* =========================================================
-   TOPBAR
+   HEADER
 ========================================================= */
 
 .topbar{
@@ -108,12 +116,11 @@ a{
 
 .nav{
   display:flex;
-  gap:20px;
   align-items:center;
+  gap:20px;
 }
 
-.nav a,
-.lang-btn{
+.nav a{
   color:#fff;
   font-size:10px;
   font-weight:900;
@@ -124,10 +131,13 @@ a{
 }
 
 .lang-btn{
-  border:1px solid rgba(255,255,255,.35);
-  background:transparent;
   padding:7px 10px;
+  border:1px solid rgba(255,255,255,.35);
   border-radius:4px;
+  background:transparent;
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
 }
 
 .lang-btn.active{
@@ -141,9 +151,9 @@ a{
 ========================================================= */
 
 .hero{
+  padding:60px 0 75px;
   background:var(--blue);
   color:#fff;
-  padding:60px 0 75px;
 }
 
 .hero-grid{
@@ -162,7 +172,7 @@ a{
 
 .hero h1{
   margin:12px 0;
-  font-family:Georgia,serif;
+  font-family:Georgia,"Times New Roman",serif;
   font-size:clamp(42px,6vw,68px);
   line-height:1;
 }
@@ -189,18 +199,18 @@ a{
   height:300px;
   margin:auto;
   padding:25px;
-  background:#f8f5e9;
-  color:var(--blue);
   display:flex;
   flex-direction:column;
   justify-content:space-between;
+  background:#f8f5e9;
+  color:var(--blue);
   text-align:center;
   box-shadow:20px 25px 50px rgba(0,0,0,.3);
   transform:rotate(-2deg);
 }
 
 .book-preview h2{
-  font-family:Georgia,serif;
+  font-family:Georgia,"Times New Roman",serif;
   font-size:28px;
 }
 
@@ -219,6 +229,11 @@ a{
   justify-content:center;
   font-size:10px;
   font-weight:900;
+  transition:.15s ease;
+}
+
+.btn:hover{
+  transform:translateY(-1px);
 }
 
 .btn-primary{
@@ -231,29 +246,14 @@ a{
   color:var(--blue);
 }
 
-.btn-dark{
-  background:var(--blue);
-  color:#fff;
-}
-
-.btn-danger{
-  background:#fff0f0;
-  color:var(--red);
-}
-
 .btn-outline{
   background:transparent;
   color:#fff;
   border:1px solid rgba(255,255,255,.5);
 }
 
-.btn:hover{
-  transform:translateY(-1px);
-}
-
 .btn:disabled{
   opacity:.55;
-  cursor:not-allowed;
 }
 
 
@@ -275,7 +275,7 @@ a{
   border-top:4px solid var(--yellow);
   box-shadow:var(--shadow);
   text-align:left;
-  transition:.2s;
+  transition:.2s ease;
 }
 
 .tool-card:hover{
@@ -292,7 +292,7 @@ a{
 .tool-card h3{
   margin:9px 0;
   color:var(--blue);
-  font-family:Georgia,serif;
+  font-family:Georgia,"Times New Roman",serif;
   font-size:21px;
 }
 
@@ -340,16 +340,16 @@ a{
 
 .workspace-header{
   padding:24px 28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   background:var(--blue);
   color:#fff;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
 }
 
 .workspace-header h2{
   margin:5px 0;
-  font-family:Georgia,serif;
+  font-family:Georgia,"Times New Roman",serif;
   font-size:27px;
 }
 
@@ -377,9 +377,9 @@ a{
 
 .subtool{
   padding:9px 13px;
-  background:#fff;
   border:1px solid var(--border);
   border-radius:4px;
+  background:#fff;
   color:var(--muted);
   font-size:9px;
   font-weight:900;
@@ -391,14 +391,14 @@ a{
 }
 
 .subtool.active{
+  border-color:var(--blue);
   background:var(--blue);
   color:#fff;
-  border-color:var(--blue);
 }
 
 
 /* =========================================================
-   CONFIG
+   CONFIG SECTION
 ========================================================= */
 
 .config-section{
@@ -408,8 +408,8 @@ a{
 
 .section-title{
   display:flex;
-  gap:10px;
   align-items:center;
+  gap:10px;
   margin-bottom:17px;
 }
 
@@ -463,12 +463,12 @@ textarea{
   width:100%;
   min-height:40px;
   padding:9px 10px;
-  background:#fff;
-  color:var(--text);
   border:1px solid #ccd3dd;
   border-radius:4px;
   outline:none;
-  transition:.15s;
+  background:#fff;
+  color:var(--text);
+  transition:.15s ease;
 }
 
 textarea{
@@ -486,14 +486,13 @@ textarea:focus{
 input:disabled,
 select:disabled,
 textarea:disabled{
-  cursor:not-allowed;
   opacity:.45;
   background:#edf0f4;
 }
 
 
 /* =========================================================
-   PO INPUT
+   PO INPUT GRID
 ========================================================= */
 
 .po-grid{
@@ -510,6 +509,7 @@ textarea:disabled{
   position:absolute;
   left:9px;
   top:50%;
+  z-index:1;
   transform:translateY(-50%);
   color:#9aa3b2;
   font-size:8px;
@@ -523,7 +523,7 @@ textarea:disabled{
 
 
 /* =========================================================
-   CHECKBOXES
+   CHECKBOX FEATURES
 ========================================================= */
 
 .checkbox-grid{
@@ -540,11 +540,11 @@ textarea:disabled{
   align-items:center;
   gap:10px;
   border:1px solid var(--border);
+  border-radius:4px;
   background:#fff;
   cursor:pointer;
   user-select:none;
-  border-radius:4px;
-  transition:.15s;
+  transition:.15s ease;
 }
 
 .feature-checkbox:hover{
@@ -569,11 +569,11 @@ textarea:disabled{
 }
 
 .feature-checkbox input:checked + .custom-check{
-  background:var(--blue);
   border-color:var(--blue);
+  background:var(--blue);
 }
 
-.feature-checkbox input:checked + .custom-check:after{
+.feature-checkbox input:checked + .custom-check::after{
   content:"✓";
   position:absolute;
   inset:0;
@@ -591,7 +591,7 @@ textarea:disabled{
 
 
 /* =========================================================
-   LOCKED STATE
+   LOCKED / FROZEN STATE
 ========================================================= */
 
 .locked{
@@ -601,8 +601,8 @@ textarea:disabled{
 }
 
 .feature-checkbox.locked{
-  background:#edf0f4;
   border-color:#d6dce4;
+  background:#edf0f4;
 }
 
 .feature-checkbox.locked .checkbox-text{
@@ -616,7 +616,7 @@ textarea:disabled{
 
 
 /* =========================================================
-   PO + BOX SPECIAL STATE
+   PO + BOX
 ========================================================= */
 
 #poPlusBoxWrap{
@@ -633,9 +633,14 @@ textarea:disabled{
   background:#edf0f4;
 }
 
-#poPlusBoxWrap.locked .custom-check{
-  background:#dfe4eb;
-  border-color:#c4ccd6;
+
+/* =========================================================
+   BORDER SETTINGS
+========================================================= */
+
+#combinedBorderWrap.active{
+  border-color:var(--blue);
+  background:#f0f4fa;
 }
 
 
@@ -659,9 +664,9 @@ textarea:disabled{
   min-width:42px;
   min-height:36px;
   border:1px solid var(--border);
+  border-radius:4px;
   background:#fff;
   color:var(--blue);
-  border-radius:4px;
   font-weight:900;
 }
 
@@ -687,9 +692,9 @@ textarea:disabled{
 
 .address-card{
   padding:18px;
-  background:#f8fafc;
   border:1px solid var(--border);
   border-radius:5px;
+  background:#f8fafc;
 }
 
 .address-card h4{
@@ -711,9 +716,9 @@ textarea:disabled{
 
 .excel-box{
   padding:22px;
-  background:#f8fafc;
   border:1px dashed #aeb8c6;
   border-radius:5px;
+  background:#f8fafc;
 }
 
 .excel-box h4{
@@ -764,9 +769,9 @@ textarea:disabled{
 .excel-preview th{
   position:sticky;
   top:0;
+  z-index:2;
   background:var(--blue);
   color:#fff;
-  z-index:2;
 }
 
 
@@ -779,15 +784,15 @@ textarea:disabled{
   min-height:280px;
   margin:25px auto;
   padding:25px;
-  background:#fff;
   border:1px solid var(--border);
+  background:#fff;
   box-shadow:var(--shadow);
   text-align:center;
 }
 
 .isbn-preview-title{
   color:var(--blue);
-  font-family:Georgia,serif;
+  font-family:Georgia,"Times New Roman",serif;
   font-size:22px;
   font-weight:900;
   word-break:break-word;
@@ -815,11 +820,11 @@ textarea:disabled{
   width:min(100%,750px);
   margin:25px auto;
   padding:25px;
-  background:#fff;
-  border:2px solid #111827;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:25px;
+  border:2px solid #111827;
+  background:#fff;
 }
 
 .address-preview-side{
@@ -832,17 +837,17 @@ textarea:disabled{
 
 .address-preview-side small{
   display:block;
+  margin-bottom:8px;
   color:#888;
   font-size:9px;
   font-weight:900;
-  margin-bottom:8px;
 }
 
 .address-preview-side strong{
   display:block;
+  margin-bottom:8px;
   color:var(--blue);
   font-size:18px;
-  margin-bottom:8px;
   word-break:break-word;
 }
 
@@ -855,15 +860,15 @@ textarea:disabled{
 
 
 /* =========================================================
-   PAGE PREVIEW
+   LIVE PAGE PREVIEW
 ========================================================= */
 
 .preview-wrapper{
   margin-top:25px;
   padding:25px;
-  background:#eef1f5;
-  border:1px solid var(--border);
   overflow:auto;
+  border:1px solid var(--border);
+  background:#eef1f5;
 }
 
 .preview-page{
@@ -871,20 +876,20 @@ textarea:disabled{
   min-height:450px;
   margin:auto;
   padding:0;
-  background:#fff;
   display:flex;
   flex-direction:column;
+  background:#fff;
   box-shadow:0 8px 25px rgba(0,0,0,.08);
-  transition:.2s;
+  transition:.2s ease;
 }
 
 .preview-label{
-  flex:1;
-  min-height:0;
   position:relative;
+  min-height:0;
+  flex:1;
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   padding:20px;
 }
 
@@ -911,6 +916,7 @@ textarea:disabled{
   color:#222;
   font-size:23px;
   font-weight:800;
+  word-break:break-word;
 }
 
 .preview-empty{
@@ -921,16 +927,48 @@ textarea:disabled{
 
 
 /* =========================================================
-   PAGE SIZE INDICATOR
+   TOAST
 ========================================================= */
 
-#pageSize{
-  font-weight:700;
+#toastContainer{
+  position:fixed;
+  top:80px;
+  left:50%;
+  z-index:99999;
+  width:min(390px,calc(100vw - 30px));
+  transform:translateX(-50%);
+  pointer-events:none;
 }
 
-#customWidth:disabled,
-#customHeight:disabled{
-  color:#9ca3af;
+.toast{
+  margin-bottom:8px;
+  padding:13px 15px;
+  border:1px solid var(--border);
+  border-left:4px solid var(--green);
+  background:#fff;
+  box-shadow:var(--shadow);
+  color:var(--green);
+  font-size:10px;
+  font-weight:800;
+  text-align:center;
+  animation:toastIn .2s ease;
+}
+
+.toast.error{
+  border-left-color:var(--red);
+  color:var(--red);
+}
+
+@keyframes toastIn{
+  from{
+    opacity:0;
+    transform:translateY(-8px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
 }
 
 
@@ -954,18 +992,18 @@ textarea:disabled{
 
 .contact-card{
   padding:30px;
-  background:#fff;
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:35px;
+  border:1px solid var(--border);
+  background:#fff;
+  box-shadow:var(--shadow);
 }
 
 .contact-card h2{
   margin:5px 0 10px;
   color:var(--blue);
-  font-family:Georgia,serif;
+  font-family:Georgia,"Times New Roman",serif;
   font-size:30px;
 }
 
@@ -986,6 +1024,13 @@ textarea:disabled{
   text-decoration:underline;
 }
 
+.created{
+  margin-top:20px;
+  color:var(--blue);
+  font-size:10px;
+  font-weight:900;
+}
+
 .qr-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -994,8 +1039,8 @@ textarea:disabled{
 
 .qr-card{
   padding:15px;
-  background:#f7f8fa;
   border:1px solid var(--border);
+  background:#f7f8fa;
   text-align:center;
 }
 
@@ -1009,10 +1054,10 @@ textarea:disabled{
   width:145px;
   height:145px;
   margin:auto;
+  padding:7px;
   display:grid;
   place-items:center;
   background:#fff;
-  padding:7px;
 }
 
 .qr-code img{
@@ -1022,59 +1067,13 @@ textarea:disabled{
 
 
 /* =========================================================
-   TOAST
-========================================================= */
-
-#toastContainer{
-  position:fixed;
-  top:80px;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:99999;
-  width:min(390px,calc(100vw - 30px));
-  pointer-events:none;
-}
-
-.toast{
-  padding:13px 15px;
-  margin-bottom:8px;
-  background:#fff;
-  border:1px solid var(--border);
-  border-left:4px solid var(--green);
-  box-shadow:var(--shadow);
-  color:var(--green);
-  font-size:10px;
-  font-weight:800;
-  text-align:center;
-  animation:toastIn .2s ease;
-}
-
-.toast.error{
-  color:var(--red);
-  border-left-color:var(--red);
-}
-
-@keyframes toastIn{
-  from{
-    opacity:0;
-    transform:translateY(-8px);
-  }
-
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-
-/* =========================================================
    FOOTER
 ========================================================= */
 
 footer{
+  border-top:5px solid var(--yellow);
   background:var(--blue);
   color:#fff;
-  border-top:5px solid var(--yellow);
 }
 
 .footer-inner{
@@ -1092,7 +1091,56 @@ footer{
 
 
 /* =========================================================
-   RESPONSIVE
+   PRINT
+========================================================= */
+
+@media print{
+
+  .topbar,
+  .hero,
+  #tools,
+  #about,
+  #support,
+  footer,
+  .workspace-header,
+  .subtools,
+  .workspace-actions,
+  .config-section:not(#poPreviewSection){
+    display:none !important;
+  }
+
+  body{
+    background:#fff;
+  }
+
+  .workspace{
+    display:block !important;
+    padding:0;
+  }
+
+  .workspace-card{
+    border:0;
+    box-shadow:none;
+  }
+
+  .workspace-body{
+    padding:0;
+  }
+
+  .preview-wrapper{
+    padding:0;
+    border:0;
+    background:#fff;
+  }
+
+  .preview-page{
+    box-shadow:none;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE - LARGE TABLET
 ========================================================= */
 
 @media(max-width:1050px){
@@ -1109,9 +1157,12 @@ footer{
   .po-grid{
     grid-template-columns:repeat(3,1fr);
   }
-
 }
 
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
 
 @media(max-width:800px){
 
@@ -1132,8 +1183,15 @@ footer{
     font-size:52px;
   }
 
+  .workspace-header{
+    gap:15px;
+  }
 }
 
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
 
 @media(max-width:600px){
 
@@ -1168,7 +1226,6 @@ footer{
   .workspace-header{
     flex-direction:column;
     align-items:flex-start;
-    gap:12px;
   }
 
   .workspace-header h2{
@@ -1221,54 +1278,7 @@ footer{
     min-width:310px;
   }
 
-}
-
-
-/* =========================================================
-   PRINT
-========================================================= */
-
-@media print{
-
-  .topbar,
-  .hero,
-  #tools,
-  #about,
-  #support,
-  footer,
-  .workspace-header,
-  .subtools,
-  .workspace-actions,
-  .config-section:not(#poPreviewSection){
-    display:none !important;
+  .section{
+    padding:45px 0;
   }
-
-  body{
-    background:#fff;
-  }
-
-  .workspace{
-    display:block !important;
-    padding:0;
-  }
-
-  .workspace-card{
-    border:0;
-    box-shadow:none;
-  }
-
-  .workspace-body{
-    padding:0;
-  }
-
-  .preview-wrapper{
-    padding:0;
-    border:0;
-    background:#fff;
-  }
-
-  .preview-page{
-    box-shadow:none;
-  }
-
 }
