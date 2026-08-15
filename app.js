@@ -1,103 +1,242 @@
+/* =========================================================
+   BOOKSWAGON LABEL STUDIO
+   FINAL APP.JS
+========================================================= */
+
 document.addEventListener("DOMContentLoaded", () => {
 
     "use strict";
 
+
     /* =====================================================
-       LIBRARY HELPERS
+       LIBRARIES
     ====================================================== */
 
-    function getPDFConstructor() {
+    const PDF =
+        window.jspdf &&
+        typeof window.jspdf.jsPDF === "function"
+            ? window.jspdf.jsPDF
+            : null;
 
-        if (
-            window.jspdf &&
-            typeof window.jspdf.jsPDF === "function"
-        ) {
-            return window.jspdf.jsPDF;
-        }
+    const ZIP =
+        window.JSZip ||
+        null;
 
-        alert(
-            "PDF library is not loaded.\n\n" +
-            "Please refresh the page and try again."
-        );
-
-        return null;
-    }
+    const XLSX_LIB =
+        window.XLSX ||
+        null;
 
 
-    function hasXLSX() {
+    /* =====================================================
+       STATE
+    ====================================================== */
 
-        if (
-            window.XLSX &&
-            typeof window.XLSX.read === "function"
-        ) {
-            return true;
-        }
+    let cocoInputMode = "manual";
+    let cocoSize = "4x6";
+    let cocoAddressSize = "4x6";
+    let cocoExcelPOs = [];
 
-        alert(
-            "Excel library is not loaded.\n\n" +
-            "Please refresh the page and try again."
-        );
+    let otherInputMode = "manual";
+    let otherSize = "4x6";
+    let otherAddressSize = "4x6";
+    let otherExcelPOs = [];
 
-        return false;
-    }
-
-
-    function downloadPDF(pdf, filename) {
-
-        try {
-
-            const blob =
-                pdf.output("blob");
-
-            const url =
-                URL.createObjectURL(blob);
-
-            const link =
-                document.createElement("a");
-
-            link.href = url;
-            link.download = filename;
-
-            document.body.appendChild(link);
-
-            link.click();
-
-            link.remove();
-
-            setTimeout(() => {
-                URL.revokeObjectURL(url);
-            }, 1500);
-
-            return true;
-
-        } catch (error) {
-
-            console.error(
-                "PDF download error:",
-                error
-            );
-
-            alert(
-                "PDF could not be downloaded.\n\n" +
-                "Please refresh the page and try again."
-            );
-
-            return false;
-        }
-    }
+    let isbnInputMode = "manual";
+    let isbnSize = "4x6";
+    let isbnExcelRows = [];
 
 
     /* =====================================================
        GENERAL HELPERS
     ====================================================== */
 
+    function requirePDF() {
+
+        if (!PDF) {
+
+            alert(
+                "PDF library load nahi hui.\n\n" +
+                "Please refresh the page and try again."
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+
+    function requireXLSX() {
+
+        if (!XLSX_LIB) {
+
+            alert(
+                "Excel library load nahi hui.\n\n" +
+                "Please refresh the page and try again."
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+
     function safeName(value) {
 
         return String(value || "BooksWagon")
+            .trim()
             .replace(
                 /[^a-zA-Z0-9_-]/g,
                 "_"
             );
+    }
+
+
+    function pad2(value) {
+
+        return String(value)
+            .padStart(2, "0");
+    }
+
+
+    function currentDateTime() {
+
+        const now =
+            new Date();
+
+        const date =
+            [
+                now.getFullYear(),
+                pad2(now.getMonth() + 1),
+                pad2(now.getDate())
+            ].join("-");
+
+        const time =
+            [
+                pad2(now.getHours()),
+                pad2(now.getMinutes()),
+                pad2(now.getSeconds())
+            ].join("-");
+
+        return {
+            date,
+            time
+        };
+    }
+
+
+    function downloadBlob(
+        blob,
+        filename
+    ) {
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const link =
+            document.createElement("a");
+
+        link.href = url;
+        link.download = filename;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        setTimeout(
+            () => {
+                URL.revokeObjectURL(url);
+            },
+            1500
+        );
+
+    }
+
+
+    function downloadPDF(
+        pdf,
+        filename
+    ) {
+
+        try {
+
+            const blob =
+                pdf.output("blob");
+
+            downloadBlob(
+                blob,
+                filename
+            );
+
+            return true;
+
+        }
+        catch (error) {
+
+            console.error(
+                "PDF error:",
+                error
+            );
+
+            alert(
+                "PDF download failed."
+            );
+
+            return false;
+        }
+
+    }
+
+
+    async function makeZip(
+        files,
+        zipFilename
+    ) {
+
+        if (!ZIP) {
+
+            alert(
+                "ZIP library load nahi hui.\n\n" +
+                "Individual PDF download try karein."
+            );
+
+            return false;
+        }
+
+
+        const zip =
+            new ZIP();
+
+
+        files.forEach(
+            file => {
+
+                zip.file(
+                    file.name,
+                    file.blob
+                );
+
+            }
+        );
+
+
+        const blob =
+            await zip.generateAsync({
+                type: "blob"
+            });
+
+
+        downloadBlob(
+            blob,
+            zipFilename
+        );
+
+
+        return true;
+
     }
 
 
@@ -114,6 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 height: 152.4,
                 label: "4 × 6 inch"
             };
+
         }
 
 
@@ -124,6 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 height: 297,
                 label: "A4"
             };
+
         }
 
 
@@ -134,6 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 height: 35,
                 label: "70 × 35 mm"
             };
+
         }
 
 
@@ -145,6 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const height =
                 Number(customHeight);
 
+
             if (
                 !Number.isFinite(width) ||
                 !Number.isFinite(height) ||
@@ -153,7 +296,9 @@ document.addEventListener("DOMContentLoaded", () => {
             ) {
 
                 return null;
+
             }
+
 
             return {
                 width,
@@ -161,74 +306,113 @@ document.addEventListener("DOMContentLoaded", () => {
                 label:
                     `${width} × ${height} mm`
             };
+
         }
 
+
         return null;
+
     }
 
 
-    function getOrientation(page) {
+    function orientation(
+        page
+    ) {
 
-        return page.width > page.height
+        return page.width >
+            page.height
             ? "landscape"
             : "portrait";
+
     }
 
 
-    function getPdfFont(font) {
+    function pdfFont(
+        font
+    ) {
 
         if (
             font === "Georgia" ||
             font === "Times New Roman"
         ) {
+
             return "times";
+
         }
+
 
         if (
             font === "Courier New"
         ) {
+
             return "courier";
+
         }
 
+
         return "helvetica";
+
     }
 
 
-    function getCssBorder(style) {
+    /* =====================================================
+       BORDER SYSTEM
+    ====================================================== */
 
-        const map = {
+    const cssBorders = {
 
-            "solid-dark":
-                "3px solid #1c1c1a",
+        "solid-dark":
+            "3px solid #1c1c1a",
 
-            "solid-medium":
-                "2px solid #555",
+        "solid-medium":
+            "2px solid #555",
 
-            "solid-light":
-                "1px solid #aaa",
+        "solid-light":
+            "1px solid #aaa",
 
-            "double":
-                "4px double #333",
+        "double":
+            "4px double #333",
 
-            "dashed":
-                "2px dashed #555",
+        "dashed":
+            "2px dashed #555",
 
-            "dotted":
-                "2px dotted #555",
+        "dotted":
+            "2px dotted #555",
 
-            "bold":
-                "5px solid #111"
+        "bold":
+            "5px solid #111",
 
-        };
+        "double-dark":
+            "5px double #111",
+
+        "inner":
+            "2px inset #444",
+
+        "outer":
+            "4px outset #444",
+
+        "triple":
+            "6px double #222",
+
+        "text-box":
+            "2px solid #222"
+
+    };
+
+
+    function cssBorder(
+        style
+    ) {
 
         return (
-            map[style] ||
-            map["solid-dark"]
+            cssBorders[style] ||
+            cssBorders["solid-dark"]
         );
+
     }
 
 
-    function drawPDFBorder(
+    function drawBorder(
         pdf,
         width,
         height,
@@ -240,51 +424,76 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const map = {
+
+        const styles = {
 
             "solid-dark": {
-                width: 0.8,
+                line: 0.8,
                 color: 25
             },
 
             "solid-medium": {
-                width: 0.5,
+                line: 0.5,
                 color: 80
             },
 
             "solid-light": {
-                width: 0.25,
+                line: 0.25,
                 color: 160
             },
 
             "double": {
-                width: 0.5,
+                line: 0.5,
                 color: 45
             },
 
             "dashed": {
-                width: 0.4,
+                line: 0.4,
                 color: 80
             },
 
             "dotted": {
-                width: 0.4,
+                line: 0.4,
                 color: 80
             },
 
             "bold": {
-                width: 1.4,
+                line: 1.4,
                 color: 10
+            },
+
+            "double-dark": {
+                line: 1,
+                color: 20
+            },
+
+            "inner": {
+                line: 0.5,
+                color: 50
+            },
+
+            "outer": {
+                line: 1,
+                color: 50
+            },
+
+            "triple": {
+                line: 0.6,
+                color: 30
+            },
+
+            "text-box": {
+                line: 0.7,
+                color: 30
             }
+
         };
 
-        const cfg =
-            map[style] ||
-            map["solid-dark"];
 
-        pdf.setLineWidth(
-            cfg.width
-        );
+        const cfg =
+            styles[style] ||
+            styles["solid-dark"];
+
 
         pdf.setDrawColor(
             cfg.color,
@@ -292,21 +501,34 @@ document.addEventListener("DOMContentLoaded", () => {
             cfg.color
         );
 
-        if (style === "dashed") {
+        pdf.setLineWidth(
+            cfg.line
+        );
+
+
+        if (
+            style === "dashed"
+        ) {
 
             pdf.setLineDashPattern(
                 [2, 2],
                 0
             );
+
         }
 
-        if (style === "dotted") {
+
+        if (
+            style === "dotted"
+        ) {
 
             pdf.setLineDashPattern(
                 [0.5, 1.5],
                 0
             );
+
         }
+
 
         pdf.rect(
             3,
@@ -315,7 +537,34 @@ document.addEventListener("DOMContentLoaded", () => {
             height - 6
         );
 
-        if (style === "double") {
+
+        if (
+            style === "double" ||
+            style === "double-dark"
+        ) {
+
+            pdf.setLineDashPattern(
+                [],
+                0
+            );
+
+            pdf.setLineWidth(
+                0.3
+            );
+
+            pdf.rect(
+                6,
+                6,
+                width - 12,
+                height - 12
+            );
+
+        }
+
+
+        if (
+            style === "triple"
+        ) {
 
             pdf.setLineDashPattern(
                 [],
@@ -327,55 +576,280 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             pdf.rect(
-                6,
-                6,
-                width - 12,
-                height - 12
+                7,
+                7,
+                width - 14,
+                height - 14
             );
+
         }
+
+
+        if (
+            style === "inner"
+        ) {
+
+            pdf.setLineDashPattern(
+                [],
+                0
+            );
+
+            pdf.setLineWidth(
+                0.35
+            );
+
+            pdf.rect(
+                7,
+                7,
+                width - 14,
+                height - 14
+            );
+
+        }
+
 
         pdf.setLineDashPattern(
             [],
             0
         );
+
     }
 
 
-    function getGrid(count) {
+    /* =====================================================
+       TAX BORDER
+       Additional inner document border.
+    ====================================================== */
 
-        const grids = {
+    function drawTaxBorder(
+        pdf,
+        width,
+        height,
+        enabled
+    ) {
 
-            1: [1, 1],
-            2: [1, 2],
-            3: [1, 3],
-            4: [2, 2],
-            5: [2, 3],
-            6: [2, 3],
-            7: [2, 4],
-            8: [2, 4],
-            9: [3, 3],
-            10: [2, 5]
-        };
+        if (!enabled) {
+            return;
+        }
 
-        return (
-            grids[count] ||
-            [2, 5]
+
+        pdf.setDrawColor(
+            100,
+            100,
+            100
         );
+
+        pdf.setLineWidth(
+            0.35
+        );
+
+
+        pdf.setLineDashPattern(
+            [1, 1],
+            0
+        );
+
+
+        pdf.rect(
+            9,
+            9,
+            width - 18,
+            height - 18
+        );
+
+
+        pdf.setLineDashPattern(
+            [],
+            0
+        );
+
     }
 
 
-    function readInputs(selector) {
+    /* =====================================================
+       CUTTING MARKS
+    ====================================================== */
 
-        return Array.from(
-            document.querySelectorAll(
-                selector
-            )
-        )
-        .map(
-            element =>
-                element.value.trim()
-        )
-        .filter(Boolean);
+    function drawCutMarks(
+        pdf,
+        width,
+        height,
+        count
+    ) {
+
+        if (count <= 1) {
+            return;
+        }
+
+
+        pdf.setDrawColor(
+            90,
+            90,
+            90
+        );
+
+        pdf.setLineWidth(
+            0.25
+        );
+
+        pdf.setLineDashPattern(
+            [1.5, 1.5],
+            0
+        );
+
+
+        const step =
+            height / count;
+
+
+        for (
+            let i = 1;
+            i < count;
+            i++
+        ) {
+
+            const y =
+                step * i;
+
+
+            pdf.line(
+                4,
+                y,
+                width - 4,
+                y
+            );
+
+        }
+
+
+        pdf.setLineDashPattern(
+            [],
+            0
+        );
+
+
+        pdf.setFont(
+            "helvetica",
+            "normal"
+        );
+
+        pdf.setFontSize(
+            8
+        );
+
+
+        for (
+            let i = 1;
+            i < count;
+            i++
+        ) {
+
+            const y =
+                step * i;
+
+
+            pdf.text(
+                "✂",
+                width - 7,
+                y - 1,
+                {
+                    align:
+                        "center"
+                }
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       PREVIEW PAGE
+    ====================================================== */
+
+    function updatePreviewPage(
+        element,
+        sizeType,
+        customWidth,
+        customHeight
+    ) {
+
+        if (!element) {
+            return;
+        }
+
+
+        element.classList.remove(
+            "size-4x6",
+            "size-a4",
+            "size-70x35",
+            "size-custom"
+        );
+
+
+        element.classList.add(
+            `size-${sizeType}`
+        );
+
+
+        const page =
+            getPageSize(
+                sizeType,
+                customWidth,
+                customHeight
+            );
+
+
+        if (!page) {
+            return;
+        }
+
+
+        const ratio =
+            page.width /
+            page.height;
+
+
+        const maxHeight =
+            440;
+
+        let height =
+            maxHeight;
+
+        let width =
+            height * ratio;
+
+
+        const maxWidth =
+            330;
+
+
+        if (
+            width > maxWidth
+        ) {
+
+            width =
+                maxWidth;
+
+            height =
+                width / ratio;
+
+        }
+
+
+        element.style.width =
+            `${Math.max(
+                120,
+                width
+            )}px`;
+
+
+        element.style.height =
+            `${Math.max(
+                90,
+                height
+            )}px`;
+
     }
 
 
@@ -389,7 +863,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-    function hideAllWorkspaces() {
+    function hideWorkspaces() {
 
         workspaces.forEach(
             workspace => {
@@ -399,6 +873,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
         );
+
     }
 
 
@@ -413,59 +888,74 @@ document.addEventListener("DOMContentLoaded", () => {
                     "click",
                     () => {
 
+                        hideWorkspaces();
+
+
                         const tool =
                             button.dataset.openTool;
 
-                        hideAllWorkspaces();
 
-                        let targetId = null;
+                        let id = "";
+
 
                         if (
-                            tool === "cocoblue"
+                            tool ===
+                            "cocoblue"
                         ) {
 
-                            targetId =
+                            id =
                                 "cocoblueWorkspace";
+
                         }
 
+
                         if (
-                            tool === "otherpo"
+                            tool ===
+                            "otherpo"
                         ) {
 
-                            targetId =
+                            id =
                                 "otherpoWorkspace";
+
                         }
+
 
                         if (
-                            tool === "isbn"
+                            tool ===
+                            "isbn"
                         ) {
 
-                            targetId =
+                            id =
                                 "isbnWorkspace";
+
                         }
 
-                        if (!targetId) {
-                            return;
-                        }
 
                         const target =
                             document.getElementById(
-                                targetId
+                                id
                             );
+
 
                         if (!target) {
                             return;
                         }
 
+
                         target.style.display =
                             "block";
 
+
                         target.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start"
+                            behavior:
+                                "smooth",
+                            block:
+                                "start"
                         });
+
                     }
                 );
+
             }
         );
 
@@ -481,50 +971,82 @@ document.addEventListener("DOMContentLoaded", () => {
                     "click",
                     () => {
 
-                        hideAllWorkspaces();
+                        hideWorkspaces();
+
 
                         const tools =
                             document.getElementById(
                                 "tools"
                             );
 
+
                         if (tools) {
 
                             tools.scrollIntoView({
-                                behavior: "smooth"
+                                behavior:
+                                    "smooth"
                             });
+
                         }
+
                     }
                 );
+
             }
         );
 
 
     /* =====================================================
-       COCOBLUE PO
+       COCOBLUE
     ====================================================== */
-
-    let cocoInputMode = "manual";
-    let cocoSize = "4x6";
-    let cocoAddressSize = "4x6";
-    let cocoExcelPOs = [];
-
 
     const cocoPOInputs =
         document.querySelectorAll(
             ".coco-po"
         );
 
+
     const cocoExcel =
         document.getElementById(
             "cocoExcel"
         );
+
 
     const cocoExcelStatus =
         document.getElementById(
             "cocoExcelStatus"
         );
 
+
+    function getCocoPOs() {
+
+        if (
+            cocoInputMode ===
+            "excel"
+        ) {
+
+            return [
+                ...cocoExcelPOs
+            ];
+
+        }
+
+
+        return Array.from(
+            cocoPOInputs
+        )
+        .map(
+            input =>
+                input.value.trim()
+        )
+        .filter(Boolean);
+
+    }
+
+
+    /* -----------------------------------------------------
+       COCO INPUT SWITCH
+    ----------------------------------------------------- */
 
     document
         .querySelectorAll(
@@ -548,12 +1070,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
 
+
                         cocoInputMode =
                             button.dataset.cocoInput;
+
 
                         document
                             .getElementById(
@@ -565,6 +1090,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "manual"
                             );
 
+
                         document
                             .getElementById(
                                 "cocoExcelArea"
@@ -575,27 +1101,19 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "excel"
                             );
 
+
                         updateCocoPreview();
+
                     }
                 );
+
             }
         );
 
 
-    function getCocoPOs() {
-
-        if (
-            cocoInputMode === "excel"
-        ) {
-
-            return [
-                ...cocoExcelPOs
-            ];
-        }
-
-        return readInputs(".coco-po");
-    }
-
+    /* -----------------------------------------------------
+       COCO EXCEL
+    ----------------------------------------------------- */
 
     if (cocoExcel) {
 
@@ -606,45 +1124,54 @@ document.addEventListener("DOMContentLoaded", () => {
                 const file =
                     event.target.files[0];
 
+
                 if (!file) {
                     return;
                 }
 
-                if (!hasXLSX()) {
+
+                if (!requireXLSX()) {
                     return;
                 }
 
-                try {
 
-                    cocoExcelStatus.textContent =
-                        "Reading Excel...";
+                try {
 
                     const buffer =
                         await file.arrayBuffer();
 
+
                     const workbook =
-                        XLSX.read(
+                        XLSX_LIB.read(
                             buffer,
                             {
-                                type: "array"
+                                type:
+                                    "array"
                             }
                         );
+
 
                     const sheet =
                         workbook.Sheets[
                             workbook.SheetNames[0]
                         ];
 
+
                     const rows =
-                        XLSX.utils.sheet_to_json(
+                        XLSX_LIB.utils.sheet_to_json(
                             sheet,
                             {
-                                header: 1,
-                                defval: ""
+                                header:
+                                    1,
+                                defval:
+                                    ""
                             }
                         );
 
-                    cocoExcelPOs = [];
+
+                    cocoExcelPOs =
+                        [];
+
 
                     rows.forEach(
                         (
@@ -652,24 +1179,21 @@ document.addEventListener("DOMContentLoaded", () => {
                             index
                         ) => {
 
-                            if (
-                                !row ||
-                                !row.length
-                            ) {
-                                return;
-                            }
-
                             const value =
                                 String(
-                                    row[0]
+                                    row?.[0] ||
+                                    ""
                                 ).trim();
+
 
                             if (!value) {
                                 return;
                             }
 
-                            const header =
+
+                            const normalized =
                                 value.toLowerCase();
+
 
                             if (
                                 index === 0 &&
@@ -681,17 +1205,22 @@ document.addEventListener("DOMContentLoaded", () => {
                                     "po_number",
                                     "purchase order"
                                 ].includes(
-                                    header
+                                    normalized
                                 )
                             ) {
+
                                 return;
+
                             }
+
 
                             cocoExcelPOs.push(
                                 value
                             );
+
                         }
                     );
+
 
                     cocoExcelPOs =
                         [
@@ -700,15 +1229,19 @@ document.addEventListener("DOMContentLoaded", () => {
                             )
                         ];
 
+
                     cocoExcelStatus.textContent =
                         `${cocoExcelPOs.length} PO(s) loaded`;
+
 
                     updateCocoPreview();
 
                 }
                 catch (error) {
 
-                    console.error(error);
+                    console.error(
+                        error
+                    );
 
                     cocoExcelStatus.textContent =
                         "Excel reading failed.";
@@ -716,11 +1249,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert(
                         "Unable to read the Excel file."
                     );
+
                 }
+
             }
         );
+
     }
 
+
+    /* -----------------------------------------------------
+       COCO SIZE
+    ----------------------------------------------------- */
 
     document
         .querySelectorAll(
@@ -744,12 +1284,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
 
+
                         cocoSize =
                             button.dataset.cocoSize;
+
 
                         document
                             .getElementById(
@@ -761,31 +1304,125 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "custom"
                             );
 
+
                         updateCocoPreview();
+
                     }
                 );
+
             }
         );
 
+
+    /* -----------------------------------------------------
+       COCO PREVIEW
+    ----------------------------------------------------- */
 
     function updateCocoPreview() {
 
         const pos =
             getCocoPOs();
 
-        const labels =
+
+        const start =
             Number(
                 document.getElementById(
-                    "cocoLabelsPerPage"
+                    "cocoStartBox"
                 ).value
             ) || 1;
 
-        const pagesPerPO =
+
+        const end =
             Number(
                 document.getElementById(
-                    "cocoPagesPerPO"
+                    "cocoEndBox"
+                ).value
+            ) || start;
+
+
+        const copies =
+            Number(
+                document.getElementById(
+                    "cocoCopiesPerBox"
                 ).value
             ) || 1;
+
+
+        const cutting =
+            document.getElementById(
+                "cocoCutting"
+            ).checked;
+
+
+        const border =
+            document.getElementById(
+                "cocoBorder"
+            ).checked;
+
+
+        const borderStyle =
+            document.getElementById(
+                "cocoBorderStyle"
+            ).value;
+
+
+        const vertical =
+            document.getElementById(
+                "cocoVertical"
+            ).checked;
+
+
+        const previewPage =
+            document.getElementById(
+                "cocoPreviewPage"
+            );
+
+
+        const previewLabel =
+            document.getElementById(
+                "cocoPreviewLabel"
+            );
+
+
+        updatePreviewPage(
+            previewPage,
+            cocoSize,
+            document.getElementById(
+                "cocoCustomWidth"
+            ).value,
+            document.getElementById(
+                "cocoCustomHeight"
+            ).value
+        );
+
+
+        document.getElementById(
+            "cocoPreviewPO"
+        ).textContent =
+            pos[0] ||
+            "";
+
+
+        document.getElementById(
+            "cocoPreviewBox"
+        ).textContent =
+            `BOX ${start}`;
+
+
+        document.getElementById(
+            "cocoBoxSummary"
+        ).textContent =
+            `${start}–${end}`;
+
+
+        document.getElementById(
+            "cocoSummary"
+        ).textContent =
+            `${Math.max(
+                1,
+                end - start + 1
+            )} boxes`;
+
 
         const page =
             getPageSize(
@@ -798,126 +1435,624 @@ document.addEventListener("DOMContentLoaded", () => {
                 ).value
             );
 
-        document.getElementById(
-            "cocoPreviewPO"
-        ).textContent =
-            pos[0] ||
-            "BWG123";
 
-        document.getElementById(
-            "cocoLabelsSummary"
-        ).textContent =
-            labels;
+        if (page) {
 
-        document.getElementById(
-            "cocoPagesSummary"
-        ).textContent =
-            Math.max(
-                1,
-                pos.length *
-                pagesPerPO
-            );
-
-        document.getElementById(
-            "cocoSizeSummary"
-        ).textContent =
-            page
-                ? page.label
-                : "Custom";
-
-        document.getElementById(
-            "cocoSummary"
-        ).textContent =
-            `${Math.max(
-                1,
-                pos.length *
-                pagesPerPO
-            )} pages`;
-
-
-        const preview =
             document.getElementById(
-                "cocoPreview"
-            );
+                "cocoSizeSummary"
+            ).textContent =
+                page.label;
 
-        preview.style.fontFamily =
-            document.getElementById(
-                "cocoFont"
-            ).value;
+        }
 
-        preview.style.fontSize =
-            `${
-                Number(
-                    document.getElementById(
-                        "cocoFontSize"
-                    ).value
-                ) || 10
-            }px`;
 
-        preview.style.fontWeight =
-            document.getElementById(
-                "cocoFontWeight"
-            ).value;
-
-        preview.style.border =
-            document.getElementById(
-                "cocoBorder"
-            ).checked
-                ? getCssBorder(
-                    document.getElementById(
-                        "cocoBorderStyle"
-                    ).value
+        previewLabel.style.border =
+            border
+                ? cssBorder(
+                    borderStyle
                 )
                 : "none";
+
+
+        previewLabel.style.flexDirection =
+            vertical
+                ? "column"
+                : "row";
+
+
+        document.getElementById(
+            "cocoPreviewDotted"
+        ).style.display =
+            copies > 0
+                ? "inline-block"
+                : "none";
+
+
+        document.getElementById(
+            "cocoPreviewScissor"
+        ).style.display =
+            cutting
+                ? "inline-block"
+                : "none";
+
     }
 
 
     [
         ...cocoPOInputs,
-        document.getElementById(
-            "cocoLabelsPerPage"
-        ),
-        document.getElementById(
-            "cocoPagesPerPO"
-        ),
-        document.getElementById(
-            "cocoCustomWidth"
-        ),
-        document.getElementById(
-            "cocoCustomHeight"
-        ),
-        document.getElementById(
-            "cocoBorder"
-        ),
-        document.getElementById(
-            "cocoBorderStyle"
-        ),
-        document.getElementById(
-            "cocoFont"
-        ),
-        document.getElementById(
-            "cocoFontSize"
-        ),
-        document.getElementById(
-            "cocoFontWeight"
-        )
+        "cocoStartBox",
+        "cocoEndBox",
+        "cocoCopiesPerBox",
+        "cocoLabelsPerPage",
+        "cocoVertical",
+        "cocoCutting",
+        "cocoTaxBorder",
+        "cocoBorder",
+        "cocoBorderStyle",
+        "cocoFont",
+        "cocoFontSize",
+        "cocoFontWeight",
+        "cocoCustomWidth",
+        "cocoCustomHeight"
     ]
-    .filter(Boolean)
     .forEach(
-        element => {
+        item => {
+
+            const element =
+                typeof item === "string"
+                    ? document.getElementById(
+                        item
+                    )
+                    : item;
+
+
+            if (!element) {
+                return;
+            }
+
 
             element.addEventListener(
                 "input",
                 updateCocoPreview
             );
 
+
             element.addEventListener(
                 "change",
                 updateCocoPreview
             );
+
         }
     );
 
+
+    /* -----------------------------------------------------
+       COCO BOX DATA
+    ----------------------------------------------------- */
+
+    function buildCocoLabels(
+        po
+    ) {
+
+        let start =
+            Number(
+                document.getElementById(
+                    "cocoStartBox"
+                ).value
+            ) || 1;
+
+
+        let end =
+            Number(
+                document.getElementById(
+                    "cocoEndBox"
+                ).value
+            ) || start;
+
+
+        start =
+            Math.max(
+                1,
+                Math.min(
+                    200,
+                    start
+                )
+            );
+
+
+        end =
+            Math.max(
+                start,
+                Math.min(
+                    200,
+                    end
+                )
+            );
+
+
+        const copies =
+            Number(
+                document.getElementById(
+                    "cocoCopiesPerBox"
+                ).value
+            ) || 1;
+
+
+        const labels = [];
+
+
+        for (
+            let box = start;
+            box <= end;
+            box++
+        ) {
+
+            for (
+                let copy = 1;
+                copy <= copies;
+                copy++
+            ) {
+
+                labels.push({
+
+                    po,
+                    box,
+                    copy
+
+                });
+
+            }
+
+        }
+
+
+        return labels;
+
+    }
+
+
+    /* -----------------------------------------------------
+       BUILD LABEL PDF
+    ----------------------------------------------------- */
+
+    function createLabelPDF(
+        labels,
+        options
+    ) {
+
+        const page =
+            options.page;
+
+
+        const pdf =
+            new PDF({
+
+                orientation:
+                    orientation(
+                        page
+                    ),
+
+                unit:
+                    "mm",
+
+                format:
+                    [
+                        page.width,
+                        page.height
+                    ]
+            });
+
+
+        const labelsPerPage =
+            Math.max(
+                1,
+                Number(
+                    options.labelsPerPage
+                ) || 1
+            );
+
+
+        const totalPages =
+            Math.ceil(
+                labels.length /
+                labelsPerPage
+            );
+
+
+        const font =
+            pdfFont(
+                options.font
+            );
+
+
+        const fontSize =
+            Number(
+                options.fontSize
+            ) || 10;
+
+
+        for (
+            let pageIndex = 0;
+            pageIndex < totalPages;
+            pageIndex++
+        ) {
+
+            if (
+                pageIndex > 0
+            ) {
+
+                pdf.addPage(
+                    [
+                        page.width,
+                        page.height
+                    ],
+                    orientation(
+                        page
+                    )
+                );
+
+            }
+
+
+            drawBorder(
+                pdf,
+                page.width,
+                page.height,
+                options.border,
+                options.borderStyle
+            );
+
+
+            drawTaxBorder(
+                pdf,
+                page.width,
+                page.height,
+                options.taxBorder
+            );
+
+
+            const currentLabels =
+                labels.slice(
+                    pageIndex *
+                    labelsPerPage,
+                    (
+                        pageIndex + 1
+                    ) *
+                    labelsPerPage
+                );
+
+
+            /*
+             * User requested vertical top-to-bottom
+             * layout by default.
+             */
+
+            const vertical =
+                options.vertical !==
+                false;
+
+
+            const count =
+                currentLabels.length;
+
+
+            if (vertical) {
+
+                const cellHeight =
+                    page.height /
+                    count;
+
+
+                currentLabels.forEach(
+                    (
+                        label,
+                        index
+                    ) => {
+
+                        const top =
+                            index *
+                            cellHeight;
+
+
+                        const centerX =
+                            page.width /
+                            2;
+
+
+                        const centerY =
+                            top +
+                            cellHeight /
+                            2;
+
+
+                        drawLabelContent(
+                            pdf,
+                            label,
+                            {
+                                centerX,
+                                centerY,
+                                cellWidth:
+                                    page.width,
+                                cellHeight,
+                                font,
+                                fontSize,
+                                cutting:
+                                    options.cutting,
+                                first:
+                                    index === 0,
+                                last:
+                                    index ===
+                                    count - 1
+                            }
+                        );
+
+                    }
+                );
+
+            }
+            else {
+
+                const [
+                    rows,
+                    columns
+                ] =
+                    getGrid(
+                        count
+                    );
+
+
+                const cellWidth =
+                    page.width /
+                    columns;
+
+
+                const cellHeight =
+                    page.height /
+                    rows;
+
+
+                currentLabels.forEach(
+                    (
+                        label,
+                        index
+                    ) => {
+
+                        const row =
+                            Math.floor(
+                                index /
+                                columns
+                            );
+
+
+                        const column =
+                            index %
+                            columns;
+
+
+                        const centerX =
+                            column *
+                            cellWidth +
+                            cellWidth /
+                            2;
+
+
+                        const centerY =
+                            row *
+                            cellHeight +
+                            cellHeight /
+                            2;
+
+
+                        drawLabelContent(
+                            pdf,
+                            label,
+                            {
+                                centerX,
+                                centerY,
+                                cellWidth,
+                                cellHeight,
+                                font,
+                                fontSize,
+                                cutting:
+                                    options.cutting,
+                                first:
+                                    index === 0,
+                                last:
+                                    index ===
+                                    count - 1
+                            }
+                        );
+
+                    }
+                );
+
+            }
+
+
+            if (
+                options.cutting
+            ) {
+
+                drawCutMarks(
+                    pdf,
+                    page.width,
+                    page.height,
+                    count
+                );
+
+            }
+
+        }
+
+
+        return pdf;
+
+    }
+
+
+    /* -----------------------------------------------------
+       LABEL CONTENT
+    ----------------------------------------------------- */
+
+    function drawLabelContent(
+        pdf,
+        label,
+        settings
+    ) {
+
+        const {
+            centerX,
+            centerY,
+            cellWidth,
+            cellHeight,
+            font,
+            fontSize,
+            cutting
+        } =
+            settings;
+
+
+        pdf.setTextColor(
+            25,
+            25,
+            25
+        );
+
+
+        pdf.setFont(
+            font,
+            "bold"
+        );
+
+
+        pdf.setFontSize(
+            fontSize
+        );
+
+
+        /*
+         * PO number only.
+         * No "PO" prefix.
+         */
+
+        pdf.text(
+            String(
+                label.po
+            ),
+            centerX,
+            centerY - 10,
+            {
+                align:
+                    "center"
+            }
+        );
+
+
+        /*
+         * Mandatory dotted separator.
+         */
+
+        pdf.setFont(
+            "helvetica",
+            "normal"
+        );
+
+        pdf.setFontSize(
+            7
+        );
+
+
+        const dotted =
+            ". ".repeat(
+                Math.max(
+                    8,
+                    Math.floor(
+                        cellWidth /
+                        7
+                    )
+                )
+            );
+
+
+        pdf.text(
+            dotted,
+            centerX,
+            centerY - 2,
+            {
+                align:
+                    "center"
+            }
+        );
+
+
+        /*
+         * Box number.
+         */
+
+        pdf.setFont(
+            font,
+            "bold"
+        );
+
+
+        pdf.setFontSize(
+            Math.max(
+                12,
+                fontSize + 4
+            )
+        );
+
+
+        pdf.text(
+            `BOX ${label.box}`,
+            centerX,
+            centerY + 12,
+            {
+                align:
+                    "center"
+            }
+        );
+
+
+        /*
+         * Cutting mark.
+         */
+
+        if (cutting) {
+
+            pdf.setFont(
+                "helvetica",
+                "normal"
+            );
+
+            pdf.setFontSize(
+                10
+            );
+
+
+            pdf.text(
+                "✂",
+                centerX,
+                centerY +
+                Math.min(
+                    25,
+                    cellHeight /
+                    3
+                ),
+                {
+                    align:
+                        "center"
+                }
+            );
+
+        }
+
+    }
+
+
+    /* -----------------------------------------------------
+       COCO GENERATE
+    ----------------------------------------------------- */
 
     document
         .getElementById(
@@ -925,26 +2060,58 @@ document.addEventListener("DOMContentLoaded", () => {
         )
         .addEventListener(
             "click",
-            () => {
+            async () => {
 
-                const PDF =
-                    getPDFConstructor();
-
-                if (!PDF) {
+                if (
+                    !requirePDF()
+                ) {
                     return;
                 }
+
 
                 const pos =
                     getCocoPOs();
 
+
                 if (!pos.length) {
 
                     alert(
-                        "Please enter at least one PO."
+                        "Please enter at least one PO number."
                     );
 
                     return;
                 }
+
+
+                const start =
+                    Number(
+                        document.getElementById(
+                            "cocoStartBox"
+                        ).value
+                    );
+
+
+                const end =
+                    Number(
+                        document.getElementById(
+                            "cocoEndBox"
+                        ).value
+                    );
+
+
+                if (
+                    start < 1 ||
+                    end < start ||
+                    end > 200
+                ) {
+
+                    alert(
+                        "Box range must be between 1 and 200."
+                    );
+
+                    return;
+                }
+
 
                 const page =
                     getPageSize(
@@ -957,6 +2124,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                     );
 
+
                 if (!page) {
 
                     alert(
@@ -966,217 +2134,224 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-                const labels =
+
+                const labelsPerPage =
                     Number(
                         document.getElementById(
                             "cocoLabelsPerPage"
                         ).value
                     ) || 1;
 
-                const pagesPerPO =
+
+                const copies =
                     Number(
                         document.getElementById(
-                            "cocoPagesPerPO"
+                            "cocoCopiesPerBox"
                         ).value
                     ) || 1;
 
-                const pdf =
-                    new PDF({
 
-                        orientation:
-                            getOrientation(
-                                page
-                            ),
+                const options = {
 
-                        unit:
-                            "mm",
+                    page,
 
-                        format:
-                            [
-                                page.width,
-                                page.height
-                            ]
+                    labelsPerPage,
+
+                    vertical:
+                        document.getElementById(
+                            "cocoVertical"
+                        ).checked,
+
+                    cutting:
+                        document.getElementById(
+                            "cocoCutting"
+                        ).checked,
+
+                    taxBorder:
+                        document.getElementById(
+                            "cocoTaxBorder"
+                        ).checked,
+
+                    border:
+                        document.getElementById(
+                            "cocoBorder"
+                        ).checked,
+
+                    borderStyle:
+                        document.getElementById(
+                            "cocoBorderStyle"
+                        ).value,
+
+                    font:
+                        document.getElementById(
+                            "cocoFont"
+                        ).value,
+
+                    fontSize:
+                        document.getElementById(
+                            "cocoFontSize"
+                        ).value
+
+                };
+
+
+                const zipEnabled =
+                    document.getElementById(
+                        "cocoZip"
+                    ).checked;
+
+
+                const zipFiles =
+                    [];
+
+
+                const timestamp =
+                    currentDateTime();
+
+
+                for (
+                    const po of pos
+                ) {
+
+                    const labels =
+                        buildCocoLabels(
+                            po
+                        );
+
+
+                    const pdf =
+                        createLabelPDF(
+                            labels,
+                            options
+                        );
+
+
+                    const filename =
+                        `${safeName(
+                            po
+                        )}_BOX${start}-${end}_${timestamp.date}_${timestamp.time}.pdf`;
+
+
+                    const blob =
+                        pdf.output(
+                            "blob"
+                        );
+
+
+                    zipFiles.push({
+                        name:
+                            filename,
+                        blob
                     });
 
-                let generatedPages = 0;
+
+                    if (!zipEnabled) {
+
+                        downloadBlob(
+                            blob,
+                            filename
+                        );
 
 
-                pos.forEach(
-                    po => {
+                        /*
+                         * Small delay prevents
+                         * browser download blocking.
+                         */
 
-                        for (
-                            let p = 0;
-                            p < pagesPerPO;
-                            p++
-                        ) {
+                        await new Promise(
+                            resolve =>
+                                setTimeout(
+                                    resolve,
+                                    350
+                                )
+                        );
 
-                            if (
-                                generatedPages > 0
-                            ) {
-
-                                pdf.addPage(
-                                    [
-                                        page.width,
-                                        page.height
-                                    ],
-                                    getOrientation(
-                                        page
-                                    )
-                                );
-                            }
-
-
-                            drawPDFBorder(
-                                pdf,
-                                page.width,
-                                page.height,
-                                document.getElementById(
-                                    "cocoBorder"
-                                ).checked,
-                                document.getElementById(
-                                    "cocoBorderStyle"
-                                ).value
-                            );
-
-
-                            const [
-                                rows,
-                                columns
-                            ] =
-                                getGrid(
-                                    labels
-                                );
-
-
-                            const cellWidth =
-                                page.width /
-                                columns;
-
-                            const cellHeight =
-                                page.height /
-                                rows;
-
-
-                            const font =
-                                getPdfFont(
-                                    document.getElementById(
-                                        "cocoFont"
-                                    ).value
-                                );
-
-                            const fontSize =
-                                Number(
-                                    document.getElementById(
-                                        "cocoFontSize"
-                                    ).value
-                                ) || 10;
-
-                            const weight =
-                                document.getElementById(
-                                    "cocoFontWeight"
-                                ).value;
-
-
-                            for (
-                                let i = 0;
-                                i < labels;
-                                i++
-                            ) {
-
-                                const row =
-                                    Math.floor(
-                                        i /
-                                        columns
-                                    );
-
-                                const column =
-                                    i %
-                                    columns;
-
-                                const centerX =
-                                    column *
-                                    cellWidth +
-                                    cellWidth /
-                                    2;
-
-                                const centerY =
-                                    row *
-                                    cellHeight +
-                                    cellHeight /
-                                    2;
-
-
-                                pdf.setFont(
-                                    font,
-                                    weight
-                                );
-
-                                pdf.setFontSize(
-                                    fontSize
-                                );
-
-                                pdf.text(
-                                    String(po),
-                                    centerX,
-                                    centerY,
-                                    {
-                                        align:
-                                            "center"
-                                    }
-                                );
-                            }
-
-
-                            generatedPages++;
-
-                        }
                     }
-                );
+
+                }
 
 
-                downloadPDF(
-                    pdf,
-                    `${safeName(
-                        pos[0]
-                    )}_CocoBlue_Labels.pdf`
-                );
+                if (
+                    zipEnabled
+                ) {
+
+                    await makeZip(
+                        zipFiles,
+                        `BooksWagon_${timestamp.date}_${timestamp.time}.zip`
+                    );
+
+                }
 
 
                 document.getElementById(
                     "cocoStatus"
                 ).textContent =
-                    `Generated ${generatedPages} page(s).`;
+                    `${pos.length} separate PDF(s) generated.`;
 
             }
         );
 
 
-    document
-        .getElementById(
-            "cocoReset"
-        )
-        .addEventListener(
-            "click",
-            () => {
+    /* -----------------------------------------------------
+       COCO STICKER TABS
+    ----------------------------------------------------- */
 
-                cocoPOInputs.forEach(
-                    input =>
-                        input.value = ""
+    document
+        .querySelectorAll(
+            "[data-cocoblue-mode]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        document
+                            .querySelectorAll(
+                                "[data-cocoblue-mode]"
+                            )
+                            .forEach(
+                                item =>
+                                    item.classList.remove(
+                                        "active"
+                                    )
+                            );
+
+
+                        button.classList.add(
+                            "active"
+                        );
+
+
+                        const mode =
+                            button.dataset.cocoblueMode;
+
+
+                        document
+                            .getElementById(
+                                "cocoblueStickerMode"
+                            )
+                            .classList.toggle(
+                                "hidden",
+                                mode !==
+                                "sticker"
+                            );
+
+
+                        document
+                            .getElementById(
+                                "cocoblueAddressMode"
+                            )
+                            .classList.toggle(
+                                "hidden",
+                                mode !==
+                                "address"
+                            );
+
+                    }
                 );
 
-                cocoExcelPOs = [];
-
-                if (cocoExcel) {
-                    cocoExcel.value = "";
-                }
-
-                if (cocoExcelStatus) {
-
-                    cocoExcelStatus.textContent =
-                        "No file selected";
-                }
-
-                updateCocoPreview();
             }
         );
 
@@ -1207,24 +2382,125 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
 
+
                         cocoAddressSize =
                             button.dataset.cocoAddressSize;
+
+
+                        updateCocoAddressPreview();
+
                     }
                 );
+
             }
         );
 
 
-    function updateCocoAddress() {
+    /*
+     * Dynamically create custom address size fields.
+     */
+
+    function ensureAddressCustomInputs(
+        containerId,
+        prefix
+    ) {
+
+        const container =
+            document.getElementById(
+                containerId
+            );
+
+
+        if (!container) {
+            return null;
+        }
+
+
+        let wrapper =
+            document.getElementById(
+                `${prefix}CustomAddressSize`
+            );
+
+
+        if (wrapper) {
+            return wrapper;
+        }
+
+
+        wrapper =
+            document.createElement(
+                "div"
+            );
+
+
+        wrapper.id =
+            `${prefix}CustomAddressSize`;
+
+
+        wrapper.className =
+            "custom-grid";
+
+
+        wrapper.innerHTML = `
+            <input
+                type="number"
+                id="${prefix}CustomAddressWidth"
+                min="1"
+                placeholder="Custom Width (mm)"
+            >
+
+            <input
+                type="number"
+                id="${prefix}CustomAddressHeight"
+                min="1"
+                placeholder="Custom Height (mm)"
+            >
+        `;
+
+
+        container.appendChild(
+            wrapper
+        );
+
+
+        return wrapper;
+
+    }
+
+
+    ensureAddressCustomInputs(
+        "cocoblueAddressMode",
+        "coco"
+    );
+
+
+    function getCocoAddressPage() {
+
+        return getPageSize(
+            cocoAddressSize,
+            document.getElementById(
+                "cocoCustomAddressWidth"
+            )?.value,
+            document.getElementById(
+                "cocoCustomAddressHeight"
+            )?.value
+        );
+
+    }
+
+
+    function updateCocoAddressPreview() {
 
         const from =
             document.getElementById(
                 "cocoFrom"
             ).value.trim();
+
 
         const to =
             document.getElementById(
@@ -1237,6 +2513,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ).textContent =
             from ||
             "FROM";
+
 
         document.getElementById(
             "cocoToPreview"
@@ -1256,23 +2533,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 "cocoAddressFont"
             ).value;
 
+
         preview.style.fontSize =
             `${
-                document.getElementById(
-                    "cocoAddressFontSize"
-                ).value
+                Number(
+                    document.getElementById(
+                        "cocoAddressFontSize"
+                    ).value
+                ) || 10
             }px`;
+
 
         preview.style.border =
             document.getElementById(
                 "cocoAddressBorder"
             ).checked
-                ? getCssBorder(
+                ? cssBorder(
                     document.getElementById(
                         "cocoAddressBorderStyle"
                     ).value
                 )
                 : "none";
+
     }
 
 
@@ -1292,19 +2574,23 @@ document.addEventListener("DOMContentLoaded", () => {
                     id
                 );
 
+
             if (!element) {
                 return;
             }
 
+
             element.addEventListener(
                 "input",
-                updateCocoAddress
+                updateCocoAddressPreview
             );
+
 
             element.addEventListener(
                 "change",
-                updateCocoAddress
+                updateCocoAddressPreview
             );
+
         }
     );
 
@@ -1317,10 +2603,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             () => {
 
-                const PDF =
-                    getPDFConstructor();
-
-                if (!PDF) {
+                if (!requirePDF()) {
                     return;
                 }
 
@@ -1337,29 +2620,32 @@ document.addEventListener("DOMContentLoaded", () => {
                     ).value.trim();
 
 
-                if (!from || !to) {
+                if (
+                    !from ||
+                    !to
+                ) {
 
                     alert(
                         "From Address and To Address are mandatory."
                     );
 
                     return;
+
                 }
 
 
                 const page =
-                    getPageSize(
-                        cocoAddressSize
-                    );
+                    getCocoAddressPage();
 
 
                 if (!page) {
 
                     alert(
-                        "Please select a valid page size."
+                        "Please enter valid custom size."
                     );
 
                     return;
+
                 }
 
 
@@ -1367,7 +2653,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     new PDF({
 
                         orientation:
-                            getOrientation(
+                            orientation(
                                 page
                             ),
 
@@ -1379,10 +2665,11 @@ document.addEventListener("DOMContentLoaded", () => {
                                 page.width,
                                 page.height
                             ]
+
                     });
 
 
-                drawPDFBorder(
+                drawBorder(
                     pdf,
                     page.width,
                     page.height,
@@ -1395,8 +2682,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
+                let y =
+                    20;
+
+
                 pdf.setFont(
-                    getPdfFont(
+                    pdfFont(
                         document.getElementById(
                             "cocoAddressFont"
                         ).value
@@ -1412,9 +2703,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                     ) || 10
                 );
-
-
-                let y = 20;
 
 
                 pdf.text(
@@ -1498,74 +2786,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     "cocoFrom"
                 ).value = "";
 
+
                 document.getElementById(
                     "cocoTo"
                 ).value = "";
+
 
                 document.getElementById(
                     "cocoAddressBorder"
                 ).checked = false;
 
-                updateCocoAddress();
 
-            }
-        );
+                updateCocoAddressPreview();
 
-
-    document
-        .querySelectorAll(
-            "[data-cocoblue-mode]"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        document
-                            .querySelectorAll(
-                                "[data-cocoblue-mode]"
-                            )
-                            .forEach(
-                                item =>
-                                    item.classList.remove(
-                                        "active"
-                                    )
-                            );
-
-                        button.classList.add(
-                            "active"
-                        );
-
-
-                        const mode =
-                            button.dataset.cocoblueMode;
-
-
-                        document
-                            .getElementById(
-                                "cocoblueStickerMode"
-                            )
-                            .classList.toggle(
-                                "hidden",
-                                mode !==
-                                "sticker"
-                            );
-
-
-                        document
-                            .getElementById(
-                                "cocoblueAddressMode"
-                            )
-                            .classList.toggle(
-                                "hidden",
-                                mode !==
-                                "address"
-                            );
-
-                    }
-                );
             }
         );
 
@@ -1573,19 +2806,6 @@ document.addEventListener("DOMContentLoaded", () => {
     /* =====================================================
        OTHER PO
     ====================================================== */
-
-    let otherInputMode =
-        "manual";
-
-    let otherSize =
-        "4x6";
-
-    let otherAddressSize =
-        "4x6";
-
-    let otherExcelPOs =
-        [];
-
 
     function getOtherPOs() {
 
@@ -1597,11 +2817,21 @@ document.addEventListener("DOMContentLoaded", () => {
             return [
                 ...otherExcelPOs
             ];
+
         }
 
-        return readInputs(
-            ".other-po"
-        );
+
+        return Array.from(
+            document.querySelectorAll(
+                ".other-po"
+            )
+        )
+        .map(
+            input =>
+                input.value.trim()
+        )
+        .filter(Boolean);
+
     }
 
 
@@ -1658,8 +2888,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "excel"
                             );
 
+
+                        updateOtherPreview();
+
                     }
                 );
+
             }
         );
 
@@ -1675,13 +2909,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 const file =
                     event.target.files[0];
 
+
                 if (!file) {
                     return;
                 }
 
-                if (!hasXLSX()) {
+
+                if (!requireXLSX()) {
                     return;
                 }
+
 
                 try {
 
@@ -1690,10 +2927,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     const workbook =
-                        XLSX.read(
+                        XLSX_LIB.read(
                             buffer,
                             {
-                                type: "array"
+                                type:
+                                    "array"
                             }
                         );
 
@@ -1705,16 +2943,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     const rows =
-                        XLSX.utils.sheet_to_json(
+                        XLSX_LIB.utils.sheet_to_json(
                             sheet,
                             {
-                                header: 1,
-                                defval: ""
+                                header:
+                                    1,
+                                defval:
+                                    ""
                             }
                         );
 
 
-                    otherExcelPOs = [];
+                    otherExcelPOs =
+                        [];
 
 
                     rows.forEach(
@@ -1723,18 +2964,20 @@ document.addEventListener("DOMContentLoaded", () => {
                             index
                         ) => {
 
-                            if (
-                                !row ||
-                                !row[0]
-                            ) {
+                            const value =
+                                String(
+                                    row?.[0] ||
+                                    ""
+                                ).trim();
+
+
+                            if (!value) {
                                 return;
                             }
 
 
-                            const value =
-                                String(
-                                    row[0]
-                                ).trim();
+                            const normalized =
+                                value.toLowerCase();
 
 
                             if (
@@ -1746,10 +2989,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                     "po no.",
                                     "po_number"
                                 ].includes(
-                                    value.toLowerCase()
+                                    normalized
                                 )
                             ) {
+
                                 return;
+
                             }
 
 
@@ -1780,11 +3025,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 catch (error) {
 
-                    console.error(error);
+                    console.error(
+                        error
+                    );
 
                     alert(
                         "Unable to read Other PO Excel."
                     );
+
                 }
 
             }
@@ -1838,20 +3086,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     }
                 );
+
             }
         );
 
 
-    function getOtherLayout() {
+    function otherLayout() {
 
-        const checked =
+        return (
             document.querySelector(
                 'input[name="otherLayout"]:checked'
-            );
+            )?.value ||
+            "same"
+        );
 
-        return checked
-            ? checked.value
-            : "same";
     }
 
 
@@ -1860,19 +3108,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const pos =
             getOtherPOs();
 
-        const labels =
-            Number(
-                document.getElementById(
-                    "otherLabelsPerPage"
-                ).value
-            ) || 1;
-
-        const pages =
-            Number(
-                document.getElementById(
-                    "otherPageCount"
-                ).value
-            ) || 1;
 
         const start =
             Number(
@@ -1880,6 +3115,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     "otherStartBox"
                 ).value
             ) || 1;
+
 
         const end =
             Number(
@@ -1889,61 +3125,47 @@ document.addEventListener("DOMContentLoaded", () => {
             ) || start;
 
 
-        let totalPages = 1;
+        const previewPage =
+            document.getElementById(
+                "otherPreviewPage"
+            );
 
 
-        if (
-            getOtherLayout() ===
-            "same"
-        ) {
-
-            totalPages =
-                Math.max(
-                    1,
-                    pos.length *
-                    pages
-                );
-
-        }
-        else {
-
-            const boxCount =
-                Math.max(
-                    0,
-                    end -
-                    start +
-                    1
-                );
+        const preview =
+            document.getElementById(
+                "otherPreview"
+            );
 
 
-            totalPages =
-                Math.max(
-                    1,
-                    Math.ceil(
-                        (
-                            Math.max(
-                                1,
-                                pos.length
-                            ) *
-                            boxCount
-                        ) /
-                        labels
-                    )
-                );
-        }
+        updatePreviewPage(
+            previewPage,
+            otherSize,
+            document.getElementById(
+                "otherCustomWidth"
+            ).value,
+            document.getElementById(
+                "otherCustomHeight"
+            ).value
+        );
 
 
         document.getElementById(
             "otherPreviewPO"
         ).textContent =
             pos[0] ||
-            "BWG123";
+            "";
 
 
         document.getElementById(
             "otherPreviewBox"
         ).textContent =
             `BOX ${start}`;
+
+
+        document.getElementById(
+            "otherBoxSummary"
+        ).textContent =
+            `${start}–${end}`;
 
 
         const page =
@@ -1958,74 +3180,101 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-        document.getElementById(
-            "otherSizeSummary"
-        ).textContent =
-            page
-                ? page.label
-                : "Custom";
+        if (page) {
+
+            document.getElementById(
+                "otherSizeSummary"
+            ).textContent =
+                page.label;
+
+        }
 
 
-        document.getElementById(
-            "otherLabelsSummary"
-        ).textContent =
-            labels;
-
-
-        document.getElementById(
-            "otherPagesSummary"
-        ).textContent =
-            totalPages;
-
-
-        document.getElementById(
-            "otherPreview"
-        ).style.border =
+        preview.style.border =
             document.getElementById(
                 "otherBorder"
             ).checked
-                ? getCssBorder(
+                ? cssBorder(
                     document.getElementById(
                         "otherBorderStyle"
                     ).value
                 )
                 : "none";
+
+
+        document
+            .querySelectorAll(
+                "#otherPreview .preview-scissor"
+            )
+            .forEach(
+                mark => {
+
+                    mark.style.display =
+                        document.getElementById(
+                            "otherCutting"
+                        ).checked
+                            ? "inline-block"
+                            : "none";
+
+                }
+            );
+
     }
 
 
     [
-        "otherCustomWidth",
-        "otherCustomHeight",
+        ".other-po",
         "otherStartBox",
         "otherEndBox",
+        "otherCopiesPerBox",
         "otherLabelsPerPage",
-        "otherPageCount",
+        "otherCustomWidth",
+        "otherCustomHeight",
+        "otherCutting",
+        "otherTaxBorder",
         "otherBorder",
         "otherBorderStyle",
         "otherFont",
         "otherFontSize"
     ]
     .forEach(
-        id => {
+        item => {
 
-            const element =
-                document.getElementById(
-                    id
+            const elements =
+                item.startsWith(".")
+                    ? document.querySelectorAll(
+                        item
+                    )
+                    : [
+                        document.getElementById(
+                            item
+                        )
+                    ];
+
+
+            elements
+                .forEach(
+                    element => {
+
+                        if (!element) {
+                            return;
+                        }
+
+
+                        element.addEventListener(
+                            "input",
+                            updateOtherPreview
+                        );
+
+
+                        element.addEventListener(
+                            "change",
+                            updateOtherPreview
+                        );
+
+                    }
                 );
 
-            if (!element) {
-                return;
-            }
-
-            element.addEventListener(
-                "input",
-                updateOtherPreview
-            );
-
-            element.addEventListener(
-                "change",
-                updateOtherPreview
-            );
         }
     );
 
@@ -2046,18 +3295,121 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
+    function buildOtherLabels(
+        po
+    ) {
+
+        const start =
+            Math.max(
+                1,
+                Math.min(
+                    200,
+                    Number(
+                        document.getElementById(
+                            "otherStartBox"
+                        ).value
+                    ) || 1
+                )
+            );
+
+
+        const end =
+            Math.max(
+                start,
+                Math.min(
+                    200,
+                    Number(
+                        document.getElementById(
+                            "otherEndBox"
+                        ).value
+                    ) || start
+                )
+            );
+
+
+        const copies =
+            Number(
+                document.getElementById(
+                    "otherCopiesPerBox"
+                ).value
+            ) || 1;
+
+
+        const result =
+            [];
+
+
+        if (
+            otherLayout() ===
+            "same"
+        ) {
+
+            for (
+                let box = start;
+                box <= end;
+                box++
+            ) {
+
+                for (
+                    let copy = 1;
+                    copy <= copies;
+                    copy++
+                ) {
+
+                    result.push({
+                        po,
+                        box,
+                        copy
+                    });
+
+                }
+
+            }
+
+        }
+        else {
+
+            for (
+                let box = start;
+                box <= end;
+                box++
+            ) {
+
+                for (
+                    let copy = 1;
+                    copy <= copies;
+                    copy++
+                ) {
+
+                    result.push({
+                        po,
+                        box,
+                        copy
+                    });
+
+                }
+
+            }
+
+        }
+
+
+        return result;
+
+    }
+
+
     document
         .getElementById(
             "otherGenerate"
         )
         .addEventListener(
             "click",
-            () => {
+            async () => {
 
-                const PDF =
-                    getPDFConstructor();
-
-                if (!PDF) {
+                if (
+                    !requirePDF()
+                ) {
                     return;
                 }
 
@@ -2069,7 +3421,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!pos.length) {
 
                     alert(
-                        "Please enter at least one PO."
+                        "Please enter at least one PO number."
+                    );
+
+                    return;
+                }
+
+
+                const start =
+                    Number(
+                        document.getElementById(
+                            "otherStartBox"
+                        ).value
+                    );
+
+
+                const end =
+                    Number(
+                        document.getElementById(
+                            "otherEndBox"
+                        ).value
+                    );
+
+
+                if (
+                    start < 1 ||
+                    start > 200 ||
+                    end < start ||
+                    end > 200
+                ) {
+
+                    alert(
+                        "Box range must be from 1 to 200."
                     );
 
                     return;
@@ -2098,305 +3481,243 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
 
-                const labels =
-                    Number(
+                const options = {
+
+                    page,
+
+                    labelsPerPage:
+                        Number(
+                            document.getElementById(
+                                "otherLabelsPerPage"
+                            ).value
+                        ) || 1,
+
+                    vertical:
+                        true,
+
+                    cutting:
                         document.getElementById(
-                            "otherLabelsPerPage"
-                        ).value
-                    ) || 1;
+                            "otherCutting"
+                        ).checked,
 
-
-                const pages =
-                    Number(
+                    taxBorder:
                         document.getElementById(
-                            "otherPageCount"
-                        ).value
-                    ) || 1;
+                            "otherTaxBorder"
+                        ).checked,
 
-
-                const start =
-                    Number(
+                    border:
                         document.getElementById(
-                            "otherStartBox"
-                        ).value
-                    ) || 1;
+                            "otherBorder"
+                        ).checked,
 
-
-                const end =
-                    Number(
+                    borderStyle:
                         document.getElementById(
-                            "otherEndBox"
+                            "otherBorderStyle"
+                        ).value,
+
+                    font:
+                        document.getElementById(
+                            "otherFont"
+                        ).value,
+
+                    fontSize:
+                        document.getElementById(
+                            "otherFontSize"
                         ).value
-                    ) || start;
+
+                };
 
 
-                const layout =
-                    getOtherLayout();
+                const zipEnabled =
+                    document.getElementById(
+                        "otherZip"
+                    ).checked;
 
 
-                const pdf =
-                    new PDF({
-
-                        orientation:
-                            getOrientation(
-                                page
-                            ),
-
-                        unit:
-                            "mm",
-
-                        format:
-                            [
-                                page.width,
-                                page.height
-                            ]
-                    });
-
-
-                const outputPages =
+                const zipFiles =
                     [];
 
 
-                if (
-                    layout ===
-                    "same"
+                const timestamp =
+                    currentDateTime();
+
+
+                for (
+                    const po of pos
                 ) {
 
-                    pos.forEach(
-                        po => {
-
-                            for (
-                                let p = 0;
-                                p < pages;
-                                p++
-                            ) {
-
-                                outputPages.push(
-                                    Array.from(
-                                        {
-                                            length:
-                                                labels
-                                        },
-                                        () => ({
-                                            po,
-                                            box:
-                                                start
-                                        })
-                                    )
-                                );
-
-                            }
-                        }
-                    );
-
-                }
-                else {
-
-                    pos.forEach(
-                        po => {
-
-                            let current =
-                                start;
+                    const labels =
+                        buildOtherLabels(
+                            po
+                        );
 
 
-                            while (
-                                current <=
-                                end
-                            ) {
-
-                                const pageLabels =
-                                    [];
+                    const pdf =
+                        createLabelPDF(
+                            labels,
+                            options
+                        );
 
 
-                                while (
-                                    pageLabels.length <
-                                    labels &&
-                                    current <=
-                                    end
-                                ) {
-
-                                    pageLabels.push({
-                                        po,
-                                        box:
-                                            current
-                                    });
+                    const filename =
+                        `${safeName(
+                            po
+                        )}_BOX${start}-${end}_${timestamp.date}_${timestamp.time}.pdf`;
 
 
-                                    current++;
-
-                                }
-
-
-                                outputPages.push(
-                                    pageLabels
-                                );
-
-                            }
-                        }
-                    );
-                }
+                    const blob =
+                        pdf.output(
+                            "blob"
+                        );
 
 
-                outputPages.forEach(
-                    (
-                        pageLabels,
-                        index
-                    ) => {
+                    zipFiles.push({
+                        name:
+                            filename,
+                        blob
+                    });
 
-                        if (
-                            index > 0
-                        ) {
 
-                            pdf.addPage(
-                                [
-                                    page.width,
-                                    page.height
-                                ],
-                                getOrientation(
-                                    page
+                    if (!zipEnabled) {
+
+                        downloadBlob(
+                            blob,
+                            filename
+                        );
+
+
+                        await new Promise(
+                            resolve =>
+                                setTimeout(
+                                    resolve,
+                                    350
                                 )
-                            );
-                        }
-
-
-                        drawPDFBorder(
-                            pdf,
-                            page.width,
-                            page.height,
-                            document.getElementById(
-                                "otherBorder"
-                            ).checked,
-                            document.getElementById(
-                                "otherBorderStyle"
-                            ).value
                         );
 
-
-                        const [
-                            rows,
-                            columns
-                        ] =
-                            getGrid(
-                                pageLabels.length
-                            );
-
-
-                        const cellWidth =
-                            page.width /
-                            columns;
-
-                        const cellHeight =
-                            page.height /
-                            rows;
-
-
-                        const font =
-                            getPdfFont(
-                                document.getElementById(
-                                    "otherFont"
-                                ).value
-                            );
-
-
-                        const fontSize =
-                            Number(
-                                document.getElementById(
-                                    "otherFontSize"
-                                ).value
-                            ) || 10;
-
-
-                        pageLabels.forEach(
-                            (
-                                item,
-                                i
-                            ) => {
-
-                                const row =
-                                    Math.floor(
-                                        i /
-                                        columns
-                                    );
-
-
-                                const column =
-                                    i %
-                                    columns;
-
-
-                                const centerX =
-                                    column *
-                                    cellWidth +
-                                    cellWidth /
-                                    2;
-
-
-                                const centerY =
-                                    row *
-                                    cellHeight +
-                                    cellHeight /
-                                    2;
-
-
-                                pdf.setFont(
-                                    font,
-                                    "bold"
-                                );
-
-
-                                pdf.setFontSize(
-                                    fontSize
-                                );
-
-
-                                pdf.text(
-                                    String(
-                                        item.po
-                                    ),
-                                    centerX,
-                                    centerY - 4,
-                                    {
-                                        align:
-                                            "center"
-                                    }
-                                );
-
-
-                                pdf.setFontSize(
-                                    Math.min(
-                                        40,
-                                        fontSize + 8
-                                    )
-                                );
-
-
-                                pdf.text(
-                                    `BOX ${item.box}`,
-                                    centerX,
-                                    centerY + 10,
-                                    {
-                                        align:
-                                            "center"
-                                    }
-                                );
-                            }
-                        );
                     }
-                );
+
+                }
 
 
-                downloadPDF(
-                    pdf,
-                    `${safeName(
-                        pos[0]
-                    )}_Other_PO_Labels.pdf`
-                );
+                if (
+                    zipEnabled
+                ) {
+
+                    await makeZip(
+                        zipFiles,
+                        `BooksWagon_OtherPO_${timestamp.date}_${timestamp.time}.zip`
+                    );
+
+                }
 
 
                 document.getElementById(
                     "otherStatus"
                 ).textContent =
-                    `Generated ${outputPages.length} page(s).`;
+                    `${pos.length} separate PDF(s) generated.`;
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "otherReset"
+        )
+        .addEventListener(
+            "click",
+            () => {
+
+                document
+                    .querySelectorAll(
+                        ".other-po"
+                    )
+                    .forEach(
+                        input =>
+                            input.value = ""
+                    );
+
+
+                otherExcelPOs =
+                    [];
+
+
+                document.getElementById(
+                    "otherExcel"
+                ).value = "";
+
+
+                document.getElementById(
+                    "otherExcelStatus"
+                ).textContent =
+                    "No file selected";
+
+
+                updateOtherPreview();
+
+            }
+        );
+
+
+    /* =====================================================
+       OTHER TABS
+    ====================================================== */
+
+    document
+        .querySelectorAll(
+            "[data-other-mode]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        document
+                            .querySelectorAll(
+                                "[data-other-mode]"
+                            )
+                            .forEach(
+                                item =>
+                                    item.classList.remove(
+                                        "active"
+                                    )
+                            );
+
+
+                        button.classList.add(
+                            "active"
+                        );
+
+
+                        const mode =
+                            button.dataset.otherMode;
+
+
+                        document
+                            .getElementById(
+                                "otherStickerMode"
+                            )
+                            .classList.toggle(
+                                "hidden",
+                                mode !==
+                                "sticker"
+                            );
+
+
+                        document
+                            .getElementById(
+                                "otherAddressMode"
+                            )
+                            .classList.toggle(
+                                "hidden",
+                                mode !==
+                                "address"
+                            );
+
+                    }
+                );
 
             }
         );
@@ -2405,6 +3726,91 @@ document.addEventListener("DOMContentLoaded", () => {
     /* =====================================================
        OTHER ADDRESS
     ====================================================== */
+
+    function ensureOtherAddressCustomInputs() {
+
+        const parent =
+            document.getElementById(
+                "otherAddressMode"
+            );
+
+
+        if (!parent) {
+            return;
+        }
+
+
+        if (
+            document.getElementById(
+                "otherCustomAddressSize"
+            )
+        ) {
+            return;
+        }
+
+
+        const card =
+            parent.querySelector(
+                ".workspace-card"
+            );
+
+
+        if (!card) {
+            return;
+        }
+
+
+        const wrapper =
+            document.createElement(
+                "div"
+            );
+
+
+        wrapper.id =
+            "otherCustomAddressSize";
+
+
+        wrapper.className =
+            "custom-grid";
+
+
+        wrapper.innerHTML = `
+            <input
+                id="otherCustomAddressWidth"
+                type="number"
+                min="1"
+                placeholder="Custom Width (mm)"
+            >
+
+            <input
+                id="otherCustomAddressHeight"
+                type="number"
+                min="1"
+                placeholder="Custom Height (mm)"
+            >
+        `;
+
+
+        const pageGrid =
+            card.querySelector(
+                ".page-grid"
+            );
+
+
+        if (pageGrid) {
+
+            pageGrid.insertAdjacentElement(
+                "afterend",
+                wrapper
+            );
+
+        }
+
+    }
+
+
+    ensureOtherAddressCustomInputs();
+
 
     document
         .querySelectorAll(
@@ -2437,13 +3843,34 @@ document.addEventListener("DOMContentLoaded", () => {
                         otherAddressSize =
                             button.dataset.otherAddressSize;
 
+
+                        const custom =
+                            document.getElementById(
+                                "otherCustomAddressSize"
+                            );
+
+
+                        if (custom) {
+
+                            custom.classList.toggle(
+                                "hidden",
+                                otherAddressSize !==
+                                "custom"
+                            );
+
+                        }
+
+
+                        updateOtherAddressPreview();
+
                     }
                 );
+
             }
         );
 
 
-    function updateOtherAddress() {
+    function updateOtherAddressPreview() {
 
         const from =
             document.getElementById(
@@ -2471,13 +3898,33 @@ document.addEventListener("DOMContentLoaded", () => {
             "TO";
 
 
-        document.getElementById(
-            "otherAddressPreview"
-        ).style.border =
+        const preview =
+            document.getElementById(
+                "otherAddressPreview"
+            );
+
+
+        preview.style.fontFamily =
+            document.getElementById(
+                "otherAddressFont"
+            ).value;
+
+
+        preview.style.fontSize =
+            `${
+                Number(
+                    document.getElementById(
+                        "otherAddressFontSize"
+                    ).value
+                ) || 10
+            }px`;
+
+
+        preview.style.border =
             document.getElementById(
                 "otherAddressBorder"
             ).checked
-                ? getCssBorder(
+                ? cssBorder(
                     document.getElementById(
                         "otherAddressBorderStyle"
                     ).value
@@ -2503,19 +3950,23 @@ document.addEventListener("DOMContentLoaded", () => {
                     id
                 );
 
+
             if (!element) {
                 return;
             }
 
+
             element.addEventListener(
                 "input",
-                updateOtherAddress
+                updateOtherAddressPreview
             );
+
 
             element.addEventListener(
                 "change",
-                updateOtherAddress
+                updateOtherAddressPreview
             );
+
         }
     );
 
@@ -2528,10 +3979,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             () => {
 
-                const PDF =
-                    getPDFConstructor();
-
-                if (!PDF) {
+                if (!requirePDF()) {
                     return;
                 }
 
@@ -2548,27 +3996,48 @@ document.addEventListener("DOMContentLoaded", () => {
                     ).value.trim();
 
 
-                if (!from || !to) {
+                if (
+                    !from ||
+                    !to
+                ) {
 
                     alert(
                         "From Address and To Address are mandatory."
                     );
 
                     return;
+
                 }
 
 
                 const page =
                     getPageSize(
-                        otherAddressSize
+                        otherAddressSize,
+                        document.getElementById(
+                            "otherCustomAddressWidth"
+                        )?.value,
+                        document.getElementById(
+                            "otherCustomAddressHeight"
+                        )?.value
                     );
+
+
+                if (!page) {
+
+                    alert(
+                        "Please enter valid custom size."
+                    );
+
+                    return;
+
+                }
 
 
                 const pdf =
                     new PDF({
 
                         orientation:
-                            getOrientation(
+                            orientation(
                                 page
                             ),
 
@@ -2583,7 +4052,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
 
 
-                drawPDFBorder(
+                drawBorder(
                     pdf,
                     page.width,
                     page.height,
@@ -2596,8 +4065,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
+                drawTaxBorder(
+                    pdf,
+                    page.width,
+                    page.height,
+                    document.getElementById(
+                        "otherAddressTaxBorder"
+                    ).checked
+                );
+
+
                 pdf.setFont(
-                    getPdfFont(
+                    pdfFont(
                         document.getElementById(
                             "otherAddressFont"
                         ).value
@@ -2615,7 +4094,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
-                let y = 20;
+                let y =
+                    20;
 
 
                 pdf.text(
@@ -2699,73 +4179,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     "otherFrom"
                 ).value = "";
 
+
                 document.getElementById(
                     "otherTo"
                 ).value = "";
+
 
                 document.getElementById(
                     "otherAddressBorder"
                 ).checked = false;
 
-                updateOtherAddress();
 
-            }
-        );
+                updateOtherAddressPreview();
 
-
-    document
-        .querySelectorAll(
-            "[data-other-mode]"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        document
-                            .querySelectorAll(
-                                "[data-other-mode]"
-                            )
-                            .forEach(
-                                item =>
-                                    item.classList.remove(
-                                        "active"
-                                    )
-                            );
-
-
-                        button.classList.add(
-                            "active"
-                        );
-
-
-                        const mode =
-                            button.dataset.otherMode;
-
-
-                        document
-                            .getElementById(
-                                "otherStickerMode"
-                            )
-                            .classList.toggle(
-                                "hidden",
-                                mode !== "sticker"
-                            );
-
-
-                        document
-                            .getElementById(
-                                "otherAddressMode"
-                            )
-                            .classList.toggle(
-                                "hidden",
-                                mode !== "address"
-                            );
-
-                    }
-                );
             }
         );
 
@@ -2773,9 +4199,6 @@ document.addEventListener("DOMContentLoaded", () => {
     /* =====================================================
        ISBN
     ====================================================== */
-
-    let isbnInputMode =
-        "manual";
 
     let isbnRows =
         [];
@@ -2839,109 +4262,152 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     }
                 );
+
             }
         );
 
 
-    function cleanISBN(value) {
+    /* -----------------------------------------------------
+       ISBN PAGE SIZE
+    ----------------------------------------------------- */
+
+    document
+        .querySelectorAll(
+            "[data-isbn-size]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        document
+                            .querySelectorAll(
+                                "[data-isbn-size]"
+                            )
+                            .forEach(
+                                item =>
+                                    item.classList.remove(
+                                        "active"
+                                    )
+                            );
+
+
+                        button.classList.add(
+                            "active"
+                        );
+
+
+                        isbnSize =
+                            button.dataset.isbnSize;
+
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* -----------------------------------------------------
+       ISBN NORMALIZATION
+    ----------------------------------------------------- */
+
+    function cleanISBN(
+        value
+    ) {
 
         return String(
             value || ""
+        )
+        .trim()
+        .replace(
+            /[\s-]/g,
+            ""
         )
         .replace(
             /[^0-9Xx]/g,
             ""
         );
+
     }
 
 
-    function toISBN13(value) {
-
-        const clean =
-            cleanISBN(
-                value
-            );
-
-
-        if (
-            /^\d{13}$/.test(
-                clean
-            )
-        ) {
-
-            return clean;
-        }
-
-
-        if (
-            clean.length === 10
-        ) {
-
-            const base =
-                "978" +
-                clean.substring(
-                    0,
-                    9
-                );
-
-
-            let sum = 0;
-
-
-            for (
-                let i = 0;
-                i < 12;
-                i++
-            ) {
-
-                sum +=
-                    Number(
-                        base[i]
-                    ) *
-                    (
-                        i % 2 === 0
-                            ? 1
-                            : 3
-                    );
-            }
-
-
-            const check =
-                (
-                    10 -
-                    (
-                        sum % 10
-                    )
-                ) %
-                10;
-
-
-            return (
-                base +
-                String(check)
-            );
-        }
-
-
-        return null;
-    }
-
-
-    function validISBN13(
-        isbn
+    function isbn10Check(
+        digits
     ) {
 
         if (
-            !/^\d{13}$/.test(
-                isbn
+            !/^[0-9]{9}[0-9Xx]$/.test(
+                digits
             )
         ) {
 
             return false;
+
         }
 
 
-        let sum = 0;
+        let sum =
+            0;
+
+
+        for (
+            let i = 0;
+            i < 9;
+            i++
+        ) {
+
+            sum +=
+                Number(
+                    digits[i]
+                ) *
+                (
+                    10 - i
+                );
+
+        }
+
+
+        const last =
+            digits[9].toUpperCase() ===
+            "X"
+                ? 10
+                : Number(
+                    digits[9]
+                );
+
+
+        sum +=
+            last;
+
+
+        return (
+            sum % 11 ===
+            0
+        );
+
+    }
+
+
+    function isbn13Check(
+        digits
+    ) {
+
+        if (
+            !/^\d{13}$/.test(
+                digits
+            )
+        ) {
+
+            return false;
+
+        }
+
+
+        let sum =
+            0;
 
 
         for (
@@ -2952,13 +4418,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             sum +=
                 Number(
-                    isbn[i]
+                    digits[i]
                 ) *
                 (
                     i % 2 === 0
                         ? 1
                         : 3
                 );
+
         }
 
 
@@ -2975,27 +4442,376 @@ document.addEventListener("DOMContentLoaded", () => {
         return (
             check ===
             Number(
-                isbn[12]
+                digits[12]
             )
         );
+
     }
 
 
-    const parityMap = {
+    function isbn10To13(
+        isbn10
+    ) {
 
-        0: "LLLLLL",
-        1: "LLGLGG",
-        2: "LLGGLG",
-        3: "LLGGGL",
-        4: "LGLLGG",
-        5: "LGGLLG",
-        6: "LGGGLL",
-        7: "LGLGLG",
-        8: "LGLGGL",
-        9: "LGGLGL"
+        const base =
+            "978" +
+            isbn10.substring(
+                0,
+                9
+            );
 
-    };
 
+        let sum =
+            0;
+
+
+        for (
+            let i = 0;
+            i < 12;
+            i++
+        ) {
+
+            sum +=
+                Number(
+                    base[i]
+                ) *
+                (
+                    i % 2 === 0
+                        ? 1
+                        : 3
+                );
+
+        }
+
+
+        const check =
+            (
+                10 -
+                (
+                    sum % 10
+                )
+            ) %
+            10;
+
+
+        return (
+            base +
+            String(
+                check
+            )
+        );
+
+    }
+
+
+    /*
+     * IMPORTANT:
+     * We still validate check digits.
+     * Spaces/hyphens do NOT cause invalid.
+     */
+
+    function normalizeToISBN13(
+        raw
+    ) {
+
+        const cleaned =
+            cleanISBN(
+                raw
+            );
+
+
+        if (
+            cleaned.length === 13
+        ) {
+
+            return isbn13Check(
+                cleaned
+            )
+                ? cleaned
+                : null;
+
+        }
+
+
+        if (
+            cleaned.length === 10
+        ) {
+
+            if (
+                !isbn10Check(
+                    cleaned
+                )
+            ) {
+
+                return null;
+
+            }
+
+
+            return isbn10To13(
+                cleaned
+            );
+
+        }
+
+
+        return null;
+
+    }
+
+
+    /* -----------------------------------------------------
+       ISBN DATA
+    ----------------------------------------------------- */
+
+    function getISBNRows() {
+
+        if (
+            isbnInputMode ===
+            "excel"
+        ) {
+
+            return [
+                ...isbnRows
+            ];
+
+        }
+
+
+        const isbnInputs =
+            document.querySelectorAll(
+                ".isbn-manual"
+            );
+
+
+        const titleInputs =
+            document.querySelectorAll(
+                ".title-manual"
+            );
+
+
+        const editionInputs =
+            document.querySelectorAll(
+                ".edition-manual"
+            );
+
+
+        const rows =
+            [];
+
+
+        isbnInputs.forEach(
+            (
+                input,
+                index
+            ) => {
+
+                const isbn =
+                    input.value.trim();
+
+
+                const title =
+                    titleInputs[
+                        index
+                    ].value.trim();
+
+
+                const edition =
+                    editionInputs[
+                        index
+                    ].value.trim();
+
+
+                if (
+                    isbn ||
+                    title ||
+                    edition
+                ) {
+
+                    rows.push({
+
+                        isbn,
+
+                        title,
+
+                        edition:
+                            edition ||
+                            "N"
+
+                    });
+
+                }
+
+            }
+        );
+
+
+        return rows;
+
+    }
+
+
+    /* -----------------------------------------------------
+       ISBN EXCEL
+    ----------------------------------------------------- */
+
+    document
+        .getElementById(
+            "isbnExcel"
+        )
+        .addEventListener(
+            "change",
+            async event => {
+
+                const file =
+                    event.target.files[0];
+
+
+                if (!file) {
+                    return;
+                }
+
+
+                if (!requireXLSX()) {
+                    return;
+                }
+
+
+                try {
+
+                    const buffer =
+                        await file.arrayBuffer();
+
+
+                    const workbook =
+                        XLSX_LIB.read(
+                            buffer,
+                            {
+                                type:
+                                    "array"
+                            }
+                        );
+
+
+                    const sheet =
+                        workbook.Sheets[
+                            workbook.SheetNames[0]
+                        ];
+
+
+                    const rows =
+                        XLSX_LIB.utils.sheet_to_json(
+                            sheet,
+                            {
+                                header:
+                                    1,
+
+                                defval:
+                                    ""
+                            }
+                        );
+
+
+                    isbnRows =
+                        [];
+
+
+                    rows.forEach(
+                        (
+                            row,
+                            index
+                        ) => {
+
+                            const isbn =
+                                String(
+                                    row?.[0] ||
+                                    ""
+                                ).trim();
+
+
+                            const title =
+                                String(
+                                    row?.[1] ||
+                                    ""
+                                ).trim();
+
+
+                            const edition =
+                                String(
+                                    row?.[2] ||
+                                    ""
+                                ).trim();
+
+
+                            if (
+                                index === 0 &&
+                                (
+                                    isbn.toLowerCase() ===
+                                    "isbn" ||
+                                    title.toLowerCase() ===
+                                    "book name"
+                                )
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            if (
+                                !isbn &&
+                                !title
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            isbnRows.push({
+
+                                isbn,
+
+                                title,
+
+                                edition:
+                                    edition ||
+                                    "N"
+
+                            });
+
+                        }
+                    );
+
+
+                    document.getElementById(
+                        "isbnExcelStatus"
+                    ).textContent =
+                        `${isbnRows.length} row(s) loaded`;
+
+
+                    updateISBNPreview();
+
+                }
+                catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+                    alert(
+                        "Unable to read ISBN Excel file."
+                    );
+
+                }
+
+            }
+        );
+
+
+    /* -----------------------------------------------------
+       EAN-13 BARCODE TABLES
+    ----------------------------------------------------- */
 
     const L = {
 
@@ -3045,19 +4861,39 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
+    const parity = {
+
+        0: "LLLLLL",
+        1: "LLGLGG",
+        2: "LLGGLG",
+        3: "LLGGGL",
+        4: "LGLLGG",
+        5: "LGGLLG",
+        6: "LGGGLL",
+        7: "LGLGLG",
+        8: "LGLGGL",
+        9: "LGGLGL"
+
+    };
+
+
     function eanPattern(
         isbn
     ) {
 
-        let pattern =
+        const first =
+            Number(
+                isbn[0]
+            );
+
+
+        let output =
             "101";
 
 
-        const parity =
-            parityMap[
-                Number(
-                    isbn[0]
-                )
+        const p =
+            parity[
+                first
             ];
 
 
@@ -3073,14 +4909,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
-            pattern +=
-                parity[i - 1] === "L"
+            output +=
+                p[
+                    i - 1
+                ] === "L"
+
                     ? L[digit]
+
                     : G[digit];
+
         }
 
 
-        pattern +=
+        output +=
             "01010";
 
 
@@ -3090,20 +4931,22 @@ document.addEventListener("DOMContentLoaded", () => {
             i++
         ) {
 
-            pattern +=
+            output +=
                 R[
                     Number(
                         isbn[i]
                     )
                 ];
+
         }
 
 
-        pattern +=
+        output +=
             "101";
 
 
-        return pattern;
+        return output;
+
     }
 
 
@@ -3148,234 +4991,27 @@ document.addEventListener("DOMContentLoaded", () => {
                     x +
                     i *
                     moduleWidth,
+
                     y,
-                    moduleWidth + .01,
+
+                    moduleWidth +
+                    0.01,
+
                     height,
+
                     "F"
                 );
+
             }
+
         }
+
     }
 
 
-    function getISBNRows() {
-
-        if (
-            isbnInputMode ===
-            "excel"
-        ) {
-
-            return [
-                ...isbnRows
-            ];
-        }
-
-
-        const isbnInputs =
-            document.querySelectorAll(
-                ".isbn-manual"
-            );
-
-        const titleInputs =
-            document.querySelectorAll(
-                ".title-manual"
-            );
-
-        const editionInputs =
-            document.querySelectorAll(
-                ".edition-manual"
-            );
-
-
-        const rows = [];
-
-
-        isbnInputs.forEach(
-            (
-                input,
-                index
-            ) => {
-
-                const isbn =
-                    input.value.trim();
-
-                const title =
-                    titleInputs[
-                        index
-                    ].value.trim();
-
-                const edition =
-                    editionInputs[
-                        index
-                    ].value.trim();
-
-
-                if (
-                    isbn ||
-                    title ||
-                    edition
-                ) {
-
-                    rows.push({
-
-                        isbn,
-
-                        title,
-
-                        edition:
-                            edition ||
-                            "N"
-                    });
-                }
-            }
-        );
-
-
-        return rows;
-    }
-
-
-    document
-        .getElementById(
-            "isbnExcel"
-        )
-        .addEventListener(
-            "change",
-            async event => {
-
-                const file =
-                    event.target.files[0];
-
-
-                if (!file) {
-                    return;
-                }
-
-
-                if (!hasXLSX()) {
-                    return;
-                }
-
-
-                try {
-
-                    const buffer =
-                        await file.arrayBuffer();
-
-
-                    const workbook =
-                        XLSX.read(
-                            buffer,
-                            {
-                                type: "array"
-                            }
-                        );
-
-
-                    const sheet =
-                        workbook.Sheets[
-                            workbook.SheetNames[0]
-                        ];
-
-
-                    const rows =
-                        XLSX.utils.sheet_to_json(
-                            sheet,
-                            {
-                                header: 1,
-                                defval: ""
-                            }
-                        );
-
-
-                    isbnRows = [];
-
-
-                    rows.forEach(
-                        (
-                            row,
-                            index
-                        ) => {
-
-                            const isbn =
-                                String(
-                                    row[0] ||
-                                    ""
-                                ).trim();
-
-
-                            const title =
-                                String(
-                                    row[1] ||
-                                    ""
-                                ).trim();
-
-
-                            const edition =
-                                String(
-                                    row[2] ||
-                                    ""
-                                ).trim();
-
-
-                            if (
-                                index === 0 &&
-                                (
-                                    isbn.toLowerCase() ===
-                                    "isbn" ||
-                                    title.toLowerCase() ===
-                                    "book name"
-                                )
-                            ) {
-
-                                return;
-                            }
-
-
-                            if (
-                                !isbn &&
-                                !title
-                            ) {
-
-                                return;
-                            }
-
-
-                            isbnRows.push({
-
-                                isbn,
-
-                                title,
-
-                                edition:
-                                    edition ||
-                                    "N"
-                            });
-
-                        }
-                    );
-
-
-                    document.getElementById(
-                        "isbnExcelStatus"
-                    ).textContent =
-                        `${isbnRows.length} row(s) loaded`;
-
-
-                    updateISBNPreview();
-
-                }
-                catch (error) {
-
-                    console.error(error);
-
-                    alert(
-                        "Unable to read ISBN Excel file."
-                    );
-                }
-            }
-        );
-
+    /* -----------------------------------------------------
+       ISBN PREVIEW
+    ----------------------------------------------------- */
 
     function updateISBNPreview() {
 
@@ -3412,16 +5048,21 @@ document.addEventListener("DOMContentLoaded", () => {
             number.textContent =
                 "9780000000000";
 
+
             title.textContent =
                 "Book Title";
+
 
             edition.textContent =
                 "N";
 
+
             barcode.innerHTML =
                 "";
 
+
             return;
+
         }
 
 
@@ -3430,7 +5071,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         const isbn13 =
-            toISBN13(
+            normalizeToISBN13(
                 row.isbn
             );
 
@@ -3438,12 +5079,12 @@ document.addEventListener("DOMContentLoaded", () => {
         number.textContent =
             isbn13 ||
             row.isbn ||
-            "9780000000000";
+            "";
 
 
         title.textContent =
             row.title ||
-            "Book Title";
+            "";
 
 
         edition.textContent =
@@ -3456,10 +5097,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         if (
-            isbn13 &&
-            validISBN13(
-                isbn13
-            )
+            isbn13
         ) {
 
             const pattern =
@@ -3484,10 +5122,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                         bar.style.width =
-                            `${
+                            `${(
                                 100 /
                                 pattern.length
-                            }%`;
+                            )}%`;
 
 
                         bar.style.background =
@@ -3499,33 +5137,77 @@ document.addEventListener("DOMContentLoaded", () => {
                         barcode.appendChild(
                             bar
                         );
+
                     }
                 );
+
         }
+
     }
 
 
-    [
-        ...document.querySelectorAll(
-            ".isbn-manual"
-        ),
-        ...document.querySelectorAll(
-            ".title-manual"
-        ),
-        ...document.querySelectorAll(
+    document
+        .querySelectorAll(
+            ".isbn-manual," +
+            ".title-manual," +
             ".edition-manual"
         )
+        .forEach(
+            input => {
+
+                input.addEventListener(
+                    "input",
+                    updateISBNPreview
+                );
+
+            }
+        );
+
+
+    /* -----------------------------------------------------
+       ISBN SETTINGS
+    ----------------------------------------------------- */
+
+    [
+        "isbnLabelsPerPage",
+        "isbnFontSize",
+        "isbnBorder",
+        "isbnTaxBorder",
+        "isbnBorderStyle",
+        "isbnFont"
     ]
     .forEach(
-        input => {
+        id => {
 
-            input.addEventListener(
+            const element =
+                document.getElementById(
+                    id
+                );
+
+
+            if (!element) {
+                return;
+            }
+
+
+            element.addEventListener(
                 "input",
                 updateISBNPreview
             );
+
+
+            element.addEventListener(
+                "change",
+                updateISBNPreview
+            );
+
         }
     );
 
+
+    /* -----------------------------------------------------
+       ISBN PDF
+    ----------------------------------------------------- */
 
     document
         .getElementById(
@@ -3535,11 +5217,9 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             () => {
 
-                const PDF =
-                    getPDFConstructor();
-
-
-                if (!PDF) {
+                if (
+                    !requirePDF()
+                ) {
                     return;
                 }
 
@@ -3558,14 +5238,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
 
-                const validRows = [];
+                const validRows =
+                    [];
 
 
                 for (
                     const row of rows
                 ) {
 
-                    if (!row.isbn) {
+                    if (
+                        !row.isbn
+                    ) {
 
                         alert(
                             "ISBN is mandatory."
@@ -3575,7 +5258,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
 
-                    if (!row.title) {
+                    if (
+                        !row.title
+                    ) {
 
                         alert(
                             "Book Name is mandatory."
@@ -3585,21 +5270,27 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
 
+                    /*
+                     * Allows:
+                     * 978-...
+                     * 978 ...
+                     * ISBN-10
+                     * ISBN-13
+                     */
+
                     const isbn13 =
-                        toISBN13(
+                        normalizeToISBN13(
                             row.isbn
                         );
 
 
                     if (
-                        !isbn13 ||
-                        !validISBN13(
-                            isbn13
-                        )
+                        !isbn13
                     ) {
 
                         alert(
-                            `Invalid ISBN: ${row.isbn}`
+                            `Invalid ISBN: ${row.isbn}\n\n` +
+                            "Please check the ISBN digits/check digit."
                         );
 
                         return;
@@ -3617,6 +5308,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         edition:
                             row.edition ||
                             "N"
+
                     });
 
                 }
@@ -3624,16 +5316,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const page =
                     getPageSize(
-                        document.getElementById(
-                            "isbnPageSize"
-                        ).value
+                        isbnSize
                     );
 
 
                 if (!page) {
 
                     alert(
-                        "Invalid page size."
+                        "Please select a valid page size."
                     );
 
                     return;
@@ -3652,7 +5342,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     new PDF({
 
                         orientation:
-                            getOrientation(
+                            orientation(
                                 page
                             ),
 
@@ -3664,7 +5354,16 @@ document.addEventListener("DOMContentLoaded", () => {
                                 page.width,
                                 page.height
                             ]
+
                     });
+
+
+                const font =
+                    pdfFont(
+                        document.getElementById(
+                            "isbnFont"
+                        ).value
+                    );
 
 
                 const fontSize =
@@ -3675,7 +5374,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     ) || 10;
 
 
-                let generatedPages = 0;
+                const border =
+                    document.getElementById(
+                        "isbnBorder"
+                    ).checked;
+
+
+                const borderStyle =
+                    document.getElementById(
+                        "isbnBorderStyle"
+                    ).value;
+
+
+                const taxBorder =
+                    document.getElementById(
+                        "isbnTaxBorder"
+                    ).checked;
 
 
                 for (
@@ -3686,7 +5400,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         labelsPerPage
                 ) {
 
-                    const pageRows =
+                    const currentRows =
                         validRows.slice(
                             start,
                             start +
@@ -3695,8 +5409,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     if (
-                        generatedPages >
-                        0
+                        start > 0
                     ) {
 
                         pdf.addPage(
@@ -3704,23 +5417,28 @@ document.addEventListener("DOMContentLoaded", () => {
                                 page.width,
                                 page.height
                             ],
-                            getOrientation(
+                            orientation(
                                 page
                             )
                         );
+
                     }
 
 
-                    drawPDFBorder(
+                    drawBorder(
                         pdf,
                         page.width,
                         page.height,
-                        document.getElementById(
-                            "isbnBorder"
-                        ).checked,
-                        document.getElementById(
-                            "isbnBorderStyle"
-                        ).value
+                        border,
+                        borderStyle
+                    );
+
+
+                    drawTaxBorder(
+                        pdf,
+                        page.width,
+                        page.height,
+                        taxBorder
                     );
 
 
@@ -3729,7 +5447,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         columnsGrid
                     ] =
                         getGrid(
-                            pageRows.length
+                            currentRows.length
                         );
 
 
@@ -3743,7 +5461,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         rowsGrid;
 
 
-                    pageRows.forEach(
+                    currentRows.forEach(
                         (
                             row,
                             index
@@ -3774,15 +5492,16 @@ document.addEventListener("DOMContentLoaded", () => {
                             const barcodeWidth =
                                 Math.min(
                                     55,
-                                    cellWidth - 12
+                                    cellWidth -
+                                    12
                                 );
 
 
                             const barcodeHeight =
                                 Math.min(
-                                    28,
+                                    30,
                                     cellHeight *
-                                    .28
+                                    0.28
                                 );
 
 
@@ -3829,6 +5548,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             );
 
 
+                            pdf.setFont(
+                                font,
+                                "bold"
+                            );
+
+
                             pdf.setFontSize(
                                 Math.min(
                                     13,
@@ -3840,7 +5565,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             const titleLines =
                                 pdf.splitTextToSize(
                                     row.title,
-                                    cellWidth - 12
+                                    cellWidth -
+                                    12
                                 );
 
 
@@ -3856,6 +5582,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                     align:
                                         "center"
                                 }
+                            );
+
+
+                            pdf.setFont(
+                                font,
+                                "normal"
                             );
 
 
@@ -3884,9 +5616,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     );
 
-
-                    generatedPages++;
-
                 }
 
 
@@ -3899,11 +5628,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById(
                     "isbnStatus"
                 ).textContent =
-                    `Generated ${validRows.length} barcode label(s).`;
+                    `${validRows.length} barcode label(s) generated.`;
 
             }
         );
 
+
+    /* -----------------------------------------------------
+       ISBN RESET
+    ----------------------------------------------------- */
 
     document
         .getElementById(
@@ -3943,12 +5676,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
 
-                isbnRows = [];
+                isbnRows =
+                    [];
 
 
                 document.getElementById(
                     "isbnExcel"
-                ).value = "";
+                ).value =
+                    "";
 
 
                 document.getElementById(
@@ -3964,18 +5699,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       INITIALIZE
+       INITIAL UPDATE
     ====================================================== */
 
     updateCocoPreview();
-    updateCocoAddress();
+
+    updateCocoAddressPreview();
+
     updateOtherPreview();
-    updateOtherAddress();
+
+    updateOtherAddressPreview();
+
     updateISBNPreview();
 
 
     console.log(
-        "BooksWagon Label Studio JS loaded."
+        "BooksWagon Label Studio: ready."
     );
 
 });
