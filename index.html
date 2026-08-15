@@ -4,26 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BooksWagon — Label Studio</title>
+<title>BooksWagon Label Studio</title>
 
+<!-- PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<!-- QR -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
 :root{
     --navy:#203d72;
-    --navy-dark:#132b54;
+    --navy2:#132b54;
     --yellow:#ffc83d;
-    --yellow-dark:#dca800;
+    --bg:#f4f6f9;
     --white:#fff;
-    --bg:#f5f7fa;
     --text:#172033;
-    --muted:#687386;
+    --muted:#6b7483;
     --border:#dce2ea;
     --green:#149c60;
     --red:#d83d3d;
-    --shadow:0 12px 35px rgba(20,45,85,.10);
+    --shadow:0 10px 30px rgba(20,45,85,.10);
 }
 
 *{
@@ -61,18 +65,15 @@ a{
     margin:auto;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* ================= HEADER ================= */
 
 .topbar{
     position:sticky;
     top:0;
     z-index:1000;
     background:var(--navy);
-    color:#fff;
     border-bottom:3px solid var(--yellow);
-    box-shadow:0 4px 18px rgba(0,0,0,.15);
+    box-shadow:0 4px 15px rgba(0,0,0,.15);
 }
 
 .topbar-inner{
@@ -80,16 +81,15 @@ a{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:20px;
 }
 
 .brand{
     color:#fff;
+    font-size:22px;
+    font-weight:900;
     display:flex;
     align-items:center;
     gap:10px;
-    font-size:22px;
-    font-weight:900;
 }
 
 .brand-mark{
@@ -105,34 +105,26 @@ a{
 .nav{
     display:flex;
     gap:22px;
-    align-items:center;
 }
 
 .nav a{
-    color:rgba(255,255,255,.85);
+    color:#fff;
     font-size:11px;
     font-weight:800;
 }
 
-.nav a:hover{
-    color:var(--yellow);
-}
-
-/* =========================
-   HERO
-========================= */
+/* ================= HERO ================= */
 
 .hero{
     background:var(--navy);
     color:#fff;
-    padding:75px 0 95px;
-    overflow:hidden;
+    padding:70px 0 85px;
 }
 
 .hero-grid{
     display:grid;
     grid-template-columns:1.1fr .9fr;
-    gap:70px;
+    gap:60px;
     align-items:center;
 }
 
@@ -141,7 +133,7 @@ a{
     font-size:10px;
     font-weight:900;
     letter-spacing:2px;
-    margin-bottom:14px;
+    margin-bottom:12px;
 }
 
 .hero h1{
@@ -149,7 +141,6 @@ a{
     font-family:Georgia,serif;
     font-size:clamp(42px,6vw,68px);
     line-height:1;
-    letter-spacing:-2px;
 }
 
 .hero h1 span{
@@ -157,7 +148,7 @@ a{
 }
 
 .hero p{
-    max-width:590px;
+    max-width:600px;
     color:rgba(255,255,255,.75);
     font-size:13px;
     line-height:1.8;
@@ -166,8 +157,8 @@ a{
 .hero-buttons{
     display:flex;
     gap:10px;
-    flex-wrap:wrap;
     margin-top:25px;
+    flex-wrap:wrap;
 }
 
 .btn{
@@ -175,20 +166,21 @@ a{
     padding:0 17px;
     border:0;
     border-radius:5px;
+    font-size:10px;
+    font-weight:900;
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    font-size:10px;
-    font-weight:900;
 }
 
 .btn-primary{
     background:var(--yellow);
-    color:var(--navy-dark);
+    color:var(--navy2);
 }
 
-.btn-primary:hover{
-    background:#ffd766;
+.btn-secondary{
+    background:#eef1f5;
+    color:var(--navy);
 }
 
 .btn-outline{
@@ -197,45 +189,27 @@ a{
     border:1px solid rgba(255,255,255,.4);
 }
 
-.btn-outline:hover{
-    border-color:var(--yellow);
-    color:var(--yellow);
-}
-
 .book-preview{
     width:220px;
     height:300px;
     margin:auto;
-    padding:25px;
     background:#f8f5e9;
     color:var(--navy);
-    box-shadow:20px 25px 50px rgba(0,0,0,.3);
-    transform:rotate(-2deg);
+    padding:25px;
     display:flex;
     flex-direction:column;
     justify-content:space-between;
     text-align:center;
-}
-
-.book-preview .small{
-    font-size:8px;
-    font-weight:900;
-    letter-spacing:1px;
+    box-shadow:20px 25px 50px rgba(0,0,0,.3);
+    transform:rotate(-2deg);
 }
 
 .book-preview h2{
     font-family:Georgia,serif;
-    font-size:29px;
-    line-height:1;
+    font-size:28px;
 }
 
-.book-preview .icon{
-    font-size:65px;
-}
-
-/* =========================
-   SECTIONS
-========================= */
+/* ================= SECTIONS ================= */
 
 .section{
     padding:70px 0;
@@ -265,34 +239,30 @@ a{
     font-size:12px;
 }
 
-/* =========================
-   TOOL CARDS
-========================= */
+/* ================= TOOLS ================= */
 
 .tool-grid{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:18px;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
 }
 
 .tool-card{
-    width:100%;
+    padding:24px;
     text-align:left;
-    padding:25px;
     background:#fff;
     border:1px solid var(--border);
     border-top:4px solid var(--yellow);
     box-shadow:var(--shadow);
-    transition:.18s ease;
+    transition:.2s;
 }
 
 .tool-card:hover{
     transform:translateY(-4px);
-    border-color:var(--yellow-dark);
 }
 
 .tool-number{
-    color:var(--yellow-dark);
+    color:#c79500;
     font-size:9px;
     font-weight:900;
 }
@@ -301,12 +271,12 @@ a{
     margin:9px 0;
     color:var(--navy);
     font-family:Georgia,serif;
-    font-size:24px;
+    font-size:22px;
 }
 
 .tool-card p{
     color:var(--muted);
-    font-size:11px;
+    font-size:10px;
     line-height:1.7;
 }
 
@@ -314,7 +284,7 @@ a{
     display:flex;
     flex-wrap:wrap;
     gap:5px;
-    margin-top:18px;
+    margin-top:15px;
 }
 
 .tags span{
@@ -325,9 +295,7 @@ a{
     font-weight:900;
 }
 
-/* =========================
-   WORKSPACE
-========================= */
+/* ================= WORKSPACE ================= */
 
 .workspace{
     display:none;
@@ -350,8 +318,8 @@ a{
     background:var(--navy);
     color:#fff;
     display:flex;
-    justify-content:space-between;
     align-items:center;
+    justify-content:space-between;
     gap:20px;
 }
 
@@ -367,20 +335,9 @@ a{
     font-size:10px;
 }
 
-.workspace-kicker{
-    color:var(--yellow);
-    font-size:9px;
-    font-weight:900;
-    letter-spacing:1px;
-}
-
 .workspace-body{
     padding:28px;
 }
-
-/* =========================
-   TOOL SELECTOR
-========================= */
 
 .tool-selector{
     display:flex;
@@ -393,8 +350,8 @@ a{
     padding:10px 16px;
     background:#fff;
     border:1px solid var(--border);
-    color:var(--muted);
     border-radius:4px;
+    color:var(--muted);
     font-size:10px;
     font-weight:900;
 }
@@ -405,23 +362,17 @@ a{
     border-color:var(--navy);
 }
 
-/* =========================
-   CONFIG SECTIONS
-========================= */
+/* ================= CONFIG ================= */
 
 .config-section{
     padding:25px 0;
     border-bottom:1px solid var(--border);
 }
 
-.config-section:first-child{
-    padding-top:0;
-}
-
 .section-title{
     display:flex;
-    align-items:center;
     gap:10px;
+    align-items:center;
     margin-bottom:17px;
 }
 
@@ -430,10 +381,10 @@ a{
     height:28px;
     min-width:28px;
     border-radius:50%;
-    background:var(--yellow);
-    color:var(--navy-dark);
     display:grid;
     place-items:center;
+    background:var(--yellow);
+    color:var(--navy2);
     font-size:9px;
     font-weight:900;
 }
@@ -450,73 +401,7 @@ a{
     font-size:10px;
 }
 
-/* =========================
-   INPUT TABS
-========================= */
-
-.input-tabs{
-    display:flex;
-    gap:6px;
-    margin-bottom:14px;
-    flex-wrap:wrap;
-}
-
-.input-tab{
-    padding:9px 13px;
-    background:#fff;
-    border:1px solid var(--border);
-    color:var(--muted);
-    border-radius:4px;
-    font-size:9px;
-    font-weight:900;
-}
-
-.input-tab.active{
-    background:var(--navy);
-    color:#fff;
-    border-color:var(--navy);
-}
-
-.input-panel{
-    display:none;
-}
-
-.input-panel.active{
-    display:block;
-}
-
-/* =========================
-   20 PO FIELDS
-========================= */
-
-.po-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:9px;
-}
-
-.po-field{
-    position:relative;
-}
-
-.po-field span{
-    position:absolute;
-    left:9px;
-    top:50%;
-    transform:translateY(-50%);
-    color:#9aa3b2;
-    font-size:8px;
-    font-weight:900;
-    pointer-events:none;
-}
-
-.po-field input{
-    padding-left:38px;
-}
-
-/* =========================
-   FORM
-========================= */
+/* ================= INPUTS ================= */
 
 .form-grid{
     display:grid;
@@ -553,13 +438,208 @@ textarea:focus{
 }
 
 textarea{
-    min-height:120px;
+    min-height:110px;
     resize:vertical;
 }
 
-/* =========================
-   CHECKBOXES
-========================= */
+input[type="file"]{
+    padding:8px;
+}
+
+/* ================= TABS ================= */
+
+.input-tabs{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+}
+
+.input-tab{
+    padding:9px 13px;
+    background:#fff;
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:4px;
+    font-size:9px;
+    font-weight:900;
+}
+
+.input-tab.active{
+    background:var(--navy);
+    color:#fff;
+}
+
+.input-panel{
+    display:none;
+}
+
+.input-panel.active{
+    display:block;
+}
+
+/* ================= PO ================= */
+
+.po-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:9px;
+}
+
+.po-field{
+    position:relative;
+}
+
+.po-field span{
+    position:absolute;
+    left:9px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#9aa3b2;
+    font-size:8px;
+    font-weight:900;
+    pointer-events:none;
+}
+
+.po-field input{
+    padding-left:38px;
+}
+
+/* ================= EXCEL ================= */
+
+.excel-box{
+    padding:22px;
+    border:1px dashed #aeb8c6;
+    background:#f8fafc;
+}
+
+.excel-box h4{
+    margin:0 0 6px;
+    color:var(--navy);
+    font-size:13px;
+}
+
+.excel-box p{
+    margin:0 0 15px;
+    color:var(--muted);
+    font-size:10px;
+    line-height:1.6;
+}
+
+.excel-status{
+    margin-top:10px;
+    color:var(--green);
+    font-size:10px;
+    font-weight:900;
+}
+
+.excel-preview{
+    margin-top:15px;
+    overflow:auto;
+    max-height:220px;
+    border:1px solid var(--border);
+}
+
+.excel-preview table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+}
+
+.excel-preview th,
+.excel-preview td{
+    padding:8px;
+    border:1px solid var(--border);
+    text-align:left;
+    font-size:9px;
+    white-space:nowrap;
+}
+
+.excel-preview th{
+    background:var(--navy);
+    color:#fff;
+}
+
+/* ================= ADDRESS ================= */
+
+.address-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.address-card{
+    padding:18px;
+    background:#f8fafc;
+    border:1px solid var(--border);
+}
+
+.address-card h4{
+    margin:0 0 12px;
+    color:var(--navy);
+    font-size:12px;
+}
+
+.address-card textarea{
+    min-height:130px;
+}
+
+.address-preview{
+    margin-top:10px;
+    padding:10px;
+    background:#fff;
+    border:1px solid #e1e5eb;
+    color:var(--muted);
+    font-size:9px;
+    line-height:1.6;
+}
+
+/* ================= ADDRESS STICKER ================= */
+
+.address-sticker-preview{
+    width:min(100%,620px);
+    min-height:300px;
+    margin:20px auto;
+    padding:28px;
+    background:#fff;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+    align-items:center;
+    border:2px solid #111827;
+    box-shadow:var(--shadow);
+}
+
+.address-side{
+    padding:20px;
+}
+
+.address-side:first-child{
+    border-right:1px dashed #888;
+}
+
+.address-side small{
+    display:block;
+    color:#888;
+    font-size:9px;
+    font-weight:900;
+    margin-bottom:8px;
+}
+
+.address-side strong{
+    display:block;
+    color:var(--navy);
+    font-size:18px;
+    margin-bottom:10px;
+}
+
+.address-side div{
+    white-space:pre-line;
+    font-size:11px;
+    line-height:1.6;
+}
+
+/* ================= CHECKBOX ================= */
 
 .checkbox-grid{
     display:grid;
@@ -577,11 +657,10 @@ textarea{
     background:#fff;
     cursor:pointer;
     border-radius:4px;
-    transition:.15s ease;
 }
 
 .feature-checkbox:hover{
-    border-color:var(--yellow-dark);
+    border-color:#dca800;
     background:#fffdf5;
 }
 
@@ -621,39 +700,7 @@ textarea{
     font-weight:800;
 }
 
-/* =========================
-   UPLOAD
-========================= */
-
-.upload-box{
-    padding:25px;
-    background:#f8fafc;
-    border:1px dashed #b9c2cf;
-    text-align:center;
-}
-
-.upload-box input{
-    margin-bottom:10px;
-}
-
-.upload-label{
-    display:block;
-    color:var(--navy);
-}
-
-.upload-label strong{
-    display:block;
-    font-size:12px;
-}
-
-.upload-label small{
-    color:var(--muted);
-    font-size:9px;
-}
-
-/* =========================
-   PREVIEW
-========================= */
+/* ================= PREVIEW ================= */
 
 .preview-section{
     margin-top:28px;
@@ -662,34 +709,20 @@ textarea{
     border:1px solid var(--border);
 }
 
-.preview-header span{
-    color:var(--navy);
-    font-size:9px;
-    font-weight:900;
-    letter-spacing:1px;
-}
-
-.preview-header h3{
-    margin:4px 0 20px;
-    color:var(--navy);
-    font-family:Georgia,serif;
-    font-size:22px;
-}
-
 .preview-page{
     width:min(100%,600px);
     min-height:420px;
     margin:auto;
+    padding:30px;
     background:#fff;
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:30px;
-    transition:.2s ease;
 }
 
 .preview-content{
     width:85%;
+    padding:20px;
     text-align:center;
 }
 
@@ -715,9 +748,7 @@ textarea{
     display:none!important;
 }
 
-/* =========================
-   ACTIONS
-========================= */
+/* ================= ACTIONS ================= */
 
 .workspace-actions{
     display:flex;
@@ -728,49 +759,7 @@ textarea{
     border-top:1px solid var(--border);
 }
 
-.btn-secondary{
-    background:#eef1f5;
-    color:var(--navy);
-}
-
-/* =========================
-   FEATURES
-========================= */
-
-.feature-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:15px;
-}
-
-.feature-card{
-    padding:22px;
-    background:#fff;
-    border:1px solid var(--border);
-    box-shadow:var(--shadow);
-}
-
-.feature-card strong{
-    color:var(--yellow-dark);
-    font-size:27px;
-}
-
-.feature-card h3{
-    margin:6px 0;
-    color:var(--navy);
-    font-size:14px;
-}
-
-.feature-card p{
-    margin:0;
-    color:var(--muted);
-    font-size:10px;
-    line-height:1.6;
-}
-
-/* =========================
-   SUPPORT
-========================= */
+/* ================= SUPPORT ================= */
 
 .support-card{
     padding:30px;
@@ -789,12 +778,6 @@ textarea{
     font-size:30px;
 }
 
-.support-card p{
-    color:var(--muted);
-    font-size:11px;
-    line-height:1.7;
-}
-
 .address-link,
 .email-link{
     display:block;
@@ -802,12 +785,6 @@ textarea{
     font-size:11px;
     font-weight:800;
     line-height:1.8;
-}
-
-.address-link:hover,
-.email-link:hover{
-    color:#0b65c2;
-    text-decoration:underline;
 }
 
 .created{
@@ -848,16 +825,7 @@ textarea{
     place-items:center;
 }
 
-.qr-card small{
-    display:block;
-    margin-top:9px;
-    color:var(--muted);
-    font-size:8px;
-}
-
-/* =========================
-   FOOTER
-========================= */
+/* ================= FOOTER ================= */
 
 footer{
     background:var(--navy);
@@ -873,7 +841,6 @@ footer{
 }
 
 .footer-brand{
-    color:#fff;
     font-size:20px;
     font-weight:900;
 }
@@ -890,10 +857,6 @@ footer{
     line-height:1.7;
 }
 
-.footer-grid a:hover{
-    color:var(--yellow);
-}
-
 .footer-bottom{
     padding:13px 0;
     border-top:1px solid rgba(255,255,255,.1);
@@ -903,9 +866,7 @@ footer{
     justify-content:space-between;
 }
 
-/* =========================
-   TOAST
-========================= */
+/* ================= TOAST ================= */
 
 #toastContainer{
     position:fixed;
@@ -925,7 +886,6 @@ footer{
     color:var(--green);
     font-size:10px;
     font-weight:800;
-    animation:toastIn .2s ease;
 }
 
 .toast.error{
@@ -933,20 +893,15 @@ footer{
     border-left-color:var(--red);
 }
 
-@keyframes toastIn{
-    from{
-        opacity:0;
-        transform:translateX(20px);
-    }
-    to{
-        opacity:1;
-        transform:translateX(0);
-    }
-}
+/* ================= RESPONSIVE ================= */
 
-/* =========================
-   RESPONSIVE
-========================= */
+@media(max-width:1050px){
+
+    .tool-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
 
 @media(max-width:900px){
 
@@ -954,21 +909,18 @@ footer{
         grid-template-columns:1fr;
     }
 
-    .tool-grid{
-        grid-template-columns:1fr;
+    .form-grid{
+        grid-template-columns:repeat(2,1fr);
     }
 
     .po-grid{
         grid-template-columns:repeat(2,1fr);
     }
 
-    .form-grid{
-        grid-template-columns:repeat(2,1fr);
+    .support-card{
+        grid-template-columns:1fr;
     }
 
-    .feature-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
 }
 
 @media(max-width:650px){
@@ -977,34 +929,23 @@ footer{
         display:none;
     }
 
-    .hero{
-        padding:55px 0 70px;
-    }
-
-    .hero h1{
-        font-size:43px;
-    }
-
-    .workspace-header{
-        flex-direction:column;
-        align-items:flex-start;
+    .tool-grid,
+    .form-grid,
+    .po-grid,
+    .checkbox-grid,
+    .address-grid,
+    .address-sticker-preview,
+    .footer-grid{
+        grid-template-columns:1fr;
     }
 
     .workspace-body{
         padding:18px;
     }
 
-    .po-grid,
-    .form-grid,
-    .checkbox-grid,
-    .feature-grid,
-    .support-card,
-    .footer-grid{
-        grid-template-columns:1fr;
-    }
-
-    .qr-grid{
-        grid-template-columns:1fr;
+    .workspace-header{
+        flex-direction:column;
+        align-items:flex-start;
     }
 
     .workspace-actions{
@@ -1015,301 +956,282 @@ footer{
         width:100%;
     }
 
-    .footer-bottom{
-        flex-direction:column;
-        gap:5px;
+    .qr-grid{
+        grid-template-columns:1fr;
     }
+
+    .address-side:first-child{
+        border-right:0;
+        border-bottom:1px dashed #888;
+    }
+
 }
 </style>
 </head>
 
-
 <body>
 
 <!-- =========================================================
-     HEADER
+HEADER
 ========================================================= -->
 
 <header class="topbar">
 
-    <div class="container topbar-inner">
+<div class="container topbar-inner">
 
-        <a href="#" class="brand">
+<a href="#" class="brand">
+<span class="brand-mark">▣</span>
+BooksWagon
+</a>
 
-            <span class="brand-mark">
-                ▣
-            </span>
+<nav class="nav">
+<a href="#tools">Tools</a>
+<a href="#support">Support</a>
+</nav>
 
-            BooksWagon
-
-        </a>
-
-
-        <nav class="nav">
-
-            <a href="#tools">
-                Tools
-            </a>
-
-            <a href="#features">
-                Features
-            </a>
-
-            <a href="#support">
-                Support
-            </a>
-
-        </nav>
-
-    </div>
+</div>
 
 </header>
 
 
 <!-- =========================================================
-     HERO
+HERO
 ========================================================= -->
 
 <section class="hero">
 
-    <div class="container hero-grid">
+<div class="container hero-grid">
 
-        <div>
+<div>
 
-            <div class="kicker">
-                BOOKSWAGON LABEL STUDIO
-            </div>
+<div class="kicker">
+BOOKSWAGON LABEL STUDIO
+</div>
 
-            <h1>
-                Professional
-                <span>PO & Box</span>
-                Labels.
-            </h1>
+<h1>
+Professional
+<span>Labels.</span>
+</h1>
 
-            <p>
-                Create clean and professional PO and Box labels
-                with complete control over page size, borders,
-                fonts, print content and download format.
-            </p>
+<p>
+Create PO labels, Box labels, ISBN labels and
+professional From / To address stickers with
+Excel bulk upload support.
+</p>
 
-            <div class="hero-buttons">
+<div class="hero-buttons">
 
-                <a
-                    href="#tools"
-                    class="btn btn-primary"
-                >
-                    Start Creating
-                </a>
+<a href="#tools" class="btn btn-primary">
+Start Creating
+</a>
 
-                <a
-                    href="#support"
-                    class="btn btn-outline"
-                >
-                    Support
-                </a>
+<a href="#support" class="btn btn-outline">
+Support
+</a>
 
-            </div>
+</div>
 
-        </div>
+</div>
 
+<div>
 
-        <div>
+<div class="book-preview">
 
-            <div class="book-preview">
+<div>
+BOOKSWAGON
+</div>
 
-                <div class="small">
-                    BOOKSWAGON
-                </div>
+<h2>
+LABEL<br>
+STUDIO
+</h2>
 
-                <h2>
-                    LABEL<br>
-                    STUDIO
-                </h2>
+<div style="font-size:60px;">
+◈
+</div>
 
-                <div class="icon">
-                    ◈
-                </div>
+<div>
+PO • BOX • ADDRESS
+</div>
 
-                <div class="small">
-                    PO • BOX • PDF
-                </div>
+</div>
 
-            </div>
+</div>
 
-        </div>
-
-    </div>
+</div>
 
 </section>
 
 
 <!-- =========================================================
-     TOOLS
+TOOLS
 ========================================================= -->
 
-<section
-    id="tools"
-    class="section"
->
+<section id="tools" class="section">
 
-    <div class="container">
+<div class="container">
 
-        <div class="section-heading">
+<div class="section-heading">
 
-            <span>
-                LABEL TOOLS
-            </span>
+<span>
+LABEL TOOLS
+</span>
 
-            <h2>
-                Choose your workflow.
-            </h2>
+<h2>
+Choose your workflow.
+</h2>
 
-            <p>
-                Select Coco Blue, Other PO or ISB.
-            </p>
+<p>
+PO, Box, ISBN and Address Sticker generation.
+</p>
 
-        </div>
+</div>
 
 
-        <div class="tool-grid">
+<div class="tool-grid">
 
 
-            <button
-                class="tool-card"
-                data-tool="Coco Blue"
-            >
+<button class="tool-card" data-tool="Coco Blue">
 
-                <span class="tool-number">
-                    01
-                </span>
+<span class="tool-number">
+01
+</span>
 
-                <h3>
-                    Coco Blue
-                </h3>
+<h3>
+Coco Blue
+</h3>
 
-                <p>
-                    Create Coco Blue PO and Box labels
-                    with complete customization.
-                </p>
+<p>
+PO / Box label generation with Excel upload
+and From / To address support.
+</p>
 
-                <div class="tags">
-                    <span>20 PO</span>
-                    <span>BOX</span>
-                    <span>PDF</span>
-                    <span>ZIP</span>
-                </div>
+<div class="tags">
+<span>20 PO</span>
+<span>EXCEL</span>
+<span>ADDRESS</span>
+<span>PDF</span>
+</div>
 
-            </button>
+</button>
 
 
-            <button
-                class="tool-card"
-                data-tool="Other PO"
-            >
+<button class="tool-card" data-tool="Other PO">
 
-                <span class="tool-number">
-                    02
-                </span>
+<span class="tool-number">
+02
+</span>
 
-                <h3>
-                    Other PO
-                </h3>
+<h3>
+Other PO
+</h3>
 
-                <p>
-                    Generate labels for other PO workflows
-                    using the same controls.
-                </p>
+<p>
+Other PO label workflow with bulk Excel
+and shipping address support.
+</p>
 
-                <div class="tags">
-                    <span>20 PO</span>
-                    <span>BOX</span>
-                    <span>MERGE</span>
-                    <span>PDF</span>
-                </div>
+<div class="tags">
+<span>20 PO</span>
+<span>EXCEL</span>
+<span>ADDRESS</span>
+<span>PDF</span>
+</div>
 
-            </button>
+</button>
 
 
-            <button
-                class="tool-card"
-                data-tool="ISBN"
-            >
+<button class="tool-card" data-tool="ISBN">
 
-                <span class="tool-number">
-                    03
-                </span>
+<span class="tool-number">
+03
+</span>
 
-                <h3>
-                    ISBN
-                </h3>
+<h3>
+ISBN
+</h3>
 
-                <p>
-                    Generate ISBN PO and Box labels
-                    with customizable layouts.
-                </p>
+<p>
+ISBN label generation with Excel bulk upload.
+</p>
 
-                <div class="tags">
-                    <span>20 PO</span>
-                    <span>BOX</span>
-                    <span>PDF</span>
-                    <span>ZIP</span>
-                </div>
+<div class="tags">
+<span>EXCEL</span>
+<span>ISBN</span>
+<span>PDF</span>
+</div>
 
-            </button>
+</button>
 
 
-        </div>
+<button class="tool-card" data-tool="Address Sticker">
 
-    </div>
+<span class="tool-number">
+04
+</span>
+
+<h3>
+Address Sticker
+</h3>
+
+<p>
+Create shipping labels from BooksWagon
+to any customer or company.
+</p>
+
+<div class="tags">
+<span>FROM</span>
+<span>TO</span>
+<span>EXCEL</span>
+<span>STICKER</span>
+</div>
+
+</button>
+
+
+</div>
+
+</div>
 
 </section>
 
 
 <!-- =========================================================
-     WORKSPACE
+WORKSPACE
 ========================================================= -->
 
-<section
-    id="workspace"
-    class="workspace"
->
+<section id="workspace" class="workspace">
 
 <div class="container">
 
 <div class="workspace-card">
 
 
-<!-- HEADER -->
-
 <div class="workspace-header">
 
-    <div>
+<div>
 
-        <span
-            id="workspaceKicker"
-            class="workspace-kicker"
-        >
-            BOOKSWAGON
-        </span>
+<div class="kicker">
+BOOKSWAGON
+</div>
 
-        <h2 id="workspaceTitle">
-            Label Generator
-        </h2>
+<h2 id="workspaceTitle">
+Label Generator
+</h2>
 
-        <p id="workspaceDescription">
-            Configure your label.
-        </p>
+<p id="workspaceDescription">
+Configure your label.
+</p>
 
-    </div>
+</div>
 
-
-    <button
-        class="btn btn-outline"
-        id="closeWorkspace"
-        type="button"
-    >
-        Back to Tools
-    </button>
+<button
+type="button"
+class="btn btn-outline"
+id="closeWorkspace"
+>
+Back to Tools
+</button>
 
 </div>
 
@@ -1317,212 +1239,161 @@ footer{
 <div class="workspace-body">
 
 
-<!-- TOOL SELECTOR -->
-
 <div class="tool-selector">
 
-    <button
-        type="button"
-        class="tool-select-btn"
-        data-select-tool="Coco Blue"
-    >
-        Coco Blue
-    </button>
+<button
+class="tool-select-btn"
+data-select-tool="Coco Blue"
+>
+Coco Blue
+</button>
 
-    <button
-        type="button"
-        class="tool-select-btn"
-        data-select-tool="Other PO"
-    >
-        Other PO
-    </button>
+<button
+class="tool-select-btn"
+data-select-tool="Other PO"
+>
+Other PO
+</button>
 
-    <button
-        type="button"
-        class="tool-select-btn"
-        data-select-tool="ISBN"
-    >
-        ISBN
-    </button>
+<button
+class="tool-select-btn"
+data-select-tool="ISBN"
+>
+ISBN
+</button>
+
+<button
+class="tool-select-btn"
+data-select-tool="Address Sticker"
+>
+Address Sticker
+</button>
 
 </div>
 
 
 <!-- =====================================================
-     PO INPUT
+PO / ISBN INPUT
 ====================================================== -->
 
-<section class="config-section">
+<section
+id="poSection"
+class="config-section"
+>
 
 <div class="section-title">
 
-    <span class="step">
-        01
-    </span>
+<span class="step">
+01
+</span>
 
-    <div>
+<div>
 
-        <h3>
-            PO Number Input
-        </h3>
+<h3>
+PO / ISBN Input
+</h3>
 
-        <p>
-            Enter PO numbers individually or paste
-            multiple PO numbers in one column.
-        </p>
+<p>
+Enter manually or upload Excel.
+</p>
 
-    </div>
+</div>
 
 </div>
 
 
 <div class="input-tabs">
 
-    <button
-        class="input-tab active"
-        data-input="individual"
-        type="button"
-    >
-        Individual PO
-    </button>
+<button
+class="input-tab active"
+data-input="individual"
+>
+Individual
+</button>
 
-    <button
-        class="input-tab"
-        data-input="bulk"
-        type="button"
-    >
-        Multiple PO
-    </button>
+<button
+class="input-tab"
+data-input="bulk"
+>
+Multiple PO
+</button>
+
+<button
+class="input-tab"
+data-input="excel"
+>
+Excel Upload
+</button>
 
 </div>
 
 
 <div
-    id="individualInput"
-    class="input-panel active"
+id="individualInput"
+class="input-panel active"
 >
 
-    <div
-        id="poGrid"
-        class="po-grid"
-    ></div>
+<div
+id="poGrid"
+class="po-grid"
+></div>
 
 </div>
 
 
 <div
-    id="bulkInput"
-    class="input-panel"
+id="bulkInput"
+class="input-panel"
 >
 
 <textarea
-    id="bulkPO"
-    placeholder="Paste multiple PO numbers here.
+id="bulkPO"
+placeholder="Paste multiple PO / ISBN numbers.
 
-Example:
 PO10001
 PO10002
-PO10003
-
-Comma, semicolon and new line are supported."
+PO10003"
 ></textarea>
 
 </div>
 
-</section>
 
+<div
+id="excelInput"
+class="input-panel"
+>
 
-<!-- =====================================================
-     BOX RANGE
-====================================================== -->
+<div class="excel-box">
 
-<section class="config-section">
+<h4>
+Upload Excel File
+</h4>
 
-<div class="section-title">
+<p>
+Upload .xlsx or .xls. The first row is treated
+as the column header. PO / ISBN / Box / From /
+To columns can be mapped automatically.
+</p>
 
-    <span class="step">
-        02
-    </span>
+<input
+type="file"
+id="excelFile"
+accept=".xlsx,.xls,.csv"
+>
 
-    <div>
-
-        <h3>
-            Box Number Range
-        </h3>
-
-        <p>
-            No artificial 1–200 restriction.
-        </p>
-
-    </div>
-
+<div
+id="excelStatus"
+class="excel-status"
+>
+No Excel file selected.
 </div>
 
+<div
+id="excelPreview"
+class="excel-preview"
+></div>
 
-<div class="form-grid">
-
-    <div class="form-field">
-
-        <label>
-            Start Box
-        </label>
-
-        <input
-            type="number"
-            id="startBox"
-            min="1"
-            value="1"
-        >
-
-    </div>
-
-
-    <div class="form-field">
-
-        <label>
-            End Box
-        </label>
-
-        <input
-            type="number"
-            id="endBox"
-            min="1"
-            value="200"
-        >
-
-    </div>
-
-
-    <div class="form-field">
-
-        <label>
-            Copies
-        </label>
-
-        <input
-            type="number"
-            id="copies"
-            min="1"
-            value="1"
-        >
-
-    </div>
-
-
-    <div class="form-field">
-
-        <label>
-            Labels Per Page
-        </label>
-
-        <input
-            type="number"
-            id="labelsPerPage"
-            min="1"
-            value="1"
-        >
-
-    </div>
+</div>
 
 </div>
 
@@ -1530,84 +1401,109 @@ Comma, semicolon and new line are supported."
 
 
 <!-- =====================================================
-     PRINT CONTENT
+FROM / TO ADDRESS FOR COCO + OTHER PO
 ====================================================== -->
 
-<section class="config-section">
+<section
+id="poAddressSection"
+class="config-section"
+>
 
 <div class="section-title">
 
-    <span class="step">
-        03
-    </span>
+<span class="step">
+02
+</span>
 
-    <div>
+<div>
 
-        <h3>
-            Print Content
-        </h3>
+<h3>
+From / To Address
+</h3>
 
-        <p>
-            Select what should be printed.
-        </p>
+<p>
+Shipping address information for Coco Blue
+and Other PO labels.
+</p>
 
-    </div>
+</div>
 
 </div>
 
 
-<div class="checkbox-grid">
+<div class="address-grid">
 
 
-<label class="feature-checkbox">
+<div class="address-card">
 
-    <input
-        type="checkbox"
-        id="printPO"
-        data-feature="PO Number Only"
-    >
+<h4>
+FROM — BooksWagon
+</h4>
 
-    <span class="custom-check"></span>
+<div class="form-field">
 
-    <span class="checkbox-text">
-        PO Number Only
-    </span>
-
+<label>
+From Name
 </label>
 
+<input
+id="fromName"
+value="BooksWagon"
+>
+</div>
 
-<label class="feature-checkbox">
+<br>
 
-    <input
-        type="checkbox"
-        id="printBox"
-        data-feature="Box Number Only"
-    >
+<div class="form-field">
 
-    <span class="custom-check"></span>
-
-    <span class="checkbox-text">
-        Box Number Only
-    </span>
-
+<label>
+From Address
 </label>
 
+<textarea
+id="fromAddress"
+>Ground Floor, 2/14, Ansari Rd, Old Delhi, Daryaganj, Delhi, 110002</textarea>
 
-<label class="feature-checkbox">
+</div>
 
-    <input
-        type="checkbox"
-        id="printPOBox"
-        data-feature="PO Number + Box Number"
-    >
+</div>
 
-    <span class="custom-check"></span>
 
-    <span class="checkbox-text">
-        PO Number + Box Number
-    </span>
+<div class="address-card">
 
+<h4>
+TO — Customer / Company
+</h4>
+
+<div class="form-field">
+
+<label>
+To Name
 </label>
+
+<input
+id="toName"
+placeholder="XYZ Company"
+>
+
+</div>
+
+<br>
+
+<div class="form-field">
+
+<label>
+To Address
+</label>
+
+<textarea
+id="toAddress"
+placeholder="Customer / Company address"
+></textarea>
+
+</div>
+
+</div>
 
 
 </div>
@@ -1616,28 +1512,218 @@ Comma, semicolon and new line are supported."
 
 
 <!-- =====================================================
-     PAGE SETUP
+ADDRESS STICKER
 ====================================================== -->
 
-<section class="config-section">
+<section
+id="addressSection"
+class="config-section"
+style="display:none;"
+>
 
 <div class="section-title">
 
-    <span class="step">
-        04
-    </span>
+<span class="step">
+02
+</span>
 
-    <div>
+<div>
 
-        <h3>
-            Page Setup
-        </h3>
+<h3>
+Address Sticker
+</h3>
 
-        <p>
-            Choose page size and orientation.
-        </p>
+<p>
+BooksWagon → Customer / Company.
+</p>
 
-    </div>
+</div>
+
+</div>
+
+
+<div class="input-tabs">
+
+<button
+class="input-tab active"
+data-address-input="manual"
+>
+Manual
+</button>
+
+<button
+class="input-tab"
+data-address-input="excel"
+>
+Excel Upload
+</button>
+
+</div>
+
+
+<div
+id="addressManualPanel"
+class="input-panel active"
+>
+
+<div class="address-grid">
+
+<div class="address-card">
+
+<h4>
+FROM — BOOKSWAGON
+</h4>
+
+<input
+id="stickerFromName"
+value="BooksWagon"
+placeholder="From Name"
+>
+
+<br><br>
+
+<textarea
+id="stickerFromAddress"
+>Ground Floor, 2/14, Ansari Rd, Old Delhi, Daryaganj, Delhi, 110002</textarea>
+
+</div>
+
+
+<div class="address-card">
+
+<h4>
+TO — CUSTOMER / COMPANY
+</h4>
+
+<input
+id="stickerToName"
+placeholder="XYZ Company"
+>
+
+<br><br>
+
+<textarea
+id="stickerToAddress"
+placeholder="Customer address"
+></textarea>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div
+id="addressExcelPanel"
+class="input-panel"
+>
+
+<div class="excel-box">
+
+<h4>
+Upload Address Excel
+</h4>
+
+<p>
+Recommended columns:
+Name, Address, City, State, PIN.
+</p>
+
+<input
+type="file"
+id="addressExcelFile"
+accept=".xlsx,.xls,.csv"
+>
+
+<div
+id="addressExcelStatus"
+class="excel-status"
+>
+No address Excel selected.
+</div>
+
+<div
+id="addressExcelPreview"
+class="excel-preview"
+></div>
+
+</div>
+
+</div>
+
+
+<div
+id="addressStickerPreview"
+class="address-sticker-preview"
+>
+
+<div class="address-side">
+
+<small>
+FROM
+</small>
+
+<strong id="previewFromName">
+BooksWagon
+</strong>
+
+<div id="previewFromAddress">
+Ground Floor, 2/14, Ansari Rd,
+Old Delhi, Daryaganj,
+Delhi, 110002
+</div>
+
+</div>
+
+
+<div class="address-side">
+
+<small>
+TO
+</small>
+
+<strong id="previewToName">
+XYZ Company
+</strong>
+
+<div id="previewToAddress">
+Customer / Company Address
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+BOX
+====================================================== -->
+
+<section
+id="boxSection"
+class="config-section"
+>
+
+<div class="section-title">
+
+<span class="step">
+03
+</span>
+
+<div>
+
+<h3>
+Box Number
+</h3>
+
+<p>
+Configure the Box range.
+</p>
+
+</div>
 
 </div>
 
@@ -1647,34 +1733,201 @@ Comma, semicolon and new line are supported."
 <div class="form-field">
 
 <label>
-    Page Size
+Start Box
+</label>
+
+<input
+type="number"
+id="startBox"
+value="1"
+min="1"
+>
+
+</div>
+
+
+<div class="form-field">
+
+<label>
+End Box
+</label>
+
+<input
+type="number"
+id="endBox"
+value="200"
+min="1"
+>
+
+</div>
+
+
+<div class="form-field">
+
+<label>
+Copies
+</label>
+
+<input
+type="number"
+id="copies"
+value="1"
+min="1"
+>
+
+</div>
+
+
+<div class="form-field">
+
+<label>
+Labels Per Page
+</label>
+
+<input
+type="number"
+id="labelsPerPage"
+value="1"
+min="1"
+>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+PRINT CONTENT
+====================================================== -->
+
+<section
+id="printSection"
+class="config-section"
+>
+
+<div class="section-title">
+
+<span class="step">
+04
+</span>
+
+<div>
+
+<h3>
+Print Content
+</h3>
+
+<p>
+Choose exactly what should appear.
+</p>
+
+</div>
+
+</div>
+
+
+<div class="checkbox-grid">
+
+<label class="feature-checkbox">
+
+<input
+type="checkbox"
+id="printPO"
+data-feature="PO Number Only"
+>
+
+<span class="custom-check"></span>
+
+<span class="checkbox-text">
+PO Number Only
+</span>
+
+</label>
+
+
+<label class="feature-checkbox">
+
+<input
+type="checkbox"
+id="printBox"
+data-feature="Box Number Only"
+>
+
+<span class="custom-check"></span>
+
+<span class="checkbox-text">
+Box Number Only
+</span>
+
+</label>
+
+
+<label class="feature-checkbox">
+
+<input
+type="checkbox"
+id="printPOBox"
+data-feature="PO Number + Box Number"
+>
+
+<span class="custom-check"></span>
+
+<span class="checkbox-text">
+PO Number + Box Number
+</span>
+
+</label>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+PAGE
+====================================================== -->
+
+<section class="config-section">
+
+<div class="section-title">
+
+<span class="step">
+05
+</span>
+
+<div>
+
+<h3>
+Page Setup
+</h3>
+
+<p>
+Page size and orientation.
+</p>
+
+</div>
+
+</div>
+
+
+<div class="form-grid">
+
+<div class="form-field">
+
+<label>
+Page Size
 </label>
 
 <select id="pageSize">
 
-<option value="A4">
-    A4
-</option>
-
-<option value="A5">
-    A5
-</option>
-
-<option value="A6">
-    A6
-</option>
-
-<option value="LETTER">
-    Letter
-</option>
-
-<option value="LEGAL">
-    Legal
-</option>
-
-<option value="CUSTOM">
-    Custom
-</option>
+<option value="A4">A4</option>
+<option value="A5">A5</option>
+<option value="A6">A6</option>
+<option value="LETTER">Letter</option>
+<option value="LEGAL">Legal</option>
+<option value="CUSTOM">Custom</option>
 
 </select>
 
@@ -1684,17 +1937,17 @@ Comma, semicolon and new line are supported."
 <div class="form-field">
 
 <label>
-    Orientation
+Orientation
 </label>
 
 <select id="orientation">
 
 <option value="portrait">
-    Portrait
+Portrait
 </option>
 
 <option value="landscape">
-    Landscape
+Landscape
 </option>
 
 </select>
@@ -1705,14 +1958,13 @@ Comma, semicolon and new line are supported."
 <div class="form-field">
 
 <label>
-    Custom Width (mm)
+Custom Width mm
 </label>
 
 <input
-    type="number"
-    id="customWidth"
-    value="210"
-    min="10"
+type="number"
+id="customWidth"
+value="210"
 >
 
 </div>
@@ -1721,14 +1973,13 @@ Comma, semicolon and new line are supported."
 <div class="form-field">
 
 <label>
-    Custom Height (mm)
+Custom Height mm
 </label>
 
 <input
-    type="number"
-    id="customHeight"
-    value="297"
-    min="10"
+type="number"
+id="customHeight"
+value="297"
 >
 
 </div>
@@ -1739,48 +1990,49 @@ Comma, semicolon and new line are supported."
 
 
 <!-- =====================================================
-     BORDER
+BORDERS
 ====================================================== -->
 
-<section class="config-section">
+<section
+id="borderSection"
+class="config-section"
+>
 
 <div class="section-title">
 
-    <span class="step">
-        05
-    </span>
+<span class="step">
+06
+</span>
 
-    <div>
+<div>
 
-        <h3>
-            Border Settings
-        </h3>
+<h3>
+Borders
+</h3>
 
-        <p>
-            Page border, PO border, Box border and
-            combined border are independent.
-        </p>
+<p>
+Page, PO, Box and combined borders.
+</p>
 
-    </div>
+</div>
 
 </div>
 
 
 <div class="checkbox-grid">
 
-
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="pageBorder"
-    data-feature="Page Border"
+type="checkbox"
+id="pageBorder"
+data-feature="Page Border"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    Page Border
+Page Border
 </span>
 
 </label>
@@ -1789,15 +2041,15 @@ Comma, semicolon and new line are supported."
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="poBorder"
-    data-feature="PO Number Border"
+type="checkbox"
+id="poBorder"
+data-feature="PO Number Border"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    PO Number Border
+PO Number Border
 </span>
 
 </label>
@@ -1806,15 +2058,15 @@ Comma, semicolon and new line are supported."
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="boxBorder"
-    data-feature="Box Number Border"
+type="checkbox"
+id="boxBorder"
+data-feature="Box Number Border"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    Box Number Border
+Box Number Border
 </span>
 
 </label>
@@ -1823,19 +2075,18 @@ Comma, semicolon and new line are supported."
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="combinedBorder"
-    data-feature="Combined PO and Box Border"
+type="checkbox"
+id="combinedBorder"
+data-feature="Combined PO and Box Border"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    Combined PO + Box Border
+Combined PO + Box Border
 </span>
 
 </label>
-
 
 </div>
 
@@ -1845,25 +2096,24 @@ Comma, semicolon and new line are supported."
 
 <div class="form-grid">
 
-
 <div class="form-field">
 
 <label>
-    Border Size
+Border Size
 </label>
 
 <select id="borderSize">
 
 <option value="thin">
-    Thin
+Thin
 </option>
 
 <option value="medium" selected>
-    Medium
+Medium
 </option>
 
 <option value="thick">
-    Thick
+Thick
 </option>
 
 </select>
@@ -1874,25 +2124,25 @@ Comma, semicolon and new line are supported."
 <div class="form-field">
 
 <label>
-    Border Style
+Border Style
 </label>
 
 <select id="borderStyle">
 
 <option value="solid">
-    Solid
+Solid
 </option>
 
 <option value="dashed">
-    Dashed
+Dashed
 </option>
 
 <option value="dotted">
-    Dotted
+Dotted
 </option>
 
 <option value="double">
-    Double
+Double
 </option>
 
 </select>
@@ -1903,17 +2153,16 @@ Comma, semicolon and new line are supported."
 <div class="form-field">
 
 <label>
-    Border Colour
+Border Colour
 </label>
 
 <input
-    type="color"
-    id="borderColor"
-    value="#111827"
+type="color"
+id="borderColor"
+value="#111827"
 >
 
 </div>
-
 
 </div>
 
@@ -1921,57 +2170,59 @@ Comma, semicolon and new line are supported."
 
 
 <!-- =====================================================
-     FONT
+FONT
 ====================================================== -->
 
-<section class="config-section">
+<section
+id="fontSection"
+class="config-section"
+>
 
 <div class="section-title">
 
-    <span class="step">
-        06
-    </span>
+<span class="step">
+07
+</span>
 
-    <div>
+<div>
 
-        <h3>
-            Font Settings
-        </h3>
+<h3>
+Font
+</h3>
 
-        <p>
-            Customize font family, size and style.
-        </p>
+<p>
+Font family, size and style.
+</p>
 
-    </div>
+</div>
 
 </div>
 
 
 <div class="form-grid">
 
-
 <div class="form-field">
 
 <label>
-    Font Family
+Font Family
 </label>
 
 <select id="fontFamily">
 
 <option value="helvetica">
-    Arial / Helvetica
+Arial / Helvetica
 </option>
 
 <option value="times">
-    Times New Roman
+Times New Roman
 </option>
 
 <option value="courier">
-    Courier
+Courier
 </option>
 
 <option value="georgia">
-    Georgia
+Georgia
 </option>
 
 </select>
@@ -1982,7 +2233,7 @@ Comma, semicolon and new line are supported."
 <div class="form-field">
 
 <label>
-    Font Size
+Font Size
 </label>
 
 <select id="fontSize">
@@ -2009,19 +2260,18 @@ Comma, semicolon and new line are supported."
 
 <div class="checkbox-grid">
 
-
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="fontBold"
-    data-feature="Bold Font"
+type="checkbox"
+id="fontBold"
+data-feature="Bold Font"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    Bold
+Bold
 </span>
 
 </label>
@@ -2030,15 +2280,15 @@ Comma, semicolon and new line are supported."
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="fontItalic"
-    data-feature="Italic Font"
+type="checkbox"
+id="fontItalic"
+data-feature="Italic Font"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    Italic
+Italic
 </span>
 
 </label>
@@ -2047,19 +2297,18 @@ Comma, semicolon and new line are supported."
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="fontUnderline"
-    data-feature="Underline Font"
+type="checkbox"
+id="fontUnderline"
+data-feature="Underline Font"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    Underline
+Underline
 </span>
 
 </label>
-
 
 </div>
 
@@ -2067,25 +2316,28 @@ Comma, semicolon and new line are supported."
 
 
 <!-- =====================================================
-     CUTTING
+CUTTING
 ====================================================== -->
 
-<section class="config-section">
+<section
+id="cutSection"
+class="config-section"
+>
 
 <div class="section-title">
 
 <span class="step">
-    07
+08
 </span>
 
 <div>
 
 <h3>
-    Cutting & Separation
+Cutting
 </h3>
 
 <p>
-    Separate PO and Box with a cutting line.
+PO / Box separation line.
 </p>
 
 </div>
@@ -2095,19 +2347,18 @@ Comma, semicolon and new line are supported."
 
 <div class="checkbox-grid">
 
-
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="cutLine"
-    data-feature="Cutting Line"
+type="checkbox"
+id="cutLine"
+data-feature="Cutting Line"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    Cutting Line
+Cutting Line
 </span>
 
 </label>
@@ -2116,47 +2367,18 @@ Comma, semicolon and new line are supported."
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="scissorMark"
-    data-feature="Scissor Mark"
+type="checkbox"
+id="scissorMark"
+data-feature="Scissor Mark"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    Scissor Mark ✂
+Scissor Mark ✂
 </span>
 
 </label>
-
-
-</div>
-
-
-<br>
-
-
-<div class="form-field">
-
-<label>
-    Cutting Line Style
-</label>
-
-<select id="cutLineStyle">
-
-<option value="dashed">
-    Dashed
-</option>
-
-<option value="dotted">
-    Dotted
-</option>
-
-<option value="solid">
-    Solid
-</option>
-
-</select>
 
 </div>
 
@@ -2164,25 +2386,28 @@ Comma, semicolon and new line are supported."
 
 
 <!-- =====================================================
-     DOWNLOAD
+DOWNLOAD
 ====================================================== -->
 
-<section class="config-section">
+<section
+id="downloadSection"
+class="config-section"
+>
 
 <div class="section-title">
 
 <span class="step">
-    08
+09
 </span>
 
 <div>
 
 <h3>
-    Download Options
+Download
 </h3>
 
 <p>
-    Choose separate PDF, merged PDF or ZIP.
+Separate PDFs, merged PDF or ZIP.
 </p>
 
 </div>
@@ -2192,19 +2417,18 @@ Comma, semicolon and new line are supported."
 
 <div class="checkbox-grid">
 
-
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="mergePDF"
-    data-feature="Merged PDF"
+type="checkbox"
+id="mergePDF"
+data-feature="Merged PDF"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    Merge All PO PDFs
+Merge All PDFs
 </span>
 
 </label>
@@ -2213,19 +2437,18 @@ Comma, semicolon and new line are supported."
 <label class="feature-checkbox">
 
 <input
-    type="checkbox"
-    id="zipPDF"
-    data-feature="ZIP Download"
+type="checkbox"
+id="zipPDF"
+data-feature="ZIP Download"
 >
 
 <span class="custom-check"></span>
 
 <span class="checkbox-text">
-    Download Separate PDFs as ZIP
+Separate PDFs as ZIP
 </span>
 
 </label>
-
 
 </div>
 
@@ -2233,53 +2456,56 @@ Comma, semicolon and new line are supported."
 
 
 <!-- =====================================================
-     PREVIEW
+PREVIEW
 ====================================================== -->
 
-<section class="preview-section">
+<section
+id="labelPreviewSection"
+class="preview-section"
+>
 
-<div class="preview-header">
+<div class="section-heading">
 
 <span>
-    LIVE PREVIEW
+LIVE PREVIEW
 </span>
 
-<h3>
-    Label Preview
-</h3>
+<h2>
+Label Preview
+</h2>
 
 </div>
 
 
 <div
-    id="labelPreview"
-    class="preview-page"
+id="labelPreview"
+class="preview-page"
 >
 
 <div
-    id="previewContent"
-    class="preview-content"
+id="previewContent"
+class="preview-content"
 >
 
 <div
-    id="previewPO"
-    class="preview-po"
+id="previewPO"
+class="preview-po"
 >
 PO NUMBER
 </div>
 
 
 <div
-    id="previewCut"
-    class="preview-cut hidden-preview"
+id="previewCut"
+class="preview-cut hidden-preview"
 >
 · · · · · ✂ · · · · ·
 </div>
 
 
 <div
-    id="previewBox"
-    class="preview-box"
+id="previewBox"
+class="preview-box"
 >
 BOX NO. 1
 </div>
@@ -2291,93 +2517,32 @@ BOX NO. 1
 </section>
 
 
-<!-- ACTIONS -->
+<!-- =====================================================
+ACTIONS
+====================================================== -->
 
 <div class="workspace-actions">
 
 <button
-    type="button"
-    id="resetButton"
-    class="btn btn-secondary"
+type="button"
+id="resetButton"
+class="btn btn-secondary"
 >
-    Reset
+Reset
 </button>
-
 
 <button
-    type="button"
-    id="generateButton"
-    class="btn btn-primary"
+type="button"
+id="generateButton"
+class="btn btn-primary"
 >
-    Generate PDF
+Generate PDF
 </button>
 
 </div>
 
 
 </div>
-</div>
-</div>
-
-</section>
-
-
-<!-- =========================================================
-     FEATURES
-========================================================= -->
-
-<section
-    id="features"
-    class="section"
->
-
-<div class="container">
-
-<div class="section-heading">
-
-<span>
-    FEATURES
-</span>
-
-<h2>
-    Built for flexible printing.
-</h2>
-
-<p>
-    Everything you requested in one workflow.
-</p>
-
-</div>
-
-
-<div class="feature-grid">
-
-<div class="feature-card">
-<strong>20</strong>
-<h3>PO Fields</h3>
-<p>Twenty individual PO number fields in every tool.</p>
-</div>
-
-
-<div class="feature-card">
-<strong>∞</strong>
-<h3>Box Range</h3>
-<p>No hard-coded 200-box restriction.</p>
-</div>
-
-
-<div class="feature-card">
-<strong>PDF</strong>
-<h3>Export</h3>
-<p>Separate and merged PDF downloads.</p>
-</div>
-
-
-<div class="feature-card">
-<strong>ZIP</strong>
-<h3>Bulk Download</h3>
-<p>Multiple PDF files can be packaged together.</p>
-</div>
 
 </div>
 
@@ -2387,59 +2552,48 @@ BOX NO. 1
 
 
 <!-- =========================================================
-     SUPPORT
+SUPPORT
 ========================================================= -->
 
-<section
-    id="support"
-    class="section"
->
+<section id="support" class="section">
 
 <div class="container">
 
 <div class="support-card">
 
-
 <div>
 
 <div class="kicker">
-    SUPPORT
+SUPPORT
 </div>
 
 <h2>
-    BooksWagon Support
+BooksWagon Support
 </h2>
 
-<p>
-    Contact the office or email directly.
-</p>
-
-
 <a
-    class="address-link"
-    href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
-    target="_blank"
-    rel="noopener noreferrer"
+class="address-link"
+href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
+target="_blank"
+rel="noopener"
 >
-    Ground Floor, 2/14, Ansari Rd,
-    Old Delhi, Daryaganj,
-    Delhi, 110002
+Ground Floor, 2/14, Ansari Rd,
+Old Delhi, Daryaganj,
+Delhi, 110002
 </a>
 
-
 <a
-    class="email-link"
-    href="mailto:ashish.verma@bookswagon.in"
+class="email-link"
+href="mailto:ashish.verma@bookswagon.in"
 >
-    ashish.verma@bookswagon.in
+ashish.verma@bookswagon.in
 </a>
-
 
 <div class="created">
-    Created by
-    <strong>
-        Ashish Verma
-    </strong>
+Created by
+<strong>
+Ashish Verma
+</strong>
 </div>
 
 </div>
@@ -2447,21 +2601,16 @@ BOX NO. 1
 
 <div class="qr-grid">
 
-
 <div class="qr-card">
 
 <h4>
-    Office Location
+Office Location
 </h4>
 
 <div
-    id="addressQR"
-    class="qr-code"
+id="addressQR"
+class="qr-code"
 ></div>
-
-<small>
-    Scan to open Google Maps
-</small>
 
 </div>
 
@@ -2469,20 +2618,15 @@ BOX NO. 1
 <div class="qr-card">
 
 <h4>
-    Official Email
+Official Email
 </h4>
 
 <div
-    id="emailQR"
-    class="qr-code"
+id="emailQR"
+class="qr-code"
 ></div>
 
-<small>
-    Scan to send email
-</small>
-
 </div>
-
 
 </div>
 
@@ -2494,7 +2638,7 @@ BOX NO. 1
 
 
 <!-- =========================================================
-     FOOTER
+FOOTER
 ========================================================= -->
 
 <footer>
@@ -2503,51 +2647,45 @@ BOX NO. 1
 
 <div class="footer-grid">
 
-
 <div>
 
 <div class="footer-brand">
-    BooksWagon
+BooksWagon
 </div>
 
 <p>
-    Label Studio
+Label Studio
 </p>
 
 </div>
 
-
 <div>
 
 <strong>
-    OFFICE
+OFFICE
 </strong>
 
 <p>
-    Ground Floor, 2/14, Ansari Rd,
-    Old Delhi, Daryaganj,
-    Delhi, 110002
+Ground Floor, 2/14, Ansari Rd,
+Old Delhi, Daryaganj,
+Delhi, 110002
 </p>
 
 </div>
 
-
 <div>
 
 <strong>
-    EMAIL
+EMAIL
 </strong>
 
 <p>
-<a
-    href="mailto:ashish.verma@bookswagon.in"
->
-    ashish.verma@bookswagon.in
+<a href="mailto:ashish.verma@bookswagon.in">
+ashish.verma@bookswagon.in
 </a>
 </p>
 
 </div>
-
 
 </div>
 
@@ -2555,11 +2693,11 @@ BOX NO. 1
 <div class="footer-bottom">
 
 <span>
-    © 2026 BooksWagon Label Studio
+© 2026 BooksWagon Label Studio
 </span>
 
 <span>
-    Created by Ashish Verma
+Created by Ashish Verma
 </span>
 
 </div>
@@ -2569,22 +2707,21 @@ BOX NO. 1
 </footer>
 
 
-<!-- =========================================================
-     TOAST
-========================================================= -->
-
 <div id="toastContainer"></div>
 
 
-<script>
+<!-- =========================================================
+JAVASCRIPT
+========================================================= -->
 
-/* =========================================================
-   BOOKSWAGON LABEL STUDIO
-   FINAL ALL-IN-ONE JAVASCRIPT
-========================================================= */
+<script>
 
 "use strict";
 
+
+/* =========================================================
+CONFIG
+========================================================= */
 
 const CONFIG = {
 
@@ -2600,62 +2737,78 @@ const CONFIG = {
 };
 
 
-const $ = selector =>
-    document.querySelector(selector);
+let currentTool =
+    "Coco Blue";
 
 
-const $$ = selector =>
-    [...document.querySelectorAll(selector)];
+let excelRows =
+    [];
 
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let currentTool = "Coco Blue";
+let addressExcelRows =
+    [];
 
 
 /* =========================================================
-   TOAST
+HELPERS
 ========================================================= */
 
-function toast(message, type="success") {
+const $ =
+    selector =>
+        document.querySelector(selector);
+
+
+const $$ =
+    selector =>
+        [...document.querySelectorAll(selector)];
+
+
+function toast(
+    message,
+    type="success"
+){
 
     const container =
         $("#toastContainer");
+
+    if(!container)
+        return;
 
     const item =
         document.createElement("div");
 
     item.className =
-        "toast" +
-        (type === "error" ? " error" : "");
+        `toast ${type === "error" ? "error" : ""}`;
 
     item.textContent =
         message;
 
     container.appendChild(item);
 
-    setTimeout(() => {
+    setTimeout(
+        () => item.remove(),
+        2800
+    );
 
-        item.remove();
-
-    }, 2600);
 }
 
 
 /* =========================================================
-   CREATE 20 PO FIELDS
+20 PO FIELDS
 ========================================================= */
 
-function createPOFields() {
+function createPOFields(){
 
     const grid =
         $("#poGrid");
 
-    grid.innerHTML = "";
+    grid.innerHTML =
+        "";
 
-    for(let i=1;i<=20;i++){
+    for(
+        let i=1;
+        i<=20;
+        i++
+    ){
 
         const wrapper =
             document.createElement("div");
@@ -2664,10 +2817,10 @@ function createPOFields() {
             "po-field";
 
 
-        const number =
+        const label =
             document.createElement("span");
 
-        number.textContent =
+        label.textContent =
             `PO ${i}`;
 
 
@@ -2683,17 +2836,16 @@ function createPOFields() {
         input.placeholder =
             `PO Number ${i}`;
 
-        input.autocomplete =
-            "off";
-
 
         wrapper.append(
-            number,
+            label,
             input
         );
 
 
-        grid.appendChild(wrapper);
+        grid.appendChild(
+            wrapper
+        );
 
     }
 
@@ -2701,30 +2853,63 @@ function createPOFields() {
 
 
 /* =========================================================
-   GET PO LIST
+PO LIST
 ========================================================= */
 
-function getPOList(){
+function parseList(
+    value
+){
 
-    const individual =
-        $$(".po-input")
-        .map(input =>
-            input.value.trim()
+    return String(value || "")
+        .split(/[\n,;|]+/)
+        .map(
+            x => x.trim()
         )
         .filter(Boolean);
 
+}
+
+
+function getPOList(){
+
+    const manual =
+        $$(".po-input")
+            .map(
+                input =>
+                    input.value.trim()
+            )
+            .filter(Boolean);
+
 
     const bulk =
-        $("#bulkPO").value
-        .split(/[\n,;]+/)
-        .map(x => x.trim())
-        .filter(Boolean);
+        parseList(
+            $("#bulkPO")?.value
+        );
+
+
+    const excel =
+        excelRows
+            .map(
+                row =>
+                    findValue(
+                        row,
+                        [
+                            "PO",
+                            "PO Number",
+                            "PONumber",
+                            "ISBN",
+                            "ISBN Number"
+                        ]
+                    )
+            )
+            .filter(Boolean);
 
 
     return [
         ...new Set([
-            ...individual,
-            ...bulk
+            ...manual,
+            ...bulk,
+            ...excel
         ])
     ];
 
@@ -2732,13 +2917,708 @@ function getPOList(){
 
 
 /* =========================================================
-   INPUT TABS
+FIND EXCEL VALUE
 ========================================================= */
 
-function setupInputTabs(){
+function findValue(
+    row,
+    possibleNames
+){
 
-    $$(".input-tab")
-    .forEach(button => {
+    const keys =
+        Object.keys(row || {});
+
+
+    for(
+        const name of possibleNames
+    ){
+
+        const exact =
+            keys.find(
+                key =>
+                    key
+                        .toLowerCase()
+                        .replace(/[\s_-]/g,"")
+                    ===
+                    name
+                        .toLowerCase()
+                        .replace(/[\s_-]/g,"")
+            );
+
+
+        if(
+            exact &&
+            row[exact] !== undefined &&
+            row[exact] !== null
+        ){
+
+            return String(
+                row[exact]
+            ).trim();
+
+        }
+
+    }
+
+
+    return "";
+
+}
+
+
+/* =========================================================
+EXCEL TABLE
+========================================================= */
+
+function showExcelPreview(
+    rows,
+    target
+){
+
+    const container =
+        $(target);
+
+    if(!container)
+        return;
+
+
+    if(
+        !rows ||
+        !rows.length
+    ){
+
+        container.innerHTML =
+            "";
+
+        return;
+
+    }
+
+
+    const columns =
+        Object.keys(
+            rows[0]
+        );
+
+
+    const sample =
+        rows.slice(
+            0,
+            10
+        );
+
+
+    let html =
+        "<table><thead><tr>";
+
+
+    columns.forEach(
+        column => {
+
+            html +=
+                `<th>${escapeHTML(column)}</th>`;
+
+        }
+    );
+
+
+    html +=
+        "</tr></thead><tbody>";
+
+
+    sample.forEach(
+        row => {
+
+            html +=
+                "<tr>";
+
+
+            columns.forEach(
+                column => {
+
+                    html +=
+                        `<td>${escapeHTML(row[column] ?? "")}</td>`;
+
+                }
+            );
+
+
+            html +=
+                "</tr>";
+
+        }
+    );
+
+
+    html +=
+        "</tbody></table>";
+
+
+    container.innerHTML =
+        html;
+
+}
+
+
+/* =========================================================
+ESCAPE
+========================================================= */
+
+function escapeHTML(
+    value
+){
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+EXCEL UPLOAD — PO / ISBN
+========================================================= */
+
+$("#excelFile")
+.addEventListener(
+    "change",
+    async event => {
+
+        const file =
+            event.target.files[0];
+
+
+        if(!file)
+            return;
+
+
+        try{
+
+            if(
+                typeof XLSX ===
+                "undefined"
+            ){
+
+                throw new Error(
+                    "Excel library is not loaded."
+                );
+
+            }
+
+
+            const buffer =
+                await file.arrayBuffer();
+
+
+            const workbook =
+                XLSX.read(
+                    buffer,
+                    {
+                        type:"array"
+                    }
+                );
+
+
+            const sheetName =
+                workbook.SheetNames[0];
+
+
+            const sheet =
+                workbook.Sheets[
+                    sheetName
+                ];
+
+
+            excelRows =
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    {
+                        defval:""
+                    }
+                );
+
+
+            $("#excelStatus")
+                .textContent =
+                `${excelRows.length} Excel row(s) loaded successfully.`;
+
+
+            showExcelPreview(
+                excelRows,
+                "#excelPreview"
+            );
+
+
+            toast(
+                `${excelRows.length} Excel row(s) loaded.`
+            );
+
+
+            updatePreview();
+
+        }catch(error){
+
+            console.error(error);
+
+            $("#excelStatus")
+                .textContent =
+                "Excel upload failed.";
+
+
+            toast(
+                "Could not read Excel file.",
+                "error"
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+ADDRESS EXCEL UPLOAD
+========================================================= */
+
+$("#addressExcelFile")
+.addEventListener(
+    "change",
+    async event => {
+
+        const file =
+            event.target.files[0];
+
+
+        if(!file)
+            return;
+
+
+        try{
+
+            const buffer =
+                await file.arrayBuffer();
+
+
+            const workbook =
+                XLSX.read(
+                    buffer,
+                    {
+                        type:"array"
+                    }
+                );
+
+
+            const sheet =
+                workbook.Sheets[
+                    workbook.SheetNames[0]
+                ];
+
+
+            addressExcelRows =
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    {
+                        defval:""
+                    }
+                );
+
+
+            $("#addressExcelStatus")
+                .textContent =
+                `${addressExcelRows.length} address row(s) loaded.`;
+
+
+            showExcelPreview(
+                addressExcelRows,
+                "#addressExcelPreview"
+            );
+
+
+            if(
+                addressExcelRows.length
+            ){
+
+                applyAddressRow(
+                    addressExcelRows[0]
+                );
+
+            }
+
+
+            toast(
+                `${addressExcelRows.length} address row(s) loaded.`
+            );
+
+        }catch(error){
+
+            console.error(error);
+
+            toast(
+                "Could not read address Excel file.",
+                "error"
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+APPLY ADDRESS ROW
+========================================================= */
+
+function applyAddressRow(
+    row
+){
+
+    const name =
+        findValue(
+            row,
+            [
+                "Name",
+                "Customer Name",
+                "Company",
+                "Company Name",
+                "To Name"
+            ]
+        );
+
+
+    const address =
+        findValue(
+            row,
+            [
+                "Address",
+                "To Address",
+                "Shipping Address"
+            ]
+        );
+
+
+    const city =
+        findValue(
+            row,
+            [
+                "City"
+            ]
+        );
+
+
+    const state =
+        findValue(
+            row,
+            [
+                "State"
+            ]
+        );
+
+
+    const pin =
+        findValue(
+            row,
+            [
+                "PIN",
+                "Pincode",
+                "Pin Code",
+                "Postal Code"
+            ]
+        );
+
+
+    const completeAddress =
+        [
+            address,
+            city,
+            state,
+            pin
+        ]
+        .filter(Boolean)
+        .join(", ");
+
+
+    if(
+        $("#toName")
+    ){
+
+        $("#toName").value =
+            name;
+
+    }
+
+
+    if(
+        $("#toAddress")
+    ){
+
+        $("#toAddress").value =
+            completeAddress;
+
+    }
+
+
+    if(
+        $("#stickerToName")
+    ){
+
+        $("#stickerToName").value =
+            name;
+
+    }
+
+
+    if(
+        $("#stickerToAddress")
+    ){
+
+        $("#stickerToAddress").value =
+            completeAddress;
+
+    }
+
+
+    updateAddressPreview();
+
+}
+
+
+/* =========================================================
+TOOL OPEN
+========================================================= */
+
+function openTool(
+    tool
+){
+
+    currentTool =
+        tool;
+
+
+    $("#workspace")
+        .classList.add(
+            "active"
+        );
+
+
+    $("#workspaceTitle")
+        .textContent =
+        `${tool} Generator`;
+
+
+    $("#workspaceDescription")
+        .textContent =
+        tool === "Address Sticker"
+            ? "Create From BooksWagon → To Customer / Company address stickers."
+            : `Create ${tool} labels with Excel and address support.`;
+
+
+    $$(".tool-select-btn")
+        .forEach(
+            button => {
+
+                button.classList.toggle(
+                    "active",
+                    button.dataset.selectTool === tool
+                );
+
+            }
+        );
+
+
+    configureToolUI();
+
+
+    $("#workspace")
+        .scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+        });
+
+}
+
+
+/* =========================================================
+TOOL-SPECIFIC UI
+========================================================= */
+
+function configureToolUI(){
+
+    const addressSticker =
+        currentTool ===
+        "Address Sticker";
+
+
+    const isISBN =
+        currentTool ===
+        "ISBN";
+
+
+    /*
+     * Address sticker gets its own address section.
+     */
+
+    $("#poSection")
+        .style.display =
+        addressSticker
+            ? "none"
+            : "";
+
+
+    $("#boxSection")
+        .style.display =
+        addressSticker ||
+        isISBN
+            ? "none"
+            : "";
+
+
+    $("#printSection")
+        .style.display =
+        addressSticker
+            ? "none"
+            : "";
+
+
+    $("#poAddressSection")
+        .style.display =
+        (
+            currentTool === "Coco Blue" ||
+            currentTool === "Other PO"
+        )
+            ? ""
+            : "none";
+
+
+    $("#addressSection")
+        .style.display =
+        addressSticker
+            ? ""
+            : "none";
+
+
+    $("#borderSection")
+        .style.display =
+        addressSticker
+            ? "none"
+            : "";
+
+
+    $("#fontSection")
+        .style.display =
+        addressSticker
+            ? "none"
+            : "";
+
+
+    $("#cutSection")
+        .style.display =
+        addressSticker
+            ? "none"
+            : "";
+
+
+    $("#labelPreviewSection")
+        .style.display =
+        addressSticker
+            ? "none"
+            : "";
+
+
+    $("#downloadSection")
+        .style.display =
+        "";
+
+
+    /*
+     * Excel is available for all three PO/ISBN tools.
+     */
+
+    updateAddressPreview();
+
+}
+
+
+/* =========================================================
+TOOL BUTTONS
+========================================================= */
+
+$$(".tool-card")
+.forEach(
+    card => {
+
+        card.addEventListener(
+            "click",
+            () =>
+                openTool(
+                    card.dataset.tool
+                )
+        );
+
+    }
+);
+
+
+$$(".tool-select-btn")
+.forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            () =>
+                openTool(
+                    button.dataset.selectTool
+                )
+        );
+
+    }
+);
+
+
+$("#closeWorkspace")
+.addEventListener(
+    "click",
+    () => {
+
+        $("#workspace")
+            .classList.remove(
+                "active"
+            );
+
+
+        $("#tools")
+            .scrollIntoView({
+                behavior:"smooth"
+            });
+
+    }
+);
+
+
+/* =========================================================
+INPUT TABS
+========================================================= */
+
+$$(".input-tab")
+.forEach(
+    button => {
 
         button.addEventListener(
             "click",
@@ -2748,15 +3628,18 @@ function setupInputTabs(){
                     button.dataset.input;
 
 
+                if(!target)
+                    return;
+
+
                 $$(".input-tab")
-                .forEach(btn => {
-
-                    btn.classList.toggle(
-                        "active",
-                        btn === button
+                    .forEach(
+                        item =>
+                            item.classList.toggle(
+                                "active",
+                                item === button
+                            )
                     );
-
-                });
 
 
                 $("#individualInput")
@@ -2772,175 +3655,143 @@ function setupInputTabs(){
                         target === "bulk"
                     );
 
+
+                $("#excelInput")
+                    .classList.toggle(
+                        "active",
+                        target === "excel"
+                    );
+
             }
         );
-
-    });
-
-}
-
-
-/* =========================================================
-   TOOL SELECTION
-========================================================= */
-
-function openTool(tool){
-
-    currentTool =
-        tool;
-
-
-    $("#workspaceTitle")
-        .textContent =
-        `${tool} Label Generator`;
-
-
-    $("#workspaceDescription")
-        .textContent =
-        `Create ${tool} PO and Box labels with complete customization.`;
-
-
-    $("#workspace")
-        .classList.add("active");
-
-
-    $$(".tool-select-btn")
-        .forEach(button => {
-
-            button.classList.toggle(
-                "active",
-                button.dataset.selectTool === tool
-            );
-
-        });
-
-
-    $("#workspace")
-        .scrollIntoView({
-            behavior:"smooth",
-            block:"start"
-        });
-
-}
-
-
-$$(".tool-card")
-.forEach(card => {
-
-    card.addEventListener(
-        "click",
-        () => {
-
-            openTool(
-                card.dataset.tool
-            );
-
-        }
-    );
-
-});
-
-
-$$(".tool-select-btn")
-.forEach(button => {
-
-    button.addEventListener(
-        "click",
-        () => {
-
-            openTool(
-                button.dataset.selectTool
-            );
-
-        }
-    );
-
-});
-
-
-$("#closeWorkspace")
-.addEventListener(
-    "click",
-    () => {
-
-        $("#workspace")
-            .classList.remove("active");
-
-        $("#tools")
-            .scrollIntoView({
-                behavior:"smooth"
-            });
 
     }
 );
 
 
 /* =========================================================
-   CHECKBOXES
-   SIMPLE ON/OFF — NO CONFIRMATION
+ADDRESS TABS
 ========================================================= */
 
-$$(".feature-checkbox input")
-.forEach(check => {
+$$("[data-address-input]")
+.forEach(
+    button => {
 
-    check.addEventListener(
-        "change",
-        () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-            const feature =
-                check.dataset.feature ||
-                "Feature";
+                const type =
+                    button.dataset.addressInput;
 
 
-            if(check.checked){
+                $$("[data-address-input]")
+                    .forEach(
+                        item =>
+                            item.classList.toggle(
+                                "active",
+                                item === button
+                            )
+                    );
 
-                toast(
-                    `${feature} is enabled.`,
-                    "success"
-                );
 
-            }else{
+                $("#addressManualPanel")
+                    .classList.toggle(
+                        "active",
+                        type === "manual"
+                    );
 
-                toast(
-                    `${feature} is disabled.`,
-                    "error"
-                );
+
+                $("#addressExcelPanel")
+                    .classList.toggle(
+                        "active",
+                        type === "excel"
+                    );
 
             }
+        );
 
-
-            updatePreview();
-
-        }
-    );
-
-});
+    }
+);
 
 
 /* =========================================================
-   PRINT MODE
+CHECKBOXES
 ========================================================= */
 
-function printMode(){
+$$(".feature-checkbox input")
+.forEach(
+    checkbox => {
+
+        checkbox.addEventListener(
+            "change",
+            () => {
+
+                const feature =
+                    checkbox.dataset.feature ||
+                    "Feature";
+
+
+                if(
+                    checkbox.checked
+                ){
+
+                    toast(
+                        `${feature} is enabled.`
+                    );
+
+                }else{
+
+                    toast(
+                        `${feature} is disabled.`,
+                        "error"
+                    );
+
+                }
+
+
+                updatePreview();
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+PRINT MODE
+========================================================= */
+
+function getPrintMode(){
 
     const po =
-        $("#printPO").checked;
+        $("#printPO")?.checked;
 
     const box =
-        $("#printBox").checked;
+        $("#printBox")?.checked;
 
     const both =
-        $("#printPOBox").checked;
+        $("#printPOBox")?.checked;
 
 
-    if(both || (po && box))
+    if(
+        both ||
+        (po && box)
+    ){
+
         return "both";
+
+    }
+
 
     if(po)
         return "po";
 
+
     if(box)
         return "box";
+
 
     return "none";
 
@@ -2948,13 +3799,13 @@ function printMode(){
 
 
 /* =========================================================
-   UPDATE PREVIEW
+UPDATE LABEL PREVIEW
 ========================================================= */
 
 function updatePreview(){
 
     const mode =
-        printMode();
+        getPrintMode();
 
 
     const po =
@@ -2963,7 +3814,7 @@ function updatePreview(){
 
 
     const box =
-        $("#startBox").value ||
+        $("#startBox")?.value ||
         "1";
 
 
@@ -2980,133 +3831,214 @@ function updatePreview(){
     $("#previewPO")
         .classList.toggle(
             "hidden-preview",
-            !(mode === "po" || mode === "both")
+            !(
+                mode === "po" ||
+                mode === "both"
+            )
         );
 
 
     $("#previewBox")
         .classList.toggle(
             "hidden-preview",
-            !(mode === "box" || mode === "both")
+            !(
+                mode === "box" ||
+                mode === "both"
+            )
         );
 
 
     $("#previewCut")
         .classList.toggle(
             "hidden-preview",
-            !(mode === "both" &&
-              $("#cutLine").checked)
+            !(
+                mode === "both" &&
+                $("#cutLine")?.checked
+            )
         );
 
 
-    /* Page border */
-
-    const page =
-        $("#labelPreview");
-
-
-    page.style.border =
-        $("#pageBorder").checked
-        ? `2px ${$("#borderStyle").value} ${$("#borderColor").value}`
-        : "0";
-
-
-    /* Border width */
-
-    const widths = {
-
-        thin:"1px",
-        medium:"2px",
-        thick:"4px"
-
-    };
-
-
-    const borderWidth =
-        widths[
-            $("#borderSize").value
-        ];
-
-
-    const borderStyle =
-        $("#borderStyle").value;
-
-
     const color =
-        $("#borderColor").value;
+        $("#borderColor")?.value ||
+        "#111827";
 
 
-    /* PO border */
-
-    $("#previewPO").style.border =
-        $("#poBorder").checked
-        ? `${borderWidth} ${borderStyle} ${color}`
-        : "0";
+    const style =
+        $("#borderStyle")?.value ||
+        "solid";
 
 
-    /* Box border */
-
-    $("#previewBox").style.border =
-        $("#boxBorder").checked
-        ? `${borderWidth} ${borderStyle} ${color}`
-        : "0";
-
-
-    /* Combined */
-
-    $("#previewContent").style.border =
-        $("#combinedBorder").checked
-        ? `${borderWidth} ${borderStyle} ${color}`
-        : "0";
+    const width =
+        $("#borderSize")?.value === "thin"
+            ? 1
+            : $("#borderSize")?.value === "thick"
+                ? 4
+                : 2;
 
 
-    /* Font */
+    $("#labelPreview")
+        .style.border =
+        $("#pageBorder")?.checked
+            ? `${width}px ${style} ${color}`
+            : "0";
+
+
+    $("#previewPO")
+        .style.border =
+        $("#poBorder")?.checked
+            ? `${width}px ${style} ${color}`
+            : "0";
+
+
+    $("#previewBox")
+        .style.border =
+        $("#boxBorder")?.checked
+            ? `${width}px ${style} ${color}`
+            : "0";
+
+
+    $("#previewContent")
+        .style.border =
+        $("#combinedBorder")?.checked
+            ? `${width}px ${style} ${color}`
+            : "0";
+
 
     const fonts = {
 
-        helvetica:"Arial,Helvetica,sans-serif",
+        helvetica:
+            "Arial,Helvetica,sans-serif",
 
-        times:"Times New Roman,Times,serif",
+        times:
+            "Times New Roman,Times,serif",
 
-        courier:"Courier New,Courier,monospace",
+        courier:
+            "Courier New,Courier,monospace",
 
-        georgia:"Georgia,serif"
+        georgia:
+            "Georgia,serif"
 
     };
 
 
-    $("#previewContent").style.fontFamily =
+    $("#previewContent")
+        .style.fontFamily =
         fonts[
-            $("#fontFamily").value
-        ];
+            $("#fontFamily")?.value
+        ] ||
+        fonts.helvetica;
 
 
-    $("#previewContent").style.fontSize =
-        `${$("#fontSize").value}px`;
+    $("#previewContent")
+        .style.fontSize =
+        `${$("#fontSize")?.value || 18}px`;
 
 
-    $("#previewContent").style.fontWeight =
-        $("#fontBold").checked
-        ? "900"
-        : "400";
+    $("#previewContent")
+        .style.fontWeight =
+        $("#fontBold")?.checked
+            ? "900"
+            : "400";
 
 
-    $("#previewContent").style.fontStyle =
-        $("#fontItalic").checked
-        ? "italic"
-        : "normal";
+    $("#previewContent")
+        .style.fontStyle =
+        $("#fontItalic")?.checked
+            ? "italic"
+            : "normal";
 
 
-    $("#previewContent").style.textDecoration =
-        $("#fontUnderline").checked
-        ? "underline"
-        : "none";
+    $("#previewContent")
+        .style.textDecoration =
+        $("#fontUnderline")?.checked
+            ? "underline"
+            : "none";
 
 }
 
 
 /* =========================================================
-   LIVE UPDATE
+ADDRESS PREVIEW
+========================================================= */
+
+function updateAddressPreview(){
+
+    const fromName =
+        currentTool === "Address Sticker"
+            ? $("#stickerFromName")?.value
+            : $("#fromName")?.value;
+
+
+    const fromAddress =
+        currentTool === "Address Sticker"
+            ? $("#stickerFromAddress")?.value
+            : $("#fromAddress")?.value;
+
+
+    const toName =
+        currentTool === "Address Sticker"
+            ? $("#stickerToName")?.value
+            : $("#toName")?.value;
+
+
+    const toAddress =
+        currentTool === "Address Sticker"
+            ? $("#stickerToAddress")?.value
+            : $("#toAddress")?.value;
+
+
+    if(
+        $("#previewFromName")
+    ){
+
+        $("#previewFromName")
+            .textContent =
+            fromName ||
+            "BooksWagon";
+
+    }
+
+
+    if(
+        $("#previewFromAddress")
+    ){
+
+        $("#previewFromAddress")
+            .textContent =
+            fromAddress ||
+            CONFIG.address;
+
+    }
+
+
+    if(
+        $("#previewToName")
+    ){
+
+        $("#previewToName")
+            .textContent =
+            toName ||
+            "XYZ Company";
+
+    }
+
+
+    if(
+        $("#previewToAddress")
+    ){
+
+        $("#previewToAddress")
+            .textContent =
+            toAddress ||
+            "Customer / Company Address";
+
+    }
+
+}
+
+
+/* =========================================================
+LIVE CHANGES
 ========================================================= */
 
 document.addEventListener(
@@ -3120,6 +4052,8 @@ document.addEventListener(
         ){
 
             updatePreview();
+
+            updateAddressPreview();
 
         }
 
@@ -3139,6 +4073,8 @@ document.addEventListener(
 
             updatePreview();
 
+            updateAddressPreview();
+
         }
 
     }
@@ -3146,7 +4082,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   PAGE SIZE
+PDF FORMAT
 ========================================================= */
 
 function getPageFormat(){
@@ -3158,477 +4094,50 @@ function getPageFormat(){
     if(size === "A4")
         return "a4";
 
+
     if(size === "A5")
         return "a5";
+
 
     if(size === "A6")
         return "a6";
 
+
     if(size === "LETTER")
         return "letter";
+
 
     if(size === "LEGAL")
         return "legal";
 
 
     return [
-        Number($("#customWidth").value),
-        Number($("#customHeight").value)
+        Number(
+            $("#customWidth").value
+        ) || 210,
+
+        Number(
+            $("#customHeight").value
+        ) || 297
     ];
 
 }
 
 
 /* =========================================================
-   BORDER WIDTH
+RGB
 ========================================================= */
 
-function getBorderWidth(){
-
-    const size =
-        $("#borderSize").value;
-
-
-    if(size === "thin")
-        return 0.5;
-
-    if(size === "thick")
-        return 1.8;
-
-    return 1;
-
-}
-
-
-/* =========================================================
-   FONT
-========================================================= */
-
-function getPDFStyle(){
-
-    let style =
-        "normal";
-
-
-    if(
-        $("#fontBold").checked &&
-        $("#fontItalic").checked
-    ){
-
-        style =
-            "bolditalic";
-
-    }else if(
-        $("#fontBold").checked
-    ){
-
-        style =
-            "bold";
-
-    }else if(
-        $("#fontItalic").checked
-    ){
-
-        style =
-            "italic";
-
-    }
-
-
-    return style;
-
-}
-
-
-/* =========================================================
-   DRAW LABEL
-========================================================= */
-
-function drawLabel(
-    doc,
-    po,
-    box
+function hexToRGB(
+    hex
 ){
-
-    const width =
-        doc.internal.pageSize.getWidth();
-
-
-    const height =
-        doc.internal.pageSize.getHeight();
-
-
-    const center =
-        width / 2;
-
-
-    const color =
-        $("#borderColor").value;
-
-
-    const rgb =
-        hexToRGB(color);
-
-
-    /* Page border */
-
-    if(
-        $("#pageBorder").checked
-    ){
-
-        doc.setDrawColor(
-            rgb.r,
-            rgb.g,
-            rgb.b
-        );
-
-        doc.setLineWidth(
-            getBorderWidth()
-        );
-
-        doc.rect(
-            7,
-            7,
-            width - 14,
-            height - 14
-        );
-
-    }
-
-
-    /* Font */
-
-    const font =
-        $("#fontFamily").value === "georgia"
-        ? "times"
-        : $("#fontFamily").value;
-
-
-    doc.setFont(
-        font,
-        getPDFStyle()
-    );
-
-
-    doc.setFontSize(
-        Number($("#fontSize").value)
-    );
-
-
-    let y =
-        height / 2 - 25;
-
-
-    const mode =
-        printMode();
-
-
-    /* PO */
-
-    if(
-        mode === "po" ||
-        mode === "both"
-    ){
-
-        const text =
-            String(po);
-
-
-        const textWidth =
-            doc.getTextWidth(text);
-
-
-        if(
-            $("#poBorder").checked
-        ){
-
-            doc.setDrawColor(
-                rgb.r,
-                rgb.g,
-                rgb.b
-            );
-
-            doc.setLineWidth(
-                getBorderWidth()
-            );
-
-            drawStyledRect(
-                doc,
-                center - textWidth/2 - 15,
-                y - 12,
-                textWidth + 30,
-                24
-            );
-
-        }
-
-
-        doc.text(
-            text,
-            center,
-            y + 4,
-            {
-                align:"center"
-            }
-        );
-
-
-        y += 45;
-
-    }
-
-
-    /* Cutting line */
-
-    if(
-        mode === "both" &&
-        $("#cutLine").checked
-    ){
-
-        doc.setDrawColor(
-            60,
-            60,
-            60
-        );
-
-
-        doc.setLineWidth(.5);
-
-
-        if(
-            $("#cutLineStyle").value ===
-            "dashed"
-        ){
-
-            doc.setLineDashPattern(
-                [3,3],
-                0
-            );
-
-        }else if(
-            $("#cutLineStyle").value ===
-            "dotted"
-        ){
-
-            doc.setLineDashPattern(
-                [1,3],
-                0
-            );
-
-        }else{
-
-            doc.setLineDashPattern(
-                [],
-                0
-            );
-
-        }
-
-
-        doc.line(
-            20,
-            y - 10,
-            width - 20,
-            y - 10
-        );
-
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-
-        if(
-            $("#scissorMark").checked
-        ){
-
-            doc.setFontSize(10);
-
-            doc.text(
-                "✂",
-                center,
-                y - 6,
-                {
-                    align:"center"
-                }
-            );
-
-            doc.setFontSize(
-                Number($("#fontSize").value)
-            );
-
-        }
-
-
-        y += 20;
-
-    }
-
-
-    /* Box */
-
-    if(
-        mode === "box" ||
-        mode === "both"
-    ){
-
-        const text =
-            `BOX NO. ${box}`;
-
-
-        const textWidth =
-            doc.getTextWidth(text);
-
-
-        if(
-            $("#boxBorder").checked
-        ){
-
-            doc.setDrawColor(
-                rgb.r,
-                rgb.g,
-                rgb.b
-            );
-
-            doc.setLineWidth(
-                getBorderWidth()
-            );
-
-            drawStyledRect(
-                doc,
-                center - textWidth/2 - 15,
-                y - 12,
-                textWidth + 30,
-                24
-            );
-
-        }
-
-
-        doc.text(
-            text,
-            center,
-            y + 4,
-            {
-                align:"center"
-            }
-        );
-
-    }
-
-
-    /* Combined border */
-
-    if(
-        $("#combinedBorder").checked
-    ){
-
-        doc.setDrawColor(
-            rgb.r,
-            rgb.g,
-            rgb.b
-        );
-
-        doc.setLineWidth(
-            getBorderWidth()
-        );
-
-        drawStyledRect(
-            doc,
-            20,
-            height/2 - 70,
-            width - 40,
-            140
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   STYLED RECTANGLE
-========================================================= */
-
-function drawStyledRect(
-    doc,
-    x,
-    y,
-    w,
-    h
-){
-
-    const style =
-        $("#borderStyle").value;
-
-
-    if(style === "dashed"){
-
-        doc.setLineDashPattern(
-            [4,3],
-            0
-        );
-
-        doc.rect(x,y,w,h);
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-    }else if(style === "dotted"){
-
-        doc.setLineDashPattern(
-            [1,2],
-            0
-        );
-
-        doc.rect(x,y,w,h);
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-    }else if(style === "double"){
-
-        doc.rect(
-            x,
-            y,
-            w,
-            h
-        );
-
-        doc.rect(
-            x + 2,
-            y + 2,
-            w - 4,
-            h - 4
-        );
-
-    }else{
-
-        doc.rect(
-            x,
-            y,
-            w,
-            h
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   HEX TO RGB
-========================================================= */
-
-function hexToRGB(hex){
 
     hex =
-        hex.replace("#","");
+        String(hex || "#111827")
+            .replace(
+                "#",
+                ""
+            );
 
 
     return {
@@ -3657,320 +4166,867 @@ function hexToRGB(hex){
 
 
 /* =========================================================
-   GENERATE PDF
+DRAW PDF BORDER
+========================================================= */
+
+function drawBorder(
+    doc,
+    x,
+    y,
+    w,
+    h
+){
+
+    const style =
+        $("#borderStyle").value;
+
+
+    if(
+        style === "dashed"
+    ){
+
+        doc.setLineDashPattern(
+            [4,3],
+            0
+        );
+
+        doc.rect(
+            x,y,w,h
+        );
+
+        doc.setLineDashPattern(
+            [],0
+        );
+
+    }
+    else if(
+        style === "dotted"
+    ){
+
+        doc.setLineDashPattern(
+            [1,2],
+            0
+        );
+
+        doc.rect(
+            x,y,w,h
+        );
+
+        doc.setLineDashPattern(
+            [],0
+        );
+
+    }
+    else if(
+        style === "double"
+    ){
+
+        doc.rect(
+            x,y,w,h
+        );
+
+        doc.rect(
+            x+2,
+            y+2,
+            w-4,
+            h-4
+        );
+
+    }
+    else{
+
+        doc.rect(
+            x,y,w,h
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+DRAW PO LABEL
+========================================================= */
+
+function drawLabel(
+    doc,
+    po,
+    box
+){
+
+    const width =
+        doc.internal.pageSize.getWidth();
+
+
+    const height =
+        doc.internal.pageSize.getHeight();
+
+
+    const center =
+        width / 2;
+
+
+    const rgb =
+        hexToRGB(
+            $("#borderColor").value
+        );
+
+
+    const borderWidth =
+        $("#borderSize").value === "thin"
+            ? 0.5
+            : $("#borderSize").value === "thick"
+                ? 1.8
+                : 1;
+
+
+    doc.setDrawColor(
+        rgb.r,
+        rgb.g,
+        rgb.b
+    );
+
+
+    doc.setLineWidth(
+        borderWidth
+    );
+
+
+    /* Page */
+
+    if(
+        $("#pageBorder").checked
+    ){
+
+        drawBorder(
+            doc,
+            7,
+            7,
+            width-14,
+            height-14
+        );
+
+    }
+
+
+    const font =
+        $("#fontFamily").value === "times"
+            ? "times"
+            : $("#fontFamily").value === "courier"
+                ? "courier"
+                : "helvetica";
+
+
+    let fontStyle =
+        "normal";
+
+
+    if(
+        $("#fontBold").checked &&
+        $("#fontItalic").checked
+    ){
+
+        fontStyle =
+            "bolditalic";
+
+    }
+    else if(
+        $("#fontBold").checked
+    ){
+
+        fontStyle =
+            "bold";
+
+    }
+    else if(
+        $("#fontItalic").checked
+    ){
+
+        fontStyle =
+            "italic";
+
+    }
+
+
+    doc.setFont(
+        font,
+        fontStyle
+    );
+
+
+    doc.setFontSize(
+        Number(
+            $("#fontSize").value
+        ) || 18
+    );
+
+
+    const mode =
+        getPrintMode();
+
+
+    let y =
+        height/2 - 30;
+
+
+    /* PO */
+
+    if(
+        mode === "po" ||
+        mode === "both"
+    ){
+
+        const text =
+            String(po);
+
+
+        const tw =
+            doc.getTextWidth(
+                text
+            );
+
+
+        if(
+            $("#poBorder").checked
+        ){
+
+            drawBorder(
+                doc,
+                center-(tw+30)/2,
+                y-13,
+                tw+30,
+                26
+            );
+
+        }
+
+
+        doc.text(
+            text,
+            center,
+            y+5,
+            {
+                align:"center"
+            }
+        );
+
+
+        y += 48;
+
+    }
+
+
+    /* Cutting */
+
+    if(
+        mode === "both" &&
+        $("#cutLine").checked
+    ){
+
+        doc.setLineDashPattern(
+            [4,3],
+            0
+        );
+
+
+        doc.setLineWidth(
+            .5
+        );
+
+
+        doc.line(
+            20,
+            y-10,
+            width-20,
+            y-10
+        );
+
+
+        doc.setLineDashPattern(
+            [],0
+        );
+
+
+        if(
+            $("#scissorMark").checked
+        ){
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
+
+            doc.setFontSize(
+                10
+            );
+
+            doc.text(
+                "✂",
+                center,
+                y-5,
+                {
+                    align:"center"
+                }
+            );
+
+
+            doc.setFont(
+                font,
+                fontStyle
+            );
+
+            doc.setFontSize(
+                Number(
+                    $("#fontSize").value
+                ) || 18
+            );
+
+        }
+
+
+        y += 22;
+
+    }
+
+
+    /* BOX */
+
+    if(
+        mode === "box" ||
+        mode === "both"
+    ){
+
+        const text =
+            `BOX NO. ${box}`;
+
+
+        const tw =
+            doc.getTextWidth(
+                text
+            );
+
+
+        if(
+            $("#boxBorder").checked
+        ){
+
+            drawBorder(
+                doc,
+                center-(tw+30)/2,
+                y-13,
+                tw+30,
+                26
+            );
+
+        }
+
+
+        doc.text(
+            text,
+            center,
+            y+5,
+            {
+                align:"center"
+            }
+        );
+
+    }
+
+
+    /* Combined */
+
+    if(
+        $("#combinedBorder").checked
+    ){
+
+        drawBorder(
+            doc,
+            18,
+            height/2-80,
+            width-36,
+            160
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+BUILD PDF
+========================================================= */
+
+function buildPOPDF(
+    po
+){
+
+    const JsPDF =
+        window.jspdf.jsPDF;
+
+
+    const doc =
+        new JsPDF({
+
+            orientation:
+                $("#orientation").value,
+
+            unit:"mm",
+
+            format:
+                getPageFormat()
+
+        });
+
+
+    const start =
+        Number(
+            $("#startBox").value
+        );
+
+
+    const end =
+        Number(
+            $("#endBox").value
+        );
+
+
+    const copies =
+        Math.max(
+            1,
+            Number(
+                $("#copies").value
+            ) || 1
+        );
+
+
+    let first =
+        true;
+
+
+    for(
+        let box=start;
+        box<=end;
+        box++
+    ){
+
+        for(
+            let copy=0;
+            copy<copies;
+            copy++
+        ){
+
+            if(!first)
+                doc.addPage();
+
+
+            first =
+                false;
+
+
+            drawLabel(
+                doc,
+                po,
+                box
+            );
+
+        }
+
+    }
+
+
+    return doc;
+
+}
+
+
+/* =========================================================
+ADDRESS PDF
+========================================================= */
+
+function buildAddressPDF(
+    fromName,
+    fromAddress,
+    toName,
+    toAddress
+){
+
+    const JsPDF =
+        window.jspdf.jsPDF;
+
+
+    const doc =
+        new JsPDF({
+
+            orientation:"landscape",
+
+            unit:"mm",
+
+            format:"a6"
+
+        });
+
+
+    const width =
+        doc.internal.pageSize.getWidth();
+
+
+    const height =
+        doc.internal.pageSize.getHeight();
+
+
+    doc.setDrawColor(
+        17,24,39
+    );
+
+    doc.setLineWidth(
+        1
+    );
+
+
+    doc.rect(
+        6,
+        6,
+        width-12,
+        height-12
+    );
+
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+
+    doc.setFontSize(
+        11
+    );
+
+
+    doc.text(
+        "FROM",
+        15,
+        22
+    );
+
+
+    doc.text(
+        "TO",
+        width/2+10,
+        22
+    );
+
+
+    doc.setFontSize(
+        14
+    );
+
+
+    doc.text(
+        fromName ||
+        "BooksWagon",
+        15,
+        33
+    );
+
+
+    doc.text(
+        toName ||
+        "Customer / Company",
+        width/2+10,
+        33
+    );
+
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+
+    doc.setFontSize(
+        9
+    );
+
+
+    const fromLines =
+        doc.splitTextToSize(
+            fromAddress ||
+            CONFIG.address,
+            width/2-30
+        );
+
+
+    const toLines =
+        doc.splitTextToSize(
+            toAddress ||
+            "Customer Address",
+            width/2-30
+        );
+
+
+    doc.text(
+        fromLines,
+        15,
+        44
+    );
+
+
+    doc.text(
+        toLines,
+        width/2+10,
+        44
+    );
+
+
+    doc.setLineDashPattern(
+        [3,3],
+        0
+    );
+
+
+    doc.line(
+        width/2,
+        12,
+        width/2,
+        height-12
+    );
+
+
+    doc.setLineDashPattern(
+        [],0
+    );
+
+
+    return doc;
+
+}
+
+
+/* =========================================================
+GENERATE
 ========================================================= */
 
 async function generatePDF(){
 
     try{
 
-        if(
-            !window.jspdf ||
-            !window.jspdf.jsPDF
-        ){
-
-            throw new Error(
-                "PDF library could not be loaded."
-            );
-
-        }
-
-
-        const mode =
-            printMode();
-
-
-        if(mode === "none"){
-
-            toast(
-                "Please select PO Number, Box Number or PO + Box.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        const poList =
-            getPOList();
-
+        /* ADDRESS STICKER */
 
         if(
-            !poList.length
-        ){
-
-            toast(
-                "Please enter at least one PO number.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        const start =
-            Number(
-                $("#startBox").value
-            );
-
-
-        const end =
-            Number(
-                $("#endBox").value
-            );
-
-
-        if(
-            !Number.isInteger(start) ||
-            !Number.isInteger(end) ||
-            start < 1 ||
-            end < start
-        ){
-
-            toast(
-                "Please enter a valid Box range.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        const copies =
-            Math.max(
-                1,
-                Number(
-                    $("#copies").value
-                ) || 1
-            );
-
-
-        const JsPDF =
-            window.jspdf.jsPDF;
-
-
-        const format =
-            getPageFormat();
-
-
-        const orientation =
-            $("#orientation").value;
-
-
-        const docs = [];
-
-
-        /* =================================================
-           CREATE EACH PO DOCUMENT
-        ================================================= */
-
-        for(
-            const po of poList
-        ){
-
-            const doc =
-                new JsPDF({
-
-                    orientation,
-
-                    unit:"mm",
-
-                    format
-
-                });
-
-
-            let first =
-                true;
-
-
-            for(
-                let box=start;
-                box<=end;
-                box++
-            ){
-
-                for(
-                    let copy=0;
-                    copy<copies;
-                    copy++
-                ){
-
-                    if(!first){
-
-                        doc.addPage();
-
-                    }
-
-
-                    first =
-                        false;
-
-
-                    drawLabel(
-                        doc,
-                        po,
-                        box
-                    );
-
-                }
-
-            }
-
-
-            docs.push({
-                po,
-                doc
-            });
-
-        }
-
-
-        /* =================================================
-           MERGED PDF
-        ================================================= */
-
-        if(
-            $("#mergePDF").checked
-        ){
-
-            const merged =
-                new JsPDF({
-
-                    orientation,
-
-                    unit:"mm",
-
-                    format
-
-                });
-
-
-            let first =
-                true;
-
-
-            for(
-                const item of docs
-            ){
-
-                const pages =
-                    item.doc.internal.getNumberOfPages();
-
-
-                for(
-                    let p=1;
-                    p<=pages;
-                    p++
-                ){
-
-                    if(!first){
-
-                        merged.addPage();
-
-                    }
-
-
-                    first =
-                        false;
-
-
-                    merged.setPage(p);
-
-
-                    const page =
-                        item.doc.internal.pages[p];
-
-
-                    /*
-                     * Re-rendering is used instead of copying
-                     * internal jsPDF page objects.
-                     */
-
-                    for(
-                        let box=start;
-                        box<=end;
-                        box++
-                    ){
-
-                        drawLabel(
-                            merged,
-                            item.po,
-                            box
-                        );
-
-                        break;
-
-                    }
-
-                }
-
-            }
-
-
-            merged.save(
-                `${safeName(currentTool)}_MERGED.pdf`
-            );
-
-
-            toast(
-                "Merged PDF downloaded successfully."
-            );
-
-
-            return;
-
-        }
-
-
-        /* =================================================
-           ZIP
-        ================================================= */
-
-        if(
-            $("#zipPDF").checked
+            currentTool ===
+            "Address Sticker"
         ){
 
             if(
-                typeof JSZip ===
-                "undefined"
+                addressExcelRows.length
             ){
 
-                throw new Error(
-                    "ZIP library could not be loaded."
+                const zip =
+                    new JSZip();
+
+                addressExcelRows
+                    .forEach(
+                        (
+                            row,
+                            index
+                        ) => {
+
+                            const name =
+                                findValue(
+                                    row,
+                                    [
+                                        "Name",
+                                        "Customer Name",
+                                        "Company",
+                                        "Company Name"
+                                    ]
+                                );
+
+
+                            const address =
+                                findValue(
+                                    row,
+                                    [
+                                        "Address",
+                                        "To Address"
+                                    ]
+                                );
+
+
+                            const city =
+                                findValue(
+                                    row,
+                                    ["City"]
+                                );
+
+
+                            const state =
+                                findValue(
+                                    row,
+                                    ["State"]
+                                );
+
+
+                            const pin =
+                                findValue(
+                                    row,
+                                    [
+                                        "PIN",
+                                        "Pincode",
+                                        "Pin Code"
+                                    ]
+                                );
+
+
+                            const fullAddress =
+                                [
+                                    address,
+                                    city,
+                                    state,
+                                    pin
+                                ]
+                                .filter(Boolean)
+                                .join(", ");
+
+
+                            const doc =
+                                buildAddressPDF(
+                                    $("#stickerFromName").value,
+                                    $("#stickerFromAddress").value,
+                                    name,
+                                    fullAddress
+                                );
+
+
+                            zip.file(
+                                `Address_Sticker_${index+1}.pdf`,
+                                doc.output("blob")
+                            );
+
+                        }
+                    );
+
+
+                const blob =
+                    await zip.generateAsync({
+                        type:"blob"
+                    });
+
+
+                downloadBlob(
+                    blob,
+                    "BooksWagon_Address_Stickers.zip"
                 );
+
+
+                toast(
+                    `${addressExcelRows.length} address stickers downloaded.`
+                );
+
+
+                return;
 
             }
 
 
-            const zip =
+            const doc =
+                buildAddressPDF(
+                    $("#stickerFromName").value,
+                    $("#stickerFromAddress").value,
+                    $("#stickerToName").value,
+                    $("#stickerToAddress").value
+                );
+
+
+            doc.save(
+                "BooksWagon_Address_Sticker.pdf"
+            );
+
+
+            toast(
+                "Address sticker PDF downloaded."
+            );
+
+
+            return;
+
+        }
+
+
+        /* PO / ISBN */
+
+        const list =
+            getPOList();
+
+
+        if(!list.length){
+
+            toast(
+                "Please enter or upload at least one PO / ISBN.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        if(
+            currentTool !== "ISBN" &&
+            getPrintMode() === "none"
+        ){
+
+            toast(
+                "Select PO Number, Box Number or PO + Box.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const merge =
+            $("#mergePDF").checked;
+
+
+        const zip =
+            $("#zipPDF").checked;
+
+
+        if(zip){
+
+            const zipFile =
                 new JSZip();
 
 
-            for(
-                const item of docs
-            ){
+            list.forEach(
+                po => {
 
-                zip.file(
-                    `${safeName(item.po)}_${safeName(currentTool)}.pdf`,
-                    item.doc.output("blob")
-                );
+                    const doc =
+                        buildPOPDF(
+                            po
+                        );
 
-            }
+
+                    zipFile.file(
+                        `${safeFilename(po)}.pdf`,
+                        doc.output("blob")
+                    );
+
+                }
+            );
 
 
             const blob =
-                await zip.generateAsync({
+                await zipFile.generateAsync({
                     type:"blob"
                 });
 
 
             downloadBlob(
                 blob,
-                `${safeName(currentTool)}_LABELS.zip`
+                `${safeFilename(currentTool)}_Labels.zip`
             );
 
 
@@ -3984,23 +5040,122 @@ async function generatePDF(){
         }
 
 
-        /* =================================================
-           SEPARATE PDFs
-        ================================================= */
+        if(merge){
 
-        for(
-            const item of docs
-        ){
+            const JsPDF =
+                window.jspdf.jsPDF;
 
-            item.doc.save(
-                `${safeName(item.po)}_${safeName(currentTool)}.pdf`
+
+            const merged =
+                new JsPDF({
+
+                    orientation:
+                        $("#orientation").value,
+
+                    unit:"mm",
+
+                    format:
+                        getPageFormat()
+
+                });
+
+
+            let first =
+                true;
+
+
+            const start =
+                Number(
+                    $("#startBox").value
+                );
+
+
+            const end =
+                Number(
+                    $("#endBox").value
+                );
+
+
+            const copies =
+                Math.max(
+                    1,
+                    Number(
+                        $("#copies").value
+                    ) || 1
+                );
+
+
+            for(
+                const po of list
+            ){
+
+                for(
+                    let box=start;
+                    box<=end;
+                    box++
+                ){
+
+                    for(
+                        let copy=0;
+                        copy<copies;
+                        copy++
+                    ){
+
+                        if(!first)
+                            merged.addPage();
+
+
+                        first =
+                            false;
+
+
+                        drawLabel(
+                            merged,
+                            po,
+                            box
+                        );
+
+                    }
+
+                }
+
+            }
+
+
+            merged.save(
+                `${safeFilename(currentTool)}_MERGED.pdf`
             );
+
+
+            toast(
+                "Merged PDF downloaded."
+            );
+
+
+            return;
 
         }
 
 
+        list.forEach(
+            po => {
+
+                const doc =
+                    buildPOPDF(
+                        po
+                    );
+
+
+                doc.save(
+                    `${safeFilename(po)}_${safeFilename(currentTool)}.pdf`
+                );
+
+            }
+        );
+
+
         toast(
-            `${docs.length} PDF file(s) generated successfully.`
+            `${list.length} PDF file(s) generated.`
         );
 
 
@@ -4010,7 +5165,7 @@ async function generatePDF(){
 
         toast(
             error.message ||
-            "PDF generation failed.",
+            "Generation failed.",
             "error"
         );
 
@@ -4020,29 +5175,7 @@ async function generatePDF(){
 
 
 /* =========================================================
-   SAFE NAME
-========================================================= */
-
-function safeName(value){
-
-    return String(value)
-        .replace(
-            /[^a-z0-9_-]+/gi,
-            "_"
-        )
-        .replace(
-            /^_+|_+$/g,
-            ""
-        )
-        .slice(0,80)
-        ||
-        "LABEL";
-
-}
-
-
-/* =========================================================
-   DOWNLOAD BLOB
+DOWNLOAD
 ========================================================= */
 
 function downloadBlob(
@@ -4051,30 +5184,39 @@ function downloadBlob(
 ){
 
     const url =
-        URL.createObjectURL(blob);
+        URL.createObjectURL(
+            blob
+        );
 
 
-    const a =
+    const link =
         document.createElement("a");
 
 
-    a.href =
+    link.href =
         url;
 
-    a.download =
+
+    link.download =
         filename;
 
 
-    document.body.appendChild(a);
+    document.body.appendChild(
+        link
+    );
 
-    a.click();
 
-    a.remove();
+    link.click();
+
+
+    link.remove();
 
 
     setTimeout(
         () =>
-            URL.revokeObjectURL(url),
+            URL.revokeObjectURL(
+                url
+            ),
         1000
     );
 
@@ -4082,7 +5224,31 @@ function downloadBlob(
 
 
 /* =========================================================
-   RESET
+SAFE NAME
+========================================================= */
+
+function safeFilename(
+    value
+){
+
+    return String(
+        value ||
+        "LABEL"
+    )
+    .replace(
+        /[^a-z0-9_-]+/gi,
+        "_"
+    )
+    .slice(
+        0,
+        80
+    );
+
+}
+
+
+/* =========================================================
+RESET
 ========================================================= */
 
 $("#resetButton")
@@ -4091,68 +5257,76 @@ $("#resetButton")
     () => {
 
         $$(".po-input")
-        .forEach(input => {
+            .forEach(
+                input =>
+                    input.value=""
+            );
 
-            input.value = "";
 
-        });
+        $("#bulkPO").value =
+            "";
 
 
-        $("#bulkPO").value = "";
+        $("#startBox").value =
+            "1";
 
-        $("#startBox").value = "1";
 
-        $("#endBox").value = "200";
+        $("#endBox").value =
+            "200";
 
-        $("#copies").value = "1";
 
-        $("#labelsPerPage").value = "1";
+        $("#copies").value =
+            "1";
 
 
         $$(".feature-checkbox input")
-        .forEach(input => {
+            .forEach(
+                checkbox =>
+                    checkbox.checked=false
+            );
 
-            input.checked = false;
 
-        });
+        $("#toName").value =
+            "";
 
 
-        $("#pageSize").value =
-            "A4";
+        $("#toAddress").value =
+            "";
 
-        $("#orientation").value =
-            "portrait";
 
-        $("#customWidth").value =
-            "210";
+        $("#stickerToName").value =
+            "";
 
-        $("#customHeight").value =
-            "297";
 
-        $("#borderSize").value =
-            "medium";
+        $("#stickerToAddress").value =
+            "";
 
-        $("#borderStyle").value =
-            "solid";
 
-        $("#borderColor").value =
-            "#111827";
+        excelRows =
+            [];
 
-        $("#fontFamily").value =
-            "helvetica";
 
-        $("#fontSize").value =
-            "18";
+        addressExcelRows =
+            [];
 
-        $("#cutLineStyle").value =
-            "dashed";
+
+        $("#excelStatus")
+            .textContent =
+            "No Excel file selected.";
+
+
+        $("#addressExcelStatus")
+            .textContent =
+            "No address Excel selected.";
 
 
         updatePreview();
 
+        updateAddressPreview();
+
 
         toast(
-            "All settings have been reset."
+            "Settings reset successfully."
         );
 
     }
@@ -4160,27 +5334,18 @@ $("#resetButton")
 
 
 /* =========================================================
-   GENERATE BUTTON
+QR
 ========================================================= */
 
-$("#generateButton")
-.addEventListener(
-    "click",
-    generatePDF
-);
-
-
-/* =========================================================
-   QR CODES
-========================================================= */
-
-function createQR(
+function makeQR(
     id,
     text
 ){
 
     const element =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
 
     if(!element)
@@ -4217,44 +5382,26 @@ function createQR(
 }
 
 
-createQR(
+makeQR(
     "addressQR",
     CONFIG.maps
 );
 
 
-createQR(
+makeQR(
     "emailQR",
     `mailto:${CONFIG.email}`
 );
 
 
 /* =========================================================
-   INITIALIZE
+INITIALIZE
 ========================================================= */
 
 createPOFields();
 
-setupInputTabs();
-
-updatePreview();
-
-
-/* Default tool */
-
-$$(".tool-select-btn")
-.forEach(button => {
-
-    button.classList.toggle(
-        "active",
-        button.dataset.selectTool === currentTool
-    );
-
-});
-
-
-console.log(
-    "BooksWagon Label Studio — Final Build Loaded"
+openTool(
+    "Coco Blue"
 );
 
 </script>
