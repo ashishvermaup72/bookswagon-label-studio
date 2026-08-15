@@ -1,1996 +1,3284 @@
 /* =========================================================
    BOOKSWAGON LABEL STUDIO
-   FINAL STYLE.CSS
+   FINAL APP.JS
    ========================================================= */
 
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
+"use strict";
+
+
+/* =========================================================
+   GLOBAL CONFIG
+========================================================= */
+
+const CONFIG = {
+    address:
+        "Ground Floor, 2/14, Ansari Rd, Old Delhi, Daryaganj, Delhi, 110002",
+
+    mapsURL:
+        "https://maps.app.goo.gl/7McYApm1u9x4QSj7A",
+
+    email:
+        "ashish.verma@bookswagon.in",
+
+    maxManualPO:
+        20
+};
+
+
+/* =========================================================
+   SHORTCUTS
+========================================================= */
+
+const $ = (selector, root = document) =>
+    root.querySelector(selector);
+
+const $$ = (selector, root = document) =>
+    [...root.querySelectorAll(selector)];
+
+
+/* =========================================================
+   UTILITY
+========================================================= */
+
+function escapeHTML(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        value ?? "";
+
+    return div.innerHTML;
 }
 
-:root {
-    --primary: #1264f5;
-    --primary-dark: #0b55d4;
 
-    --text: #101828;
-    --text-soft: #344054;
-    --muted: #667085;
+function unique(values) {
 
-    --border: #e4e7ec;
-    --border-dark: #d0d5dd;
+    const seen =
+        new Set();
 
-    --success: #12b76a;
-    --success-bg: #ecfdf3;
+    return values.filter(value => {
 
-    --danger: #f04438;
-    --danger-bg: #fef3f2;
+        const key =
+            String(value)
+                .trim()
+                .toUpperCase();
 
-    --white: #ffffff;
-    --page-bg: #f6f8fb;
+        if (!key || seen.has(key)) {
+            return false;
+        }
 
-    --radius-sm: 8px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
-    --radius-xl: 18px;
+        seen.add(key);
 
-    --shadow-sm:
-        0 4px 12px rgba(16, 24, 40, 0.05);
+        return true;
+    });
+}
 
-    --shadow-md:
-        0 12px 30px rgba(16, 24, 40, 0.08);
 
-    --shadow-lg:
-        0 25px 80px rgba(16, 24, 40, 0.22);
+function safeFilename(value) {
+
+    return String(value || "PO")
+        .replace(
+            /[<>:"/\\|?*\x00-\x1F]/g,
+            "_"
+        )
+        .replace(
+            /\s+/g,
+            "_"
+        )
+        .slice(0, 100);
 }
 
 
 /* =========================================================
-   RESET
-   ========================================================= */
-
-html {
-    scroll-behavior: smooth;
-    scroll-padding-top: 80px;
-}
-
-body {
-    margin: 0;
-
-    min-height: 100vh;
-
-    background: var(--page-bg);
-
-    color: var(--text);
-
-    font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-
-    line-height: 1.45;
-
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-}
-
-button,
-input,
-textarea,
-select {
-    font: inherit;
-}
-
-button {
-    border: 0;
-}
-
-a {
-    color: inherit;
-}
-
-img {
-    max-width: 100%;
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.header {
-    position: sticky;
-
-    top: 0;
-
-    z-index: 5000;
-
-    width: 100%;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 15px;
-
-    padding:
-        13px
-        22px;
-
-    background:
-        rgba(255, 255, 255, 0.96);
-
-    border-bottom:
-        1px solid var(--border);
-
-    backdrop-filter:
-        blur(12px);
-
-    -webkit-backdrop-filter:
-        blur(12px);
-}
-
-.logo {
-    font-size: 18px;
-
-    font-weight: 950;
-
-    letter-spacing: -0.3px;
-
-    color: var(--primary);
-
-    white-space: nowrap;
-}
-
-.logo span {
-    color: var(--text);
-}
-
-.header-right {
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-}
-
-
-/* =========================================================
-   MAIN CONTAINER
-   ========================================================= */
-
-.container {
-    width:
-        min(
-            1180px,
-            calc(100% - 30px)
-        );
-
-    margin:
-        0 auto;
-}
-
-
-/* =========================================================
-   HERO
-   ========================================================= */
-
-.hero {
-    padding:
-        44px
-        0
-        28px;
-}
-
-.hero h1 {
-    margin:
-        0
-        0
-        8px;
-
-    font-size:
-        clamp(
-            30px,
-            5vw,
-            48px
-        );
-
-    line-height: 1.08;
-
-    letter-spacing:
-        -1.5px;
-
-    font-weight: 950;
-}
-
-.hero p {
-    max-width: 700px;
-
-    margin: 0;
-
-    color: var(--muted);
-
-    font-size: 14px;
-
-    line-height: 1.7;
-}
-
-
-/* =========================================================
-   TOOL CARDS
-   ========================================================= */
-
-.tool-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(
-                220px,
-                1fr
-            )
-        );
-
-    gap: 15px;
-}
-
-.tool-card {
-    position: relative;
-
-    min-height: 145px;
-
-    padding: 20px;
-
-    background: var(--white);
-
-    border:
-        1px solid var(--border);
-
-    border-radius:
-        var(--radius-lg);
-
-    cursor: pointer;
-
-    transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        border-color 0.18s ease,
-        background 0.18s ease;
-}
-
-.tool-card::after {
-    content: "→";
-
-    position: absolute;
-
-    right: 18px;
-
-    bottom: 16px;
-
-    width: 30px;
-
-    height: 30px;
-
-    display: grid;
-
-    place-items: center;
-
-    border-radius: 50%;
-
-    background: #edf4ff;
-
-    color: var(--primary);
-
-    font-weight: 900;
-}
-
-.tool-card:hover {
-    transform:
-        translateY(-3px);
-
-    border-color:
-        #b2ddff;
-
-    box-shadow:
-        var(--shadow-md);
-
-    background:
-        #fcfdff;
-}
-
-.tool-card h3 {
-    margin:
-        0
-        0
-        7px;
-
-    font-size: 16px;
-
-    font-weight: 900;
-}
-
-.tool-card p {
-    max-width: 250px;
-
-    margin: 0;
-
-    color: var(--muted);
-
-    font-size: 12px;
-
-    line-height: 1.6;
-}
-
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
-
-.btn {
-    min-height: 40px;
-
-    padding:
-        0
-        15px;
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 7px;
-
-    border-radius:
-        var(--radius-md);
-
-    font-size: 11px;
-
-    font-weight: 850;
-
-    line-height: 1;
-
-    cursor: pointer;
-
-    transition:
-        background 0.15s ease,
-        border-color 0.15s ease,
-        transform 0.15s ease,
-        box-shadow 0.15s ease;
-}
-
-.btn:active {
-    transform:
-        translateY(1px);
-}
-
-.btn-primary {
-    background:
-        var(--primary);
-
-    color:
-        var(--white);
-
-    box-shadow:
-        0 4px 10px
-        rgba(18, 100, 245, 0.15);
-}
-
-.btn-primary:hover {
-    background:
-        var(--primary-dark);
-
-    box-shadow:
-        0 6px 15px
-        rgba(18, 100, 245, 0.22);
-}
-
-.btn-secondary {
-    background:
-        var(--white);
-
-    color:
-        var(--text-soft);
-
-    border:
-        1px solid var(--border-dark);
-}
-
-.btn-secondary:hover {
-    background:
-        #f9fafb;
-
-    border-color:
-        #98a2b3;
-}
-
-.btn-danger {
-    background:
-        var(--danger);
-
-    color:
-        var(--white);
-}
-
-.btn-danger:hover {
-    background:
-        #d92d20;
-}
-
-
-/* =========================================================
-   WORKSPACE
-   ========================================================= */
-
-.tool-workspace {
-    display: none;
-
-    margin:
-        30px
-        0;
-}
-
-.tool-workspace.active {
-    display: block;
-
-    animation:
-        workspaceIn
-        0.22s
-        ease;
-}
-
-@keyframes workspaceIn {
-    from {
-        opacity: 0;
-
-        transform:
-            translateY(8px);
-    }
-
-    to {
-        opacity: 1;
-
-        transform:
-            translateY(0);
-    }
-}
-
-.workspace-card {
-    overflow: hidden;
-
-    background:
-        var(--white);
-
-    border:
-        1px solid var(--border);
-
-    border-radius:
-        var(--radius-xl);
-
-    padding:
-        22px;
-
-    box-shadow:
-        var(--shadow-sm);
-}
-
-.workspace-header {
-    display: flex;
-
-    align-items: flex-start;
-
-    justify-content: space-between;
-
-    gap: 15px;
-
-    margin-bottom:
-        22px;
-
-    padding-bottom:
-        18px;
-
-    border-bottom:
-        1px solid var(--border);
-}
-
-.workspace-header h2 {
-    margin:
-        0
-        0
-        5px;
-
-    font-size: 22px;
-
-    font-weight: 950;
-
-    letter-spacing:
-        -0.5px;
-}
-
-.workspace-header p {
-    margin: 0;
-
-    color:
-        var(--muted);
-
-    font-size: 12px;
-}
-
-
-/* =========================================================
-   SECTIONS
-   ========================================================= */
-
-.section {
-    margin-top:
-        20px;
-
-    padding-top:
-        20px;
-
-    border-top:
-        1px solid #eaecf0;
-}
-
-.section:first-child {
-    margin-top: 0;
-}
-
-.section h3 {
-    margin:
-        0
-        0
-        12px;
-
-    color:
-        var(--text);
-
-    font-size:
-        14px;
-
-    font-weight:
-        900;
-}
-
-.section small {
-    display: block;
-
-    margin-top:
-        7px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        10px;
-}
-
-
-/* =========================================================
-   INPUT GRID
-   ========================================================= */
-
-.input-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(
-                180px,
-                1fr
-            )
-        );
-
-    gap: 12px;
-}
-
-.field {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 6px;
-}
-
-.field label {
-    color:
-        var(--text-soft);
-
-    font-size:
-        11px;
-
-    font-weight:
-        800;
-}
-
-
-/* =========================================================
-   INPUTS
-   ========================================================= */
-
-input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="file"],
-input[type="url"],
-textarea,
-select {
-    width: 100%;
-
-    min-height: 40px;
-
-    padding:
-        9px
-        11px;
-
-    color:
-        var(--text);
-
-    background:
-        var(--white);
-
-    border:
-        1px solid var(--border-dark);
-
-    border-radius:
-        var(--radius-md);
-
-    outline: none;
-
-    transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease;
-}
-
-textarea {
-    min-height: 100px;
-
-    resize:
-        vertical;
-
-    line-height:
-        1.55;
-}
-
-input[type="file"] {
-    padding:
-        8px;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-    border-color:
-        var(--primary);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(
-            18,
-            100,
-            245,
-            0.10
-        );
-}
-
-input::placeholder,
-textarea::placeholder {
-    color:
-        #98a2b3;
-}
-
-
-/* =========================================================
-   NUMBER INPUT — REMOVE VISUAL LIMIT LOOK
-   ========================================================= */
-
-input[type="number"] {
-    appearance: textfield;
-    -moz-appearance: textfield;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    opacity: 1;
-}
-
-
-/* =========================================================
-   INPUT TABS
-   ========================================================= */
-
-.input-tabs {
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 7px;
-
-    margin-bottom:
-        13px;
-}
-
-.input-tab {
-    min-height: 38px;
-
-    padding:
-        0
-        13px;
-
-    border:
-        1px solid var(--border-dark);
-
-    border-radius:
-        var(--radius-sm);
-
-    background:
-        var(--white);
-
-    color:
-        var(--text-soft);
-
-    font-size:
-        11px;
-
-    font-weight:
-        850;
-
-    cursor:
-        pointer;
-
-    transition:
-        background 0.15s ease,
-        color 0.15s ease,
-        border-color 0.15s ease;
-}
-
-.input-tab:hover {
-    border-color:
-        #98a2b3;
-}
-
-.input-tab.active {
-    background:
-        var(--primary);
-
-    color:
-        var(--white);
-
-    border-color:
-        var(--primary);
-}
-
-
-/* =========================================================
-   PO GRID
-   ========================================================= */
-
-.po-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fill,
-            minmax(
-                160px,
-                1fr
-            )
-        );
-
-    gap: 8px;
-
-    max-height:
-        430px;
-
-    overflow-y:
-        auto;
-
-    padding:
-        2px
-        5px
-        4px
-        2px;
-}
-
-.po-grid::-webkit-scrollbar {
-    width: 7px;
-}
-
-.po-grid::-webkit-scrollbar-track {
-    background:
-        #f2f4f7;
-
-    border-radius:
-        10px;
-}
-
-.po-grid::-webkit-scrollbar-thumb {
-    background:
-        #cfd4dc;
-
-    border-radius:
-        10px;
-}
-
-.po-grid input {
-    font-size:
-        11px;
-}
-
-
-/* =========================================================
-   CHECKBOX GRID
-   ========================================================= */
-
-.checkbox-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(
-                220px,
-                1fr
-            )
-        );
-
-    gap: 9px;
-}
-
-
-/* =========================================================
-   CHECKBOX ROW
-   ========================================================= */
-
-.check-row {
-    position: relative;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    min-height:
-        45px;
-
-    padding:
-        9px
-        11px;
-
-    background:
-        var(--white);
-
-    border:
-        1px solid var(--border);
-
-    border-radius:
-        var(--radius-md);
-
-    cursor:
-        pointer;
-
-    user-select:
-        none;
-
-    transition:
-        border-color 0.15s ease,
-        background 0.15s ease,
-        box-shadow 0.15s ease;
-}
-
-.check-row:hover {
-    border-color:
-        #b2ddff;
-
-    background:
-        #fcfdff;
-}
-
-.check-row input[type="checkbox"] {
-    appearance:
-        none;
-
-    -webkit-appearance:
-        none;
-
-    position:
-        relative;
-
-    width:
-        19px;
-
-    height:
-        19px;
-
-    min-width:
-        19px;
-
-    min-height:
-        19px;
-
-    margin:
-        0;
-
-    padding:
-        0;
-
-    flex:
-        0 0 19px;
-
-    background:
-        var(--white);
-
-    border:
-        2px solid #98a2b3;
-
-    border-radius:
-        5px;
-
-    cursor:
-        pointer;
-
-    transition:
-        background 0.15s ease,
-        border-color 0.15s ease,
-        box-shadow 0.15s ease;
-}
-
-.check-row input[type="checkbox"]:hover {
-    border-color:
-        var(--primary);
-}
-
-.check-row input[type="checkbox"]:checked {
-    background:
-        var(--primary);
-
-    border-color:
-        var(--primary);
-}
-
-.check-row input[type="checkbox"]:checked::after {
-    content:
-        "✓";
-
-    position:
-        absolute;
-
-    inset:
-        0;
-
-    display:
-        grid;
-
-    place-items:
-        center;
-
-    color:
-        var(--white);
-
-    font-size:
-        12px;
-
-    font-weight:
-        950;
-
-    line-height:
-        1;
-}
-
-.check-row span {
-    color:
-        var(--text-soft);
-
-    font-size:
-        11px;
-
-    font-weight:
-        800;
-
-    line-height:
-        1.35;
-}
-
-
-/* =========================================================
-   ACTIVE CHECKBOX ROW
-   ========================================================= */
-
-.check-row:has(
-    input[type="checkbox"]:checked
+   TOAST SYSTEM
+========================================================= */
+
+function showToast(
+    type,
+    title,
+    message
 ) {
-    border-color:
-        #b2ddff;
 
-    background:
-        #f8fbff;
+    let container =
+        $("#toastContainer");
+
+
+    if (!container) {
+
+        container =
+            document.createElement("div");
+
+        container.id =
+            "toastContainer";
+
+        document.body.appendChild(
+            container
+        );
+    }
+
+
+    const toast =
+        document.createElement("div");
+
+
+    const color =
+        type === "success"
+            ? "#12b76a"
+            : type === "error"
+                ? "#f04438"
+                : "#1264f5";
+
+
+    const border =
+        type === "success"
+            ? "#abefc6"
+            : type === "error"
+                ? "#fecdca"
+                : "#b2ddff";
+
+
+    toast.style.cssText = `
+        pointer-events:auto;
+        margin-bottom:10px;
+        padding:14px 16px;
+        background:#fff;
+        border:1px solid ${border};
+        border-left:4px solid ${color};
+        border-radius:12px;
+        box-shadow:0 15px 40px rgba(16,24,40,.14);
+        opacity:0;
+        transform:translateX(20px);
+        transition:.22s ease;
+    `;
+
+
+    toast.innerHTML = `
+        <div style="
+            color:${color};
+            font-size:12px;
+            font-weight:900;
+            margin-bottom:4px;
+        ">
+            ${escapeHTML(title)}
+        </div>
+
+        <div style="
+            color:#667085;
+            font-size:11px;
+            line-height:1.5;
+        ">
+            ${escapeHTML(message)}
+        </div>
+    `;
+
+
+    container.appendChild(
+        toast
+    );
+
+
+    requestAnimationFrame(() => {
+
+        toast.style.opacity =
+            "1";
+
+        toast.style.transform =
+            "translateX(0)";
+    });
+
+
+    setTimeout(() => {
+
+        toast.style.opacity =
+            "0";
+
+        toast.style.transform =
+            "translateX(20px)";
+
+
+        setTimeout(
+            () => toast.remove(),
+            230
+        );
+
+    }, 3300);
+}
+
+
+/* =========================================================
+   CHECKBOX CONFIRMATION SYSTEM
+   ========================================================= */
+
+let pendingCheckbox = null;
+let pendingState = false;
+
+
+function getFeatureName(
+    checkbox
+) {
+
+    const label =
+        checkbox.closest(
+            "label"
+        );
+
+
+    if (label) {
+
+        const clone =
+            label.cloneNode(true);
+
+
+        clone
+            .querySelectorAll(
+                "input"
+            )
+            .forEach(
+                input =>
+                    input.remove()
+            );
+
+
+        const name =
+            clone.textContent
+                .replace(/\s+/g, " ")
+                .trim();
+
+
+        if (name) {
+            return name;
+        }
+    }
+
+
+    return (
+        checkbox.dataset.feature ||
+        checkbox.id ||
+        "this feature"
+    );
+}
+
+
+function openConfirmation(
+    checkbox
+) {
+
+    pendingCheckbox =
+        checkbox;
+
+    pendingState =
+        !checkbox.checked;
+
+
+    const modal =
+        $("#featureConfirmModal");
+
+
+    const title =
+        $("#featureConfirmTitle");
+
+
+    const message =
+        $("#featureConfirmMessage");
+
+
+    const confirmButton =
+        $("#featureConfirmOK");
+
+
+    if (
+        !modal ||
+        !title ||
+        !message ||
+        !confirmButton
+    ) {
+
+        /*
+         * Safety fallback.
+         */
+
+        checkbox.checked =
+            pendingState;
+
+        pendingCheckbox =
+            null;
+
+        return;
+    }
+
+
+    const feature =
+        getFeatureName(
+            checkbox
+        );
+
+
+    title.textContent =
+        pendingState
+            ? "Enable Feature?"
+            : "Disable Feature?";
+
+
+    message.textContent =
+        pendingState
+            ? `Are you sure you want to enable "${feature}"?`
+            : `Are you sure you want to disable "${feature}"?`;
+
+
+    confirmButton.textContent =
+        pendingState
+            ? "Yes, Enable"
+            : "Yes, Disable";
+
+
+    confirmButton.style.background =
+        pendingState
+            ? "#1264f5"
+            : "#f04438";
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+}
+
+
+function closeConfirmation() {
+
+    $("#featureConfirmModal")
+        ?.classList.add(
+            "hidden"
+        );
+
+
+    pendingCheckbox =
+        null;
+
+    pendingState =
+        false;
+}
+
+
+/*
+ * IMPORTANT FIX:
+ *
+ * Capture checkbox CLICK before browser
+ * toggles it.
+ */
+
+document.addEventListener(
+    "click",
+    event => {
+
+        const checkbox =
+            event.target.closest(
+                'input[type="checkbox"]'
+            );
+
+
+        if (!checkbox) {
+            return;
+        }
+
+
+        /*
+         * Explicit bypass.
+         */
+
+        if (
+            checkbox.dataset.confirmSkip ===
+            "true"
+        ) {
+            return;
+        }
+
+
+        /*
+         * Prevent native checkbox toggle.
+         */
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+
+        openConfirmation(
+            checkbox
+        );
+
+    },
+    true
+);
+
+
+/* =========================================================
+   CONFIRM ENABLE / DISABLE
+========================================================= */
+
+$("#featureConfirmOK")
+    ?.addEventListener(
+        "click",
+        () => {
+
+            if (!pendingCheckbox) {
+                closeConfirmation();
+                return;
+            }
+
+
+            const checkbox =
+                pendingCheckbox;
+
+
+            const state =
+                pendingState;
+
+
+            /*
+             * REAL STATE CHANGE
+             */
+
+            checkbox.checked =
+                state;
+
+
+            /*
+             * Trigger application listeners.
+             */
+
+            checkbox.dispatchEvent(
+                new Event(
+                    "change",
+                    {
+                        bubbles: true
+                    }
+                )
+            );
+
+
+            const feature =
+                getFeatureName(
+                    checkbox
+                );
+
+
+            closeConfirmation();
+
+
+            if (state) {
+
+                showToast(
+                    "success",
+                    "Feature Enabled",
+                    `"${feature}" is now enabled.`
+                );
+
+            } else {
+
+                showToast(
+                    "error",
+                    "Feature Disabled",
+                    `"${feature}" is now disabled.`
+                );
+            }
+
+
+            updateAllPreviews();
+        }
+    );
+
+
+$("#featureConfirmCancel")
+    ?.addEventListener(
+        "click",
+        closeConfirmation
+    );
+
+
+$("#featureConfirmModal")
+    ?.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target.id ===
+                "featureConfirmModal"
+            ) {
+                closeConfirmation();
+            }
+
+        }
+    );
+
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape"
+        ) {
+            closeConfirmation();
+        }
+
+    }
+);
+
+
+/* =========================================================
+   REMOVE OLD 1–200 RANGE LIMIT
+========================================================= */
+
+function removeBoxRangeLimit() {
+
+    $$(
+        'input[type="number"]'
+    ).forEach(input => {
+
+        const identity = `
+            ${input.id}
+            ${input.name}
+            ${input.placeholder}
+        `.toLowerCase();
+
+
+        if (
+            identity.includes("box") ||
+            identity.includes("range")
+        ) {
+
+            input.removeAttribute(
+                "max"
+            );
+
+            input.min =
+                "1";
+        }
+
+    });
+}
+
+
+/* =========================================================
+   RANGE READER
+========================================================= */
+
+function getNumber(
+    selector,
+    fallback = 1
+) {
+
+    const input =
+        $(selector);
+
+
+    if (!input) {
+        return fallback;
+    }
+
+
+    const number =
+        Number(
+            input.value
+        );
+
+
+    if (
+        !Number.isInteger(number) ||
+        number < 1
+    ) {
+
+        return fallback;
+    }
+
+
+    return number;
+}
+
+
+function getBoxRange(
+    startSelector,
+    endSelector
+) {
+
+    const start =
+        getNumber(
+            startSelector,
+            1
+        );
+
+
+    const end =
+        getNumber(
+            endSelector,
+            start
+        );
+
+
+    if (end < start) {
+
+        showToast(
+            "error",
+            "Invalid Box Range",
+            "End Box Number must be greater than or equal to Start Box Number."
+        );
+
+        return null;
+    }
+
+
+    return {
+        start,
+        end
+    };
+}
+
+
+/* =========================================================
+   PO PARSER
+========================================================= */
+
+function parsePOs(
+    values
+) {
+
+    return unique(
+        values
+            .flatMap(
+                value =>
+                    String(value || "")
+                        .split(
+                            /[,\n;]+/
+                        )
+            )
+            .map(
+                value =>
+                    value.trim()
+            )
+            .filter(Boolean)
+    );
+}
+
+
+function getPOList(
+    individualSelector,
+    multipleSelector
+) {
+
+    const individual =
+        $$(individualSelector)
+            .map(
+                input =>
+                    input.value.trim()
+            )
+            .filter(Boolean);
+
+
+    const multiple =
+        parsePOs([
+            $(multipleSelector)
+                ?.value || ""
+        ]);
+
+
+    return unique([
+        ...individual,
+        ...multiple
+    ]);
+}
+
+
+/* =========================================================
+   PRINT MODE
+========================================================= */
+
+function getPrintMode(
+    poSelector,
+    boxSelector,
+    bothSelector
+) {
+
+    const po =
+        $(poSelector)?.checked;
+
+    const box =
+        $(boxSelector)?.checked;
+
+    const both =
+        $(bothSelector)?.checked;
+
+
+    if (both) {
+        return "both";
+    }
+
+
+    if (po && box) {
+        return "both";
+    }
+
+
+    if (po) {
+        return "po";
+    }
+
+
+    if (box) {
+        return "box";
+    }
+
+
+    return "none";
+}
+
+
+function validatePrintMode(
+    poSelector,
+    boxSelector,
+    bothSelector
+) {
+
+    const mode =
+        getPrintMode(
+            poSelector,
+            boxSelector,
+            bothSelector
+        );
+
+
+    if (mode === "none") {
+
+        showToast(
+            "error",
+            "Print Option Required",
+            "Please select PO Number, Box Number, or PO + Box Number."
+        );
+
+        return false;
+    }
+
+
+    return true;
 }
 
 
 /* =========================================================
    PREVIEW
-   ========================================================= */
+========================================================= */
 
-.preview-area {
-    display: grid;
+function buildPreview(
+    po,
+    box,
+    mode,
+    poBorder,
+    boxBorder,
+    combinedBorder,
+    cutting,
+    scissor
+) {
 
-    grid-template-columns:
-        minmax(
-            280px,
-            1fr
-        )
-        minmax(
-            200px,
-            1fr
+    let content =
+        "";
+
+
+    if (
+        mode === "po" ||
+        mode === "both"
+    ) {
+
+        content += `
+            <strong
+                class="${
+                    poBorder
+                        ? "preview-item-border"
+                        : ""
+                }"
+            >
+                ${escapeHTML(po)}
+            </strong>
+        `;
+    }
+
+
+    if (
+        mode === "both" &&
+        cutting
+    ) {
+
+        content += `
+            <div class="preview-dotted-line">
+                ${
+                    scissor
+                        ? "· · · · · ✂ · · · · ·"
+                        : "· · · · · · · · · ·"
+                }
+            </div>
+        `;
+    }
+
+
+    if (
+        mode === "box" ||
+        mode === "both"
+    ) {
+
+        content += `
+            <div
+                class="${
+                    boxBorder
+                        ? "preview-box-number"
+                        : ""
+                }"
+            >
+                BOX NO. ${escapeHTML(box)}
+            </div>
+        `;
+    }
+
+
+    if (!content) {
+
+        content = `
+            <span style="
+                color:#98a2b3;
+                font-size:11px;
+            ">
+                Select a print option
+            </span>
+        `;
+    }
+
+
+    return `
+        <div
+            class="
+                dynamic-label-preview
+                ${
+                    combinedBorder
+                        ? "has-outer-border"
+                        : ""
+                }
+            "
+        >
+            ${content}
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   COCO PREVIEW
+========================================================= */
+
+function updateCocoPreview() {
+
+    const page =
+        $("#cocoPreviewPage");
+
+
+    if (!page) {
+        return;
+    }
+
+
+    const po =
+        getPOList(
+            ".coco-po",
+            "#cocoCommaPO"
+        )[0] ||
+        "PO NUMBER";
+
+
+    const box =
+        $("#cocoStartBox")
+            ?.value ||
+        "1";
+
+
+    const mode =
+        getPrintMode(
+            "#cocoPrintPO",
+            "#cocoPrintBox",
+            "#cocoPrintPOBox"
         );
 
-    gap:
-        18px;
 
-    align-items:
-        center;
-}
+    page.innerHTML =
+        buildPreview(
+            po,
+            box,
+            mode,
 
-.preview-page {
-    position:
-        relative;
+            $("#cocoPOBorder")
+                ?.checked,
 
-    min-height:
-        330px;
+            $("#cocoBoxBorder")
+                ?.checked,
 
-    display:
-        flex;
+            $("#cocoPOBoxOuterBorder")
+                ?.checked,
 
-    align-items:
-        center;
+            $("#cocoCutting")
+                ?.checked,
 
-    justify-content:
-        center;
-
-    padding:
-        25px;
-
-    background:
-        #ffffff;
-
-    border:
-        1.5px solid #101828;
-
-    box-shadow:
-        var(--shadow-md);
-}
-
-.dynamic-label-preview {
-    width:
-        88%;
-
-    min-height:
-        210px;
-
-    display:
-        flex;
-
-    flex-direction:
-        column;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    gap:
-        15px;
-
-    padding:
-        20px;
-
-    text-align:
-        center;
-}
-
-.dynamic-label-preview strong {
-    font-weight:
-        950;
-}
-
-
-/* =========================================================
-   PO NUMBER BORDER
-   ========================================================= */
-
-.preview-item-border {
-    display:
-        inline-flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    min-width:
-        150px;
-
-    min-height:
-        42px;
-
-    padding:
-        9px
-        18px;
-
-    border:
-        2px solid #111827;
-
-    border-radius:
-        2px;
-
-    background:
-        #ffffff;
-
-    color:
-        #111827;
-
-    font-size:
-        15px;
-
-    font-weight:
-        950;
-}
-
-
-/* =========================================================
-   BOX NUMBER BORDER
-   ========================================================= */
-
-.preview-box-number {
-    display:
-        inline-flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    min-width:
-        150px;
-
-    min-height:
-        42px;
-
-    padding:
-        9px
-        18px;
-
-    border:
-        2px solid #111827;
-
-    border-radius:
-        2px;
-
-    background:
-        #ffffff;
-
-    color:
-        #111827;
-
-    font-size:
-        14px;
-
-    font-weight:
-        950;
-
-    text-transform:
-        uppercase;
-}
-
-
-/* =========================================================
-   COMBINED PO + BOX OUTER BORDER
-   ========================================================= */
-
-.has-outer-border {
-    border:
-        3px double #111827;
-
-    padding:
-        24px;
-
-    border-radius:
-        2px;
-}
-
-
-/* =========================================================
-   CUTTING LINE
-   ========================================================= */
-
-.preview-dotted-line {
-    width:
-        100%;
-
-    overflow:
-        hidden;
-
-    white-space:
-        nowrap;
-
-    color:
-        #111827;
-
-    font-size:
-        12px;
-
-    font-weight:
-        850;
-
-    letter-spacing:
-        2px;
-
-    text-align:
-        center;
-
-    line-height:
-        1;
-}
-
-
-/* =========================================================
-   ADDRESS SECTION
-   ========================================================= */
-
-.address-section {
-    margin-top:
-        45px;
-
-    padding:
-        30px;
-
-    background:
-        var(--white);
-
-    border:
-        1px solid var(--border);
-
-    border-radius:
-        var(--radius-xl);
-
-    box-shadow:
-        var(--shadow-sm);
-}
-
-.address-section h2 {
-    margin:
-        0
-        0
-        20px;
-
-    font-size:
-        22px;
-
-    font-weight:
-        950;
-
-    letter-spacing:
-        -0.4px;
-}
-
-.address-section h3 {
-    margin:
-        0
-        0
-        12px;
-
-    font-size:
-        16px;
-
-    font-weight:
-        900;
-}
-
-.address-layout {
-    display:
-        grid;
-
-    grid-template-columns:
-        1.5fr
-        1fr;
-
-    gap:
-        28px;
-
-    align-items:
-        start;
-}
-
-.contact-block {
-    margin-top:
-        18px;
-}
-
-.contact-block strong {
-    display:
-        block;
-
-    margin-bottom:
-        6px;
-
-    font-size:
-        11px;
-
-    font-weight:
-        900;
-
-    color:
-        var(--text-soft);
-}
-
-.address-link {
-    color:
-        var(--primary);
-
-    font-size:
-        12px;
-
-    font-weight:
-        800;
-
-    text-decoration:
-        none;
-
-    line-height:
-        1.65;
-}
-
-.address-link:hover {
-    text-decoration:
-        underline;
-}
-
-
-/* =========================================================
-   QR GRID
-   ========================================================= */
-
-.qr-grid {
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(
-                140px,
-                1fr
-            )
+            $("#cocoScissorLine")
+                ?.checked
         );
 
-    gap:
-        15px;
-}
 
-.qr-card {
-    display:
-        flex;
+    const pageBorder =
+        $("#cocoPageBorder")
+            ?.checked;
 
-    flex-direction:
-        column;
 
-    align-items:
-        center;
+    page.style.border =
+        pageBorder
+            ? "1.5px solid #101828"
+            : "0";
 
-    text-align:
-        center;
 
-    padding:
-        15px;
+    const summary =
+        $("#cocoBoxSummary");
 
-    background:
-        #ffffff;
 
-    border:
-        1px solid var(--border);
+    if (summary) {
 
-    border-radius:
-        14px;
-
-    transition:
-        border-color .15s ease,
-        box-shadow .15s ease;
-}
-
-.qr-card:hover {
-    border-color:
-        #b2ddff;
-
-    box-shadow:
-        var(--shadow-sm);
-}
-
-.qr-card h4 {
-    margin:
-        0
-        0
-        12px;
-
-    color:
-        var(--text);
-
-    font-size:
-        12px;
-
-    font-weight:
-        900;
-}
-
-.qr-box {
-    width:
-        150px;
-
-    height:
-        150px;
-
-    display:
-        grid;
-
-    place-items:
-        center;
-
-    padding:
-        5px;
-
-    background:
-        #ffffff;
-}
-
-.qr-box img {
-    display:
-        block;
-
-    width:
-        140px;
-
-    height:
-        140px;
-
-    image-rendering:
-        pixelated;
-}
-
-.qr-label {
-    margin-top:
-        10px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        10px;
-
-    font-weight:
-        750;
-
-    line-height:
-        1.4;
+        summary.textContent =
+            `${getNumber("#cocoStartBox", 1)}–${getNumber("#cocoEndBox", 200)}`;
+    }
 }
 
 
 /* =========================================================
-   FOOTER
-   ========================================================= */
+   OTHER PO PREVIEW
+========================================================= */
 
-.footer {
-    margin-top:
-        45px;
+function updateOtherPreview() {
 
-    padding:
-        30px
-        0
-        60px;
-
-    border-top:
-        1px solid var(--border);
-
-    color:
-        var(--muted);
-
-    font-size:
-        11px;
-}
-
-.footer-layout {
-    display:
-        flex;
-
-    align-items:
-        flex-start;
-
-    justify-content:
-        space-between;
-
-    gap:
-        20px;
-
-    flex-wrap:
-        wrap;
-}
-
-.footer strong {
-    display:
-        block;
-
-    margin-bottom:
-        4px;
-
-    color:
-        var(--text);
-
-    font-size:
-        12px;
-}
+    const page =
+        $("#otherPreviewPage");
 
 
-/* =========================================================
-   TOAST CONTAINER
-   ========================================================= */
+    if (!page) {
+        return;
+    }
 
-#toastContainer {
-    position:
-        fixed;
 
-    top:
-        20px;
+    const po =
+        getPOList(
+            ".other-po",
+            "#otherCommaPO"
+        )[0] ||
+        "PO NUMBER";
 
-    right:
-        20px;
 
-    z-index:
-        100000;
+    const box =
+        $("#otherStartBox")
+            ?.value ||
+        "1";
 
-    width:
-        min(
-            370px,
-            calc(100vw - 30px)
+
+    const mode =
+        getPrintMode(
+            "#otherPrintPO",
+            "#otherPrintBox",
+            "#otherPrintPOBox"
         );
 
-    pointer-events:
-        none;
-}
 
+    page.innerHTML =
+        buildPreview(
+            po,
+            box,
+            mode,
 
-/* =========================================================
-   CONFIRMATION MODAL
-   ========================================================= */
+            $("#otherPOBorder")
+                ?.checked,
 
-#featureConfirmModal {
-    position:
-        fixed;
+            $("#otherBoxBorder")
+                ?.checked,
 
-    inset:
-        0;
+            $("#otherPOBoxOuterBorder")
+                ?.checked,
 
-    z-index:
-        99999;
+            $("#otherCutting")
+                ?.checked,
 
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    padding:
-        20px;
-
-    background:
-        rgba(
-            15,
-            23,
-            42,
-            .48
+            true
         );
 
-    backdrop-filter:
-        blur(5px);
 
-    -webkit-backdrop-filter:
-        blur(5px);
+    const pageBorder =
+        $("#otherPageBorder")
+            ?.checked;
+
+
+    page.style.border =
+        pageBorder
+            ? "1.5px solid #101828"
+            : "0";
 }
 
-#featureConfirmModal.hidden {
-    display:
-        none !important;
-}
 
-.confirm-box {
-    width:
-        min(
-            420px,
-            100%
+/* =========================================================
+   SBMO PREVIEW
+========================================================= */
+
+function updateSBMOPreview() {
+
+    const page =
+        $("#sbmoWorkspace .dynamic-page-preview");
+
+
+    if (!page) {
+        return;
+    }
+
+
+    const po =
+        getPOList(
+            ".sbmo-po",
+            "#sbmoCommaPO"
+        )[0] ||
+        "PO NUMBER";
+
+
+    const box =
+        $("#sbmoStartBox")
+            ?.value ||
+        "1";
+
+
+    const mode =
+        getPrintMode(
+            "#sbmoPrintPO",
+            "#sbmoPrintBox",
+            "#sbmoPrintPOBox"
         );
 
-    padding:
-        26px;
 
-    background:
-        var(--white);
+    page.innerHTML =
+        buildPreview(
+            po,
+            box,
+            mode,
 
-    border-radius:
-        18px;
+            $("#sbmoPOBorder")
+                ?.checked,
 
-    box-shadow:
-        var(--shadow-lg);
+            $("#sbmoBoxBorder")
+                ?.checked,
 
-    animation:
-        confirmIn
-        .18s
-        ease;
+            false,
+
+            $("#sbmoCutting")
+                ?.checked,
+
+            true
+        );
 }
 
-@keyframes confirmIn {
-    from {
-        opacity:
-            0;
 
-        transform:
-            translateY(8px)
-            scale(.98);
-    }
+function updateAllPreviews() {
 
-    to {
-        opacity:
-            1;
+    updateCocoPreview();
 
-        transform:
-            translateY(0)
-            scale(1);
-    }
-}
+    updateOtherPreview();
 
-.confirm-box h3 {
-    margin:
-        0
-        0
-        7px;
-
-    color:
-        var(--text);
-
-    font-size:
-        18px;
-
-    font-weight:
-        950;
-}
-
-.confirm-box p {
-    margin:
-        0;
-
-    color:
-        var(--muted);
-
-    font-size:
-        12px;
-
-    line-height:
-        1.6;
-}
-
-.confirm-actions {
-    display:
-        flex;
-
-    justify-content:
-        flex-end;
-
-    gap:
-        8px;
-
-    margin-top:
-        22px;
+    updateSBMOPreview();
 }
 
 
 /* =========================================================
-   SCROLLBAR
-   ========================================================= */
+   TOOL NAVIGATION
+========================================================= */
 
-::-webkit-scrollbar {
-    width:
-        8px;
+function setupToolNavigation() {
 
-    height:
-        8px;
-}
+    $$("[data-open-tool]")
+        .forEach(card => {
 
-::-webkit-scrollbar-track {
-    background:
-        #f2f4f7;
-}
+            card.addEventListener(
+                "click",
+                () => {
 
-::-webkit-scrollbar-thumb {
-    background:
-        #cfd4dc;
-
-    border-radius:
-        10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background:
-        #98a2b3;
-}
+                    const tool =
+                        card.dataset.openTool;
 
 
-/* =========================================================
-   SELECTION
-   ========================================================= */
-
-::selection {
-    background:
-        #dbeafe;
-
-    color:
-        #101828;
-}
+                    $$(".tool-workspace")
+                        .forEach(
+                            workspace =>
+                                workspace.classList.remove(
+                                    "active"
+                                )
+                        );
 
 
-/* =========================================================
-   RESPONSIVE — TABLET
-   ========================================================= */
-
-@media (max-width: 900px) {
-
-    .preview-area {
-        grid-template-columns:
-            1fr;
-    }
-
-    .address-layout {
-        grid-template-columns:
-            1fr;
-    }
-
-    .qr-grid {
-        max-width:
-            500px;
-    }
-}
+                    const workspace =
+                        $(
+                            `#${tool}Workspace`
+                        );
 
 
-/* =========================================================
-   RESPONSIVE — MOBILE
-   ========================================================= */
+                    if (!workspace) {
+                        return;
+                    }
 
-@media (max-width: 650px) {
 
-    .header {
-        padding:
-            11px
-            14px;
-    }
+                    workspace.classList.add(
+                        "active"
+                    );
 
-    .logo {
-        font-size:
-            15px;
-    }
 
-    .header-right .btn {
-        min-height:
-            36px;
+                    workspace.scrollIntoView({
+                        behavior:"smooth",
+                        block:"start"
+                    });
 
-        padding:
-            0
-            11px;
-    }
-
-    .container {
-        width:
-            calc(100% - 20px);
-    }
-
-    .hero {
-        padding:
-            30px
-            0
-            20px;
-    }
-
-    .hero h1 {
-        font-size:
-            30px;
-    }
-
-    .workspace-card {
-        padding:
-            16px;
-        border-radius:
-            14px;
-    }
-
-    .workspace-header {
-        flex-direction:
-            column;
-    }
-
-    .workspace-header .btn {
-        width:
-            100%;
-    }
-
-    .input-tabs {
-        display:
-            grid;
-
-        grid-template-columns:
-            1fr;
-    }
-
-    .input-tab {
-        width:
-            100%;
-    }
-
-    .checkbox-grid {
-        grid-template-columns:
-            1fr;
-    }
-
-    .po-grid {
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(
-                    0,
-                    1fr
-                )
+                }
             );
 
-        max-height:
-            380px;
+        });
+
+
+    $$("[data-close-tool]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    $$(".tool-workspace")
+                        .forEach(
+                            workspace =>
+                                workspace.classList.remove(
+                                    "active"
+                                )
+                        );
+
+
+                    $("#tools")
+                        ?.scrollIntoView({
+                            behavior:"smooth"
+                        });
+
+                }
+            );
+
+        });
+}
+
+
+/* =========================================================
+   INPUT TABS
+========================================================= */
+
+function setupInputTabs() {
+
+    $$("[data-coco-input]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const mode =
+                        button.dataset.cocoInput;
+
+
+                    $("#cocoManualArea")
+                        ?.classList.toggle(
+                            "hidden",
+                            mode !== "manual"
+                        );
+
+
+                    $("#cocoCommaArea")
+                        ?.classList.toggle(
+                            "hidden",
+                            mode !== "comma"
+                        );
+
+
+                    $("#cocoExcelArea")
+                        ?.classList.toggle(
+                            "hidden",
+                            mode !== "excel"
+                        );
+
+
+                    $$("[data-coco-input]")
+                        .forEach(
+                            item =>
+                                item.classList.toggle(
+                                    "active",
+                                    item === button
+                                )
+                        );
+
+                }
+            );
+
+        });
+
+
+    $$("[data-other-input]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const mode =
+                        button.dataset.otherInput;
+
+
+                    $("#otherManualArea")
+                        ?.classList.toggle(
+                            "hidden",
+                            mode !== "manual"
+                        );
+
+
+                    $("#otherCommaArea")
+                        ?.classList.toggle(
+                            "hidden",
+                            mode !== "comma"
+                        );
+
+
+                    $("#otherExcelArea")
+                        ?.classList.toggle(
+                            "hidden",
+                            mode !== "excel"
+                        );
+
+
+                    $$("[data-other-input]")
+                        .forEach(
+                            item =>
+                                item.classList.toggle(
+                                    "active",
+                                    item === button
+                                )
+                        );
+
+                }
+            );
+
+        });
+}
+
+
+/* =========================================================
+   PDF LIBRARY
+========================================================= */
+
+function getJsPDF() {
+
+    if (
+        !window.jspdf ||
+        !window.jspdf.jsPDF
+    ) {
+
+        throw new Error(
+            "jsPDF library is not loaded."
+        );
     }
 
-    .address-section {
-        padding:
-            20px;
+
+    return window.jspdf.jsPDF;
+}
+
+
+/* =========================================================
+   DRAW PDF LABEL
+========================================================= */
+
+function drawLabel(
+    doc,
+    po,
+    box,
+    options
+) {
+
+    const pageWidth =
+        doc.internal.pageSize.getWidth();
+
+    const pageHeight =
+        doc.internal.pageSize.getHeight();
+
+
+    const centerX =
+        pageWidth / 2;
+
+
+    const margin =
+        12;
+
+
+    const mode =
+        options.mode ||
+        "both";
+
+
+    /*
+     * PAGE BORDER
+     */
+
+    if (
+        options.pageBorder
+    ) {
+
+        doc.setDrawColor(
+            17,
+            24,
+            39
+        );
+
+        doc.setLineWidth(
+            0.7
+        );
+
+        doc.rect(
+            6,
+            6,
+            pageWidth - 12,
+            pageHeight - 12
+        );
     }
 
-    .qr-grid {
-        grid-template-columns:
-            1fr;
 
-        width:
-            100%;
+    /*
+     * COMBINED OUTER BORDER
+     */
+
+    if (
+        options.combinedBorder
+    ) {
+
+        doc.setDrawColor(
+            17,
+            24,
+            39
+        );
+
+        doc.setLineWidth(
+            1.1
+        );
+
+        doc.rect(
+            margin,
+            margin,
+            pageWidth -
+                margin * 2,
+            pageHeight -
+                margin * 2
+        );
     }
 
-    .qr-card {
-        width:
-            100%;
+
+    let y =
+        pageHeight * 0.34;
+
+
+    const fontSize =
+        options.fontSize ||
+        16;
+
+
+    doc.setFont(
+        "helvetica",
+        options.bold
+            ? "bold"
+            : "normal"
+    );
+
+
+    doc.setFontSize(
+        fontSize
+    );
+
+
+    /*
+     * PO NUMBER
+     */
+
+    if (
+        mode === "po" ||
+        mode === "both"
+    ) {
+
+        const poText =
+            String(po);
+
+
+        const width =
+            Math.max(
+                65,
+                doc.getTextWidth(
+                    poText
+                ) + 28
+            );
+
+
+        const x =
+            centerX -
+            width / 2;
+
+
+        if (
+            options.poBorder
+        ) {
+
+            doc.setLineWidth(
+                0.8
+            );
+
+            doc.rect(
+                x,
+                y - 15,
+                width,
+                30
+            );
+        }
+
+
+        doc.text(
+            poText,
+            centerX,
+            y + 4,
+            {
+                align:"center"
+            }
+        );
+
+
+        y += 48;
     }
 
-    .qr-box {
-        width:
-            150px;
+
+    /*
+     * CUTTING LINE
+     */
+
+    if (
+        mode === "both" &&
+        options.cutting
+    ) {
+
+        const left =
+            margin + 15;
+
+        const right =
+            pageWidth -
+            margin -
+            15;
+
+        const lineY =
+            y - 13;
+
+
+        doc.setDrawColor(
+            80,
+            80,
+            80
+        );
+
+        doc.setLineWidth(
+            0.45
+        );
+
+
+        const dash =
+            4;
+
+        const gap =
+            3;
+
+
+        for (
+            let x = left;
+            x < right;
+            x += dash + gap
+        ) {
+
+            doc.line(
+                x,
+                lineY,
+                Math.min(
+                    x + dash,
+                    right
+                ),
+                lineY
+            );
+        }
+
+
+        if (
+            options.scissor
+        ) {
+
+            doc.setFontSize(
+                10
+            );
+
+
+            doc.text(
+                "✂",
+                centerX,
+                lineY + 3,
+                {
+                    align:"center"
+                }
+            );
+        }
+
+
+        y += 30;
     }
 
-    #toastContainer {
-        top:
-            10px;
 
-        right:
-            10px;
+    /*
+     * BOX NUMBER
+     */
 
-        width:
-            calc(100vw - 20px);
-    }
+    if (
+        mode === "box" ||
+        mode === "both"
+    ) {
 
-    .confirm-box {
-        padding:
-            20px;
-    }
+        const boxText =
+            `BOX NO. ${box}`;
 
-    .confirm-actions {
-        flex-direction:
-            column-reverse;
-    }
 
-    .confirm-actions .btn {
-        width:
-            100%;
+        const width =
+            Math.max(
+                90,
+                doc.getTextWidth(
+                    boxText
+                ) + 30
+            );
+
+
+        const x =
+            centerX -
+            width / 2;
+
+
+        if (
+            options.boxBorder
+        ) {
+
+            doc.setLineWidth(
+                0.8
+            );
+
+            doc.rect(
+                x,
+                y - 15,
+                width,
+                30
+            );
+        }
+
+
+        doc.text(
+            boxText,
+            centerX,
+            y + 4,
+            {
+                align:"center"
+            }
+        );
     }
 }
 
 
 /* =========================================================
-   VERY SMALL DEVICES
-   ========================================================= */
+   CREATE PDF
+========================================================= */
 
-@media (max-width: 400px) {
+function createPDF(
+    po,
+    start,
+    end,
+    options
+) {
 
-    .po-grid {
-        grid-template-columns:
-            1fr;
+    const JsPDF =
+        getJsPDF();
+
+
+    const doc =
+        new JsPDF({
+            orientation:"portrait",
+            unit:"mm",
+            format:"a4"
+        });
+
+
+    let firstPage =
+        true;
+
+
+    for (
+        let box = start;
+        box <= end;
+        box++
+    ) {
+
+        if (!firstPage) {
+            doc.addPage();
+        }
+
+
+        firstPage =
+            false;
+
+
+        drawLabel(
+            doc,
+            po,
+            box,
+            options
+        );
     }
 
-    .tool-grid {
-        grid-template-columns:
-            1fr;
+
+    return doc;
+}
+
+
+/* =========================================================
+   CREATE MERGED PDF
+========================================================= */
+
+function createMergedPDF(
+    poList,
+    start,
+    end,
+    options
+) {
+
+    const JsPDF =
+        getJsPDF();
+
+
+    const doc =
+        new JsPDF({
+            orientation:"portrait",
+            unit:"mm",
+            format:"a4"
+        });
+
+
+    let firstPage =
+        true;
+
+
+    poList.forEach(po => {
+
+        for (
+            let box = start;
+            box <= end;
+            box++
+        ) {
+
+            if (!firstPage) {
+                doc.addPage();
+            }
+
+
+            firstPage =
+                false;
+
+
+            drawLabel(
+                doc,
+                po,
+                box,
+                options
+            );
+        }
+
+    });
+
+
+    return doc;
+}
+
+
+/* =========================================================
+   ZIP CREATOR
+========================================================= */
+
+async function createZIP(
+    files,
+    filename
+) {
+
+    if (
+        typeof JSZip ===
+        "undefined"
+    ) {
+
+        throw new Error(
+            "JSZip library is not loaded."
+        );
     }
 
-    .preview-page {
-        min-height:
-            280px;
 
-        padding:
-            15px;
-    }
+    const zip =
+        new JSZip();
 
-    .dynamic-label-preview {
-        width:
-            100%;
+
+    files.forEach(file => {
+
+        zip.file(
+            file.name,
+            file.blob
+        );
+
+    });
+
+
+    const blob =
+        await zip.generateAsync({
+            type:"blob",
+            compression:"DEFLATE",
+            compressionOptions:{
+                level:6
+            }
+        });
+
+
+    downloadBlob(
+        blob,
+        filename
+    );
+}
+
+
+/* =========================================================
+   BLOB DOWNLOAD
+========================================================= */
+
+function downloadBlob(
+    blob,
+    filename
+) {
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+    link.download =
+        filename;
+
+    link.style.display =
+        "none";
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    setTimeout(
+        () =>
+            URL.revokeObjectURL(
+                url
+            ),
+        1500
+    );
+}
+
+
+/* =========================================================
+   COCO OPTIONS
+========================================================= */
+
+function getCocoOptions() {
+
+    return {
+
+        mode:
+            getPrintMode(
+                "#cocoPrintPO",
+                "#cocoPrintBox",
+                "#cocoPrintPOBox"
+            ),
+
+        pageBorder:
+            $("#cocoPageBorder")
+                ?.checked === true,
+
+        poBorder:
+            $("#cocoPOBorder")
+                ?.checked === true,
+
+        boxBorder:
+            $("#cocoBoxBorder")
+                ?.checked === true,
+
+        combinedBorder:
+            $("#cocoPOBoxOuterBorder")
+                ?.checked === true,
+
+        cutting:
+            $("#cocoCutting")
+                ?.checked === true,
+
+        scissor:
+            $("#cocoScissorLine")
+                ?.checked === true,
+
+        bold:
+            $("#cocoBoldText")
+                ?.checked === true,
+
+        fontSize:
+            16
+    };
+}
+
+
+/* =========================================================
+   OTHER OPTIONS
+========================================================= */
+
+function getOtherOptions() {
+
+    return {
+
+        mode:
+            getPrintMode(
+                "#otherPrintPO",
+                "#otherPrintBox",
+                "#otherPrintPOBox"
+            ),
+
+        pageBorder:
+            $("#otherPageBorder")
+                ?.checked === true,
+
+        poBorder:
+            $("#otherPOBorder")
+                ?.checked === true,
+
+        boxBorder:
+            $("#otherBoxBorder")
+                ?.checked === true,
+
+        combinedBorder:
+            $("#otherPOBoxOuterBorder")
+                ?.checked === true,
+
+        cutting:
+            $("#otherCutting")
+                ?.checked === true,
+
+        scissor:
+            true,
+
+        bold:
+            true,
+
+        fontSize:
+            16
+    };
+}
+
+
+/* =========================================================
+   SBMO OPTIONS
+========================================================= */
+
+function getSBMOOptions() {
+
+    return {
+
+        mode:
+            getPrintMode(
+                "#sbmoPrintPO",
+                "#sbmoPrintBox",
+                "#sbmoPrintPOBox"
+            ),
+
+        pageBorder:
+            true,
+
+        poBorder:
+            $("#sbmoPOBorder")
+                ?.checked === true,
+
+        boxBorder:
+            $("#sbmoBoxBorder")
+                ?.checked === true,
+
+        combinedBorder:
+            false,
+
+        cutting:
+            $("#sbmoCutting")
+                ?.checked === true,
+
+        scissor:
+            true,
+
+        bold:
+            true,
+
+        fontSize:
+            16
+    };
+}
+
+
+/* =========================================================
+   COCO GENERATOR
+========================================================= */
+
+async function generateCoco() {
+
+    try {
+
+        const range =
+            getBoxRange(
+                "#cocoStartBox",
+                "#cocoEndBox"
+            );
+
+
+        if (!range) {
+            return;
+        }
+
+
+        if (
+            !validatePrintMode(
+                "#cocoPrintPO",
+                "#cocoPrintBox",
+                "#cocoPrintPOBox"
+            )
+        ) {
+            return;
+        }
+
+
+        const poList =
+            getPOList(
+                ".coco-po",
+                "#cocoCommaPO"
+            );
+
+
+        if (!poList.length) {
+
+            showToast(
+                "error",
+                "PO Number Required",
+                "Please enter at least one PO number."
+            );
+
+            return;
+        }
+
+
+        const options =
+            getCocoOptions();
+
+
+        const zip =
+            $("#cocoZIP")
+                ?.checked === true;
+
+
+        const merged =
+            $("#cocoMergedPDF")
+                ?.checked === true;
+
+
+        /*
+         * ONE PO
+         * DIRECT PDF
+         */
+
+        if (
+            poList.length === 1 &&
+            !zip &&
+            !merged
+        ) {
+
+            const doc =
+                createPDF(
+                    poList[0],
+                    range.start,
+                    range.end,
+                    options
+                );
+
+
+            doc.save(
+                `${safeFilename(
+                    poList[0]
+                )}_BOX_${range.start}-${range.end}.pdf`
+            );
+
+
+            showToast(
+                "success",
+                "PDF Downloaded",
+                "The PDF was downloaded directly."
+            );
+
+
+            return;
+        }
+
+
+        /*
+         * MERGED PDF
+         */
+
+        if (
+            merged &&
+            !zip
+        ) {
+
+            const doc =
+                createMergedPDF(
+                    poList,
+                    range.start,
+                    range.end,
+                    options
+                );
+
+
+            doc.save(
+                `BOOKSWAGON_MERGED_${Date.now()}.pdf`
+            );
+
+
+            showToast(
+                "success",
+                "Merged PDF Downloaded",
+                "All selected PO labels are in one PDF."
+            );
+
+
+            return;
+        }
+
+
+        /*
+         * MULTIPLE PDF → ZIP
+         */
+
+        const files = [];
+
+
+        for (
+            const po of poList
+        ) {
+
+            const doc =
+                createPDF(
+                    po,
+                    range.start,
+                    range.end,
+                    options
+                );
+
+
+            files.push({
+
+                name:
+                    `${safeFilename(
+                        po
+                    )}_BOX_${range.start}-${range.end}.pdf`,
+
+                blob:
+                    doc.output(
+                        "blob"
+                    )
+            });
+        }
+
+
+        await createZIP(
+            files,
+            `BOOKSWAGON_PO_LABELS_${Date.now()}.zip`
+        );
+
+
+        showToast(
+            "success",
+            "ZIP Downloaded",
+            `${files.length} PDF file(s) were added to the ZIP.`
+        );
+
+    } catch (error) {
+
+        console.error(
+            "CocoBlue Error:",
+            error
+        );
+
+
+        showToast(
+            "error",
+            "Generation Failed",
+            error.message ||
+            "Unable to generate the PDF."
+        );
     }
 }
 
 
 /* =========================================================
-   PRINT
-   ========================================================= */
+   OTHER PO GENERATOR
+========================================================= */
 
-@media print {
+async function generateOther() {
 
-    body {
-        background:
-            #ffffff;
+    try {
+
+        const range =
+            getBoxRange(
+                "#otherStartBox",
+                "#otherEndBox"
+            );
+
+
+        if (!range) {
+            return;
+        }
+
+
+        if (
+            !validatePrintMode(
+                "#otherPrintPO",
+                "#otherPrintBox",
+                "#otherPrintPOBox"
+            )
+        ) {
+            return;
+        }
+
+
+        const poList =
+            getPOList(
+                ".other-po",
+                "#otherCommaPO"
+            );
+
+
+        if (!poList.length) {
+
+            showToast(
+                "error",
+                "PO Number Required",
+                "Please enter at least one PO number."
+            );
+
+            return;
+        }
+
+
+        const options =
+            getOtherOptions();
+
+
+        const zip =
+            $("#otherZIP")
+                ?.checked === true;
+
+
+        const merged =
+            $("#otherMergedPDF")
+                ?.checked === true;
+
+
+        if (
+            poList.length === 1 &&
+            !zip &&
+            !merged
+        ) {
+
+            const doc =
+                createPDF(
+                    poList[0],
+                    range.start,
+                    range.end,
+                    options
+                );
+
+
+            doc.save(
+                `${safeFilename(
+                    poList[0]
+                )}_BOX_${range.start}-${range.end}.pdf`
+            );
+
+
+            showToast(
+                "success",
+                "PDF Downloaded",
+                "The PDF was downloaded directly."
+            );
+
+
+            return;
+        }
+
+
+        if (
+            merged &&
+            !zip
+        ) {
+
+            const doc =
+                createMergedPDF(
+                    poList,
+                    range.start,
+                    range.end,
+                    options
+                );
+
+
+            doc.save(
+                `BOOKSWAGON_OTHER_PO_MERGED_${Date.now()}.pdf`
+            );
+
+
+            showToast(
+                "success",
+                "Merged PDF Downloaded",
+                "All Other PO labels are in one PDF."
+            );
+
+
+            return;
+        }
+
+
+        const files = [];
+
+
+        for (
+            const po of poList
+        ) {
+
+            const doc =
+                createPDF(
+                    po,
+                    range.start,
+                    range.end,
+                    options
+                );
+
+
+            files.push({
+
+                name:
+                    `${safeFilename(
+                        po
+                    )}_BOX_${range.start}-${range.end}.pdf`,
+
+                blob:
+                    doc.output(
+                        "blob"
+                    )
+            });
+        }
+
+
+        await createZIP(
+            files,
+            `BOOKSWAGON_OTHER_PO_${Date.now()}.zip`
+        );
+
+
+        showToast(
+            "success",
+            "ZIP Downloaded",
+            `${files.length} PDF file(s) packed into ZIP.`
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Other PO Error:",
+            error
+        );
+
+
+        showToast(
+            "error",
+            "Generation Failed",
+            error.message ||
+            "Unable to generate the PDF."
+        );
+    }
+}
+
+
+/* =========================================================
+   SBMO GENERATOR
+========================================================= */
+
+async function generateSBMO() {
+
+    try {
+
+        const range =
+            getBoxRange(
+                "#sbmoStartBox",
+                "#sbmoEndBox"
+            );
+
+
+        if (!range) {
+            return;
+        }
+
+
+        if (
+            !validatePrintMode(
+                "#sbmoPrintPO",
+                "#sbmoPrintBox",
+                "#sbmoPrintPOBox"
+            )
+        ) {
+            return;
+        }
+
+
+        const poList =
+            getPOList(
+                ".sbmo-po",
+                "#sbmoCommaPO"
+            );
+
+
+        if (!poList.length) {
+
+            showToast(
+                "error",
+                "PO Number Required",
+                "Please enter at least one PO number."
+            );
+
+            return;
+        }
+
+
+        const options =
+            getSBMOOptions();
+
+
+        const zip =
+            $("#sbmoZIP")
+                ?.checked === true;
+
+
+        const merged =
+            $("#sbmoMergedPDF")
+                ?.checked === true;
+
+
+        if (
+            poList.length === 1 &&
+            !zip &&
+            !merged
+        ) {
+
+            const doc =
+                createPDF(
+                    poList[0],
+                    range.start,
+                    range.end,
+                    options
+                );
+
+
+            doc.save(
+                `${safeFilename(
+                    poList[0]
+                )}_SBMO_BOX_${range.start}-${range.end}.pdf`
+            );
+
+
+            showToast(
+                "success",
+                "PDF Downloaded",
+                "SBMO PDF downloaded directly."
+            );
+
+
+            return;
+        }
+
+
+        if (
+            merged &&
+            !zip
+        ) {
+
+            const doc =
+                createMergedPDF(
+                    poList,
+                    range.start,
+                    range.end,
+                    options
+                );
+
+
+            doc.save(
+                `BOOKSWAGON_SBMO_MERGED_${Date.now()}.pdf`
+            );
+
+
+            showToast(
+                "success",
+                "Merged PDF Downloaded",
+                "All SBMO labels are in one PDF."
+            );
+
+
+            return;
+        }
+
+
+        const files = [];
+
+
+        for (
+            const po of poList
+        ) {
+
+            const doc =
+                createPDF(
+                    po,
+                    range.start,
+                    range.end,
+                    options
+                );
+
+
+            files.push({
+
+                name:
+                    `${safeFilename(
+                        po
+                    )}_SBMO_BOX_${range.start}-${range.end}.pdf`,
+
+                blob:
+                    doc.output(
+                        "blob"
+                    )
+            });
+        }
+
+
+        await createZIP(
+            files,
+            `BOOKSWAGON_SBMO_${Date.now()}.zip`
+        );
+
+
+        showToast(
+            "success",
+            "ZIP Downloaded",
+            `${files.length} SBMO PDF file(s) packed into ZIP.`
+        );
+
+    } catch (error) {
+
+        console.error(
+            "SBMO Error:",
+            error
+        );
+
+
+        showToast(
+            "error",
+            "Generation Failed",
+            error.message ||
+            "Unable to generate SBMO PDF."
+        );
+    }
+}
+
+
+/* =========================================================
+   ADDRESS PDF
+========================================================= */
+
+function generateAddressPDF() {
+
+    try {
+
+        const JsPDF =
+            getJsPDF();
+
+
+        const doc =
+            new JsPDF({
+                orientation:"portrait",
+                unit:"mm",
+                format:"a4"
+            });
+
+
+        const pageWidth =
+            doc.internal.pageSize
+                .getWidth();
+
+        const pageHeight =
+            doc.internal.pageSize
+                .getHeight();
+
+
+        /*
+         * PAGE BORDER
+         */
+
+        doc.setLineWidth(
+            0.8
+        );
+
+
+        doc.rect(
+            10,
+            10,
+            pageWidth - 20,
+            pageHeight - 20
+        );
+
+
+        /*
+         * TITLE
+         */
+
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
+
+
+        doc.setFontSize(
+            18
+        );
+
+
+        doc.text(
+            "BOOKSWAGON OFFICE",
+            pageWidth / 2,
+            32,
+            {
+                align:"center"
+            }
+        );
+
+
+        /*
+         * ADDRESS
+         */
+
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
+
+
+        doc.setFontSize(
+            11
+        );
+
+
+        const addressLines =
+            doc.splitTextToSize(
+                CONFIG.address,
+                pageWidth - 50
+            );
+
+
+        doc.text(
+            addressLines,
+            25,
+            55
+        );
+
+
+        /*
+         * EMAIL
+         */
+
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
+
+
+        doc.text(
+            "Email:",
+            25,
+            85
+        );
+
+
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
+
+
+        doc.text(
+            CONFIG.email,
+            45,
+            85
+        );
+
+
+        doc.save(
+            "BOOKSWAGON_OFFICE_ADDRESS.pdf"
+        );
+
+
+        showToast(
+            "success",
+            "Address PDF Downloaded",
+            "The office address PDF has been downloaded."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Address PDF Error:",
+            error
+        );
+
+
+        showToast(
+            "error",
+            "Address PDF Failed",
+            error.message ||
+            "Unable to create address PDF."
+        );
+    }
+}
+
+
+/* =========================================================
+   EXCEL IMPORT
+========================================================= */
+
+async function importExcel(
+    file
+) {
+
+    if (!file) {
+        return [];
     }
 
-    .header,
-    .hero,
-    #tools,
-    .footer,
-    .address-section,
-    .btn,
-    .section:not(.print-section) {
-        display:
-            none !important;
+
+    if (
+        typeof XLSX ===
+        "undefined"
+    ) {
+
+        throw new Error(
+            "Excel library is not loaded."
+        );
     }
 
-    .tool-workspace {
-        display:
-            block !important;
 
-        margin:
-            0;
+    const buffer =
+        await file.arrayBuffer();
+
+
+    const workbook =
+        XLSX.read(
+            buffer,
+            {
+                type:"array"
+            }
+        );
+
+
+    const sheet =
+        workbook.Sheets[
+            workbook.SheetNames[0]
+        ];
+
+
+    if (!sheet) {
+        return [];
     }
 
-    .workspace-card {
-        border:
-            0;
 
-        box-shadow:
-            none;
+    const rows =
+        XLSX.utils.sheet_to_json(
+            sheet,
+            {
+                header:1,
+                defval:""
+            }
+        );
 
-        padding:
-            0;
+
+    const values = [];
+
+
+    rows.forEach(row => {
+
+        if (
+            !Array.isArray(row)
+        ) {
+            return;
+        }
+
+
+        row.forEach(cell => {
+
+            const value =
+                String(cell)
+                    .trim();
+
+
+            if (value) {
+                values.push(value);
+            }
+
+        });
+
+    });
+
+
+    return unique(values);
+}
+
+
+async function setupExcel() {
+
+    $("#cocoExcel")
+        ?.addEventListener(
+            "change",
+            async event => {
+
+                try {
+
+                    const values =
+                        await importExcel(
+                            event.target.files[0]
+                        );
+
+
+                    $$(".coco-po")
+                        .forEach(
+                            (input, index) => {
+
+                                input.value =
+                                    values[index] ||
+                                    "";
+
+                            }
+                        );
+
+
+                    $("#cocoExcelStatus")
+                        && (
+                            $("#cocoExcelStatus")
+                                .textContent =
+                                `${Math.min(
+                                    values.length,
+                                    CONFIG.maxManualPO
+                                )} PO(s) loaded.`
+                        );
+
+
+                    updateAllPreviews();
+
+                } catch (error) {
+
+                    showToast(
+                        "error",
+                        "Excel Import Failed",
+                        error.message
+                    );
+                }
+
+            }
+        );
+
+
+    $("#otherExcel")
+        ?.addEventListener(
+            "change",
+            async event => {
+
+                try {
+
+                    const values =
+                        await importExcel(
+                            event.target.files[0]
+                        );
+
+
+                    $$(".other-po")
+                        .forEach(
+                            (input, index) => {
+
+                                input.value =
+                                    values[index] ||
+                                    "";
+
+                            }
+                        );
+
+
+                    $("#otherExcelStatus")
+                        && (
+                            $("#otherExcelStatus")
+                                .textContent =
+                                `${Math.min(
+                                    values.length,
+                                    CONFIG.maxManualPO
+                                )} PO(s) loaded.`
+                        );
+
+
+                    updateAllPreviews();
+
+                } catch (error) {
+
+                    showToast(
+                        "error",
+                        "Excel Import Failed",
+                        error.message
+                    );
+                }
+
+            }
+        );
+}
+
+
+/* =========================================================
+   QR CODE
+========================================================= */
+
+function generateQR(
+    elementId,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!element) {
+        return;
     }
 
-    .preview-page {
-        box-shadow:
-            none;
 
-        page-break-after:
-            always;
+    element.innerHTML =
+        "";
+
+
+    if (
+        typeof QRCode ===
+        "undefined"
+    ) {
+
+        element.textContent =
+            "QR library not loaded.";
+
+        return;
     }
+
+
+    new QRCode(
+        element,
+        {
+            text:value,
+            width:150,
+            height:150,
+            correctLevel:
+                QRCode.CorrectLevel.M
+        }
+    );
+}
+
+
+function setupQRCodes() {
+
+    generateQR(
+        "addressQR",
+        CONFIG.mapsURL
+    );
+
+
+    generateQR(
+        "emailQR",
+        `mailto:${CONFIG.email}`
+    );
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+function setupButtons() {
+
+    $("#cocoGenerate")
+        ?.addEventListener(
+            "click",
+            generateCoco
+        );
+
+
+    $("#otherGenerate")
+        ?.addEventListener(
+            "click",
+            generateOther
+        );
+
+
+    $("#sbmoGenerate")
+        ?.addEventListener(
+            "click",
+            generateSBMO
+        );
+
+
+    $("#cocoAddressGenerate")
+        ?.addEventListener(
+            "click",
+            generateAddressPDF
+        );
+}
+
+
+/* =========================================================
+   LIVE PREVIEW
+========================================================= */
+
+function setupLivePreview() {
+
+    document.addEventListener(
+        "input",
+        event => {
+
+            if (
+                event.target.matches(
+                    "input, textarea, select"
+                )
+            ) {
+
+                updateAllPreviews();
+
+            }
+
+        }
+    );
+
+
+    document.addEventListener(
+        "change",
+        event => {
+
+            if (
+                event.target.matches(
+                    "input, textarea, select"
+                )
+            ) {
+
+                updateAllPreviews();
+
+            }
+
+        }
+    );
+}
+
+
+/* =========================================================
+   PAGE RELOAD → BOTTOM
+========================================================= */
+
+function forceBottomOnReload() {
+
+    if (
+        "scrollRestoration"
+        in history
+    ) {
+
+        history.scrollRestoration =
+            "manual";
+    }
+
+
+    /*
+     * Clear old hash because the browser can
+     * otherwise reopen at an old anchor.
+     */
+
+    if (
+        window.location.hash
+    ) {
+
+        history.replaceState(
+            null,
+            "",
+            window.location.pathname +
+            window.location.search
+        );
+    }
+
+
+    const goBottom =
+        () => {
+
+            window.scrollTo({
+                top:
+                    document.documentElement
+                        .scrollHeight,
+
+                left:0,
+
+                behavior:"instant"
+            });
+        };
+
+
+    /*
+     * Multiple passes because QR codes,
+     * fonts and dynamic content can change
+     * document height after first load.
+     */
+
+    setTimeout(
+        goBottom,
+        50
+    );
+
+    setTimeout(
+        goBottom,
+        250
+    );
+
+    setTimeout(
+        goBottom,
+        700
+    );
+}
+
+
+/* =========================================================
+   RESET BUTTONS
+========================================================= */
+
+function setupResetButtons() {
+
+    $$(".btn").forEach(button => {
+
+        const text =
+            button.textContent
+                .trim()
+                .toLowerCase();
+
+
+        if (
+            text !== "reset"
+        ) {
+            return;
+        }
+
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                const workspace =
+                    button.closest(
+                        ".tool-workspace"
+                    );
+
+
+                if (!workspace) {
+                    return;
+                }
+
+
+                $$(
+                    'input[type="text"], textarea',
+                    workspace
+                )
+                .forEach(input => {
+
+                    input.value =
+                        "";
+
+                });
+
+
+                $$(
+                    'input[type="number"]',
+                    workspace
+                )
+                .forEach(input => {
+
+                    input.value =
+                        input.id.includes(
+                            "Start"
+                        )
+                            ? "1"
+                            : "200";
+
+                });
+
+
+                updateAllPreviews();
+
+
+                showToast(
+                    "success",
+                    "Reset Complete",
+                    "The selected tool has been reset."
+                );
+
+            }
+        );
+
+    });
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+function init() {
+
+    removeBoxRangeLimit();
+
+    setupToolNavigation();
+
+    setupInputTabs();
+
+    setupButtons();
+
+    setupExcel();
+
+    setupQRCodes();
+
+    setupLivePreview();
+
+    setupResetButtons();
+
+    updateAllPreviews();
+
+    forceBottomOnReload();
+
+
+    console.log(
+        "BooksWagon Label Studio loaded."
+    );
+
+    console.log(
+        "✓ 20 PO fields"
+    );
+
+    console.log(
+        "✓ Unlimited box range"
+    );
+
+    console.log(
+        "✓ Checkbox confirmation"
+    );
+
+    console.log(
+        "✓ PO / Box / PO + Box"
+    );
+
+    console.log(
+        "✓ Individual borders"
+    );
+
+    console.log(
+        "✓ Combined border"
+    );
+
+    console.log(
+        "✓ Direct PDF download"
+    );
+
+    console.log(
+        "✓ ZIP download"
+    );
+
+    console.log(
+        "✓ Merged PDF"
+    );
+
+    console.log(
+        "✓ Address QR"
+    );
+
+    console.log(
+        "✓ Email QR"
+    );
+
+    console.log(
+        "✓ Reload opens at bottom"
+    );
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        init,
+        {
+            once:true
+        }
+    );
+
+} else {
+
+    init();
 }
