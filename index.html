@@ -2,18 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Books Label Studio Tool</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="style.css">
+    <title>Books Label Studio</title>
 
-    <!-- Libraries used by the final JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <!-- Excel -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
+    ></script>
+
+    <!-- Barcode -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
+    ></script>
+
+    <!-- QR Code -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"
+    ></script>
+
+    <!-- PDF -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
+    ></script>
 </head>
+
 
 <body>
 
@@ -22,22 +44,23 @@
     <!-- =====================================================
          HEADER
     ====================================================== -->
+
     <header class="app-header">
 
         <div class="brand-area">
 
             <div class="brand-logo">
-                B
+                BL
             </div>
 
             <div class="brand-text">
 
-                <h1 data-i18n="appTitle">
-                    Books Label Studio Tool
+                <h1>
+                    Books Label Studio
                 </h1>
 
-                <p data-i18n="appSubtitle">
-                    Books Label & Barcode Management Studio
+                <p>
+                    Professional Label & Barcode Generator
                 </p>
 
             </div>
@@ -47,15 +70,18 @@
 
         <div class="header-right">
 
-            <label
-                for="languageSelect"
-                data-i18n="language">
+            <label for="languageSelect">
                 Language
             </label>
 
             <select id="languageSelect">
-                <option value="en">English</option>
-                <option value="hi">हिंदी</option>
+                <option value="en">
+                    English
+                </option>
+
+                <option value="hi">
+                    हिंदी
+                </option>
             </select>
 
         </div>
@@ -64,98 +90,84 @@
 
 
     <!-- =====================================================
-         MAIN TOOL CATEGORY NAVIGATION
+         MAIN CATEGORY NAVIGATION
     ====================================================== -->
+
     <nav class="category-nav">
 
         <button
             type="button"
             class="category-btn active"
-            id="categoryCocoBlue"
-            data-category="cocoBlue">
-
-            <span>📦</span>
-            <span data-i18n="cocoBlue">Coco Blue PO</span>
-
+            data-category="cocoBlue"
+        >
+            🏷️ Coco Blue PO
         </button>
 
 
         <button
             type="button"
             class="category-btn"
-            id="categoryOtherPO"
-            data-category="otherPO">
-
-            <span>📋</span>
-            <span data-i18n="otherPO">Other PO</span>
-
+            data-category="otherPO"
+        >
+            📦 Other PO
         </button>
 
 
         <button
             type="button"
             class="category-btn"
-            id="categoryISBN"
-            data-category="isbn">
-
-            <span>▥</span>
-            <span data-i18n="isbnBarcode">ISBN Barcode</span>
-
+            data-category="isbnBarcode"
+        >
+            ▥ ISBN Barcode
         </button>
 
 
         <button
             type="button"
             class="category-btn"
-            id="categoryAddress"
-            data-category="address">
-
-            <span>✉</span>
-            <span data-i18n="addressSticker">Address Sticker</span>
-
+            data-category="addressSticker"
+        >
+            ✉️ Address Sticker
         </button>
 
     </nav>
 
 
     <!-- =====================================================
-         MAIN CONTENT
+         MAIN
     ====================================================== -->
+
     <main class="main-content">
 
 
         <!-- =================================================
-             COCO BLUE PO
+             COCO BLUE
         ================================================== -->
+
         <section
             class="tool-section active"
-            id="cocoBlueSection"
-            data-tool="cocoBlue">
+            data-tool="cocoBlue"
+        >
 
             <div class="section-heading">
 
-                <div>
+                <span class="section-label">
+                    LABEL TOOL
+                </span>
 
-                    <span class="section-label">
-                        LABEL STUDIO
-                    </span>
+                <h2>
+                    Coco Blue PO Labels
+                </h2>
 
-                    <h2 data-i18n="cocoBlue">
-                        Coco Blue PO
-                    </h2>
-
-                    <p data-i18n="cocoDescription">
-                        Create PO and Box labels.
-                    </p>
-
-                </div>
+                <p>
+                    Create PO and Box labels with
+                    flexible repeat and page settings.
+                </p>
 
             </div>
 
 
-            <!-- =============================================
-                 COCO BLUE SUB CATEGORIES
-            ============================================== -->
+            <!-- COCO SUB CATEGORY -->
 
             <div class="sub-navigation">
 
@@ -163,55 +175,45 @@
                     type="button"
                     class="sub-category-btn active"
                     data-coco-mode="individual"
-                    id="cocoIndividualTab">
-
+                >
                     Individual
-
                 </button>
-
 
                 <button
                     type="button"
                     class="sub-category-btn"
                     data-coco-mode="multiple"
-                    id="cocoMultipleTab">
-
+                >
                     Multiple
-
                 </button>
-
 
                 <button
                     type="button"
                     class="sub-category-btn"
                     data-coco-mode="excel"
-                    id="cocoExcelTab">
-
+                >
                     Excel Upload
-
                 </button>
-
 
                 <button
                     type="button"
                     class="sub-category-btn"
                     data-coco-mode="address"
-                    id="cocoAddressTab">
-
-                    Address Print
-
+                >
+                    From / To Address
                 </button>
 
             </div>
 
 
             <!-- =============================================
-                 COCO INDIVIDUAL
+                 INDIVIDUAL PO
             ============================================== -->
 
             <div
+                id="cocoIndividualPanel"
                 class="mode-panel active"
-                id="cocoIndividualPanel">
+            >
 
                 <div class="panel-card">
 
@@ -219,7 +221,9 @@
 
                         <div>
 
-                            <h3>Individual PO</h3>
+                            <h3>
+                                Individual PO Numbers
+                            </h3>
 
                             <p>
                                 Enter up to 40 PO numbers manually.
@@ -235,10 +239,9 @@
 
 
                     <div
+                        id="individualPOGrid"
                         class="po-input-grid"
-                        id="individualPOGrid">
-
-                    </div>
+                    ></div>
 
                 </div>
 
@@ -246,12 +249,13 @@
 
 
             <!-- =============================================
-                 COCO MULTIPLE
+                 MULTIPLE PO
             ============================================== -->
 
             <div
+                id="cocoMultiplePanel"
                 class="mode-panel"
-                id="cocoMultiplePanel">
+            >
 
                 <div class="panel-card">
 
@@ -259,10 +263,13 @@
 
                         <div>
 
-                            <h3>Multiple PO</h3>
+                            <h3>
+                                Multiple PO Numbers
+                            </h3>
 
                             <p>
-                                Enter multiple PO numbers separated by commas.
+                                Separate PO numbers using comma
+                                or a new line.
                             </p>
 
                         </div>
@@ -278,8 +285,8 @@
 
                         <textarea
                             id="cocoMultiplePO"
-                            rows="7"
-                            placeholder="Example: BW001, BW002, BW003, BW004"></textarea>
+                            placeholder="BW01, BW02, BW03, BW04"
+                        ></textarea>
 
                     </div>
 
@@ -289,12 +296,13 @@
 
 
             <!-- =============================================
-                 COCO EXCEL
+                 EXCEL UPLOAD
             ============================================== -->
 
             <div
+                id="cocoExcelPanel"
                 class="mode-panel"
-                id="cocoExcelPanel">
+            >
 
                 <div class="panel-card">
 
@@ -302,10 +310,12 @@
 
                         <div>
 
-                            <h3>Excel Upload</h3>
+                            <h3>
+                                Excel PO Upload
+                            </h3>
 
                             <p>
-                                Upload PO data from Excel.
+                                Upload an Excel file with PO numbers.
                             </p>
 
                         </div>
@@ -315,30 +325,31 @@
 
                     <div class="upload-area">
 
-                        <input
-                            type="file"
-                            id="cocoExcelFile"
-                            accept=".xlsx,.xls,.csv">
+                        <strong>
+                            Upload Excel File
+                        </strong>
 
-                        <label
-                            for="cocoExcelFile"
-                            class="upload-button">
-
-                            Choose Excel File
-
-                        </label>
-
-                        <p id="cocoExcelFileName">
-                            No file selected
+                        <p>
+                            First column will be used as PO numbers.
                         </p>
+
+                        <input
+                            id="cocoExcelFile"
+                            type="file"
+                            accept=".xlsx,.xls,.csv"
+                        >
+
+                        <span id="cocoExcelFileName">
+                            No file selected
+                        </span>
 
                     </div>
 
 
                     <div
+                        id="cocoExcelPreview"
                         class="excel-preview"
-                        id="cocoExcelPreview">
-                    </div>
+                    ></div>
 
                 </div>
 
@@ -346,12 +357,13 @@
 
 
             <!-- =============================================
-                 COCO ADDRESS PRINT
+                 COCO ADDRESS
             ============================================== -->
 
             <div
+                id="cocoAddressPanel"
                 class="mode-panel"
-                id="cocoAddressPanel">
+            >
 
                 <div class="panel-card">
 
@@ -359,10 +371,13 @@
 
                         <div>
 
-                            <h3>Address Print</h3>
+                            <h3>
+                                Coco Blue From / To Address
+                            </h3>
 
                             <p>
-                                Print From and To addresses with Coco Blue labels.
+                                Optional address printing inside
+                                the Coco Blue tool.
                             </p>
 
                         </div>
@@ -372,35 +387,321 @@
 
                     <div class="address-two-column">
 
+                        <div class="address-editor">
+
+                            <div class="field">
+
+                                <label for="cocoFromAddress">
+                                    From Address
+                                </label>
+
+                                <textarea
+                                    id="cocoFromAddress"
+                                    placeholder="Company Name&#10;Customer Name&#10;Full Address&#10;City, PIN"
+                                ></textarea>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="address-editor">
+
+                            <div class="field">
+
+                                <label for="cocoToAddress">
+                                    To Address
+                                </label>
+
+                                <textarea
+                                    id="cocoToAddress"
+                                    placeholder="Customer Name&#10;Full Address&#10;City, PIN"
+                                ></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 BOX SETTINGS
+            ============================================== -->
+
+            <div class="panel-card">
+
+                <div class="panel-title">
+
+                    <div>
+
+                        <h3>
+                            Box Repeat Settings
+                        </h3>
+
+                        <p>
+                            Unlimited box range and repeat count.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="three-column-fields">
+
+                    <div class="field">
+
+                        <label for="startBoxNumber">
+                            Start Box Number
+                        </label>
+
+                        <input
+                            id="startBoxNumber"
+                            type="number"
+                            min="1"
+                            value="1"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="endBoxNumber">
+                            End Box Number
+                        </label>
+
+                        <input
+                            id="endBoxNumber"
+                            type="number"
+                            min="1"
+                            value="10"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="boxRepeatCount">
+                            Repeat Count
+                        </label>
+
+                        <input
+                            id="boxRepeatCount"
+                            type="number"
+                            min="1"
+                            value="1"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="two-column-fields">
+
+                    <label class="feature-check">
+
+                        <input
+                            id="samePOPageFlow"
+                            type="checkbox"
+                        >
+
+                        <span class="checkmark"></span>
+
+                        <span>
+                            Page Flow — Same PO
+                        </span>
+
+                    </label>
+
+
+                    <label class="feature-check">
+
+                        <input
+                            id="halfPageFlowCheck"
+                            type="checkbox"
+                            checked
+                        >
+
+                        <span class="checkmark"></span>
+
+                        <span>
+                            Half Page Label Flow
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="two-column-fields">
+
+                    <div class="field">
+
+                        <label for="labelsPerPage">
+                            Labels Per Page
+                        </label>
+
+                        <input
+                            id="labelsPerPage"
+                            type="number"
+                            min="1"
+                            value="2"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="labelGap">
+                            Label Gap
+                        </label>
+
+                        <input
+                            id="labelGap"
+                            type="number"
+                            min="0"
+                            value="2"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 PAGE SETTINGS
+            ============================================== -->
+
+            <div class="panel-card">
+
+                <div class="panel-title">
+
+                    <div>
+
+                        <h3>
+                            Page Settings
+                        </h3>
+
+                        <p>
+                            All page sizes support Portrait
+                            and Landscape.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="three-column-fields">
+
+                    <div class="field">
+
+                        <label for="pageSize">
+                            Page Size
+                        </label>
+
+                        <select id="pageSize">
+
+                            <option value="4x6">
+                                4 × 6 Inches
+                            </option>
+
+                            <option value="70x35">
+                                70 × 35 mm
+                            </option>
+
+                            <option value="a4">
+                                A4
+                            </option>
+
+                            <option value="custom">
+                                Custom Size
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="orientation">
+                            Orientation
+                        </label>
+
+                        <select id="orientation">
+
+                            <option value="portrait">
+                                Portrait
+                            </option>
+
+                            <option value="landscape">
+                                Landscape
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div
+                        id="selectedPageInfo"
+                        class="selected-page-info"
+                    >
+                        4 × 6 Inches
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="customSizePanel"
+                    class="custom-size-panel hidden"
+                >
+
+                    <div class="two-column-fields">
+
                         <div class="field">
 
-                            <label for="cocoFromAddress">
-                                From Address
+                            <label for="customWidth">
+                                Custom Width (mm)
                             </label>
 
-                            <textarea
-                                id="cocoFromAddress"
-                                rows="8"
-                                placeholder="Example:
-Company Name
-Customer Name
-Full Address"></textarea>
+                            <input
+                                id="customWidth"
+                                type="number"
+                                min="1"
+                                placeholder="Width"
+                                disabled
+                            >
 
                         </div>
 
 
                         <div class="field">
 
-                            <label for="cocoToAddress">
-                                To Address
+                            <label for="customHeight">
+                                Custom Height (mm)
                             </label>
 
-                            <textarea
-                                id="cocoToAddress"
-                                rows="8"
-                                placeholder="Example:
-Customer Name
-Full Address"></textarea>
+                            <input
+                                id="customHeight"
+                                type="number"
+                                min="1"
+                                placeholder="Height"
+                                disabled
+                            >
 
                         </div>
 
@@ -412,777 +713,493 @@ Full Address"></textarea>
 
 
             <!-- =============================================
-                 COCO LABEL CONTENT
+                 LABEL FEATURES
             ============================================== -->
 
-            <div class="settings-grid">
+            <div class="panel-card">
 
+                <div class="panel-title">
 
-                <!-- LEFT SETTINGS -->
-                <div class="settings-column">
+                    <div>
 
+                        <h3>
+                            Label Features
+                        </h3>
 
-                    <!-- BOX REPEAT -->
-                    <div class="panel-card">
-
-                        <div class="panel-title">
-
-                            <div>
-
-                                <h3>Box Repeat Settings</h3>
-
-                                <p>
-                                    Control box range and repeat count.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="three-column-fields">
-
-                            <div class="field">
-
-                                <label for="startBoxNumber">
-                                    Start Box Number
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="startBoxNumber"
-                                    min="1"
-                                    value="1">
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <label for="endBoxNumber">
-                                    End Box Number
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="endBoxNumber"
-                                    min="1"
-                                    value="10">
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <label for="boxRepeatCount">
-                                    Repeat Count
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="boxRepeatCount"
-                                    min="1"
-                                    value="1">
-
-                            </div>
-
-                        </div>
-
-
-                        <label class="switch-row">
-
-                            <input
-                                type="checkbox"
-                                id="samePOPageFlow">
-
-                            <span class="switch-ui"></span>
-
-                            <span>
-                                Page Flow — Same PO
-                            </span>
-
-                        </label>
-
-                    </div>
-
-
-                    <!-- LABEL CONTENT -->
-                    <div class="panel-card">
-
-                        <div class="panel-title">
-
-                            <div>
-
-                                <h3>Label Content</h3>
-
-                                <p>
-                                    Select how PO and Box information appears.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="feature-checkbox-list">
-
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="poNumberCheck"
-                                    checked>
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    PO Number
-                                </span>
-
-                            </label>
-
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="boxNumberCheck"
-                                    checked>
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    Box Number
-                                </span>
-
-                            </label>
-
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="poPlusBoxCheck">
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    PO Number + Box Number
-                                </span>
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- BORDER -->
-                    <div class="panel-card">
-
-                        <div class="panel-title">
-
-                            <div>
-
-                                <h3>Border & Cut Settings</h3>
-
-                                <p>
-                                    Configure individual and combined borders.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="feature-checkbox-list">
-
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="combinedBorderCheck">
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    Combined Border
-                                </span>
-
-                            </label>
-
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="poBorderCheck">
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    PO Border
-                                </span>
-
-                            </label>
-
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="boxBorderCheck">
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    Box Border
-                                </span>
-
-                            </label>
-
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="cutLineCheck">
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    Cut Line / Scissor Mark
-                                </span>
-
-                            </label>
-
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="pageBorderCheck">
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    Page Border
-                                </span>
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- PO FONT -->
-                    <div class="panel-card">
-
-                        <div class="panel-title">
-
-                            <div>
-
-                                <h3>PO Number Font</h3>
-
-                                <p>
-                                    Separate font controls for PO number.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="two-column-fields">
-
-
-                            <div class="field">
-
-                                <label for="poFontFamily">
-                                    Font Family
-                                </label>
-
-                                <select id="poFontFamily">
-
-                                    <option>Arial</option>
-                                    <option>Calibri</option>
-                                    <option>Cambria</option>
-                                    <option>Century Gothic</option>
-                                    <option>Courier New</option>
-                                    <option>Georgia</option>
-                                    <option>Helvetica</option>
-                                    <option>Impact</option>
-                                    <option>Lucida Console</option>
-                                    <option>Lucida Sans</option>
-                                    <option>Microsoft Sans Serif</option>
-                                    <option>Palatino Linotype</option>
-                                    <option>Segoe UI</option>
-                                    <option>Tahoma</option>
-                                    <option>Times New Roman</option>
-                                    <option>Trebuchet MS</option>
-                                    <option>Verdana</option>
-                                    <option>Book Antiqua</option>
-                                    <option>Consolas</option>
-                                    <option>Franklin Gothic Medium</option>
-                                    <option>Garamond</option>
-                                    <option>Gill Sans</option>
-                                    <option>Rockwell</option>
-                                    <option>Symbol</option>
-                                    <option>Yu Gothic</option>
-
-                                </select>
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <label for="poFontSize">
-                                    Font Size
-                                </label>
-
-                                <select id="poFontSize">
-
-                                    <option value="8">8</option>
-                                    <option value="10">10</option>
-                                    <option value="12">12</option>
-                                    <option value="14">14</option>
-                                    <option value="16">16</option>
-                                    <option value="18">18</option>
-                                    <option value="20">20</option>
-                                    <option value="22">22</option>
-                                    <option value="24">24</option>
-                                    <option value="26">26</option>
-                                    <option value="28">28</option>
-                                    <option value="30">30</option>
-                                    <option value="32">32</option>
-                                    <option value="34">34</option>
-                                    <option value="36">36</option>
-                                    <option value="38">38</option>
-                                    <option value="40">40</option>
-                                    <option value="42">42</option>
-                                    <option value="44">44</option>
-                                    <option value="46">46</option>
-                                    <option value="48">48</option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="text-style-controls">
-
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="poBoldCheck">
-                                <span>Bold</span>
-                            </label>
-
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="poItalicCheck">
-                                <span>Italic</span>
-                            </label>
-
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="poUnderlineCheck">
-                                <span>Underline</span>
-                            </label>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- BOX FONT -->
-                    <div class="panel-card">
-
-                        <div class="panel-title">
-
-                            <div>
-
-                                <h3>Box Number Font</h3>
-
-                                <p>
-                                    Separate font controls for Box Number.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="two-column-fields">
-
-                            <div class="field">
-
-                                <label for="boxFontFamily">
-                                    Font Family
-                                </label>
-
-                                <select id="boxFontFamily">
-
-                                    <option>Arial</option>
-                                    <option>Calibri</option>
-                                    <option>Cambria</option>
-                                    <option>Century Gothic</option>
-                                    <option>Courier New</option>
-                                    <option>Georgia</option>
-                                    <option>Helvetica</option>
-                                    <option>Impact</option>
-                                    <option>Lucida Console</option>
-                                    <option>Lucida Sans</option>
-                                    <option>Microsoft Sans Serif</option>
-                                    <option>Palatino Linotype</option>
-                                    <option>Segoe UI</option>
-                                    <option>Tahoma</option>
-                                    <option>Times New Roman</option>
-                                    <option>Trebuchet MS</option>
-                                    <option>Verdana</option>
-                                    <option>Book Antiqua</option>
-                                    <option>Consolas</option>
-                                    <option>Franklin Gothic Medium</option>
-                                    <option>Garamond</option>
-                                    <option>Gill Sans</option>
-                                    <option>Rockwell</option>
-                                    <option>Symbol</option>
-                                    <option>Yu Gothic</option>
-
-                                </select>
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <label for="boxFontSize">
-                                    Font Size
-                                </label>
-
-                                <select id="boxFontSize">
-
-                                    <option value="8">8</option>
-                                    <option value="10">10</option>
-                                    <option value="12">12</option>
-                                    <option value="14">14</option>
-                                    <option value="16">16</option>
-                                    <option value="18">18</option>
-                                    <option value="20">20</option>
-                                    <option value="22">22</option>
-                                    <option value="24">24</option>
-                                    <option value="26">26</option>
-                                    <option value="28">28</option>
-                                    <option value="30">30</option>
-                                    <option value="32">32</option>
-                                    <option value="34">34</option>
-                                    <option value="36">36</option>
-                                    <option value="38">38</option>
-                                    <option value="40">40</option>
-                                    <option value="42">42</option>
-                                    <option value="44">44</option>
-                                    <option value="46">46</option>
-                                    <option value="48">48</option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="text-style-controls">
-
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="boxBoldCheck">
-                                <span>Bold</span>
-                            </label>
-
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="boxItalicCheck">
-                                <span>Italic</span>
-                            </label>
-
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="boxUnderlineCheck">
-                                <span>Underline</span>
-                            </label>
-
-                        </div>
+                        <p>
+                            Select exactly what should appear
+                            on the printed label.
+                        </p>
 
                     </div>
 
                 </div>
 
 
-                <!-- RIGHT SETTINGS -->
-                <div class="settings-column">
+                <div class="feature-checkbox-list">
+
+                    <label class="feature-check">
+
+                        <input
+                            id="poNumberCheck"
+                            type="checkbox"
+                            checked
+                        >
+
+                        <span class="checkmark"></span>
+
+                        <span>
+                            PO Number
+                        </span>
+
+                    </label>
 
 
-                    <!-- PAGE SIZE -->
-                    <div class="panel-card">
+                    <label class="feature-check">
 
-                        <div class="panel-title">
+                        <input
+                            id="boxNumberCheck"
+                            type="checkbox"
+                            checked
+                        >
 
-                            <div>
+                        <span class="checkmark"></span>
 
-                                <h3>Page Settings</h3>
+                        <span>
+                            Box Number
+                        </span>
 
-                                <p>
-                                    Select page size and orientation.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="two-column-fields">
-
-                            <div class="field">
-
-                                <label for="pageSize">
-                                    Page Size
-                                </label>
-
-                                <select id="pageSize">
-
-                                    <option value="4x6">
-                                        4 × 6 Inches
-                                    </option>
-
-                                    <option value="70x35">
-                                        70 × 35 mm
-                                    </option>
-
-                                    <option value="a4">
-                                        A4
-                                    </option>
-
-                                    <option value="custom">
-                                        Custom Size
-                                    </option>
-
-                                </select>
-
-                            </div>
+                    </label>
 
 
-                            <div class="field">
+                    <label class="feature-check">
 
-                                <label for="orientation">
-                                    Orientation
-                                </label>
+                        <input
+                            id="poPlusBoxCheck"
+                            type="checkbox"
+                        >
 
-                                <select id="orientation">
+                        <span class="checkmark"></span>
 
-                                    <option value="portrait">
-                                        Portrait
-                                    </option>
+                        <span>
+                            PO Number + Box Number
+                        </span>
 
-                                    <option value="landscape">
-                                        Landscape
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
+                    </label>
 
 
-                        <!-- CUSTOM SIZE -->
-                        <div
-                            class="custom-size-panel"
-                            id="customSizePanel">
+                    <label class="feature-check">
 
-                            <div class="two-column-fields">
+                        <input
+                            id="combinedBorderCheck"
+                            type="checkbox"
+                        >
 
-                                <div class="field">
+                        <span class="checkmark"></span>
 
-                                    <label for="customWidth">
-                                        Custom Width (mm)
-                                    </label>
+                        <span>
+                            Combined Border
+                        </span>
 
-                                    <input
-                                        type="number"
-                                        id="customWidth"
-                                        min="1"
-                                        step="0.1"
-                                        placeholder="Width">
-
-                                </div>
+                    </label>
 
 
-                                <div class="field">
+                    <label class="feature-check">
 
-                                    <label for="customHeight">
-                                        Custom Height (mm)
-                                    </label>
+                        <input
+                            id="poBorderCheck"
+                            type="checkbox"
+                        >
 
-                                    <input
-                                        type="number"
-                                        id="customHeight"
-                                        min="1"
-                                        step="0.1"
-                                        placeholder="Height">
+                        <span class="checkmark"></span>
 
-                                </div>
+                        <span>
+                            PO Border
+                        </span>
 
-                            </div>
-
-                        </div>
+                    </label>
 
 
-                        <div
-                            class="selected-page-info"
-                            id="selectedPageInfo">
+                    <label class="feature-check">
 
-                            4 × 6 Inches
+                        <input
+                            id="boxBorderCheck"
+                            type="checkbox"
+                        >
+
+                        <span class="checkmark"></span>
+
+                        <span>
+                            Box Border
+                        </span>
+
+                    </label>
+
+
+                    <label class="feature-check">
+
+                        <input
+                            id="cutLineCheck"
+                            type="checkbox"
+                        >
+
+                        <span class="checkmark"></span>
+
+                        <span>
+                            Cut Line / Scissor Mark
+                        </span>
+
+                    </label>
+
+
+                    <label class="feature-check">
+
+                        <input
+                            id="pageBorderCheck"
+                            type="checkbox"
+                        >
+
+                        <span class="checkmark"></span>
+
+                        <span>
+                            Page Border
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 FONT SETTINGS
+            ============================================== -->
+
+            <div class="settings-grid">
+
+                <!-- PO FONT -->
+
+                <div class="panel-card">
+
+                    <div class="panel-title">
+
+                        <div>
+
+                            <h3>
+                                PO Number Font
+                            </h3>
+
+                            <p>
+                                Separate PO text formatting.
+                            </p>
 
                         </div>
 
                     </div>
 
 
-                    <!-- LABEL PLACEMENT -->
-                    <div class="panel-card">
+                    <div class="two-column-fields">
 
-                        <div class="panel-title">
+                        <div class="field">
 
-                            <div>
-
-                                <h3>Label Placement</h3>
-
-                                <p>
-                                    Configure label position and page flow.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="two-column-fields">
-
-                            <div class="field">
-
-                                <label for="labelsPerPage">
-                                    Labels Per Page
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="labelsPerPage"
-                                    min="1"
-                                    value="2">
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <label for="labelGap">
-                                    Label Gap (mm)
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="labelGap"
-                                    min="0"
-                                    step="0.1"
-                                    value="2">
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="feature-checkbox-list">
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="halfPageFlowCheck"
-                                    checked>
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    Half Page Label Flow
-                                </span>
-
+                            <label for="poFontFamily">
+                                Font
                             </label>
 
+                            <select id="poFontFamily">
+
+                                <option>Arial</option>
+                                <option>Calibri</option>
+                                <option>Cambria</option>
+                                <option>Georgia</option>
+                                <option>Verdana</option>
+                                <option>Tahoma</option>
+                                <option>Trebuchet MS</option>
+                                <option>Times New Roman</option>
+                                <option>Courier New</option>
+                                <option>Consolas</option>
+                                <option>Garamond</option>
+                                <option>Century Gothic</option>
+                                <option>Arial Black</option>
+                                <option>Impact</option>
+                                <option>Segoe UI</option>
+                                <option>Segoe UI Semibold</option>
+                                <option>Franklin Gothic Medium</option>
+                                <option>Book Antiqua</option>
+                                <option>Bookman Old Style</option>
+                                <option>Comic Sans MS</option>
+                                <option>Lucida Console</option>
+                                <option>Lucida Sans</option>
+                                <option>MS Sans Serif</option>
+                                <option>MS Serif</option>
+                                <option>Palatino Linotype</option>
+                                <option>Rockwell</option>
+                                <option>Gill Sans</option>
+                                <option>Helvetica</option>
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="poFontSize">
+                                Font Size
+                            </label>
+
+                            <select id="poFontSize">
+
+                                <option value="10">10</option>
+                                <option value="12">12</option>
+                                <option value="14">14</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                                <option value="20">20</option>
+                                <option value="22">22</option>
+                                <option value="24" selected>24</option>
+                                <option value="26">26</option>
+                                <option value="28">28</option>
+                                <option value="30">30</option>
+                                <option value="32">32</option>
+                                <option value="34">34</option>
+                                <option value="36">36</option>
+                                <option value="38">38</option>
+                                <option value="40">40</option>
+                                <option value="42">42</option>
+                                <option value="44">44</option>
+                                <option value="46">46</option>
+                                <option value="48">48</option>
+
+                            </select>
+
                         </div>
 
                     </div>
 
 
-                    <!-- LIVE PREVIEW -->
-                    <div class="panel-card preview-card">
+                    <div class="text-style-controls">
 
-                        <div class="panel-title">
+                        <label>
+                            <input
+                                id="poBoldCheck"
+                                type="checkbox"
+                            >
+                            Bold
+                        </label>
 
-                            <div>
 
-                                <h3>Live Preview</h3>
+                        <label>
+                            <input
+                                id="poItalicCheck"
+                                type="checkbox"
+                            >
+                            Italic
+                        </label>
 
-                                <p>
-                                    Preview changes according to page size.
-                                </p>
 
-                            </div>
+                        <label>
+                            <input
+                                id="poUnderlineCheck"
+                                type="checkbox"
+                            >
+                            Underline
+                        </label>
 
-                            <span
-                                id="previewPageSize">
-                                4 × 6 Inches
-                            </span>
+                    </div>
+
+                </div>
+
+
+                <!-- BOX FONT -->
+
+                <div class="panel-card">
+
+                    <div class="panel-title">
+
+                        <div>
+
+                            <h3>
+                                Box Number Font
+                            </h3>
+
+                            <p>
+                                Separate Box text formatting.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="two-column-fields">
+
+                        <div class="field">
+
+                            <label for="boxFontFamily">
+                                Font
+                            </label>
+
+                            <select id="boxFontFamily">
+
+                                <option>Arial</option>
+                                <option>Calibri</option>
+                                <option>Cambria</option>
+                                <option>Georgia</option>
+                                <option>Verdana</option>
+                                <option>Tahoma</option>
+                                <option>Trebuchet MS</option>
+                                <option>Times New Roman</option>
+                                <option>Courier New</option>
+                                <option>Consolas</option>
+                                <option>Garamond</option>
+                                <option>Century Gothic</option>
+                                <option>Arial Black</option>
+                                <option>Impact</option>
+                                <option>Segoe UI</option>
+                                <option>Segoe UI Semibold</option>
+                                <option>Franklin Gothic Medium</option>
+                                <option>Book Antiqua</option>
+                                <option>Bookman Old Style</option>
+                                <option>Comic Sans MS</option>
+                                <option>Lucida Console</option>
+                                <option>Lucida Sans</option>
+                                <option>MS Sans Serif</option>
+                                <option>MS Serif</option>
+                                <option>Palatino Linotype</option>
+                                <option>Rockwell</option>
+                                <option>Gill Sans</option>
+                                <option>Helvetica</option>
+
+                            </select>
 
                         </div>
 
 
+                        <div class="field">
+
+                            <label for="boxFontSize">
+                                Font Size
+                            </label>
+
+                            <select id="boxFontSize">
+
+                                <option value="10">10</option>
+                                <option value="12">12</option>
+                                <option value="14">14</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                                <option value="20" selected>20</option>
+                                <option value="22">22</option>
+                                <option value="24">24</option>
+                                <option value="26">26</option>
+                                <option value="28">28</option>
+                                <option value="30">30</option>
+                                <option value="32">32</option>
+                                <option value="34">34</option>
+                                <option value="36">36</option>
+                                <option value="38">38</option>
+                                <option value="40">40</option>
+                                <option value="42">42</option>
+                                <option value="44">44</option>
+                                <option value="46">46</option>
+                                <option value="48">48</option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="text-style-controls">
+
+                        <label>
+                            <input
+                                id="boxBoldCheck"
+                                type="checkbox"
+                            >
+                            Bold
+                        </label>
+
+
+                        <label>
+                            <input
+                                id="boxItalicCheck"
+                                type="checkbox"
+                            >
+                            Italic
+                        </label>
+
+
+                        <label>
+                            <input
+                                id="boxUnderlineCheck"
+                                type="checkbox"
+                            >
+                            Underline
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 PREVIEW
+            ============================================== -->
+
+            <div class="panel-card preview-card">
+
+                <div class="panel-title">
+
+                    <div>
+
+                        <h3>
+                            Live Preview
+                        </h3>
+
+                        <p>
+                            Preview changes automatically with
+                            page size and settings.
+                        </p>
+
+                    </div>
+
+                    <span id="previewPageSize">
+                        4 × 6 Inches
+                    </span>
+
+                </div>
+
+
+                <div class="preview-container">
+
+                    <div
+                        id="previewPage"
+                        class="preview-page"
+                    >
+
                         <div
-                            class="preview-container"
-                            id="previewContainer">
+                            id="previewLabel"
+                            class="preview-label"
+                        >
 
                             <div
-                                class="preview-page"
-                                id="previewPage">
+                                id="previewPO"
+                                class="preview-po"
+                            >
+                                PO NUMBER
+                            </div>
 
-                                <div
-                                    class="preview-label"
-                                    id="previewLabel">
 
-                                    <div
-                                        class="preview-po"
-                                        id="previewPO">
-                                        PO NUMBER
-                                    </div>
-
-                                    <div
-                                        class="preview-box"
-                                        id="previewBox">
-                                        BOX NO. 1
-                                    </div>
-
-                                </div>
-
+                            <div
+                                id="previewBox"
+                                class="preview-box"
+                            >
+                                BOX NO. 1
                             </div>
 
                         </div>
@@ -1194,29 +1211,27 @@ Full Address"></textarea>
             </div>
 
 
-            <!-- =================================================
-                 COCO ACTIONS
-            ================================================== -->
+            <!-- =============================================
+                 ACTIONS
+            ============================================== -->
 
             <div class="action-bar">
 
                 <button
+                    id="cocoResetButton"
                     type="button"
                     class="secondary-btn"
-                    id="cocoResetButton">
-
+                >
                     Reset
-
                 </button>
 
 
                 <button
+                    id="cocoGenerateButton"
                     type="button"
                     class="primary-btn"
-                    id="cocoGenerateButton">
-
+                >
                     Generate PDF
-
                 </button>
 
             </div>
@@ -1224,30 +1239,29 @@ Full Address"></textarea>
         </section>
 
 
-        <!-- =====================================================
+
+        <!-- =================================================
              OTHER PO
-        ====================================================== -->
+        ================================================== -->
 
         <section
             class="tool-section"
-            id="otherPOSection"
-            data-tool="otherPO">
+            data-tool="otherPO"
+        >
 
             <div class="section-heading">
 
-                <div>
+                <span class="section-label">
+                    LABEL TOOL
+                </span>
 
-                    <span class="section-label">
-                        LABEL STUDIO
-                    </span>
+                <h2>
+                    Other PO
+                </h2>
 
-                    <h2>Other PO</h2>
-
-                    <p>
-                        Other PO label generation.
-                    </p>
-
-                </div>
+                <p>
+                    Create labels for other purchase orders.
+                </p>
 
             </div>
 
@@ -1257,62 +1271,83 @@ Full Address"></textarea>
                 <button
                     type="button"
                     class="sub-category-btn active"
-                    data-other-mode="individual">
-
+                    data-other-mode="individual"
+                >
                     Individual
-
                 </button>
 
 
                 <button
                     type="button"
                     class="sub-category-btn"
-                    data-other-mode="multiple">
-
+                    data-other-mode="multiple"
+                >
                     Multiple
-
                 </button>
 
 
                 <button
                     type="button"
                     class="sub-category-btn"
-                    data-other-mode="excel">
-
+                    data-other-mode="excel"
+                >
                     Excel Upload
-
                 </button>
 
 
                 <button
                     type="button"
                     class="sub-category-btn"
-                    data-other-mode="address">
-
-                    Address Print
-
+                    data-other-mode="address"
+                >
+                    From / To Address
                 </button>
 
             </div>
 
 
-            <div class="other-po-panel active" id="otherIndividualPanel">
+            <!-- INDIVIDUAL -->
+
+            <div
+                id="otherIndividualPanel"
+                class="other-po-panel active"
+            >
 
                 <div class="panel-card">
 
-                    <h3>Individual Other PO</h3>
+                    <div class="panel-title">
+
+                        <div>
+
+                            <h3>
+                                Individual PO Numbers
+                            </h3>
+
+                            <p>
+                                Up to 40 manual PO numbers.
+                            </p>
+
+                        </div>
+
+                    </div>
+
 
                     <div
+                        id="otherIndividualPOGrid"
                         class="po-input-grid"
-                        id="otherIndividualPOGrid">
-                    </div>
+                    ></div>
 
                 </div>
 
             </div>
 
 
-            <div class="other-po-panel" id="otherMultiplePanel">
+            <!-- MULTIPLE -->
+
+            <div
+                id="otherMultiplePanel"
+                class="other-po-panel"
+            >
 
                 <div class="panel-card">
 
@@ -1324,8 +1359,8 @@ Full Address"></textarea>
 
                         <textarea
                             id="otherMultiplePO"
-                            rows="7"
-                            placeholder="PO001, PO002, PO003"></textarea>
+                            placeholder="PO01, PO02, PO03..."
+                        ></textarea>
 
                     </div>
 
@@ -1334,71 +1369,87 @@ Full Address"></textarea>
             </div>
 
 
-            <div class="other-po-panel" id="otherExcelPanel">
+            <!-- EXCEL -->
+
+            <div
+                id="otherExcelPanel"
+                class="other-po-panel"
+            >
 
                 <div class="panel-card">
 
                     <div class="upload-area">
 
+                        <strong>
+                            Upload Other PO Excel
+                        </strong>
+
                         <input
-                            type="file"
                             id="otherExcelFile"
-                            accept=".xlsx,.xls,.csv">
+                            type="file"
+                            accept=".xlsx,.xls,.csv"
+                        >
 
-                        <label
-                            for="otherExcelFile"
-                            class="upload-button">
-
-                            Choose Excel File
-
-                        </label>
-
-                        <p id="otherExcelFileName">
+                        <span id="otherExcelFileName">
                             No file selected
-                        </p>
+                        </span>
 
                     </div>
+
 
                     <div
                         id="otherExcelPreview"
-                        class="excel-preview">
-                    </div>
+                        class="excel-preview"
+                    ></div>
 
                 </div>
 
             </div>
 
 
-            <div class="other-po-panel" id="otherAddressPanel">
+            <!-- ADDRESS -->
+
+            <div
+                id="otherAddressPanel"
+                class="other-po-panel"
+            >
 
                 <div class="panel-card">
 
                     <div class="address-two-column">
 
-                        <div class="field">
+                        <div class="address-editor">
 
-                            <label for="otherFromAddress">
-                                From Address
-                            </label>
+                            <div class="field">
 
-                            <textarea
-                                id="otherFromAddress"
-                                rows="8"
-                                placeholder="Company Name&#10;Customer Name&#10;Full Address"></textarea>
+                                <label for="otherFromAddress">
+                                    From Address
+                                </label>
+
+                                <textarea
+                                    id="otherFromAddress"
+                                    placeholder="From Company / Name / Address"
+                                ></textarea>
+
+                            </div>
 
                         </div>
 
 
-                        <div class="field">
+                        <div class="address-editor">
 
-                            <label for="otherToAddress">
-                                To Address
-                            </label>
+                            <div class="field">
 
-                            <textarea
-                                id="otherToAddress"
-                                rows="8"
-                                placeholder="Customer Name&#10;Full Address"></textarea>
+                                <label for="otherToAddress">
+                                    To Address
+                                </label>
+
+                                <textarea
+                                    id="otherToAddress"
+                                    placeholder="Customer / Address"
+                                ></textarea>
+
+                            </div>
 
                         </div>
 
@@ -1409,12 +1460,20 @@ Full Address"></textarea>
             </div>
 
 
-            <!-- OTHER PO SETTINGS -->
+            <!-- OTHER PAGE -->
+
             <div class="panel-card">
 
-                <h3>Other PO Label Settings</h3>
+                <div class="panel-title">
 
-                <div class="two-column-fields">
+                    <h3>
+                        Page Settings
+                    </h3>
+
+                </div>
+
+
+                <div class="three-column-fields">
 
                     <div class="field">
 
@@ -1437,7 +1496,7 @@ Full Address"></textarea>
                             </option>
 
                             <option value="custom">
-                                Custom Size
+                                Custom
                             </option>
 
                         </select>
@@ -1470,7 +1529,8 @@ Full Address"></textarea>
 
                 <div
                     id="otherCustomSizePanel"
-                    class="custom-size-panel">
+                    class="custom-size-panel hidden"
+                >
 
                     <div class="two-column-fields">
 
@@ -1481,9 +1541,10 @@ Full Address"></textarea>
                             </label>
 
                             <input
-                                type="number"
                                 id="otherCustomWidth"
-                                min="1">
+                                type="number"
+                                disabled
+                            >
 
                         </div>
 
@@ -1495,9 +1556,10 @@ Full Address"></textarea>
                             </label>
 
                             <input
-                                type="number"
                                 id="otherCustomHeight"
-                                min="1">
+                                type="number"
+                                disabled
+                            >
 
                         </div>
 
@@ -1508,25 +1570,25 @@ Full Address"></textarea>
             </div>
 
 
+            <!-- OTHER ACTIONS -->
+
             <div class="action-bar">
 
                 <button
+                    id="otherResetButton"
                     type="button"
                     class="secondary-btn"
-                    id="otherResetButton">
-
+                >
                     Reset
-
                 </button>
 
 
                 <button
+                    id="otherGenerateButton"
                     type="button"
                     class="primary-btn"
-                    id="otherGenerateButton">
-
+                >
                     Generate PDF
-
                 </button>
 
             </div>
@@ -1534,52 +1596,57 @@ Full Address"></textarea>
         </section>
 
 
-        <!-- =====================================================
+
+        <!-- =================================================
              ISBN BARCODE
-        ====================================================== -->
+        ================================================== -->
 
         <section
             class="tool-section"
-            id="isbnSection"
-            data-tool="isbn">
+            data-tool="isbnBarcode"
+        >
 
             <div class="section-heading">
 
-                <div>
+                <span class="section-label">
+                    BARCODE TOOL
+                </span>
 
-                    <span class="section-label">
-                        BARCODE GENERATOR
-                    </span>
+                <h2>
+                    ISBN Barcode Generator
+                </h2>
 
-                    <h2>
-                        ISBN Barcode Generator
-                    </h2>
-
-                    <p>
-                        Generate barcode labels — barcode, not QR code.
-                    </p>
-
-                </div>
+                <p>
+                    Generate clean printable book barcode labels.
+                </p>
 
             </div>
 
 
             <div class="panel-card">
 
-                <div class="three-column-fields">
+                <div class="panel-title">
 
+                    <h3>
+                        ISBN Information
+                    </h3>
+
+                </div>
+
+
+                <div class="two-column-fields">
 
                     <div class="field">
 
                         <label for="isbnValue">
-                            ISBN
-                            <span class="required">*</span>
+                            ISBN / Barcode Value
                         </label>
 
                         <input
-                            type="text"
                             id="isbnValue"
-                            placeholder="Enter ISBN">
+                            type="text"
+                            placeholder="978XXXXXXXXXX"
+                        >
 
                     </div>
 
@@ -1587,51 +1654,60 @@ Full Address"></textarea>
                     <div class="field">
 
                         <label for="isbnBookTitle">
-                            Book Name / Title
-                            <span class="required">*</span>
+                            Book Title
                         </label>
 
                         <input
-                            type="text"
                             id="isbnBookTitle"
-                            placeholder="Enter book title">
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="isbnEdition">
-                            Edition
-                            <span class="optional">
-                                Optional
-                            </span>
-                        </label>
-
-                        <input
                             type="text"
-                            id="isbnEdition"
-                            placeholder="Edition">
+                            placeholder="Book Title"
+                        >
 
                     </div>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="isbnEdition">
+                        Edition / Additional Text
+                    </label>
+
+                    <input
+                        id="isbnEdition"
+                        type="text"
+                        placeholder="Edition"
+                    >
 
                 </div>
 
 
                 <div class="isbn-note">
 
-                    ISBN may contain numeric,
-                    alphabetic or alphanumeric values.
+                    Barcode preview updates automatically.
+                    Keep sufficient gap between barcode,
+                    code text and title.
 
                 </div>
 
             </div>
 
 
-            <!-- ISBN PAGE SETTINGS -->
+            <!-- ISBN PAGE -->
+
             <div class="panel-card">
 
-                <div class="two-column-fields">
+                <div class="panel-title">
+
+                    <h3>
+                        Page Settings
+                    </h3>
+
+                </div>
+
+
+                <div class="three-column-fields">
 
                     <div class="field">
 
@@ -1654,7 +1730,7 @@ Full Address"></textarea>
                             </option>
 
                             <option value="custom">
-                                Custom Size
+                                Custom
                             </option>
 
                         </select>
@@ -1687,7 +1763,8 @@ Full Address"></textarea>
 
                 <div
                     id="isbnCustomSizePanel"
-                    class="custom-size-panel">
+                    class="custom-size-panel hidden"
+                >
 
                     <div class="two-column-fields">
 
@@ -1698,9 +1775,10 @@ Full Address"></textarea>
                             </label>
 
                             <input
-                                type="number"
                                 id="isbnCustomWidth"
-                                min="1">
+                                type="number"
+                                disabled
+                            >
 
                         </div>
 
@@ -1712,9 +1790,10 @@ Full Address"></textarea>
                             </label>
 
                             <input
-                                type="number"
                                 id="isbnCustomHeight"
-                                min="1">
+                                type="number"
+                                disabled
+                            >
 
                         </div>
 
@@ -1726,24 +1805,28 @@ Full Address"></textarea>
 
 
             <!-- ISBN PREVIEW -->
+
             <div class="panel-card">
 
                 <div class="panel-title">
 
-                    <h3>Barcode Preview</h3>
+                    <h3>
+                        Barcode Preview
+                    </h3>
 
                 </div>
 
-                <div
-                    class="barcode-preview"
-                    id="isbnBarcodePreview">
+
+                <div class="barcode-preview">
 
                     <svg
-                        id="isbnBarcodeSvg">
-                    </svg>
+                        id="isbnBarcodeSvg"
+                    ></svg>
 
                     <div
-                        id="isbnBarcodeText">
+                        id="isbnBarcodeText"
+                    >
+                        Enter ISBN to preview
                     </div>
 
                 </div>
@@ -1754,22 +1837,20 @@ Full Address"></textarea>
             <div class="action-bar">
 
                 <button
+                    id="isbnResetButton"
                     type="button"
                     class="secondary-btn"
-                    id="isbnResetButton">
-
+                >
                     Reset
-
                 </button>
 
 
                 <button
+                    id="isbnGenerateButton"
                     type="button"
                     class="primary-btn"
-                    id="isbnGenerateButton">
-
-                    Generate Barcode PDF
-
+                >
+                    Generate PDF
                 </button>
 
             </div>
@@ -1777,65 +1858,61 @@ Full Address"></textarea>
         </section>
 
 
-        <!-- =====================================================
+
+        <!-- =================================================
              ADDRESS STICKER
-        ====================================================== -->
+        ================================================== -->
 
         <section
             class="tool-section"
-            id="addressSection"
-            data-tool="address">
+            data-tool="addressSticker"
+        >
 
             <div class="section-heading">
 
-                <div>
+                <span class="section-label">
+                    ADDRESS TOOL
+                </span>
 
-                    <span class="section-label">
-                        ADDRESS TOOL
-                    </span>
+                <h2>
+                    Address Sticker
+                </h2>
 
-                    <h2>
-                        Address Sticker
-                    </h2>
-
-                    <p>
-                        Create From and To address stickers.
-                    </p>
-
-                </div>
+                <p>
+                    Create separate From and To address labels.
+                </p>
 
             </div>
 
 
-            <!-- ADDRESS SUB CATEGORY -->
             <div class="sub-navigation">
 
                 <button
                     type="button"
                     class="sub-category-btn active"
-                    data-address-mode="manual">
-
+                    data-address-mode="manual"
+                >
                     Manual
-
                 </button>
 
 
                 <button
                     type="button"
                     class="sub-category-btn"
-                    data-address-mode="excel">
-
+                    data-address-mode="excel"
+                >
                     Excel Upload
-
                 </button>
 
             </div>
 
 
             <!-- ADDRESS MANUAL -->
+
             <div
+                id="addressManualPanel"
                 class="address-mode-panel active"
-                id="addressManualPanel">
+            >
 
                 <div class="panel-card">
 
@@ -1843,6 +1920,7 @@ Full Address"></textarea>
 
 
                         <!-- FROM -->
+
                         <div class="address-editor">
 
                             <div class="panel-title">
@@ -1854,7 +1932,10 @@ Full Address"></textarea>
                                     </h3>
 
                                     <p>
-                                        Enter sender / company address.
+                                        Example:
+                                        Company Name,
+                                        Customer Name,
+                                        Full Address
                                     </p>
 
                                 </div>
@@ -1862,13 +1943,22 @@ Full Address"></textarea>
                             </div>
 
 
-                            <textarea
-                                id="addressFrom"
-                                rows="10"
-                                placeholder="Example:
+                            <div class="field">
+
+                                <label for="addressFrom">
+                                    From
+                                </label>
+
+                                <textarea
+                                    id="addressFrom"
+                                    placeholder="Example:
 Company Name
 Customer Name
-Full Address"></textarea>
+Full Address
+City, State - PIN"
+                                ></textarea>
+
+                            </div>
 
 
                             <div class="address-settings">
@@ -1876,7 +1966,7 @@ Full Address"></textarea>
                                 <div class="field">
 
                                     <label for="fromFontFamily">
-                                        Font Family
+                                        Font
                                     </label>
 
                                     <select id="fromFontFamily">
@@ -1884,16 +1974,13 @@ Full Address"></textarea>
                                         <option>Arial</option>
                                         <option>Calibri</option>
                                         <option>Cambria</option>
-                                        <option>Century Gothic</option>
-                                        <option>Courier New</option>
                                         <option>Georgia</option>
-                                        <option>Helvetica</option>
-                                        <option>Segoe UI</option>
+                                        <option>Verdana</option>
                                         <option>Tahoma</option>
                                         <option>Times New Roman</option>
-                                        <option>Verdana</option>
+                                        <option>Courier New</option>
+                                        <option>Segoe UI</option>
                                         <option>Garamond</option>
-                                        <option>Trebuchet MS</option>
 
                                     </select>
 
@@ -1908,10 +1995,9 @@ Full Address"></textarea>
 
                                     <select id="fromFontSize">
 
-                                        <option value="8">8</option>
                                         <option value="10">10</option>
                                         <option value="12">12</option>
-                                        <option value="14">14</option>
+                                        <option value="14" selected>14</option>
                                         <option value="16">16</option>
                                         <option value="18">18</option>
                                         <option value="20">20</option>
@@ -1921,13 +2007,9 @@ Full Address"></textarea>
                                         <option value="28">28</option>
                                         <option value="30">30</option>
                                         <option value="32">32</option>
-                                        <option value="34">34</option>
                                         <option value="36">36</option>
-                                        <option value="38">38</option>
                                         <option value="40">40</option>
-                                        <option value="42">42</option>
                                         <option value="44">44</option>
-                                        <option value="46">46</option>
                                         <option value="48">48</option>
 
                                     </select>
@@ -1940,47 +2022,60 @@ Full Address"></textarea>
                             <div class="text-style-controls">
 
                                 <label>
+
                                     <input
+                                        id="fromBold"
                                         type="checkbox"
-                                        id="fromBold">
-                                    <span>Bold</span>
+                                    >
+
+                                    Bold
+
                                 </label>
 
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        id="fromItalic">
-                                    <span>Italic</span>
-                                </label>
 
                                 <label>
+
                                     <input
+                                        id="fromItalic"
                                         type="checkbox"
-                                        id="fromUnderline">
-                                    <span>Underline</span>
+                                    >
+
+                                    Italic
+
+                                </label>
+
+
+                                <label>
+
+                                    <input
+                                        id="fromUnderline"
+                                        type="checkbox"
+                                    >
+
+                                    Underline
+
+                                </label>
+
+
+                                <label>
+
+                                    <input
+                                        id="fromBorder"
+                                        type="checkbox"
+                                    >
+
+                                    Border
+
                                 </label>
 
                             </div>
 
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="fromBorder">
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    From Border
-                                </span>
-
-                            </label>
-
                         </div>
 
 
+
                         <!-- TO -->
+
                         <div class="address-editor">
 
                             <div class="panel-title">
@@ -1992,7 +2087,7 @@ Full Address"></textarea>
                                     </h3>
 
                                     <p>
-                                        Enter receiver / customer address.
+                                        Customer / Receiver Address
                                     </p>
 
                                 </div>
@@ -2000,12 +2095,22 @@ Full Address"></textarea>
                             </div>
 
 
-                            <textarea
-                                id="addressTo"
-                                rows="10"
-                                placeholder="Example:
+                            <div class="field">
+
+                                <label for="addressTo">
+                                    To
+                                </label>
+
+                                <textarea
+                                    id="addressTo"
+                                    placeholder="Example:
 Customer Name
-Full Address"></textarea>
+Full Address
+City, State - PIN
+Country"
+                                ></textarea>
+
+                            </div>
 
 
                             <div class="address-settings">
@@ -2013,7 +2118,7 @@ Full Address"></textarea>
                                 <div class="field">
 
                                     <label for="toFontFamily">
-                                        Font Family
+                                        Font
                                     </label>
 
                                     <select id="toFontFamily">
@@ -2021,16 +2126,13 @@ Full Address"></textarea>
                                         <option>Arial</option>
                                         <option>Calibri</option>
                                         <option>Cambria</option>
-                                        <option>Century Gothic</option>
-                                        <option>Courier New</option>
                                         <option>Georgia</option>
-                                        <option>Helvetica</option>
-                                        <option>Segoe UI</option>
+                                        <option>Verdana</option>
                                         <option>Tahoma</option>
                                         <option>Times New Roman</option>
-                                        <option>Verdana</option>
+                                        <option>Courier New</option>
+                                        <option>Segoe UI</option>
                                         <option>Garamond</option>
-                                        <option>Trebuchet MS</option>
 
                                     </select>
 
@@ -2045,10 +2147,9 @@ Full Address"></textarea>
 
                                     <select id="toFontSize">
 
-                                        <option value="8">8</option>
                                         <option value="10">10</option>
                                         <option value="12">12</option>
-                                        <option value="14">14</option>
+                                        <option value="14" selected>14</option>
                                         <option value="16">16</option>
                                         <option value="18">18</option>
                                         <option value="20">20</option>
@@ -2058,13 +2159,9 @@ Full Address"></textarea>
                                         <option value="28">28</option>
                                         <option value="30">30</option>
                                         <option value="32">32</option>
-                                        <option value="34">34</option>
                                         <option value="36">36</option>
-                                        <option value="38">38</option>
                                         <option value="40">40</option>
-                                        <option value="42">42</option>
                                         <option value="44">44</option>
-                                        <option value="46">46</option>
                                         <option value="48">48</option>
 
                                     </select>
@@ -2077,44 +2174,72 @@ Full Address"></textarea>
                             <div class="text-style-controls">
 
                                 <label>
+
                                     <input
+                                        id="toBold"
                                         type="checkbox"
-                                        id="toBold">
-                                    <span>Bold</span>
+                                    >
+
+                                    Bold
+
                                 </label>
 
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        id="toItalic">
-                                    <span>Italic</span>
-                                </label>
 
                                 <label>
+
                                     <input
+                                        id="toItalic"
                                         type="checkbox"
-                                        id="toUnderline">
-                                    <span>Underline</span>
+                                    >
+
+                                    Italic
+
+                                </label>
+
+
+                                <label>
+
+                                    <input
+                                        id="toUnderline"
+                                        type="checkbox"
+                                    >
+
+                                    Underline
+
+                                </label>
+
+
+                                <label>
+
+                                    <input
+                                        id="toBorder"
+                                        type="checkbox"
+                                    >
+
+                                    Border
+
                                 </label>
 
                             </div>
 
-
-                            <label class="feature-check">
-
-                                <input
-                                    type="checkbox"
-                                    id="toBorder">
-
-                                <span class="checkmark"></span>
-
-                                <span>
-                                    To Border
-                                </span>
-
-                            </label>
-
                         </div>
+
+                    </div>
+
+
+                    <div class="map-link-box">
+
+                        <span>
+                            Map:
+                        </span>
+
+                        <a
+                            href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
+                            target="_blank"
+                            rel="noopener"
+                        >
+                            Open Location
+                        </a>
 
                     </div>
 
@@ -2124,82 +2249,70 @@ Full Address"></textarea>
 
 
             <!-- ADDRESS EXCEL -->
+
             <div
+                id="addressExcelPanel"
                 class="address-mode-panel"
-                id="addressExcelPanel">
+            >
 
                 <div class="panel-card">
 
                     <div class="panel-title">
 
-                        <div>
-
-                            <h3>
-                                Address Excel Upload
-                            </h3>
-
-                            <p>
-                                Upload From and To address data.
-                            </p>
-
-                        </div>
+                        <h3>
+                            Address Excel Upload
+                        </h3>
 
                     </div>
 
 
                     <div class="upload-area">
 
-                        <input
-                            type="file"
-                            id="addressExcelFile"
-                            accept=".xlsx,.xls,.csv">
+                        <strong>
+                            Upload Address Excel
+                        </strong>
 
-                        <label
-                            for="addressExcelFile"
-                            class="upload-button">
-
-                            Choose Excel File
-
-                        </label>
-
-                        <p id="addressExcelFileName">
-                            No file selected
+                        <p>
+                            Use From and To columns.
                         </p>
+
+                        <input
+                            id="addressExcelFile"
+                            type="file"
+                            accept=".xlsx,.xls,.csv"
+                        >
+
+                        <span id="addressExcelFileName">
+                            No file selected
+                        </span>
 
                     </div>
 
 
                     <div
                         id="addressExcelPreview"
-                        class="excel-preview">
-                    </div>
+                        class="excel-preview"
+                    ></div>
 
                 </div>
 
             </div>
 
 
-            <!-- ADDRESS PAGE SETTINGS -->
+            <!-- ADDRESS PAGE -->
+
             <div class="panel-card">
 
                 <div class="panel-title">
 
-                    <div>
-
-                        <h3>
-                            Address Page Settings
-                        </h3>
-
-                        <p>
-                            Page size and orientation.
-                        </p>
-
-                    </div>
+                    <h3>
+                        Page Settings
+                    </h3>
 
                 </div>
 
 
-                <div class="two-column-fields">
+                <div class="three-column-fields">
 
                     <div class="field">
 
@@ -2222,7 +2335,7 @@ Full Address"></textarea>
                             </option>
 
                             <option value="custom">
-                                Custom Size
+                                Custom
                             </option>
 
                         </select>
@@ -2254,8 +2367,9 @@ Full Address"></textarea>
 
 
                 <div
-                    class="custom-size-panel"
-                    id="addressCustomSizePanel">
+                    id="addressCustomSizePanel"
+                    class="custom-size-panel hidden"
+                >
 
                     <div class="two-column-fields">
 
@@ -2266,9 +2380,10 @@ Full Address"></textarea>
                             </label>
 
                             <input
-                                type="number"
                                 id="addressCustomWidth"
-                                min="1">
+                                type="number"
+                                disabled
+                            >
 
                         </div>
 
@@ -2280,9 +2395,10 @@ Full Address"></textarea>
                             </label>
 
                             <input
-                                type="number"
                                 id="addressCustomHeight"
-                                min="1">
+                                type="number"
+                                disabled
+                            >
 
                         </div>
 
@@ -2294,6 +2410,7 @@ Full Address"></textarea>
 
 
             <!-- ADDRESS QR -->
+
             <div class="panel-card">
 
                 <div class="panel-title">
@@ -2301,11 +2418,11 @@ Full Address"></textarea>
                     <div>
 
                         <h3>
-                            Location QR Code
+                            Location QR
                         </h3>
 
                         <p>
-                            Scan to open the registered location.
+                            Scan to open the saved map location.
                         </p>
 
                     </div>
@@ -2314,27 +2431,9 @@ Full Address"></textarea>
 
 
                 <div
+                    id="addressQRPreview"
                     class="qr-preview"
-                    id="addressQRPreview">
-                </div>
-
-
-                <div class="map-link-box">
-
-                    <span>
-                        Location:
-                    </span>
-
-                    <a
-                        href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
-                        target="_blank"
-                        rel="noopener">
-
-                        Open Google Maps
-
-                    </a>
-
-                </div>
+                ></div>
 
             </div>
 
@@ -2342,22 +2441,20 @@ Full Address"></textarea>
             <div class="action-bar">
 
                 <button
+                    id="addressResetButton"
                     type="button"
                     class="secondary-btn"
-                    id="addressResetButton">
-
+                >
                     Reset
-
                 </button>
 
 
                 <button
+                    id="addressGenerateButton"
                     type="button"
                     class="primary-btn"
-                    id="addressGenerateButton">
-
+                >
                     Generate PDF
-
                 </button>
 
             </div>
@@ -2366,85 +2463,6 @@ Full Address"></textarea>
 
     </main>
 
-
-    <!-- =====================================================
-         TOAST
-    ====================================================== -->
-
-    <div
-        class="toast"
-        id="toast"
-        role="status"
-        aria-live="polite">
-
-        <span id="toastIcon">✓</span>
-
-        <span id="toastMessage">
-            Ready
-        </span>
-
-    </div>
-
-
-    <!-- =====================================================
-         CONFIRMATION MODAL
-         Not used for checkbox enable/disable.
-         Toast is used instead.
-    ====================================================== -->
-
-    <div
-        class="modal"
-        id="confirmationModal"
-        aria-hidden="true">
-
-        <div class="modal-box">
-
-            <button
-                type="button"
-                class="modal-close"
-                id="modalCloseButton">
-
-                ×
-
-            </button>
-
-
-            <h3 id="modalTitle">
-                Confirmation
-            </h3>
-
-
-            <p id="modalMessage">
-                Are you sure?
-            </p>
-
-
-            <div class="modal-actions">
-
-                <button
-                    type="button"
-                    class="secondary-btn"
-                    id="modalCancelButton">
-
-                    Cancel
-
-                </button>
-
-
-                <button
-                    type="button"
-                    class="primary-btn"
-                    id="modalConfirmButton">
-
-                    Confirm
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
 
 
     <!-- =====================================================
@@ -2456,11 +2474,11 @@ Full Address"></textarea>
         <div>
 
             <strong>
-                Books Label Studio Tool
+                Books Label Studio
             </strong>
 
             <span>
-                Label & Barcode Management
+                Professional browser-based label generator
             </span>
 
         </div>
@@ -2472,7 +2490,9 @@ Full Address"></textarea>
                 Contact:
             </span>
 
-            <a href="mailto:ashish.verma@bookswagon.in">
+            <a
+                href="mailto:ashish.verma@bookswagon.in"
+            >
                 ashish.verma@bookswagon.in
             </a>
 
@@ -2483,38 +2503,180 @@ Full Address"></textarea>
 </div>
 
 
-<!-- =====================================================
-     APPLICATION CONFIG
-====================================================== -->
+
+<!-- =========================================================
+     TOAST
+========================================================== -->
+
+<div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+>
+
+    <span id="toastIcon">
+        ✓
+    </span>
+
+    <span id="toastMessage">
+        Done
+    </span>
+
+</div>
+
+
+
+<!-- =========================================================
+     CONFIRMATION MODAL
+     Kept in HTML for compatibility.
+     Feature enable/disable itself does NOT use confirmation.
+========================================================== -->
+
+<div
+    id="confirmationModal"
+    class="modal"
+    aria-hidden="true"
+>
+
+    <div class="modal-box">
+
+        <button
+            id="modalCloseButton"
+            type="button"
+            class="modal-close"
+            aria-label="Close"
+        >
+            ×
+        </button>
+
+
+        <h3 id="modalTitle">
+            Confirmation
+        </h3>
+
+
+        <p id="modalMessage">
+            Are you sure?
+        </p>
+
+
+        <div class="modal-actions">
+
+            <button
+                id="modalCancelButton"
+                type="button"
+                class="secondary-btn"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                id="modalConfirmButton"
+                type="button"
+                class="primary-btn"
+            >
+                Confirm
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================== -->
 
 <script>
+
     window.BOOKS_LABEL_STUDIO_CONFIG = {
-        mapUrl: "https://maps.app.goo.gl/7McYApm1u9x4QSj7A",
-        email: "ashish.verma@bookswagon.in",
-        maxManualPO: 40,
-        maxFontSize: 48,
-        pageSizes: {
-            "4x6": {
-                width: 101.6,
-                height: 152.4,
-                unit: "mm"
-            },
-            "70x35": {
-                width: 70,
-                height: 35,
-                unit: "mm"
-            },
-            "a4": {
-                width: 210,
-                height: 297,
-                unit: "mm"
-            }
-        }
+
+        mapUrl:
+            "https://maps.app.goo.gl/7McYApm1u9x4QSj7A",
+
+        email:
+            "ashish.verma@bookswagon.in",
+
+        maxManualPO:
+            40,
+
+        maxFontSize:
+            48
+
     };
+
 </script>
 
 
-<script src="script.js"></script>
+<script
+    src="app.js"
+></script>
+
+
+<!-- =========================================================
+     QR INITIALIZER
+========================================================== -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const qrContainer =
+            document.getElementById(
+                "addressQRPreview"
+            );
+
+        const mapUrl =
+            "https://maps.app.goo.gl/7McYApm1u9x4QSj7A";
+
+
+        if (
+            qrContainer &&
+            typeof QRCode !== "undefined"
+        ) {
+
+            QRCode.toCanvas(
+                mapUrl,
+                {
+                    width: 150,
+                    margin: 2
+                },
+                function (error, canvas) {
+
+                    if (error) {
+
+                        console.error(
+                            error
+                        );
+
+                        return;
+
+                    }
+
+
+                    qrContainer.innerHTML =
+                        "";
+
+                    qrContainer.appendChild(
+                        canvas
+                    );
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
 
 </body>
 </html>
