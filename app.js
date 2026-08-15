@@ -1,1201 +1,3358 @@
-:root {
-    --navy: #203d72;
-    --dark: #132b54;
-    --yellow: #ffc83d;
-    --bg: #f4f6f9;
-    --white: #ffffff;
-    --text: #172033;
-    --muted: #6b7483;
-    --border: #dce2ea;
-    --green: #149c60;
-    --red: #d83d3d;
-    --shadow: 0 10px 30px rgba(20, 45, 85, 0.10);
-}
-
-* {
-    box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-button,
-input,
-select,
-textarea {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.container {
-    width: min(1180px, calc(100% - 30px));
-    margin: auto;
-}
-
-/* =========================
-   HEADER
-========================= */
-
-.topbar {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: var(--navy);
-    border-bottom: 3px solid var(--yellow);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, .15);
-}
-
-.topbar-inner {
-    min-height: 68px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.brand {
-    color: #fff;
-    font-size: 22px;
-    font-weight: 900;
-}
-
-.nav {
-    display: flex;
-    gap: 25px;
-}
-
-.nav a {
-    color: #fff;
-    font-size: 11px;
-    font-weight: 800;
-}
-
-/* =========================
-   HERO
-========================= */
-
-.hero {
-    background: var(--navy);
-    color: #fff;
-    padding: 65px 0 80px;
-}
-
-.hero-grid {
-    display: grid;
-    grid-template-columns: 1.1fr .9fr;
-    gap: 50px;
-    align-items: center;
-}
-
-.kicker {
-    color: var(--yellow);
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: 2px;
-}
-
-.hero h1 {
-    margin: 12px 0;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(42px, 6vw, 68px);
-    line-height: 1;
-}
-
-.hero h1 span {
-    color: var(--yellow);
-}
-
-.hero p {
-    max-width: 620px;
-    color: rgba(255, 255, 255, .75);
-    font-size: 13px;
-    line-height: 1.8;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 25px;
-}
-
-.btn {
-    min-height: 42px;
-    padding: 0 17px;
-    border: 0;
-    border-radius: 5px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 900;
-    transition: .18s ease;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-.btn:disabled {
-    opacity: .55;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-primary {
-    background: var(--yellow);
-    color: var(--dark);
-}
-
-.btn-secondary {
-    background: #eef1f5;
-    color: var(--navy);
-}
-
-.btn-outline {
-    background: transparent;
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, .4);
-}
-
-.book-preview {
-    width: 220px;
-    height: 300px;
-    margin: auto;
-    padding: 25px;
-    background: #f8f5e9;
-    color: var(--navy);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-align: center;
-    box-shadow: 20px 25px 50px rgba(0, 0, 0, .3);
-    transform: rotate(-2deg);
-}
-
-.book-preview h2 {
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 28px;
-}
-
-/* =========================
-   SECTIONS
-========================= */
-
-.section {
-    padding: 70px 0;
-}
-
-.section-heading {
-    margin-bottom: 30px;
-}
+"use strict";
 
-.section-heading span {
-    color: var(--navy);
-    font-size: 9px;
-    font-weight: 900;
-    letter-spacing: 1.5px;
-}
-
-.section-heading h2 {
-    margin: 6px 0;
-    color: var(--navy);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 34px;
-}
+/* =========================================================
+   BOOKSWAGON LABEL STUDIO
+   FINAL JAVASCRIPT
+========================================================= */
 
-.section-heading p {
-    color: var(--muted);
-    font-size: 12px;
-}
-
-/* =========================
-   TOOL CARDS
-========================= */
-
-.tool-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-}
+const CONFIG = {
+    email: "ashish.verma@bookswagon.in",
+    address: "Ground Floor, 2/14 Ansari Road, Daryaganj, Delhi - 110002",
+    maps: "https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
+};
 
-.tool-card {
-    width: 100%;
-    padding: 24px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-top: 4px solid var(--yellow);
-    box-shadow: var(--shadow);
-    text-align: left;
-    transition: .2s ease;
-}
+let currentTool = "Coco Blue PO";
 
-.tool-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 35px rgba(20, 45, 85, .14);
-}
+let poExcelRows = [];
+let isbnExcelRows = [];
+let addressExcelRows = [];
 
-.tool-number {
-    color: #b68b00;
-    font-size: 9px;
-    font-weight: 900;
-}
 
-.tool-card h3 {
-    margin: 9px 0;
-    color: var(--navy);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 21px;
-}
+/* =========================================================
+   HELPERS
+========================================================= */
 
-.tool-card p {
-    color: var(--muted);
-    font-size: 10px;
-    line-height: 1.7;
-}
+const $ = selector => document.querySelector(selector);
+const $$ = selector => [...document.querySelectorAll(selector)];
 
-.tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 15px;
-}
+function toast(message, type = "success") {
 
-.tags span {
-    padding: 4px 7px;
-    background: #eef2f7;
-    color: var(--navy);
-    font-size: 8px;
-    font-weight: 900;
-}
+    const container = $("#toastContainer");
 
-/* =========================
-   WORKSPACE
-========================= */
+    if (!container) return;
 
-.workspace {
-    display: none;
-    padding: 30px 0 70px;
-}
+    const item = document.createElement("div");
 
-.workspace.active {
-    display: block;
-}
+    item.className =
+        "toast" +
+        (type === "error" ? " error" : "");
 
-.workspace-card {
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-}
+    item.textContent = message;
 
-.workspace-header {
-    padding: 25px 28px;
-    background: var(--navy);
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-}
+    container.appendChild(item);
 
-.workspace-header h2 {
-    margin: 5px 0;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 27px;
+    setTimeout(() => {
+        item.remove();
+    }, 2600);
 }
 
-.workspace-header p {
-    margin: 0;
-    color: rgba(255, 255, 255, .7);
-    font-size: 10px;
-}
 
-.workspace-body {
-    padding: 28px;
-}
+function escapeHTML(value) {
 
-/* =========================
-   TOOL SELECTOR
-========================= */
-
-.tool-selector {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    margin-bottom: 25px;
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
-.tool-select-btn {
-    padding: 10px 16px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--muted);
-    font-size: 10px;
-    font-weight: 900;
-    transition: .18s ease;
-}
 
-.tool-select-btn:hover {
-    border-color: var(--navy);
-}
+function safeFileName(value) {
 
-.tool-select-btn.active {
-    background: var(--navy);
-    color: #fff;
-    border-color: var(--navy);
+    return String(value || "LABEL")
+        .replace(/[^a-z0-9_-]+/gi, "_")
+        .replace(/^_+|_+$/g, "")
+        .slice(0, 80);
 }
 
-/* =========================
-   CONFIGURATION
-========================= */
 
-.config-section {
-    padding: 25px 0;
-    border-bottom: 1px solid var(--border);
-}
-
-.section-title {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 17px;
-}
+function downloadBlob(blob, filename) {
 
-.step {
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: var(--yellow);
-    color: var(--dark);
-    font-size: 9px;
-    font-weight: 900;
-}
+    const url = URL.createObjectURL(blob);
 
-.section-title h3 {
-    margin: 0;
-    color: var(--navy);
-    font-size: 14px;
-}
+    const link = document.createElement("a");
 
-.section-title p {
-    margin: 3px 0 0;
-    color: var(--muted);
-    font-size: 10px;
-}
+    link.href = url;
+    link.download = filename;
 
-/* =========================
-   FORM
-========================= */
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-}
+    document.body.appendChild(link);
 
-.form-field label {
-    display: block;
-    margin-bottom: 5px;
-    color: var(--muted);
-    font-size: 9px;
-    font-weight: 900;
-}
+    link.click();
 
-input,
-select,
-textarea {
-    width: 100%;
-    min-height: 40px;
-    padding: 9px 10px;
-    background: #fff;
-    color: var(--text);
-    border: 1px solid #ccd3dd;
-    border-radius: 4px;
-    outline: none;
-    transition: .15s ease;
-}
+    link.remove();
 
-input:focus,
-select:focus,
-textarea:focus {
-    border-color: var(--navy);
-    box-shadow: 0 0 0 3px rgba(32, 61, 114, .08);
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 1000);
 }
 
-textarea {
-    min-height: 110px;
-    resize: vertical;
-}
 
-/* =========================
-   PAGE SIZE LOCK
-========================= */
-
-input:disabled,
-select:disabled {
-    cursor: not-allowed;
-    opacity: .55;
-    background: #edf0f4;
-}
+function showElement(selector, visible) {
 
-.locked {
-    opacity: .45;
-    pointer-events: none;
-    background: #edf0f4 !important;
-}
+    const element = $(selector);
 
-/* =========================
-   INPUT TABS
-========================= */
-
-.input-tabs {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 14px;
-}
+    if (!element) return;
 
-.input-tab {
-    padding: 9px 13px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--muted);
-    font-size: 9px;
-    font-weight: 900;
-    transition: .15s ease;
+    element.style.display = visible ? "" : "none";
 }
 
-.input-tab:hover {
-    border-color: var(--navy);
-}
 
-.input-tab.active {
-    background: var(--navy);
-    color: #fff;
-    border-color: var(--navy);
-}
+function splitValues(value) {
 
-.input-panel {
-    display: none;
+    return String(value || "")
+        .split(/[\n,;|]+/)
+        .map(value => value.trim())
+        .filter(Boolean);
 }
 
-.input-panel.active {
-    display: block;
-}
 
-/* =========================
+/* =========================================================
    PO INPUTS
-========================= */
+========================================================= */
 
-.po-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 9px;
+function createPOInputs() {
+
+    const grid = $("#poGrid");
+
+    if (!grid) return;
+
+    grid.innerHTML = "";
+
+    for (let i = 1; i <= 20; i++) {
+
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className = "po-field";
+
+        wrapper.innerHTML = `
+            <span>PO ${i}</span>
+
+            <input
+                class="po-input"
+                type="text"
+                placeholder="PO Number ${i}"
+                autocomplete="off"
+            >
+        `;
+
+        grid.appendChild(wrapper);
+    }
 }
 
-.po-field {
-    position: relative;
+
+/* =========================================================
+   TOOL SWITCHING
+========================================================= */
+
+function openTool(tool) {
+
+    currentTool = tool;
+
+    $("#workspace")?.classList.add("active");
+
+    const title = $("#workspaceTitle");
+    const description = $("#workspaceDescription");
+
+    if (title) {
+        title.textContent = tool;
+    }
+
+    if (description) {
+
+        if (tool === "Coco Blue PO") {
+
+            description.textContent =
+                "Coco Blue PO and Box label generator.";
+
+        } else if (tool === "Other PO") {
+
+            description.textContent =
+                "Other PO and Box label generator.";
+
+        } else if (tool === "ISBN Barcode") {
+
+            description.textContent =
+                "ISBN barcode generator.";
+
+        } else {
+
+            description.textContent =
+                "From and To address sticker generator.";
+        }
+    }
+
+    $$(".tool-select-btn").forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.selectTool === tool
+        );
+
+    });
+
+    configureTool();
+
+    $("#workspace")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 }
 
-.po-field span {
-    position: absolute;
-    left: 9px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9aa3b2;
-    font-size: 8px;
-    font-weight: 900;
-    pointer-events: none;
+
+function configureTool() {
+
+    const isPO =
+        currentTool === "Coco Blue PO" ||
+        currentTool === "Other PO";
+
+    const isISBN =
+        currentTool === "ISBN Barcode";
+
+    const isAddress =
+        currentTool === "Address Sticker";
+
+
+    showElement("#poInputSection", isPO);
+    showElement("#boxSection", isPO);
+    showElement("#poAddressSection", isPO);
+    showElement("#printSection", isPO);
+    showElement("#borderSection", isPO);
+    showElement("#fontSection", isPO);
+    showElement("#previewSection", isPO);
+    showElement("#downloadSection", true);
+
+
+    showElement("#isbnSection", isISBN);
+    showElement("#addressSection", isAddress);
+
+
+    updatePreview();
+    updateISBNPreview();
+    updateAddressPreview();
 }
 
-.po-field input {
-    padding-left: 38px;
+
+/* =========================================================
+   TOOL CARDS
+========================================================= */
+
+$$(".tool-card").forEach(card => {
+
+    card.addEventListener("click", () => {
+
+        openTool(card.dataset.tool);
+
+    });
+
+});
+
+
+$$(".tool-select-btn").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        openTool(button.dataset.selectTool);
+
+    });
+
+});
+
+
+$("#openStudio")?.addEventListener("click", () => {
+
+    $("#tools")?.scrollIntoView({
+        behavior: "smooth"
+    });
+
+});
+
+
+$("#closeWorkspace")?.addEventListener("click", () => {
+
+    $("#workspace")?.classList.remove("active");
+
+    $("#tools")?.scrollIntoView({
+        behavior: "smooth"
+    });
+
+});
+
+
+/* =========================================================
+   PO INPUT TABS
+========================================================= */
+
+$$("[data-input]").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const mode = button.dataset.input;
+
+        $$("[data-input]").forEach(item => {
+
+            item.classList.toggle(
+                "active",
+                item === button
+            );
+
+        });
+
+
+        $("#individualInput")
+            ?.classList.toggle(
+                "active",
+                mode === "individual"
+            );
+
+
+        $("#multipleInput")
+            ?.classList.toggle(
+                "active",
+                mode === "multiple"
+            );
+
+
+        $("#poExcelInput")
+            ?.classList.toggle(
+                "active",
+                mode === "excel"
+            );
+
+    });
+
+});
+
+
+/* =========================================================
+   ISBN TABS
+========================================================= */
+
+$$("[data-isbn-input]").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const mode =
+            button.dataset.isbnInput;
+
+        $$("[data-isbn-input]").forEach(item => {
+
+            item.classList.toggle(
+                "active",
+                item === button
+            );
+
+        });
+
+
+        $("#isbnManual")
+            ?.classList.toggle(
+                "active",
+                mode === "manual"
+            );
+
+
+        $("#isbnExcel")
+            ?.classList.toggle(
+                "active",
+                mode === "excel"
+            );
+
+    });
+
+});
+
+
+/* =========================================================
+   ADDRESS TABS
+========================================================= */
+
+$$("[data-address-mode]").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const mode =
+            button.dataset.addressMode;
+
+        $$("[data-address-mode]").forEach(item => {
+
+            item.classList.toggle(
+                "active",
+                item === button
+            );
+
+        });
+
+
+        $("#addressManual")
+            ?.classList.toggle(
+                "active",
+                mode === "manual"
+            );
+
+
+        $("#addressExcel")
+            ?.classList.toggle(
+                "active",
+                mode === "excel"
+            );
+
+    });
+
+});
+
+
+/* =========================================================
+   CHECKBOXES
+   NO CONFIRMATION DIALOG
+========================================================= */
+
+$$(".feature-checkbox input").forEach(check => {
+
+    check.addEventListener("change", () => {
+
+        const parent =
+            check.closest(".feature-checkbox");
+
+        const label =
+            parent?.querySelector(".checkbox-text")
+                ?.textContent
+                ?.trim() ||
+            "Feature";
+
+
+        toast(
+            `${label} ${
+                check.checked
+                    ? "enabled"
+                    : "disabled"
+            }.`
+        );
+
+
+        updatePreview();
+    });
+
+});
+
+
+/* =========================================================
+   PAGE SIZE
+========================================================= */
+
+$("#pageSize")?.addEventListener(
+    "change",
+    updatePageSizeState
+);
+
+
+function updatePageSizeState() {
+
+    const custom =
+        $("#pageSize")?.value === "CUSTOM";
+
+    if ($("#customWidth")) {
+        $("#customWidth").disabled = !custom;
+    }
+
+    if ($("#customHeight")) {
+        $("#customHeight").disabled = !custom;
+    }
+
+    updatePreview();
 }
 
-/* =========================
-   EXCEL
-========================= */
 
-.excel-box {
-    padding: 22px;
-    background: #f8fafc;
-    border: 1px dashed #aeb8c6;
-    border-radius: 5px;
+/* =========================================================
+   PAGE DIMENSIONS
+========================================================= */
+
+function getPageDimensions() {
+
+    const size =
+        $("#pageSize")?.value;
+
+    if (size === "4x6") {
+
+        return {
+            width: 101.6,
+            height: 152.4
+        };
+    }
+
+
+    if (size === "70x25") {
+
+        return {
+            width: 70,
+            height: 25
+        };
+    }
+
+
+    if (size === "A4") {
+
+        return {
+            width: 210,
+            height: 297
+        };
+    }
+
+
+    return {
+
+        width:
+            Number(
+                $("#customWidth")?.value
+            ) || 101.6,
+
+        height:
+            Number(
+                $("#customHeight")?.value
+            ) || 152.4
+    };
 }
 
-.excel-box h4 {
-    margin: 0 0 7px;
-    color: var(--navy);
-    font-size: 13px;
+
+function getOrientedDimensions() {
+
+    let {
+        width,
+        height
+    } = getPageDimensions();
+
+
+    if (
+        $("#orientation")?.value ===
+        "landscape"
+    ) {
+
+        [width, height] =
+            [height, width];
+    }
+
+
+    return {
+        width,
+        height
+    };
 }
 
-.excel-box p {
-    margin: 0 0 15px;
-    color: var(--muted);
-    font-size: 10px;
-    line-height: 1.7;
+
+/* =========================================================
+   PO VALUES
+========================================================= */
+
+function getPOValues() {
+
+    const manual =
+        $$(".po-input")
+            .map(input => input.value.trim())
+            .filter(Boolean);
+
+
+    const multiple =
+        splitValues(
+            $("#multiplePO")?.value
+        );
+
+
+    const excel =
+        poExcelRows
+            .map(row => {
+
+                const keys =
+                    Object.keys(row);
+
+                if (!keys.length) {
+                    return "";
+                }
+
+                return String(
+                    row[keys[0]] ?? ""
+                ).trim();
+            })
+            .filter(Boolean);
+
+
+    return [
+        ...new Set([
+            ...manual,
+            ...multiple,
+            ...excel
+        ])
+    ];
 }
 
-.excel-box input[type="file"] {
-    padding: 8px;
-    background: #fff;
-    cursor: pointer;
+
+/* =========================================================
+   BOX NUMBERS
+========================================================= */
+
+function getBoxNumbers() {
+
+    const start =
+        Math.max(
+            1,
+            Number(
+                $("#startBox")?.value
+            ) || 1
+        );
+
+
+    const end =
+        Math.max(
+            start,
+            Number(
+                $("#endBox")?.value
+            ) || start
+        );
+
+
+    const boxes = [];
+
+    for (
+        let number = start;
+        number <= end;
+        number++
+    ) {
+
+        boxes.push(number);
+    }
+
+
+    return boxes;
 }
 
-.excel-status {
-    margin-top: 10px;
-    color: var(--green);
-    font-size: 10px;
-    font-weight: 900;
+
+/* =========================================================
+   REPEAT COUNT
+========================================================= */
+
+function getRepeatCount() {
+
+    return Math.max(
+        1,
+        Number(
+            $("#repeatCount")?.value
+        ) || 1
+    );
 }
 
-.excel-preview {
-    max-height: 240px;
-    overflow: auto;
-    margin-top: 15px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
+
+/* =========================================================
+   BUILD PO LABEL SEQUENCE
+========================================================= */
+
+function buildLabelSequence() {
+
+    const poNumbers =
+        getPOValues();
+
+    const boxes =
+        getBoxNumbers();
+
+    const repeat =
+        getRepeatCount();
+
+
+    if (!poNumbers.length) {
+        return [];
+    }
+
+
+    const sequence = [];
+
+
+    poNumbers.forEach(po => {
+
+        boxes.forEach(box => {
+
+            for (
+                let count = 0;
+                count < repeat;
+                count++
+            ) {
+
+                sequence.push({
+                    po,
+                    box
+                });
+
+            }
+
+        });
+
+    });
+
+
+    return sequence;
 }
 
-.excel-preview:empty {
-    display: none;
+
+/* =========================================================
+   EXCEL TABLE PREVIEW
+========================================================= */
+
+function renderTable(rows, selector) {
+
+    const target = $(selector);
+
+    if (!target) return;
+
+
+    if (!rows.length) {
+
+        target.innerHTML = "";
+
+        return;
+    }
+
+
+    const columns =
+        Object.keys(rows[0]);
+
+
+    let html =
+        "<table><thead><tr>";
+
+
+    columns.forEach(column => {
+
+        html +=
+            `<th>${escapeHTML(column)}</th>`;
+
+    });
+
+
+    html +=
+        "</tr></thead><tbody>";
+
+
+    rows
+        .slice(0, 100)
+        .forEach(row => {
+
+            html += "<tr>";
+
+            columns.forEach(column => {
+
+                html +=
+                    `<td>${escapeHTML(
+                        row[column]
+                    )}</td>`;
+
+            });
+
+            html += "</tr>";
+        });
+
+
+    html +=
+        "</tbody></table>";
+
+
+    target.innerHTML = html;
 }
 
-.excel-preview table {
-    width: 100%;
-    border-collapse: collapse;
+
+/* =========================================================
+   PO EXCEL
+========================================================= */
+
+$("#poExcelFile")?.addEventListener(
+    "change",
+    async function () {
+
+        const file =
+            this.files?.[0];
+
+        if (!file) return;
+
+
+        try {
+
+            const buffer =
+                await file.arrayBuffer();
+
+
+            const workbook =
+                XLSX.read(
+                    buffer,
+                    { type: "array" }
+                );
+
+
+            const sheet =
+                workbook.Sheets[
+                    workbook.SheetNames[0]
+                ];
+
+
+            poExcelRows =
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    { defval: "" }
+                );
+
+
+            renderTable(
+                poExcelRows,
+                "#poExcelPreview"
+            );
+
+
+            $("#poExcelStatus").textContent =
+                `${poExcelRows.length} PO row(s) loaded.`;
+
+
+            toast(
+                `${poExcelRows.length} PO row(s) loaded.`
+            );
+
+
+            updatePreview();
+
+        } catch (error) {
+
+            console.error(error);
+
+            toast(
+                "Could not read PO Excel.",
+                "error"
+            );
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ISBN EXCEL
+========================================================= */
+
+$("#isbnExcelFile")?.addEventListener(
+    "change",
+    async function () {
+
+        const file =
+            this.files?.[0];
+
+        if (!file) return;
+
+
+        try {
+
+            const buffer =
+                await file.arrayBuffer();
+
+
+            const workbook =
+                XLSX.read(
+                    buffer,
+                    { type: "array" }
+                );
+
+
+            const sheet =
+                workbook.Sheets[
+                    workbook.SheetNames[0]
+                ];
+
+
+            const rows =
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    {
+                        header: 1,
+                        defval: ""
+                    }
+                );
+
+
+            if (rows.length < 2) {
+
+                throw new Error(
+                    "ISBN Excel has no data."
+                );
+            }
+
+
+            let headers =
+                rows[0].map(value =>
+                    String(value)
+                        .trim()
+                        .toLowerCase()
+                );
+
+
+            let isbnIndex =
+                headers.indexOf("isbn");
+
+            let titleIndex =
+                headers.indexOf("title");
+
+            let editionIndex =
+                headers.indexOf("edition");
+
+
+            if (isbnIndex < 0) {
+                isbnIndex = 0;
+            }
+
+            if (titleIndex < 0) {
+                titleIndex = 1;
+            }
+
+            if (editionIndex < 0) {
+                editionIndex = 2;
+            }
+
+
+            isbnExcelRows =
+                rows
+                    .slice(1)
+                    .map(row => ({
+
+                        ISBN:
+                            String(
+                                row[isbnIndex] ?? ""
+                            ).trim(),
+
+                        Title:
+                            String(
+                                row[titleIndex] ?? ""
+                            ).trim(),
+
+                        Edition:
+                            String(
+                                row[editionIndex] ?? ""
+                            ).trim()
+
+                    }))
+                    .filter(
+                        row =>
+                            row.ISBN ||
+                            row.Title
+                    );
+
+
+            if (
+                isbnExcelRows.some(
+                    row =>
+                        !row.ISBN ||
+                        !row.Title
+                )
+            ) {
+
+                throw new Error(
+                    "ISBN and Title are mandatory."
+                );
+            }
+
+
+            renderTable(
+                isbnExcelRows,
+                "#isbnExcelPreview"
+            );
+
+
+            $("#isbnExcelStatus").textContent =
+                `${isbnExcelRows.length} ISBN row(s) loaded.`;
+
+
+            toast(
+                `${isbnExcelRows.length} ISBN row(s) loaded.`
+            );
+
+
+            updateISBNPreview();
+
+        } catch (error) {
+
+            console.error(error);
+
+            toast(
+                error.message ||
+                "Could not read ISBN Excel.",
+                "error"
+            );
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ADDRESS EXCEL
+========================================================= */
+
+$("#addressExcelFile")?.addEventListener(
+    "change",
+    async function () {
+
+        const file =
+            this.files?.[0];
+
+        if (!file) return;
+
+
+        try {
+
+            const buffer =
+                await file.arrayBuffer();
+
+
+            const workbook =
+                XLSX.read(
+                    buffer,
+                    { type: "array" }
+                );
+
+
+            const sheet =
+                workbook.Sheets[
+                    workbook.SheetNames[0]
+                ];
+
+
+            const rows =
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    {
+                        header: 1,
+                        defval: ""
+                    }
+                );
+
+
+            if (rows.length < 2) {
+
+                throw new Error(
+                    "Address Excel needs From and To columns."
+                );
+            }
+
+
+            const headers =
+                rows[0].map(value =>
+                    String(value)
+                        .trim()
+                        .toLowerCase()
+                );
+
+
+            let fromIndex =
+                headers.indexOf("from");
+
+            let toIndex =
+                headers.indexOf("to");
+
+
+            if (fromIndex < 0) {
+                fromIndex = 0;
+            }
+
+            if (toIndex < 0) {
+                toIndex = 1;
+            }
+
+
+            addressExcelRows =
+                rows
+                    .slice(1)
+                    .map(row => ({
+
+                        From:
+                            String(
+                                row[fromIndex] ?? ""
+                            ).trim(),
+
+                        To:
+                            String(
+                                row[toIndex] ?? ""
+                            ).trim()
+
+                    }))
+                    .filter(
+                        row =>
+                            row.From ||
+                            row.To
+                    );
+
+
+            if (!addressExcelRows.length) {
+
+                throw new Error(
+                    "No address rows found."
+                );
+            }
+
+
+            renderTable(
+                addressExcelRows,
+                "#addressExcelPreview"
+            );
+
+
+            $("#addressExcelStatus").textContent =
+                `${addressExcelRows.length} address row(s) loaded.`;
+
+
+            $("#stickerFromAddress").value =
+                addressExcelRows[0].From;
+
+
+            $("#stickerToAddress").value =
+                addressExcelRows[0].To;
+
+
+            updateAddressPreview();
+
+
+            toast(
+                `${addressExcelRows.length} address row(s) loaded.`
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            toast(
+                error.message ||
+                "Could not read Address Excel.",
+                "error"
+            );
+        }
+
+    }
+);
+
+
+/* =========================================================
+   PO PREVIEW
+========================================================= */
+
+function updatePreview() {
+
+    if (
+        currentTool === "ISBN Barcode" ||
+        currentTool === "Address Sticker"
+    ) {
+        return;
+    }
+
+
+    const sequence =
+        buildLabelSequence();
+
+
+    const twoLabels =
+        $("#labelsPerPage")?.value === "2";
+
+
+    const label1 =
+        $("#previewLabel1");
+
+    const label2 =
+        $("#previewLabel2");
+
+
+    if (!label1 || !label2) {
+        return;
+    }
+
+
+    label2.style.display =
+        twoLabels
+            ? "flex"
+            : "none";
+
+
+    label1.classList.toggle(
+        "half",
+        twoLabels
+    );
+
+    label2.classList.toggle(
+        "half",
+        twoLabels
+    );
+
+
+    renderPreviewLabel(
+        label1,
+        sequence[0]
+    );
+
+
+    if (twoLabels) {
+
+        renderPreviewLabel(
+            label2,
+            sequence[1]
+        );
+
+    } else {
+
+        renderPreviewLabel(
+            label2,
+            null
+        );
+    }
+
+
+    applyPreviewStyles();
 }
 
-.excel-preview th,
-.excel-preview td {
-    padding: 8px;
-    border: 1px solid var(--border);
-    text-align: left;
-    font-size: 9px;
-    white-space: nowrap;
+
+function renderPreviewLabel(
+    element,
+    item
+) {
+
+    if (!element) return;
+
+
+    if (!item) {
+
+        element.innerHTML = `
+            <div class="preview-inner">
+                <div class="preview-empty">
+                    EMPTY LABEL
+                </div>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const showPO =
+        $("#printPO")?.checked;
+
+    const showBox =
+        $("#printBox")?.checked;
+
+    const combined =
+        $("#printPOBox")?.checked;
+
+
+    let content = "";
+
+
+    if (showPO || combined) {
+
+        content += `
+            <div class="preview-po">
+                ${escapeHTML(item.po)}
+            </div>
+        `;
+    }
+
+
+    if (showBox || combined) {
+
+        content += `
+            <div class="preview-box">
+                BOX ${escapeHTML(item.box)}
+            </div>
+        `;
+    }
+
+
+    element.innerHTML = `
+        <div class="preview-inner">
+            ${content}
+        </div>
+    `;
 }
 
-.excel-preview th {
-    background: var(--navy);
-    color: #fff;
-    position: sticky;
-    top: 0;
-    z-index: 2;
+
+/* =========================================================
+   PREVIEW STYLING
+========================================================= */
+
+function applyPreviewStyles() {
+
+    const font =
+        $("#fontFamily")?.value;
+
+
+    const fontFamily =
+        font === "times"
+            ? "Times New Roman"
+            : font === "courier"
+                ? "Courier New"
+                : "Arial";
+
+
+    const fontSize =
+        Number(
+            $("#fontSize")?.value
+        ) || 18;
+
+
+    const weight =
+        $("#fontBold")?.checked
+            ? "900"
+            : "400";
+
+
+    const style =
+        $("#fontItalic")?.checked
+            ? "italic"
+            : "normal";
+
+
+    const decoration =
+        $("#fontUnderline")?.checked
+            ? "underline"
+            : "none";
+
+
+    $$(".preview-inner").forEach(element => {
+
+        element.style.fontFamily =
+            fontFamily;
+
+        element.style.fontSize =
+            `${fontSize}px`;
+
+        element.style.fontWeight =
+            weight;
+
+        element.style.fontStyle =
+            style;
+
+        element.style.textDecoration =
+            decoration;
+    });
+
+
+    const borderSize =
+        $("#borderSize")?.value;
+
+
+    const borderWidth =
+        borderSize === "thin"
+            ? "1px"
+            : borderSize === "thick"
+                ? "4px"
+                : "2px";
+
+
+    const borderStyle =
+        $("#borderStyle")?.value ||
+        "solid";
+
+
+    const borderColor =
+        $("#borderColor")?.value ||
+        "#111827";
+
+
+    $$(".preview-label").forEach(label => {
+
+        const enabled =
+            $("#pageBorder")?.checked;
+
+
+        label.style.border =
+            enabled
+                ? `${borderWidth} ${borderStyle} ${borderColor}`
+                : "0";
+
+    });
 }
 
-/* =========================
+
+/* =========================================================
+   ISBN PREVIEW
+========================================================= */
+
+function getISBNRows() {
+
+    if (isbnExcelRows.length) {
+
+        return isbnExcelRows;
+    }
+
+
+    const isbn =
+        $("#manualISBN")?.value.trim();
+
+    const title =
+        $("#manualTitle")?.value.trim();
+
+    const edition =
+        $("#manualEdition")?.value.trim();
+
+
+    if (!isbn || !title) {
+
+        return [];
+    }
+
+
+    return [{
+        ISBN: isbn,
+        Title: title,
+        Edition: edition
+    }];
+}
+
+
+function updateISBNPreview() {
+
+    if (
+        currentTool !==
+        "ISBN Barcode"
+    ) {
+        return;
+    }
+
+
+    const rows =
+        getISBNRows();
+
+
+    const data =
+        rows[0];
+
+
+    if (!data) {
+
+        $("#isbnPreviewTitle").textContent =
+            "Book Title";
+
+        $("#isbnPreviewEdition").textContent = "";
+
+        if ($("#isbnBarcode")) {
+            $("#isbnBarcode").innerHTML = "";
+        }
+
+        return;
+    }
+
+
+    $("#isbnPreviewTitle").textContent =
+        data.Title ||
+        "Book Title";
+
+
+    $("#isbnPreviewEdition").textContent =
+        data.Edition
+            ? `Edition: ${data.Edition}`
+            : "";
+
+
+    const svg =
+        $("#isbnBarcode");
+
+
+    if (!svg) return;
+
+
+    svg.innerHTML = "";
+
+
+    if (
+        !data.ISBN ||
+        typeof JsBarcode ===
+        "undefined"
+    ) {
+        return;
+    }
+
+
+    try {
+
+        JsBarcode(
+            svg,
+            data.ISBN,
+            {
+                format: "CODE128",
+                displayValue: true,
+                fontSize: 16,
+                margin: 10,
+                height: 80,
+                width: 2
+            }
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        toast(
+            "Barcode generation failed.",
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   ADDRESS PREVIEW
+========================================================= */
+
+function updateAddressPreview() {
+
+    if (
+        currentTool !==
+        "Address Sticker"
+    ) {
+        return;
+    }
+
+
+    if ($("#previewFromName")) {
+
+        $("#previewFromName").textContent =
+            $("#stickerFromName")?.value ||
+            "BooksWagon";
+    }
+
+
+    if ($("#previewFromAddress")) {
+
+        $("#previewFromAddress").textContent =
+            $("#stickerFromAddress")?.value ||
+            CONFIG.address;
+    }
+
+
+    if ($("#previewToName")) {
+
+        $("#previewToName").textContent =
+            $("#stickerToName")?.value ||
+            "Customer";
+    }
+
+
+    if ($("#previewToAddress")) {
+
+        $("#previewToAddress").textContent =
+            $("#stickerToAddress")?.value ||
+            "Customer Address";
+    }
+}
+
+
+/* =========================================================
+   LIVE UPDATE
+========================================================= */
+
+document.addEventListener(
+    "input",
+    event => {
+
+        if (
+            event.target.matches(
+                "input, textarea, select"
+            )
+        ) {
+
+            updatePreview();
+            updateISBNPreview();
+            updateAddressPreview();
+        }
+    }
+);
+
+
+/* =========================================================
+   PDF SETTINGS
+========================================================= */
+
+function getPDFFormat() {
+
+    const {
+        width,
+        height
+    } = getOrientedDimensions();
+
+
+    return [width, height];
+}
+
+
+function getPDFOrientation() {
+
+    return "portrait";
+}
+
+
+/* =========================================================
+   PDF BORDER
+========================================================= */
+
+function drawPDFBorder(
+    doc,
+    x,
+    y,
+    width,
+    height
+) {
+
+    const color =
+        $("#borderColor")?.value ||
+        "#111827";
+
+
+    const red =
+        parseInt(
+            color.substring(1, 3),
+            16
+        );
+
+    const green =
+        parseInt(
+            color.substring(3, 5),
+            16
+        );
+
+    const blue =
+        parseInt(
+            color.substring(5, 7),
+            16
+        );
+
+
+    doc.setDrawColor(
+        red,
+        green,
+        blue
+    );
+
+
+    const size =
+        $("#borderSize")?.value;
+
+
+    doc.setLineWidth(
+        size === "thin"
+            ? 0.5
+            : size === "thick"
+                ? 1.8
+                : 1
+    );
+
+
+    const style =
+        $("#borderStyle")?.value ||
+        "solid";
+
+
+    if (style === "dashed") {
+
+        doc.setLineDashPattern(
+            [4, 3],
+            0
+        );
+
+    } else if (style === "dotted") {
+
+        doc.setLineDashPattern(
+            [1, 2],
+            0
+        );
+
+    } else {
+
+        doc.setLineDashPattern(
+            [],
+            0
+        );
+    }
+
+
+    doc.rect(
+        x,
+        y,
+        width,
+        height
+    );
+
+
+    if (style === "double") {
+
+        doc.setLineDashPattern(
+            [],
+            0
+        );
+
+        doc.rect(
+            x + 2,
+            y + 2,
+            width - 4,
+            height - 4
+        );
+    }
+
+
+    doc.setLineDashPattern(
+        [],
+        0
+    );
+}
+
+
+/* =========================================================
+   PDF FONT
+========================================================= */
+
+function getPDFFont() {
+
+    const value =
+        $("#fontFamily")?.value;
+
+
+    if (value === "times") {
+        return "times";
+    }
+
+
+    if (value === "courier") {
+        return "courier";
+    }
+
+
+    return "helvetica";
+}
+
+
+function getPDFFontStyle() {
+
+    const bold =
+        $("#fontBold")?.checked;
+
+    const italic =
+        $("#fontItalic")?.checked;
+
+
+    if (bold && italic) {
+        return "bolditalic";
+    }
+
+
+    if (bold) {
+        return "bold";
+    }
+
+
+    if (italic) {
+        return "italic";
+    }
+
+
+    return "normal";
+}
+
+
+/* =========================================================
+   DRAW PO LABEL
+========================================================= */
+
+function drawPOLabel(
+    doc,
+    item,
+    slot,
+    totalSlots
+) {
+
+    const pageWidth =
+        doc.internal.pageSize.getWidth();
+
+    const pageHeight =
+        doc.internal.pageSize.getHeight();
+
+
+    const slotHeight =
+        pageHeight / totalSlots;
+
+
+    const top =
+        slot * slotHeight;
+
+
+    const padding = 7;
+
+
+    if ($("#pageBorder")?.checked) {
+
+        drawPDFBorder(
+            doc,
+            3,
+            top + 3,
+            pageWidth - 6,
+            slotHeight - 6
+        );
+    }
+
+
+    if (
+        $("#cutLine")?.checked &&
+        slot < totalSlots - 1
+    ) {
+
+        doc.setLineDashPattern(
+            [4, 3],
+            0
+        );
+
+        doc.setLineWidth(0.5);
+
+        doc.line(
+            padding,
+            top + slotHeight,
+            pageWidth - padding,
+            top + slotHeight
+        );
+
+        doc.setLineDashPattern(
+            [],
+            0
+        );
+    }
+
+
+    const font =
+        getPDFFont();
+
+    const fontStyle =
+        getPDFFontStyle();
+
+
+    doc.setFont(
+        font,
+        fontStyle
+    );
+
+
+    doc.setFontSize(
+        Number(
+            $("#fontSize")?.value
+        ) || 18
+    );
+
+
+    const showPO =
+        $("#printPO")?.checked;
+
+    const showBox =
+        $("#printBox")?.checked;
+
+    const combined =
+        $("#printPOBox")?.checked;
+
+
+    const lines = [];
+
+
+    if (showPO || combined) {
+
+        lines.push({
+            text: String(item.po),
+            type: "po"
+        });
+    }
+
+
+    if (showBox || combined) {
+
+        lines.push({
+            text: `BOX ${item.box}`,
+            type: "box"
+        });
+    }
+
+
+    if (!lines.length) {
+        return;
+    }
+
+
+    const centerY =
+        top +
+        slotHeight / 2;
+
+
+    const lineGap =
+        Math.min(
+            22,
+            slotHeight /
+            (lines.length + 1)
+        );
+
+
+    lines.forEach(
+        (line, index) => {
+
+            const y =
+                centerY +
+                (
+                    index -
+                    (lines.length - 1) / 2
+                ) *
+                lineGap;
+
+
+            const textWidth =
+                doc.getTextWidth(
+                    line.text
+                );
+
+
+            const shouldBorder =
+                line.type === "po"
+                    ? $("#poBorder")?.checked
+                    : $("#boxBorder")?.checked;
+
+
+            if (shouldBorder) {
+
+                drawPDFBorder(
+                    doc,
+                    pageWidth / 2 -
+                    textWidth / 2 -
+                    8,
+
+                    y - 11,
+
+                    textWidth + 16,
+
+                    20
+                );
+            }
+
+
+            doc.text(
+                line.text,
+                pageWidth / 2,
+                y,
+                {
+                    align: "center"
+                }
+            );
+
+
+            if (
+                $("#fontUnderline")?.checked
+            ) {
+
+                doc.setLineWidth(0.4);
+
+                doc.line(
+                    pageWidth / 2 -
+                    textWidth / 2,
+
+                    y + 2,
+
+                    pageWidth / 2 +
+                    textWidth / 2,
+
+                    y + 2
+                );
+            }
+
+        }
+    );
+
+
+    if (
+        $("#combinedBorder")?.checked
+    ) {
+
+        drawPDFBorder(
+            doc,
+            7,
+            top + 7,
+            pageWidth - 14,
+            slotHeight - 14
+        );
+    }
+
+
+    if (
+        $("#scissorMark")?.checked &&
+        slot < totalSlots - 1
+    ) {
+
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
+
+        doc.setFontSize(8);
+
+        doc.text(
+            "CUT",
+            pageWidth / 2,
+            top + slotHeight - 2,
+            {
+                align: "center"
+            }
+        );
+    }
+}
+
+
+/* =========================================================
+   CREATE PO PDF
+========================================================= */
+
+function createPOPDF(sequence) {
+
+    const {
+        jsPDF
+    } = window.jspdf;
+
+
+    const dimensions =
+        getPDFFormat();
+
+
+    const doc =
+        new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: dimensions
+        });
+
+
+    const labelsPerPage =
+        Math.max(
+            1,
+            Number(
+                $("#labelsPerPage")?.value
+            ) || 1
+        );
+
+
+    let firstPage = true;
+
+
+    for (
+        let index = 0;
+        index < sequence.length;
+        index += labelsPerPage
+    ) {
+
+        if (!firstPage) {
+
+            doc.addPage(
+                dimensions,
+                "portrait"
+            );
+        }
+
+
+        firstPage = false;
+
+
+        const pageItems =
+            sequence.slice(
+                index,
+                index + labelsPerPage
+            );
+
+
+        for (
+            let slot = 0;
+            slot < labelsPerPage;
+            slot++
+        ) {
+
+            const item =
+                pageItems[slot];
+
+
+            if (item) {
+
+                drawPOLabel(
+                    doc,
+                    item,
+                    slot,
+                    labelsPerPage
+                );
+
+            } else if (
+                $("#pageBorder")?.checked
+            ) {
+
+                const pageWidth =
+                    doc.internal.pageSize
+                        .getWidth();
+
+                const pageHeight =
+                    doc.internal.pageSize
+                        .getHeight();
+
+                const slotHeight =
+                    pageHeight /
+                    labelsPerPage;
+
+
+                drawPDFBorder(
+                    doc,
+                    3,
+                    slot * slotHeight + 3,
+                    pageWidth - 6,
+                    slotHeight - 6
+                );
+            }
+        }
+    }
+
+
+    return doc;
+}
+
+
+/* =========================================================
+   GENERATE PO
+========================================================= */
+
+async function generatePO() {
+
+    const values =
+        getPOValues();
+
+
+    if (!values.length) {
+
+        toast(
+            "Enter or upload at least one PO.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const sequence =
+        buildLabelSequence();
+
+
+    if (!sequence.length) {
+
+        toast(
+            "No labels to generate.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const copies =
+        Math.max(
+            1,
+            Number(
+                $("#copies")?.value
+            ) || 1
+        );
+
+
+    const finalSequence = [];
+
+
+    for (
+        let copy = 0;
+        copy < copies;
+        copy++
+    ) {
+
+        finalSequence.push(
+            ...sequence
+        );
+    }
+
+
+    if (
+        $("#zipPDF")?.checked
+    ) {
+
+        const zip =
+            new JSZip();
+
+
+        for (
+            const po of values
+        ) {
+
+            const poSequence =
+                finalSequence.filter(
+                    item =>
+                        item.po === po
+                );
+
+
+            if (!poSequence.length) {
+                continue;
+            }
+
+
+            const doc =
+                createPOPDF(
+                    poSequence
+                );
+
+
+            zip.file(
+                `${safeFileName(po)}_Labels.pdf`,
+                doc.output("blob")
+            );
+        }
+
+
+        const blob =
+            await zip.generateAsync({
+                type: "blob"
+            });
+
+
+        downloadBlob(
+            blob,
+            `${safeFileName(currentTool)}_Labels.zip`
+        );
+
+
+        toast(
+            "ZIP generated successfully."
+        );
+
+        return;
+    }
+
+
+    if (
+        $("#mergePDF")?.checked
+    ) {
+
+        const doc =
+            createPOPDF(
+                finalSequence
+            );
+
+
+        doc.save(
+            `${safeFileName(currentTool)}_Merged.pdf`
+        );
+
+
+        toast(
+            "Merged PDF generated."
+        );
+
+        return;
+    }
+
+
+    for (
+        const po of values
+    ) {
+
+        const poSequence =
+            finalSequence.filter(
+                item =>
+                    item.po === po
+            );
+
+
+        if (!poSequence.length) {
+            continue;
+        }
+
+
+        const doc =
+            createPOPDF(
+                poSequence
+            );
+
+
+        doc.save(
+            `${safeFileName(po)}_Labels.pdf`
+        );
+    }
+
+
+    toast(
+        "PO label PDFs generated."
+    );
+}
+
+
+/* =========================================================
+   ISBN
+========================================================= */
+
+function createBarcodeSVG(value) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const svg =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "svg"
+                );
+
+
+            try {
+
+                JsBarcode(
+                    svg,
+                    value,
+                    {
+                        format: "CODE128",
+                        displayValue: true,
+                        fontSize: 14,
+                        margin: 8,
+                        height: 70,
+                        width: 2
+                    }
+                );
+
+
+                const text =
+                    new XMLSerializer()
+                        .serializeToString(
+                            svg
+                        );
+
+
+                const blob =
+                    new Blob(
+                        [text],
+                        {
+                            type:
+                                "image/svg+xml"
+                        }
+                    );
+
+
+                const url =
+                    URL.createObjectURL(
+                        blob
+                    );
+
+
+                const image =
+                    new Image();
+
+
+                image.onload = () => {
+
+                    URL.revokeObjectURL(
+                        url
+                    );
+
+
+                    const canvas =
+                        document.createElement(
+                            "canvas"
+                        );
+
+
+                    canvas.width =
+                        image.width;
+
+                    canvas.height =
+                        image.height;
+
+
+                    const context =
+                        canvas.getContext(
+                            "2d"
+                        );
+
+
+                    context.drawImage(
+                        image,
+                        0,
+                        0
+                    );
+
+
+                    resolve(
+                        canvas.toDataURL(
+                            "image/png"
+                        )
+                    );
+                };
+
+
+                image.onerror =
+                    reject;
+
+
+                image.src = url;
+
+            } catch (error) {
+
+                reject(error);
+            }
+
+        }
+    );
+}
+
+
+async function createISBNPDF(row) {
+
+    const {
+        jsPDF
+    } = window.jspdf;
+
+
+    const dimensions =
+        getPDFFormat();
+
+
+    const doc =
+        new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: dimensions
+        });
+
+
+    const pageWidth =
+        doc.internal.pageSize
+            .getWidth();
+
+    const pageHeight =
+        doc.internal.pageSize
+            .getHeight();
+
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.setFontSize(16);
+
+
+    doc.text(
+        row.Title,
+        pageWidth / 2,
+        25,
+        {
+            align: "center"
+        }
+    );
+
+
+    if (row.Edition) {
+
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
+
+        doc.setFontSize(10);
+
+
+        doc.text(
+            `Edition: ${row.Edition}`,
+            pageWidth / 2,
+            33,
+            {
+                align: "center"
+            }
+        );
+    }
+
+
+    const barcode =
+        await createBarcodeSVG(
+            row.ISBN
+        );
+
+
+    const imageWidth =
+        Math.min(
+            pageWidth - 25,
+            110
+        );
+
+
+    doc.addImage(
+        barcode,
+        "PNG",
+        (pageWidth - imageWidth) / 2,
+        pageHeight / 2 - 15,
+        imageWidth,
+        40
+    );
+
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.setFontSize(10);
+
+
+    doc.text(
+        row.ISBN,
+        pageWidth / 2,
+        pageHeight / 2 + 35,
+        {
+            align: "center"
+        }
+    );
+
+
+    return doc;
+}
+
+
+async function generateISBN() {
+
+    const rows =
+        getISBNRows();
+
+
+    if (!rows.length) {
+
+        toast(
+            "ISBN and Title are mandatory.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (
+        $("#zipPDF")?.checked
+    ) {
+
+        const zip =
+            new JSZip();
+
+
+        for (
+            let index = 0;
+            index < rows.length;
+            index++
+        ) {
+
+            const doc =
+                await createISBNPDF(
+                    rows[index]
+                );
+
+
+            zip.file(
+                `${safeFileName(
+                    rows[index].ISBN
+                )}_Barcode.pdf`,
+                doc.output("blob")
+            );
+        }
+
+
+        const blob =
+            await zip.generateAsync({
+                type: "blob"
+            });
+
+
+        downloadBlob(
+            blob,
+            "BooksWagon_ISBN_Barcodes.zip"
+        );
+
+
+        toast(
+            "ISBN barcode ZIP generated."
+        );
+
+        return;
+    }
+
+
+    if (
+        $("#mergePDF")?.checked
+    ) {
+
+        let merged = null;
+
+
+        for (
+            let index = 0;
+            index < rows.length;
+            index++
+        ) {
+
+            const one =
+                await createISBNPDF(
+                    rows[index]
+                );
+
+
+            if (!merged) {
+
+                merged = one;
+
+            } else {
+
+                /*
+                 * Add a new page and redraw the
+                 * next ISBN directly.
+                 */
+
+                merged.addPage(
+                    getPDFFormat(),
+                    "portrait"
+                );
+
+
+                await drawISBNOnExistingPDF(
+                    merged,
+                    rows[index]
+                );
+            }
+        }
+
+
+        merged.save(
+            "BooksWagon_ISBN_Barcodes_Merged.pdf"
+        );
+
+
+        toast(
+            "Merged ISBN PDF generated."
+        );
+
+        return;
+    }
+
+
+    for (
+        const row of rows
+    ) {
+
+        const doc =
+            await createISBNPDF(row);
+
+
+        doc.save(
+            `${safeFileName(
+                row.ISBN
+            )}_Barcode.pdf`
+        );
+    }
+
+
+    toast(
+        "ISBN barcode PDFs generated."
+    );
+}
+
+
+async function drawISBNOnExistingPDF(
+    doc,
+    row
+) {
+
+    const pageWidth =
+        doc.internal.pageSize
+            .getWidth();
+
+    const pageHeight =
+        doc.internal.pageSize
+            .getHeight();
+
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.setFontSize(16);
+
+
+    doc.text(
+        row.Title,
+        pageWidth / 2,
+        25,
+        {
+            align: "center"
+        }
+    );
+
+
+    if (row.Edition) {
+
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
+
+        doc.setFontSize(10);
+
+
+        doc.text(
+            `Edition: ${row.Edition}`,
+            pageWidth / 2,
+            33,
+            {
+                align: "center"
+            }
+        );
+    }
+
+
+    const barcode =
+        await createBarcodeSVG(
+            row.ISBN
+        );
+
+
+    const imageWidth =
+        Math.min(
+            pageWidth - 25,
+            110
+        );
+
+
+    doc.addImage(
+        barcode,
+        "PNG",
+        (pageWidth - imageWidth) / 2,
+        pageHeight / 2 - 15,
+        imageWidth,
+        40
+    );
+
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.setFontSize(10);
+
+
+    doc.text(
+        row.ISBN,
+        pageWidth / 2,
+        pageHeight / 2 + 35,
+        {
+            align: "center"
+        }
+    );
+}
+
+
+/* =========================================================
    ADDRESS
-========================= */
+========================================================= */
 
-.address-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
+function getAddressRows() {
 
-.address-card {
-    padding: 18px;
-    background: #f8fafc;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-}
+    if (addressExcelRows.length) {
 
-.address-card h4 {
-    margin: 0 0 12px;
-    color: var(--navy);
-    font-size: 12px;
-}
-
-.address-card textarea {
-    min-height: 130px;
-}
-
-/* =========================
-   ADDRESS STICKER
-========================= */
-
-.address-sticker-preview {
-    width: min(100%, 650px);
-    min-height: 300px;
-    margin: 25px auto;
-    padding: 28px;
-    background: #fff;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: center;
-    border: 2px solid #111827;
-    box-shadow: var(--shadow);
-}
-
-.address-side {
-    padding: 20px;
-}
-
-.address-side:first-child {
-    border-right: 1px dashed #888;
-}
-
-.address-side small {
-    display: block;
-    margin-bottom: 8px;
-    color: #888;
-    font-size: 9px;
-    font-weight: 900;
-}
-
-.address-side strong {
-    display: block;
-    margin-bottom: 10px;
-    color: var(--navy);
-    font-size: 18px;
-}
-
-.address-side div {
-    white-space: pre-line;
-    font-size: 11px;
-    line-height: 1.6;
-}
-
-/* =========================
-   ISBN BARCODE
-========================= */
-
-.isbn-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-}
-
-.isbn-card {
-    padding: 18px;
-    background: #f8fafc;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-}
-
-.isbn-card h4 {
-    margin: 0 0 12px;
-    color: var(--navy);
-    font-size: 12px;
-}
-
-.isbn-card small {
-    display: block;
-    margin-top: 8px;
-    color: var(--muted);
-    font-size: 9px;
-    line-height: 1.6;
-}
-
-.isbn-barcode-preview {
-    margin: 25px auto;
-    padding: 25px;
-    min-height: 220px;
-    max-width: 600px;
-    background: #fff;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    text-align: center;
-}
-
-.isbn-barcode-preview svg {
-    max-width: 100%;
-}
-
-.isbn-barcode-preview .book-title {
-    margin-top: 12px;
-    color: var(--navy);
-    font-weight: 900;
-    font-size: 15px;
-}
-
-.isbn-barcode-preview .edition {
-    margin-top: 5px;
-    color: var(--muted);
-    font-size: 10px;
-}
-
-/* =========================
-   CHECKBOX
-========================= */
-
-.checkbox-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-}
-
-.feature-checkbox {
-    min-height: 44px;
-    padding: 9px 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: 1px solid var(--border);
-    background: #fff;
-    cursor: pointer;
-    user-select: none;
-    border-radius: 4px;
-    transition: .15s ease;
-}
-
-.feature-checkbox:hover {
-    border-color: var(--navy);
-    background: #fafbfd;
-}
-
-.feature-checkbox input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.custom-check {
-    width: 18px;
-    height: 18px;
-    min-width: 18px;
-    position: relative;
-    border: 2px solid #aab3c0;
-    border-radius: 3px;
-    background: #fff;
-    transition: .15s;
-}
-
-.feature-checkbox input:checked + .custom-check {
-    background: var(--navy);
-    border-color: var(--navy);
-}
-
-.feature-checkbox input:checked + .custom-check::after {
-    content: "✓";
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    color: var(--yellow);
-    font-size: 12px;
-    font-weight: 900;
-}
-
-.checkbox-text {
-    font-size: 10px;
-    font-weight: 800;
-}
-
-/* =========================
-   PREVIEW
-========================= */
-
-.preview-section {
-    margin-top: 28px;
-    padding: 25px;
-    background: #eef1f5;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-}
-
-.preview-page {
-    width: min(100%, 600px);
-    min-height: 420px;
-    margin: auto;
-    padding: 30px;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: .2s ease;
-}
-
-.preview-content {
-    width: 85%;
-    padding: 20px;
-    text-align: center;
-    transition: .2s ease;
-}
-
-.preview-po,
-.preview-box {
-    min-width: 180px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 22px;
-    margin: 5px;
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.preview-cut {
-    margin: 12px 0;
-    color: #555;
-    font-size: 12px;
-    letter-spacing: 2px;
-}
-
-.hidden-preview {
-    display: none !important;
-}
-
-/* =========================
-   DOWNLOAD
-========================= */
-
-.workspace-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 9px;
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-}
-
-/* =========================
-   SUPPORT
-========================= */
-
-.support-card {
-    padding: 30px;
-    background: #fff;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    border-radius: 5px;
-}
-
-.support-card h2 {
-    margin: 5px 0 10px;
-    color: var(--navy);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 30px;
-}
-
-.address-link,
-.email-link {
-    display: block;
-    color: var(--navy);
-    font-size: 11px;
-    font-weight: 800;
-    line-height: 1.8;
-    margin-bottom: 6px;
-}
-
-.address-link:hover,
-.email-link:hover {
-    color: #315da8;
-    text-decoration: underline;
-}
-
-.created {
-    margin-top: 20px;
-    color: var(--muted);
-    font-size: 10px;
-}
-
-.created strong {
-    color: var(--navy);
-}
-
-.qr-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.qr-card {
-    padding: 15px;
-    background: #f7f8fa;
-    border: 1px solid var(--border);
-    text-align: center;
-    border-radius: 5px;
-}
-
-.qr-card h4 {
-    margin: 0 0 10px;
-    color: var(--navy);
-    font-size: 10px;
-}
-
-.qr-code {
-    width: 140px;
-    height: 140px;
-    margin: auto;
-    display: grid;
-    place-items: center;
-    background: #fff;
-}
-
-.qr-code img,
-.qr-code canvas {
-    max-width: 130px;
-    max-height: 130px;
-}
-
-/* =========================
-   FOOTER
-========================= */
-
-footer {
-    background: var(--navy);
-    color: #fff;
-    border-top: 5px solid var(--yellow);
-}
-
-.footer-grid {
-    padding: 35px 0;
-    display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr;
-    gap: 30px;
-}
-
-.footer-brand {
-    font-size: 20px;
-    font-weight: 900;
-}
-
-.footer-grid strong {
-    color: var(--yellow);
-    font-size: 10px;
-}
-
-.footer-grid p,
-.footer-grid a {
-    color: rgba(255, 255, 255, .68);
-    font-size: 10px;
-    line-height: 1.7;
-}
-
-.footer-grid a:hover {
-    color: #fff;
-    text-decoration: underline;
-}
-
-.footer-bottom {
-    padding: 13px 0;
-    border-top: 1px solid rgba(255, 255, 255, .1);
-    color: rgba(255, 255, 255, .5);
-    font-size: 9px;
-    display: flex;
-    justify-content: space-between;
-}
-
-/* =========================
-   TOAST
-========================= */
-
-#toastContainer {
-    position: fixed;
-    top: 82px;
-    right: 18px;
-    z-index: 99999;
-    width: min(350px, calc(100vw - 30px));
-    pointer-events: none;
-}
-
-.toast {
-    padding: 13px 15px;
-    margin-bottom: 8px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--green);
-    box-shadow: var(--shadow);
-    color: var(--green);
-    font-size: 10px;
-    font-weight: 800;
-    animation: toastIn .2s ease;
-}
-
-.toast.error {
-    color: var(--red);
-    border-left-color: var(--red);
-}
-
-@keyframes toastIn {
-    from {
-        opacity: 0;
-        transform: translateX(15px);
+        return addressExcelRows;
     }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
+
+    const from =
+        $("#stickerFromAddress")
+            ?.value
+            .trim();
+
+
+    const to =
+        $("#stickerToAddress")
+            ?.value
+            .trim();
+
+
+    if (!from || !to) {
+        return [];
+    }
+
+
+    return [{
+        From: from,
+        To: to
+    }];
+}
+
+
+function drawAddressSticker(
+    doc,
+    from,
+    to
+) {
+
+    const pageWidth =
+        doc.internal.pageSize
+            .getWidth();
+
+    const pageHeight =
+        doc.internal.pageSize
+            .getHeight();
+
+
+    doc.setDrawColor(
+        20,
+        20,
+        20
+    );
+
+    doc.setLineWidth(1);
+
+
+    doc.rect(
+        5,
+        5,
+        pageWidth - 10,
+        pageHeight - 10
+    );
+
+
+    doc.setLineDashPattern(
+        [3, 3],
+        0
+    );
+
+
+    doc.line(
+        pageWidth / 2,
+        8,
+        pageWidth / 2,
+        pageHeight - 8
+    );
+
+
+    doc.setLineDashPattern(
+        [],
+        0
+    );
+
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.setFontSize(12);
+
+
+    doc.text(
+        "FROM — BOOKSWAGON",
+        12,
+        20
+    );
+
+
+    doc.text(
+        "TO",
+        pageWidth / 2 + 8,
+        20
+    );
+
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.setFontSize(9);
+
+
+    const fromLines =
+        doc.splitTextToSize(
+            from || CONFIG.address,
+            pageWidth / 2 - 25
+        );
+
+
+    const toLines =
+        doc.splitTextToSize(
+            to || "Customer Address",
+            pageWidth / 2 - 25
+        );
+
+
+    doc.text(
+        fromLines,
+        12,
+        30
+    );
+
+
+    doc.text(
+        toLines,
+        pageWidth / 2 + 8,
+        30
+    );
+}
+
+
+function createAddressPDF(
+    from,
+    to
+) {
+
+    const {
+        jsPDF
+    } = window.jspdf;
+
+
+    const dimensions =
+        getPDFFormat();
+
+
+    const doc =
+        new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: dimensions
+        });
+
+
+    drawAddressSticker(
+        doc,
+        from,
+        to
+    );
+
+
+    return doc;
+}
+
+
+async function generateAddress() {
+
+    const rows =
+        getAddressRows();
+
+
+    if (!rows.length) {
+
+        toast(
+            "Enter both From and To address.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (
+        $("#zipPDF")?.checked
+    ) {
+
+        const zip =
+            new JSZip();
+
+
+        rows.forEach(
+            (row, index) => {
+
+                const doc =
+                    createAddressPDF(
+                        row.From,
+                        row.To
+                    );
+
+
+                zip.file(
+                    `Address_Sticker_${index + 1}.pdf`,
+                    doc.output("blob")
+                );
+            }
+        );
+
+
+        const blob =
+            await zip.generateAsync({
+                type: "blob"
+            });
+
+
+        downloadBlob(
+            blob,
+            "BooksWagon_Address_Stickers.zip"
+        );
+
+
+        toast(
+            "Address ZIP generated."
+        );
+
+        return;
+    }
+
+
+    if (
+        $("#mergePDF")?.checked
+    ) {
+
+        const {
+            jsPDF
+        } = window.jspdf;
+
+
+        const dimensions =
+            getPDFFormat();
+
+
+        const doc =
+            new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: dimensions
+            });
+
+
+        rows.forEach(
+            (row, index) => {
+
+                if (index > 0) {
+
+                    doc.addPage(
+                        dimensions,
+                        "portrait"
+                    );
+                }
+
+
+                drawAddressSticker(
+                    doc,
+                    row.From,
+                    row.To
+                );
+            }
+        );
+
+
+        doc.save(
+            "BooksWagon_Address_Stickers_Merged.pdf"
+        );
+
+
+        toast(
+            "Merged address PDF generated."
+        );
+
+        return;
+    }
+
+
+    rows.forEach(
+        (row, index) => {
+
+            const doc =
+                createAddressPDF(
+                    row.From,
+                    row.To
+                );
+
+
+            doc.save(
+                `Address_Sticker_${index + 1}.pdf`
+            );
+        }
+    );
+
+
+    toast(
+        "Address sticker PDFs generated."
+    );
+}
+
+
+/* =========================================================
+   GENERATE BUTTON
+========================================================= */
+
+$("#generateButton")?.addEventListener(
+    "click",
+    async () => {
+
+        const button =
+            $("#generateButton");
+
+
+        if (button) {
+
+            button.disabled = true;
+            button.textContent =
+                "GENERATING...";
+        }
+
+
+        try {
+
+            if (
+                currentTool ===
+                "ISBN Barcode"
+            ) {
+
+                await generateISBN();
+
+            } else if (
+                currentTool ===
+                "Address Sticker"
+            ) {
+
+                await generateAddress();
+
+            } else {
+
+                await generatePO();
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            toast(
+                error.message ||
+                "Generation failed.",
+                "error"
+            );
+
+        } finally {
+
+            if (button) {
+
+                button.disabled = false;
+                button.textContent =
+                    "GENERATE";
+            }
+        }
+    }
+);
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+$("#resetButton")?.addEventListener(
+    "click",
+    () => {
+
+        $$(".po-input")
+            .forEach(input => {
+                input.value = "";
+            });
+
+
+        if ($("#multiplePO")) {
+            $("#multiplePO").value = "";
+        }
+
+
+        if ($("#startBox")) {
+            $("#startBox").value = 1;
+        }
+
+
+        if ($("#endBox")) {
+            $("#endBox").value = 1;
+        }
+
+
+        if ($("#repeatCount")) {
+            $("#repeatCount").value = 1;
+        }
+
+
+        if ($("#copies")) {
+            $("#copies").value = 1;
+        }
+
+
+        if ($("#labelsPerPage")) {
+            $("#labelsPerPage").value = 1;
+        }
+
+
+        if ($("#manualISBN")) {
+            $("#manualISBN").value = "";
+        }
+
+
+        if ($("#manualTitle")) {
+            $("#manualTitle").value = "";
+        }
+
+
+        if ($("#manualEdition")) {
+            $("#manualEdition").value = "";
+        }
+
+
+        if ($("#stickerToName")) {
+            $("#stickerToName").value = "";
+        }
+
+
+        if ($("#stickerToAddress")) {
+            $("#stickerToAddress").value = "";
+        }
+
+
+        poExcelRows = [];
+        isbnExcelRows = [];
+        addressExcelRows = [];
+
+
+        $$(".feature-checkbox input")
+            .forEach(input => {
+                input.checked = false;
+            });
+
+
+        $("#printPO").checked = true;
+        $("#printBox").checked = true;
+        $("#pageBorder").checked = true;
+        $("#poBorder").checked = true;
+        $("#boxBorder").checked = true;
+        $("#fontBold").checked = true;
+
+
+        if ($("#poExcelPreview")) {
+            $("#poExcelPreview").innerHTML = "";
+        }
+
+
+        if ($("#isbnExcelPreview")) {
+            $("#isbnExcelPreview").innerHTML = "";
+        }
+
+
+        if ($("#addressExcelPreview")) {
+            $("#addressExcelPreview").innerHTML = "";
+        }
+
+
+        if ($("#poExcelStatus")) {
+            $("#poExcelStatus").textContent =
+                "No Excel file selected.";
+        }
+
+
+        if ($("#isbnExcelStatus")) {
+            $("#isbnExcelStatus").textContent =
+                "No ISBN Excel selected.";
+        }
+
+
+        if ($("#addressExcelStatus")) {
+            $("#addressExcelStatus").textContent =
+                "No Address Excel selected.";
+        }
+
+
+        updatePreview();
+        updateISBNPreview();
+        updateAddressPreview();
+
+
+        toast(
+            "Settings reset."
+        );
+    }
+);
+
+
+/* =========================================================
+   QR CODES
+========================================================= */
+
+function createQRCodes() {
+
+    if (
+        typeof QRCode ===
+        "undefined"
+    ) {
+        return;
+    }
+
+
+    if ($("#addressQR")) {
+
+        $("#addressQR").innerHTML = "";
+
+
+        new QRCode(
+            $("#addressQR"),
+            {
+                text: CONFIG.maps,
+                width: 130,
+                height: 130
+            }
+        );
+    }
+
+
+    if ($("#emailQR")) {
+
+        $("#emailQR").innerHTML = "";
+
+
+        new QRCode(
+            $("#emailQR"),
+            {
+                text:
+                    `mailto:${CONFIG.email}`,
+                width: 130,
+                height: 130
+            }
+        );
     }
 }
 
-/* =========================
-   MOBILE
-========================= */
 
-@media (max-width: 1050px) {
+/* =========================================================
+   INITIALIZE
+========================================================= */
 
-    .tool-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+function initialize() {
 
-    .form-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    createPOInputs();
 
-    .po-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+    updatePageSizeState();
 
-    .isbn-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+    createQRCodes();
+
+    configureTool();
+
+    updatePreview();
+
+    updateISBNPreview();
+
+    updateAddressPreview();
 }
 
-@media (max-width: 900px) {
 
-    .hero-grid {
-        grid-template-columns: 1fr;
-    }
+if (
+    document.readyState ===
+    "loading"
+) {
 
-    .support-card {
-        grid-template-columns: 1fr;
-    }
+    document.addEventListener(
+        "DOMContentLoaded",
+        initialize
+    );
 
-    .footer-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+} else {
 
-    .isbn-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 650px) {
-
-    .container {
-        width: min(100% - 20px, 1180px);
-    }
-
-    .nav {
-        display: none;
-    }
-
-    .hero {
-        padding: 45px 0 60px;
-    }
-
-    .hero h1 {
-        font-size: 45px;
-    }
-
-    .hero-buttons {
-        flex-direction: column;
-    }
-
-    .hero-buttons .btn {
-        width: 100%;
-    }
-
-    .tool-grid,
-    .form-grid,
-    .po-grid,
-    .checkbox-grid,
-    .address-grid,
-    .isbn-grid,
-    .address-sticker-preview,
-    .footer-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .workspace-body {
-        padding: 18px;
-    }
-
-    .workspace-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .workspace-actions {
-        flex-direction: column;
-    }
-
-    .workspace-actions .btn {
-        width: 100%;
-    }
-
-    .address-side:first-child {
-        border-right: 0;
-        border-bottom: 1px dashed #888;
-    }
-
-    .qr-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .preview-page {
-        min-height: 300px;
-        padding: 15px;
-    }
-
-    .preview-content {
-        width: 100%;
-    }
-
-    #toastContainer {
-        top: 72px;
-        right: 10px;
-        width: calc(100vw - 20px);
-    }
-}
-
-/* =========================
-   PRINT
-========================= */
-
-@media print {
-
-    .topbar,
-    .hero,
-    .tool-grid,
-    .workspace-header,
-    .workspace-actions,
-    footer,
-    #support {
-        display: none !important;
-    }
-
-    body {
-        background: #fff;
-    }
-
-    .workspace {
-        display: block !important;
-        padding: 0;
-    }
-
-    .workspace-card {
-        border: 0;
-        box-shadow: none;
-    }
-
-    .workspace-body {
-        padding: 0;
-    }
+    initialize();
 }
