@@ -1,62 +1,47 @@
 /* =========================================================
    BOOKSWAGON LABEL STUDIO
-   COMPLETE app.js
+   app.js
 ========================================================= */
 
 (() => {
     "use strict";
 
-    /* =====================================================
-       GLOBAL STATE
-    ===================================================== */
-
-    const state = {
-        activeTool: null,
-
-        coco: {
-            mode: "sticker",
-            size: "4x6",
-            inputMode: "manual",
-            borderStyle: "solid-dark"
-        },
-
-        other: {
-            size: "4x6",
-            inputMode: "manual"
-        },
-
-        isbn: {
-            size: "4x6",
-            inputMode: "manual"
-        },
-
-        pendingCheckbox: null
-    };
-
 
     /* =====================================================
-       SHORTCUTS
+       HELPERS
     ===================================================== */
 
     const $ = (selector, parent = document) =>
         parent.querySelector(selector);
 
     const $$ = (selector, parent = document) =>
-        Array.from(parent.querySelectorAll(selector));
+        [...parent.querySelectorAll(selector)];
+
+
+    const escapeHTML = (value) => {
+        const div = document.createElement("div");
+        div.textContent = value ?? "";
+        return div.innerHTML;
+    };
+
+
+    const sleep = (ms) =>
+        new Promise(resolve => setTimeout(resolve, ms));
 
 
     /* =====================================================
        TOAST
     ===================================================== */
 
-    function showToast(
-        message,
-        type = "success",
-        title = null
-    ) {
-        const container = $("#toastContainer");
+    const toastContainer = $("#toastContainer");
 
-        if (!container) return;
+
+    function showToast(
+        type = "info",
+        title = "Notice",
+        message = ""
+    ) {
+        if (!toastContainer) return;
 
         const toast = document.createElement("div");
 
@@ -69,486 +54,439 @@
                     ? "!"
                     : "i";
 
-        const heading =
-            title ||
-            (
-                type === "success"
-                    ? "Success"
-                    : type === "error"
-                        ? "Error"
-                        : "Information"
-            );
-
         toast.innerHTML = `
             <div class="toast-icon">${icon}</div>
 
             <div class="toast-content">
-                <strong>${escapeHTML(heading)}</strong>
+                <strong>${escapeHTML(title)}</strong>
                 <span>${escapeHTML(message)}</span>
             </div>
         `;
 
-        container.appendChild(toast);
+        toastContainer.appendChild(toast);
+
 
         setTimeout(() => {
-            toast.remove();
-        }, 4100);
+            toast.style.opacity = "0";
+            toast.style.transform = "translateX(20px)";
+
+            setTimeout(() => {
+                toast.remove();
+            }, 200);
+
+        }, 3500);
     }
 
 
     /* =====================================================
-       ESCAPE HTML
+       CONFIRMATION MODAL
     ===================================================== */
 
-    function escapeHTML(value) {
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+    const confirmModal = $("#featureConfirmModal");
+    const confirmTitle = $("#featureConfirmTitle");
+    const confirmMessage = $("#featureConfirmMessage");
+
+    const confirmCancel = $("#featureConfirmCancel");
+    const confirmOK = $("#featureConfirmOK");
+
+
+    let pendingCheckbox = null;
+    let pendingDesiredState = null;
+
+
+    function closeConfirmation() {
+        if (!confirmModal) return;
+
+        confirmModal.classList.add("hidden");
+
+        pendingCheckbox = null;
+        pendingDesiredState = null;
     }
 
 
-    /* =====================================================
-       CONFIRMATION FOR CHECKBOXES
-    ===================================================== */
+    function openConfirmation(checkbox, desiredState) {
+        pendingCheckbox = checkbox;
+        pendingDesiredState = desiredState;
 
-    function setupConfirmableCheckboxes() {
+        const label =
+            checkbox.closest(".check-row")
+                ?.querySelector("span")
+                ?.textContent
+                ?.trim()
+            || "this feature";
 
-        $$('input[type="checkbox"]').forEach((checkbox) => {
+        if (confirmTitle) {
+            confirmTitle.textContent =
+                desiredState
+                    ? "Confirm Enable"
+                    : "Confirm Disable";
+        }
 
-            if (checkbox.dataset.confirmBound === "true") {
-                return;
-            }
+        if (confirmMessage) {
+            confirmMessage.textContent =
+                desiredState
+                    ? `Are you sure you want to enable "${label}"?`
+                    : `Are you sure you want to disable "${label}"?`;
+        }
 
-            checkbox.dataset.confirmBound = "true";
+        if (confirmOK) {
+            confirmOK.textContent =
+                desiredState
+                    ? "Yes, Enable"
+                    : "Yes, Disable";
+        }
 
-            checkbox.addEventListener("click", function (event) {
+        if (confirmModal) {
+            confirmModal.classList.remove("hidden");
+        }
+    }
+
+
+    function setupCheckboxConfirmations() {
+        $$(
+            'input[type="checkbox"]'
+        ).forEach(checkbox => {
+
+            checkbox.dataset.confirmReady = "true";
+
+            checkbox.addEventListener("click", event => {
+
+                /*
+                 * Prevent the native checkbox state from changing.
+                 * The state changes only after confirmation.
+                 */
 
                 event.preventDefault();
 
-                const desiredState = !this.checked;
+                const desiredState =
+                    !checkbox.checked;
 
-                const label =
-                    this.closest(".check-row")
-                        ?.querySelector("span")
-                        ?.textContent
-                        ?.trim()
-                    || "This feature";
-
-                openFeatureConfirmation(
-                    this,
-                    desiredState,
-                    label
+                openConfirmation(
+                    checkbox,
+                    desiredState
                 );
             });
         });
     }
 
 
-    function openFeatureConfirmation(
-        checkbox,
-        desiredState,
-        label
-    ) {
-
-        const modal = $("#featureConfirmModal");
-
-        if (!modal) {
-            checkbox.checked = desiredState;
-            return;
-        }
-
-        state.pendingCheckbox = {
-            checkbox,
-            desiredState,
-            label
-        };
-
-        $("#featureConfirmTitle").textContent =
-            desiredState
-                ? "Enable Feature?"
-                : "Disable Feature?";
-
-        $("#featureConfirmMessage").textContent =
-            desiredState
-                ? `Are you sure you want to enable "${label}"?`
-                : `Are you sure you want to disable "${label}"?`;
-
-        modal.classList.remove("hidden");
+    if (confirmCancel) {
+        confirmCancel.addEventListener(
+            "click",
+            closeConfirmation
+        );
     }
 
 
-    function closeFeatureConfirmation() {
-        const modal = $("#featureConfirmModal");
+    if (confirmOK) {
+        confirmOK.addEventListener("click", () => {
 
-        if (modal) {
-            modal.classList.add("hidden");
-        }
+            if (
+                !pendingCheckbox ||
+                pendingDesiredState === null
+            ) {
+                closeConfirmation();
+                return;
+            }
 
-        state.pendingCheckbox = null;
+
+            const checkbox = pendingCheckbox;
+            const newState = pendingDesiredState;
+
+
+            checkbox.checked = newState;
+
+
+            const label =
+                checkbox.closest(".check-row")
+                    ?.querySelector("span")
+                    ?.textContent
+                    ?.trim()
+                || "Feature";
+
+
+            closeConfirmation();
+
+
+            if (newState) {
+
+                showToast(
+                    "success",
+                    "Feature Enabled",
+                    `${label} is now enabled.`
+                );
+
+            } else {
+
+                showToast(
+                    "success",
+                    "Feature Disabled",
+                    `${label} is now disabled.`
+                );
+            }
+
+
+            updateAllPreviews();
+        });
     }
 
 
-    function confirmFeatureChange() {
+    if (confirmModal) {
 
-        if (!state.pendingCheckbox) {
-            closeFeatureConfirmation();
-            return;
-        }
+        confirmModal.addEventListener(
+            "click",
+            event => {
 
-        const {
-            checkbox,
-            desiredState,
-            label
-        } = state.pendingCheckbox;
+                if (event.target === confirmModal) {
+                    closeConfirmation();
+                }
 
-        checkbox.checked = desiredState;
-
-        closeFeatureConfirmation();
-
-        updateAllPreviews();
-
-        if (desiredState) {
-
-            showToast(
-                `"${label}" has been enabled.`,
-                "success",
-                "Feature Enabled"
-            );
-
-        } else {
-
-            showToast(
-                `"${label}" has been disabled.`,
-                "info",
-                "Feature Disabled"
-            );
-        }
+            }
+        );
     }
+
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Escape" &&
+                confirmModal &&
+                !confirmModal.classList.contains("hidden")
+            ) {
+                closeConfirmation();
+            }
+
+        }
+    );
 
 
     /* =====================================================
-       TOOL OPEN / CLOSE
+       TOOL NAVIGATION
     ===================================================== */
 
-    function openTool(tool) {
+    const workspaces = $$(".tool-workspace");
 
-        state.activeTool = tool;
 
-        $$(".tool-workspace").forEach((workspace) => {
+    function closeAllWorkspaces() {
+
+        workspaces.forEach(workspace => {
             workspace.classList.remove("active");
         });
 
-        const target = $(`#${tool}Workspace`);
+        const workspaceSection =
+            $("#workspace");
 
-        if (target) {
-            target.classList.add("active");
+        if (workspaceSection) {
+            workspaceSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    }
+
+
+    $$("[data-open-tool]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const tool =
+                button.dataset.openTool;
+
+            closeAllWorkspaces();
+
+
+            const workspace =
+                $(`#${tool}Workspace`);
+
+            if (!workspace) return;
+
+            workspace.classList.add("active");
+
 
             setTimeout(() => {
-                target.scrollIntoView({
+
+                workspace.scrollIntoView({
                     behavior: "smooth",
                     block: "start"
                 });
-            }, 50);
+
+            }, 30);
+        });
+    });
+
+
+    $$("[data-close-tool]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            closeAllWorkspaces();
+
+            $("#tools")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        });
+
+    });
+
+
+    /* =====================================================
+       GENERIC NUMBER PARSER
+       IMPORTANT:
+       NO 200 LIMIT
+    ===================================================== */
+
+    function getPositiveInteger(
+        element,
+        fallback = 1
+    ) {
+
+        if (!element) {
+            return fallback;
         }
+
+        const raw =
+            String(element.value ?? "")
+                .trim();
+
+        if (!raw) {
+            return fallback;
+        }
+
+        const value =
+            Number(raw);
+
+        if (
+            !Number.isFinite(value) ||
+            !Number.isInteger(value) ||
+            value < 1
+        ) {
+            return fallback;
+        }
+
+        /*
+         * Deliberately NO:
+         *
+         * if (value > 200) ...
+         *
+         * This fixes the old "range must be between 1 to 200"
+         * problem.
+         */
+
+        return value;
     }
 
 
-    function closeTool() {
-
-        state.activeTool = null;
-
-        $$(".tool-workspace").forEach((workspace) => {
-            workspace.classList.remove("active");
-        });
-
-        $("#tools")?.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
-    }
-
-
-    /* =====================================================
-       TOOL BUTTONS
-    ===================================================== */
-
-    $$("[data-open-tool]").forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            const tool = button.dataset.openTool;
-
-            openTool(tool);
-        });
-    });
-
-
-    $$("[data-close-tool]").forEach((button) => {
-
-        button.addEventListener("click", closeTool);
-    });
-
-
-    /* =====================================================
-       COCOBLUE TABS
-    ===================================================== */
-
-    $$("[data-cocoblue-mode]").forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            const mode = button.dataset.cocoblueMode;
-
-            state.coco.mode = mode;
-
-            $$("[data-cocoblue-mode]").forEach((btn) => {
-                btn.classList.toggle(
-                    "active",
-                    btn === button
-                );
-            });
-
-            $("#cocoblueStickerMode")
-                ?.classList.toggle(
-                    "hidden",
-                    mode !== "sticker"
-                );
-
-            $("#cocoblueAddressMode")
-                ?.classList.toggle(
-                    "hidden",
-                    mode !== "address"
-                );
-        });
-    });
-
-
-    /* =====================================================
-       COCO INPUT MODE
-    ===================================================== */
-
-    $$("[data-coco-input]").forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            const mode = button.dataset.cocoInput;
-
-            state.coco.inputMode = mode;
-
-            $$("[data-coco-input]").forEach((btn) => {
-                btn.classList.toggle(
-                    "active",
-                    btn === button
-                );
-            });
-
-            $("#cocoManualArea")
-                ?.classList.toggle(
-                    "hidden",
-                    mode !== "manual"
-                );
-
-            $("#cocoExcelArea")
-                ?.classList.toggle(
-                    "hidden",
-                    mode !== "excel"
-                );
-        });
-    });
-
-
-    /* =====================================================
-       OTHER INPUT MODE
-    ===================================================== */
-
-    $$("[data-other-input]").forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            const mode = button.dataset.otherInput;
-
-            state.other.inputMode = mode;
-
-            $$("[data-other-input]").forEach((btn) => {
-                btn.classList.toggle(
-                    "active",
-                    btn === button
-                );
-            });
-
-            $("#otherManualArea")
-                ?.classList.toggle(
-                    "hidden",
-                    mode !== "manual"
-                );
-
-            $("#otherExcelArea")
-                ?.classList.toggle(
-                    "hidden",
-                    mode !== "excel"
-                );
-        });
-    });
-
-
-    /* =====================================================
-       ISBN INPUT MODE
-    ===================================================== */
-
-    $$("[data-isbn-input]").forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            const mode = button.dataset.isbnInput;
-
-            state.isbn.inputMode = mode;
-
-            $$("[data-isbn-input]").forEach((btn) => {
-                btn.classList.toggle(
-                    "active",
-                    btn === button
-                );
-            });
-
-            $("#isbnManualCard")
-                ?.classList.toggle(
-                    "hidden",
-                    mode !== "manual"
-                );
-
-            $("#isbnExcelCard")
-                ?.classList.toggle(
-                    "hidden",
-                    mode !== "excel"
-                );
-        });
-    });
-
-
-    /* =====================================================
-       SIZE BUTTONS
-    ===================================================== */
-
-    $$("[data-coco-size]").forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            state.coco.size = button.dataset.cocoSize;
-
-            $$("[data-coco-size]").forEach((btn) => {
-                btn.classList.toggle(
-                    "active",
-                    btn === button
-                );
-            });
-
-            $("#cocoCustomSize")
-                ?.classList.toggle(
-                    "hidden",
-                    state.coco.size !== "custom"
-                );
-
-            updateCocoPreview();
-        });
-    });
-
-
-    $$("[data-other-size]").forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            state.other.size = button.dataset.otherSize;
-
-            $$("[data-other-size]").forEach((btn) => {
-                btn.classList.toggle(
-                    "active",
-                    btn === button
-                );
-            });
-
-            $("#otherCustomSize")
-                ?.classList.toggle(
-                    "hidden",
-                    state.other.size !== "custom"
-                );
-
-            updateOtherPreview();
-        });
-    });
-
-
-    $$("[data-isbn-size]").forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            state.isbn.size = button.dataset.isbnSize;
-
-            $$("[data-isbn-size]").forEach((btn) => {
-                btn.classList.toggle(
-                    "active",
-                    btn === button
-                );
-            });
-        });
-    });
-
-
-    /* =====================================================
-       EXCEL HANDLING
-    ===================================================== */
-
-    $("#cocoExcel")?.addEventListener(
-        "change",
-        (event) => {
-
-            handleExcelFile(
-                event.target.files[0],
-                $("#cocoExcelStatus")
+    function validateRange(startElement, endElement) {
+
+        const start =
+            getPositiveInteger(
+                startElement,
+                1
             );
-        }
-    );
 
-
-    $("#otherExcel")?.addEventListener(
-        "change",
-        (event) => {
-
-            handleExcelFile(
-                event.target.files[0],
-                $("#otherExcelStatus")
+        const end =
+            getPositiveInteger(
+                endElement,
+                start
             );
-        }
-    );
 
 
-    $("#isbnExcel")?.addEventListener(
-        "change",
-        (event) => {
-
-            handleExcelFile(
-                event.target.files[0],
-                $("#isbnExcelStatus")
-            );
-        }
-    );
-
-
-    async function handleExcelFile(file, statusElement) {
-
-        if (!file) return;
-
-        if (!window.XLSX) {
+        if (end < start) {
 
             showToast(
-                "Excel library is not loaded.",
-                "error"
+                "error",
+                "Invalid Box Range",
+                "End Box Number must be greater than or equal to Start Box Number."
             );
 
-            return;
+            return null;
         }
+
+
+        return {
+            start,
+            end
+        };
+    }
+
+
+    /* =====================================================
+       PO PARSING
+    ===================================================== */
+
+    function cleanPO(value) {
+
+        return String(value ?? "")
+            .trim()
+            .replace(/\s+/g, " ");
+    }
+
+
+    function parseCommaSeparatedPO(value) {
+
+        return String(value ?? "")
+            .split(",")
+            .map(cleanPO)
+            .filter(Boolean);
+    }
+
+
+    function collectPOsFromInputs(selector) {
+
+        return $$(selector)
+            .map(input => cleanPO(input.value))
+            .filter(Boolean);
+    }
+
+
+    function getUniquePOs(values) {
+
+        const seen = new Set();
+        const result = [];
+
+        values.forEach(value => {
+
+            const normalized =
+                value.toUpperCase();
+
+            if (!seen.has(normalized)) {
+
+                seen.add(normalized);
+                result.push(value);
+            }
+
+        });
+
+        return result;
+    }
+
+
+    /* =====================================================
+       EXCEL READER
+    ===================================================== */
+
+    async function readExcelPOs(file) {
+
+        if (!file) {
+            return [];
+        }
+
+        if (
+            typeof XLSX === "undefined"
+        ) {
+
+            showToast(
+                "error",
+                "Excel Library Missing",
+                "The Excel library could not be loaded."
+            );
+
+            return [];
+        }
+
 
         try {
 
@@ -558,15 +496,20 @@
             const workbook =
                 XLSX.read(
                     buffer,
-                    {
-                        type: "array"
-                    }
+                    { type: "array" }
                 );
+
 
             const firstSheet =
                 workbook.Sheets[
                     workbook.SheetNames[0]
                 ];
+
+
+            if (!firstSheet) {
+                return [];
+            }
+
 
             const rows =
                 XLSX.utils.sheet_to_json(
@@ -577,152 +520,379 @@
                     }
                 );
 
-            if (statusElement) {
 
-                statusElement.textContent =
-                    `${file.name} loaded — ${Math.max(
-                        rows.length - 1,
-                        0
-                    )} data rows found.`;
-            }
+            const values = [];
 
-            statusElement.dataset.fileRows =
-                JSON.stringify(rows);
 
-            showToast(
-                `${file.name} loaded successfully.`,
-                "success",
-                "Excel Loaded"
-            );
+            rows.forEach(row => {
+
+                if (!Array.isArray(row)) {
+                    return;
+                }
+
+
+                const firstNonEmpty =
+                    row.find(
+                        cell =>
+                            String(cell).trim()
+                    );
+
+
+                if (
+                    firstNonEmpty !== undefined &&
+                    String(firstNonEmpty).trim()
+                ) {
+                    values.push(
+                        cleanPO(firstNonEmpty)
+                    );
+                }
+            });
+
+
+            return getUniquePOs(values);
 
         } catch (error) {
 
             console.error(error);
 
-            if (statusElement) {
-                statusElement.textContent =
-                    "Unable to read Excel file.";
-            }
-
             showToast(
-                "The Excel file could not be read.",
-                "error"
+                "error",
+                "Excel Error",
+                "Unable to read the selected Excel file."
             );
+
+            return [];
         }
     }
 
 
     /* =====================================================
-       GET COCO PO LIST
+       INPUT MODE — COCOBLUE
+    ===================================================== */
+
+    function setCocoInputMode(mode) {
+
+        const manual = $("#cocoManualArea");
+        const comma = $("#cocoCommaArea");
+        const excel = $("#cocoExcelArea");
+
+
+        manual?.classList.add("hidden");
+        comma?.classList.add("hidden");
+        excel?.classList.add("hidden");
+
+
+        if (mode === "manual") {
+            manual?.classList.remove("hidden");
+        }
+
+        if (mode === "comma") {
+            comma?.classList.remove("hidden");
+        }
+
+        if (mode === "excel") {
+            excel?.classList.remove("hidden");
+        }
+
+
+        $$("[data-coco-input]").forEach(tab => {
+
+            tab.classList.toggle(
+                "active",
+                tab.dataset.cocoInput === mode
+            );
+
+        });
+
+
+        updateCocoPreview();
+    }
+
+
+    $$("[data-coco-input]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            setCocoInputMode(
+                button.dataset.cocoInput
+            );
+
+        });
+
+    });
+
+
+    let cocoInputMode = "manual";
+
+
+    /* =====================================================
+       COCOBLUE EXCEL
+    ===================================================== */
+
+    $("#cocoExcel")?.addEventListener(
+        "change",
+        async event => {
+
+            const file =
+                event.target.files?.[0];
+
+            const status =
+                $("#cocoExcelStatus");
+
+
+            if (!file) {
+
+                if (status) {
+                    status.textContent =
+                        "No file selected.";
+                }
+
+                return;
+            }
+
+
+            if (status) {
+                status.textContent =
+                    `Reading ${file.name}...`;
+            }
+
+
+            const values =
+                await readExcelPOs(file);
+
+
+            /*
+             * Fill the first 20 PO fields.
+             */
+
+            const fields =
+                $$(".coco-po");
+
+
+            fields.forEach((field, index) => {
+
+                field.value =
+                    values[index] || "";
+
+            });
+
+
+            if (status) {
+
+                status.textContent =
+                    values.length
+                        ? `${Math.min(values.length, 20)} PO number(s) loaded.`
+                        : "No PO numbers found.";
+            }
+
+
+            updateCocoPreview();
+        }
+    );
+
+
+    /* =====================================================
+       INPUT MODE — OTHER PO
+    ===================================================== */
+
+    function setOtherInputMode(mode) {
+
+        $("#otherManualArea")
+            ?.classList.toggle(
+                "hidden",
+                mode !== "manual"
+            );
+
+
+        $("#otherCommaArea")
+            ?.classList.toggle(
+                "hidden",
+                mode !== "comma"
+            );
+
+
+        $("#otherExcelArea")
+            ?.classList.toggle(
+                "hidden",
+                mode !== "excel"
+            );
+
+
+        $$("[data-other-input]").forEach(tab => {
+
+            tab.classList.toggle(
+                "active",
+                tab.dataset.otherInput === mode
+            );
+
+        });
+
+
+        updateOtherPreview();
+    }
+
+
+    $$("[data-other-input]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            setOtherInputMode(
+                button.dataset.otherInput
+            );
+
+        });
+
+    });
+
+
+    $("#otherExcel")?.addEventListener(
+        "change",
+        async event => {
+
+            const file =
+                event.target.files?.[0];
+
+            const status =
+                $("#otherExcelStatus");
+
+
+            if (!file) {
+
+                if (status) {
+                    status.textContent =
+                        "No file selected.";
+                }
+
+                return;
+            }
+
+
+            const values =
+                await readExcelPOs(file);
+
+
+            const fields =
+                $$(".other-po");
+
+
+            fields.forEach((field, index) => {
+
+                field.value =
+                    values[index] || "";
+
+            });
+
+
+            if (status) {
+
+                status.textContent =
+                    values.length
+                        ? `${Math.min(values.length, 20)} PO number(s) loaded.`
+                        : "No PO numbers found.";
+            }
+
+
+            updateOtherPreview();
+        }
+    );
+
+
+    /* =====================================================
+       GET COCOBLUE POs
     ===================================================== */
 
     function getCocoPOs() {
 
-        if (state.coco.inputMode === "excel") {
+        let values = [];
 
-            const status = $("#cocoExcelStatus");
 
-            try {
+        if (
+            !$("#cocoCommaArea")
+                ?.classList.contains("hidden")
+        ) {
 
-                const rows =
-                    JSON.parse(
-                        status?.dataset?.fileRows || "[]"
-                    );
+            values =
+                parseCommaSeparatedPO(
+                    $("#cocoCommaPO")?.value
+                );
 
-                return rows
-                    .slice(1)
-                    .map(row => String(row[0] ?? "").trim())
-                    .filter(Boolean);
+        } else {
 
-            } catch {
-                return [];
-            }
+            values =
+                collectPOsFromInputs(
+                    ".coco-po"
+                );
         }
 
-        return $$(".coco-po")
-            .map(input => input.value.trim())
-            .filter(Boolean);
+
+        return getUniquePOs(values);
     }
 
 
     /* =====================================================
-       GET OTHER PO LIST
+       GET OTHER POs
     ===================================================== */
 
     function getOtherPOs() {
 
-        if (state.other.inputMode === "excel") {
+        if (
+            !$("#otherCommaArea")
+                ?.classList.contains("hidden")
+        ) {
 
-            const status = $("#otherExcelStatus");
-
-            try {
-
-                const rows =
-                    JSON.parse(
-                        status?.dataset?.fileRows || "[]"
-                    );
-
-                return rows
-                    .slice(1)
-                    .map(row => String(row[0] ?? "").trim())
-                    .filter(Boolean);
-
-            } catch {
-                return [];
-            }
+            return getUniquePOs(
+                parseCommaSeparatedPO(
+                    $("#otherCommaPO")?.value
+                )
+            );
         }
 
-        return $$(".other-po")
-            .map(input => input.value.trim())
-            .filter(Boolean);
+
+        return getUniquePOs(
+            collectPOsFromInputs(
+                ".other-po"
+            )
+        );
     }
 
 
     /* =====================================================
-       UNLIMITED RANGE
+       PRINT MODE
     ===================================================== */
 
-    function getBoxRange(startId, endId) {
+    function getPrintMode(
+        poCheckbox,
+        boxCheckbox,
+        poBoxCheckbox
+    ) {
 
-        const start =
-            Number($(startId)?.value);
+        const po =
+            poCheckbox?.checked;
 
-        const end =
-            Number($(endId)?.value);
+        const box =
+            boxCheckbox?.checked;
 
-        if (
-            !Number.isFinite(start) ||
-            !Number.isFinite(end)
-        ) {
+        const both =
+            poBoxCheckbox?.checked;
 
-            throw new Error(
-                "Please enter a valid Box Number range."
-            );
+
+        if (both) {
+            return "po-box";
         }
 
-        if (start < 1) {
-
-            throw new Error(
-                "Starting Box Number must be 1 or greater."
-            );
+        if (po && !box) {
+            return "po";
         }
 
-        if (end < start) {
-
-            throw new Error(
-                "End Box Number must be greater than or equal to Start Box Number."
-            );
+        if (box && !po) {
+            return "box";
         }
 
-        /*
-         * IMPORTANT:
-         * There is intentionally NO max 200 restriction.
-         */
+        if (po && box) {
+            return "po-box";
+        }
 
-        return {
-            start,
-            end
-        };
+        return "none";
     }
 
 
@@ -730,281 +900,250 @@
        FORMAT BOX NUMBER
     ===================================================== */
 
-    function formatBoxNumber(number) {
+    function formatBoxNumber(
+        number
+    ) {
 
         return `BOX NO. ${number}`;
     }
 
 
     /* =====================================================
-       PAGE SIZE
+       LABEL CONTENT
     ===================================================== */
 
-    function getPageDimensions(size, customWidth, customHeight) {
+    function createLabelHTML(
+        po,
+        box,
+        options = {}
+    ) {
 
-        switch (size) {
+        const {
+            printMode = "po-box",
+            poBorder = true,
+            boxBorder = true,
+            outerBorder = false,
+            cutting = true,
+            scissor = true,
+            bold = true
+        } = options;
 
-            case "a4":
-                return {
-                    width: 210,
-                    height: 297
-                };
 
-            case "70x35":
-                return {
-                    width: 70,
-                    height: 35
-                };
+        const labelClass = [
+            "dynamic-label-preview",
 
-            case "custom":
+            outerBorder
+                ? "has-outer-border"
+                : ""
+        ]
+            .filter(Boolean)
+            .join(" ");
 
-                return {
-                    width:
-                        Number(customWidth) || 100,
 
-                    height:
-                        Number(customHeight) || 100
-                };
+        let content = "";
 
-            case "4x6":
-            default:
 
-                return {
-                    width: 101.6,
-                    height: 152.4
-                };
+        if (
+            printMode === "po" ||
+            printMode === "po-box"
+        ) {
+
+            content += `
+                <strong
+                    class="${poBorder ? "preview-item-border" : ""}"
+                >
+                    ${escapeHTML(po)}
+                </strong>
+            `;
         }
+
+
+        if (
+            printMode === "po-box" &&
+            cutting
+        ) {
+
+            content += `
+                <div class="preview-dotted-line">
+                    ${scissor ? "· · · · · ✂ · · · · ·" : "· · · · · · · · · ·"}
+                </div>
+            `;
+        }
+
+
+        if (
+            printMode === "box" ||
+            printMode === "po-box"
+        ) {
+
+            content += `
+                <div
+                    class="preview-box-number ${boxBorder ? "preview-item-border" : ""}"
+                >
+                    ${escapeHTML(
+                        formatBoxNumber(box)
+                    )}
+                </div>
+            `;
+        }
+
+
+        if (
+            !content.trim()
+        ) {
+
+            content = `
+                <div class="preview-empty">
+                    No print content selected
+                </div>
+            `;
+        }
+
+
+        return `
+            <div
+                class="${labelClass} ${bold ? "bold-label" : ""}"
+            >
+                ${content}
+            </div>
+        `;
     }
 
 
     /* =====================================================
-       PAGE SIZE LABEL
-    ===================================================== */
-
-    function getSizeLabel(size) {
-
-        switch (size) {
-
-            case "a4":
-                return "A4";
-
-            case "70x35":
-                return "70 × 35 mm";
-
-            case "custom":
-                return "Custom";
-
-            case "4x6":
-            default:
-                return "4 × 6 inch";
-        }
-    }
-
-
-    /* =====================================================
-       UPDATE COCO PREVIEW
+       COCOBLUE PREVIEW
     ===================================================== */
 
     function updateCocoPreview() {
 
+        const range =
+            validateRange(
+                $("#cocoStartBox"),
+                $("#cocoEndBox")
+            );
+
+
+        if (!range) {
+            return;
+        }
+
+
+        const poList =
+            getCocoPOs();
+
+
+        const samplePO =
+            poList[0] ||
+            "BWG 123";
+
+
+        const mode =
+            getPrintMode(
+                $("#cocoPrintPO"),
+                $("#cocoPrintBox"),
+                $("#cocoPrintPOBox")
+            );
+
+
         const page =
             $("#cocoPreviewPage");
 
-        if (!page) return;
-
-        page.classList.remove(
-            "size-4x6",
-            "size-a4",
-            "size-70x35",
-            "size-custom"
-        );
-
-        page.classList.add(
-            `size-${state.coco.size}`
-        );
-
-
-        const firstPO =
-            getCocoPOs()[0] || "BWG 123";
-
-
-        const start =
-            Number($("#cocoStartBox")?.value) || 1;
-
-
-        $("#cocoPreviewPO").textContent =
-            firstPO;
-
-
-        $("#cocoPreviewBox").textContent =
-            formatBoxNumber(start);
-
-
-        const printPO =
-            $("#cocoPrintPO")?.checked;
-
-
-        const printBox =
-            $("#cocoPrintBox")?.checked;
-
-
-        const printPOBox =
-            $("#cocoPrintPOBox")?.checked;
-
-
-        const poElement =
-            $("#cocoPreviewPO");
-
-
-        const boxElement =
-            $("#cocoPreviewBox");
-
-
-        const separator =
-            $("#cocoPreviewSeparator");
-
-
-        const scissor =
-            $("#cocoPreviewScissor");
-
-
-        if (poElement) {
-
-            poElement.style.display =
-                printPO || printPOBox
-                    ? "inline-flex"
-                    : "none";
-
-            applyPreviewBorder(
-                poElement,
-                $("#cocoPOBorder")?.checked
-            );
-        }
-
-
-        if (boxElement) {
-
-            boxElement.style.display =
-                printBox || printPOBox
-                    ? "inline-flex"
-                    : "none";
-
-            applyPreviewBorder(
-                boxElement,
-                $("#cocoBoxBorder")?.checked
-            );
-        }
-
-
-        if (separator) {
-
-            separator.style.display =
-                printPOBox
-                    ? "block"
-                    : "none";
-        }
-
-
-        if (scissor) {
-
-            scissor.style.display =
-                $("#cocoCutting")?.checked
-                    ? "block"
-                    : "none";
-        }
-
-
-        applyPreviewBorder(
-            page,
-            $("#cocoPageBorder")?.checked
-        );
-
-
-        const label =
+        const preview =
             $("#cocoPreviewLabel");
 
 
-        if (label) {
+        if (!page || !preview) {
+            return;
+        }
 
-            applyPreviewBorder(
-                label,
-                $("#cocoPOBoxOuterBorder")?.checked
+
+        const pageBorder =
+            $("#cocoPageBorder")?.checked;
+
+
+        page.style.border =
+            pageBorder
+                ? "1.5px solid #111827"
+                : "0";
+
+
+        const html =
+            createLabelHTML(
+                samplePO,
+                range.start,
+                {
+                    printMode: mode,
+                    poBorder:
+                        $("#cocoPOBorder")?.checked,
+                    boxBorder:
+                        $("#cocoBoxBorder")?.checked,
+                    outerBorder:
+                        $("#cocoPOBoxOuterBorder")?.checked ||
+                        $("#cocoBorder")?.checked,
+                    cutting:
+                        $("#cocoCutting")?.checked,
+                    scissor:
+                        $("#cocoScissorLine")?.checked,
+                    bold:
+                        $("#cocoBoldText")?.checked
+                }
             );
 
-            if ($("#cocoBorder")?.checked) {
-                label.style.boxShadow =
-                    "inset 0 0 0 1px #111";
-            } else {
-                label.style.boxShadow =
-                    "none";
-            }
+
+        preview.outerHTML =
+            html.replace(
+                "dynamic-label-preview",
+                "dynamic-label-preview"
+            );
+
+
+        const updatedPreview =
+            $("#cocoPreviewLabel");
+
+
+        if (updatedPreview) {
+
+            const borderStyle =
+                $("#cocoBorderStyle")?.value;
+
+            updatedPreview.style.border =
+                getBorderStyleCSS(
+                    borderStyle
+                );
         }
 
 
-        const borderStyle =
-            $("#cocoBorderStyle")?.value
-            || "solid-dark";
+        const summary =
+            $("#cocoBoxSummary");
 
+        if (summary) {
 
-        applyBorderStyle(
-            poElement,
-            borderStyle
-        );
-
-        applyBorderStyle(
-            boxElement,
-            borderStyle
-        );
-
-        applyBorderStyle(
-            label,
-            borderStyle
-        );
-
-
-        const startBox =
-            Number($("#cocoStartBox")?.value) || 1;
-
-        const endBox =
-            Number($("#cocoEndBox")?.value) || 200;
-
-
-        $("#cocoBoxSummary").textContent =
-            `${startBox}–${endBox}`;
-
-
-        $("#cocoSizeSummary").textContent =
-            getSizeLabel(state.coco.size);
-
-
-        if (
-            Number.isFinite(startBox) &&
-            Number.isFinite(endBox) &&
-            endBox >= startBox
-        ) {
-
-            const copies =
-                Number($("#cocoCopiesPerBox")?.value) || 1;
-
-            const labelsPerPage =
-                Number($("#cocoLabelsPerPage")?.value) || 1;
-
-            const count =
-                (
-                    endBox -
-                    startBox +
-                    1
-                ) *
-                copies;
-
-            $("#cocoSummary").textContent =
-                `${count} labels / ${Math.ceil(
-                    count / labelsPerPage
-                )} pages`;
+            summary.textContent =
+                `${range.start}–${range.end}`;
         }
 
 
-        updateCocoFilename();
+        const filename =
+            $("#cocoFilenamePreview");
+
+
+        if (filename) {
+
+            filename.textContent =
+                `PO_BOX_${range.start}-${range.end}.pdf`;
+        }
+
+
+        const output =
+            $("#cocoSummary");
+
+        if (output) {
+
+            output.textContent =
+                poList.length
+                    ? `${poList.length} PO(s)`
+                    : "Ready";
+        }
     }
 
 
@@ -1014,214 +1153,177 @@
 
     function updateOtherPreview() {
 
-        const page =
+        const range =
+            validateRange(
+                $("#otherStartBox"),
+                $("#otherEndBox")
+            );
+
+
+        if (!range) {
+            return;
+        }
+
+
+        const poList =
+            getOtherPOs();
+
+
+        const samplePO =
+            poList[0] ||
+            "BWG 123";
+
+
+        const mode =
+            getPrintMode(
+                $("#otherPrintPO"),
+                $("#otherPrintBox"),
+                $("#otherPrintPOBox")
+            );
+
+
+        const preview =
             $("#otherPreviewPage");
 
-        if (!page) return;
 
-        page.classList.remove(
-            "size-4x6",
-            "size-a4",
-            "size-70x35",
-            "size-custom"
-        );
-
-        page.classList.add(
-            `size-${state.other.size}`
-        );
+        if (!preview) {
+            return;
+        }
 
 
-        const po =
-            getOtherPOs()[0] || "BWG 123";
+        preview.innerHTML =
+            createLabelHTML(
+                samplePO,
+                range.start,
+                {
+                    printMode: mode,
+                    poBorder:
+                        $("#otherPOBorder")?.checked,
+                    boxBorder:
+                        $("#otherBoxBorder")?.checked,
+                    outerBorder:
+                        $("#otherPOBoxOuterBorder")?.checked ||
+                        $("#otherBorder")?.checked,
+                    cutting:
+                        $("#otherCutting")?.checked,
+                    scissor: true,
+                    bold: true
+                }
+            );
 
 
-        const box =
-            Number($("#otherStartBox")?.value) || 1;
+        const boxSummary =
+            $("#otherBoxSummary");
 
+        if (boxSummary) {
 
-        $("#otherPreviewPO").textContent =
-            po;
-
-
-        $("#otherPreviewBox").textContent =
-            formatBoxNumber(box);
-
-
-        const poElement =
-            $("#otherPreviewPO");
-
-
-        const boxElement =
-            $("#otherPreviewBox");
-
-
-        applyPreviewBorder(
-            poElement,
-            $("#otherPOBorder")?.checked
-        );
-
-
-        applyPreviewBorder(
-            boxElement,
-            $("#otherBoxBorder")?.checked
-        );
-
-
-        applyPreviewBorder(
-            page,
-            $("#otherPageBorder")?.checked
-        );
-
-
-        applyBorderStyle(
-            poElement,
-            $("#otherBorderStyle")?.value
-        );
-
-
-        applyBorderStyle(
-            boxElement,
-            $("#otherBorderStyle")?.value
-        );
-
-
-        const start =
-            Number($("#otherStartBox")?.value) || 1;
-
-
-        const end =
-            Number($("#otherEndBox")?.value) || 200;
-
-
-        $("#otherBoxSummary").textContent =
-            `${start}–${end}`;
-
-
-        $("#otherSizeSummary").textContent =
-            getSizeLabel(state.other.size);
+            boxSummary.textContent =
+                `${range.start}–${range.end}`;
+        }
     }
 
 
     /* =====================================================
-       PREVIEW BORDER
+       SBMO PREVIEW
     ===================================================== */
 
-    function applyPreviewBorder(
-        element,
-        enabled
-    ) {
+    function updateSBMOPreview() {
 
-        if (!element) return;
+        const start =
+            getPositiveInteger(
+                $("#sbmoStartBox"),
+                1
+            );
 
-        element.style.border =
-            enabled
-                ? "2px solid #111"
-                : "none";
+
+        const preview =
+            $("#sbmoWorkspace .dynamic-page-preview");
+
+
+        if (!preview) {
+            return;
+        }
+
+
+        const po =
+            collectPOsFromInputs(
+                ".sbmo-po"
+            )[0] ||
+            parseCommaSeparatedPO(
+                $("#sbmoCommaPO")?.value
+            )[0] ||
+            "BWG 123";
+
+
+        const mode =
+            getPrintMode(
+                $("#sbmoPrintPO"),
+                $("#sbmoPrintBox"),
+                $("#sbmoPrintPOBox")
+            );
+
+
+        preview.innerHTML =
+            createLabelHTML(
+                po,
+                start,
+                {
+                    printMode: mode,
+                    poBorder:
+                        $("#sbmoPOBorder")?.checked,
+                    boxBorder:
+                        $("#sbmoBoxBorder")?.checked,
+                    outerBorder: false,
+                    cutting:
+                        $("#sbmoCutting")?.checked,
+                    scissor: true,
+                    bold: true
+                }
+            );
     }
 
 
-    function applyBorderStyle(
-        element,
-        style
-    ) {
+    /* =====================================================
+       BORDER STYLE
+    ===================================================== */
 
-        if (!element) return;
-
-        const currentBorder =
-            element.style.border;
-
-        if (
-            currentBorder === "none" ||
-            !currentBorder
-        ) {
-            return;
-        }
+    function getBorderStyleCSS(style) {
 
         switch (style) {
 
             case "double":
-                element.style.border =
-                    "3px double #111";
-                break;
-
-            case "dashed":
-                element.style.border =
-                    "2px dashed #111";
-                break;
-
-            case "dotted":
-                element.style.border =
-                    "2px dotted #111";
-                break;
-
-            case "bold":
-                element.style.border =
-                    "4px solid #111";
-                break;
+                return "3px double #111827";
 
             case "double-dark":
-                element.style.border =
-                    "4px double #000";
-                break;
+                return "4px double #111827";
+
+            case "dashed":
+                return "2px dashed #111827";
+
+            case "dotted":
+                return "2px dotted #111827";
+
+            case "bold":
+                return "4px solid #111827";
 
             case "triple":
-                element.style.border =
-                    "5px double #111";
-                break;
+                return "5px double #111827";
 
             case "solid-light":
-                element.style.border =
-                    "1px solid #777";
-                break;
+                return "1px solid #667085";
 
             case "solid-medium":
-                element.style.border =
-                    "2px solid #444";
-                break;
-
-            case "inner":
-                element.style.border =
-                    "2px solid #111";
-                element.style.boxShadow =
-                    "inset 0 0 0 2px #fff, inset 0 0 0 4px #111";
-                break;
-
-            case "outer":
-                element.style.border =
-                    "2px solid #111";
-                element.style.boxShadow =
-                    "0 0 0 4px #fff, 0 0 0 6px #111";
-                break;
-
-            case "text-box":
-                element.style.border =
-                    "2px solid #111";
-                break;
+                return "2px solid #111827";
 
             case "solid-dark":
             default:
-                element.style.border =
-                    "2px solid #111";
+                return "2px solid #111827";
         }
     }
 
 
     /* =====================================================
-       ALL PREVIEWS
-    ===================================================== */
-
-    function updateAllPreviews() {
-
-        updateCocoPreview();
-
-        updateOtherPreview();
-
-        updateISBNPreview();
-    }
-
-
-    /* =====================================================
-       COCO INPUT LISTENERS
+       LIVE INPUT LISTENERS
     ===================================================== */
 
     [
@@ -1229,8 +1331,9 @@
         "#cocoEndBox",
         "#cocoCopiesPerBox",
         "#cocoLabelsPerPage",
-        "#cocoCustomWidth",
-        "#cocoCustomHeight",
+        "#cocoCommaPO",
+        "#cocoBorderStyle",
+        "#cocoFont",
         "#cocoFontSize"
     ].forEach(selector => {
 
@@ -1238,36 +1341,12 @@
             "input",
             updateCocoPreview
         );
-    });
-
-
-    [
-        "#cocoPrintPO",
-        "#cocoPrintBox",
-        "#cocoPrintPOBox",
-        "#cocoPageBorder",
-        "#cocoPOBorder",
-        "#cocoBoxBorder",
-        "#cocoPOBoxOuterBorder",
-        "#cocoTaxBorder",
-        "#cocoBorder",
-        "#cocoCutting",
-        "#cocoScissorLine",
-        "#cocoBoldText"
-    ].forEach(selector => {
 
         $(selector)?.addEventListener(
             "change",
             updateCocoPreview
         );
     });
-
-
-    $("#cocoBorderStyle")
-        ?.addEventListener(
-            "change",
-            updateCocoPreview
-        );
 
 
     $$(".coco-po").forEach(input => {
@@ -1276,54 +1355,29 @@
             "input",
             updateCocoPreview
         );
+
     });
 
-
-    /* =====================================================
-       OTHER INPUT LISTENERS
-    ===================================================== */
 
     [
         "#otherStartBox",
         "#otherEndBox",
         "#otherCopiesPerBox",
         "#otherLabelsPerPage",
-        "#otherCustomWidth",
-        "#otherCustomHeight"
+        "#otherCommaPO",
+        "#otherBorderStyle"
     ].forEach(selector => {
 
         $(selector)?.addEventListener(
             "input",
             updateOtherPreview
         );
-    });
-
-
-    [
-        "#otherPrintPO",
-        "#otherPrintBox",
-        "#otherPrintPOBox",
-        "#otherPageBorder",
-        "#otherPOBorder",
-        "#otherBoxBorder",
-        "#otherPOBoxOuterBorder",
-        "#otherTaxBorder",
-        "#otherBorder",
-        "#otherCutting"
-    ].forEach(selector => {
 
         $(selector)?.addEventListener(
             "change",
             updateOtherPreview
         );
     });
-
-
-    $("#otherBorderStyle")
-        ?.addEventListener(
-            "change",
-            updateOtherPreview
-        );
 
 
     $$(".other-po").forEach(input => {
@@ -1332,930 +1386,179 @@
             "input",
             updateOtherPreview
         );
+
+    });
+
+
+    $$(".sbmo-po").forEach(input => {
+
+        input.addEventListener(
+            "input",
+            updateSBMOPreview
+        );
+
+    });
+
+
+    $("#sbmoCommaPO")?.addEventListener(
+        "input",
+        updateSBMOPreview
+    );
+
+
+    [
+        "#sbmoStartBox",
+        "#sbmoEndBox"
+    ].forEach(selector => {
+
+        $(selector)?.addEventListener(
+            "input",
+            updateSBMOPreview
+        );
+
     });
 
 
     /* =====================================================
-       ISBN PREVIEW
+       UPDATE ALL PREVIEWS
     ===================================================== */
 
-    function updateISBNPreview() {
+    function updateAllPreviews() {
 
-        const input =
-            $(".isbn-manual");
-
-        const isbn =
-            input?.value?.trim()
-            || "9780000000000";
-
-
-        $("#isbnPreviewNumber").textContent =
-            formatISBNDisplay(isbn);
-
-
-        const title =
-            $(".title-manual")
-                ?.value
-                ?.trim()
-            || "Book Title";
-
-
-        const edition =
-            $(".edition-manual")
-                ?.value
-                ?.trim()
-            || "N";
-
-
-        $("#isbnPreviewTitle").textContent =
-            title;
-
-
-        $("#isbnPreviewEdition").textContent =
-            edition;
-    }
-
-
-    $$(".isbn-manual, .title-manual, .edition-manual")
-        .forEach(input => {
-
-            input.addEventListener(
-                "input",
-                updateISBNPreview
-            );
-        });
-
-
-    /* =====================================================
-       ISBN FORMAT
-    ===================================================== */
-
-    function cleanISBN(value) {
-
-        return String(value || "")
-            .replace(/[^0-9Xx]/g, "")
-            .toUpperCase();
-    }
-
-
-    function formatISBNDisplay(value) {
-
-        const clean =
-            cleanISBN(value);
-
-        if (clean.length === 13) {
-
-            return clean.replace(
-                /^(\d{3})(\d)(\d{4})(\d{4})(\d)$/,
-                "$1-$2-$3-$4-$5"
-            );
-        }
-
-        if (clean.length === 10) {
-
-            return clean.replace(
-                /^(\d)(\d{3})(\d{5})([\dX])$/,
-                "$1-$2-$3-$4"
-            );
-        }
-
-        return value || "";
+        updateCocoPreview();
+        updateOtherPreview();
+        updateSBMOPreview();
     }
 
 
     /* =====================================================
-       ISBN VALIDATION
+       ADDRESS PREVIEW
     ===================================================== */
 
-    function validateISBN(value) {
+    $("#cocoFrom")?.addEventListener(
+        "input",
+        event => {
 
-        const isbn =
-            cleanISBN(value);
+            const preview =
+                $("#cocoFromPreview");
 
-
-        if (isbn.length === 10) {
-
-            let sum = 0;
-
-            for (let i = 0; i < 10; i++) {
-
-                const char =
-                    isbn[i];
-
-                const digit =
-                    char === "X"
-                        ? 10
-                        : Number(char);
-
-                if (!Number.isInteger(digit)) {
-                    return false;
-                }
-
-                sum += digit * (10 - i);
+            if (preview) {
+                preview.textContent =
+                    event.target.value;
             }
-
-            return sum % 11 === 0;
         }
+    );
 
 
-        if (isbn.length === 13) {
+    $("#cocoTo")?.addEventListener(
+        "input",
+        event => {
 
-            if (!/^\d{13}$/.test(isbn)) {
-                return false;
+            const preview =
+                $("#cocoToPreview");
+
+            if (preview) {
+                preview.textContent =
+                    event.target.value ||
+                    "Recipient Address";
             }
+        }
+    );
 
-            let sum = 0;
 
-            for (let i = 0; i < 12; i++) {
+    /* =====================================================
+       COCOBLUE TABS
+    ===================================================== */
 
-                sum +=
-                    Number(isbn[i]) *
-                    (
-                        i % 2 === 0
-                            ? 1
-                            : 3
+    $$("[data-cocoblue-mode]").forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                const mode =
+                    button.dataset.cocoblueMode;
+
+
+                $$("[data-cocoblue-mode]")
+                    .forEach(tab => {
+
+                        tab.classList.toggle(
+                            "active",
+                            tab === button
+                        );
+
+                    });
+
+
+                $("#cocoblueStickerMode")
+                    ?.classList.toggle(
+                        "hidden",
+                        mode !== "sticker"
+                    );
+
+
+                $("#cocoblueAddressMode")
+                    ?.classList.toggle(
+                        "hidden",
+                        mode !== "address"
                     );
             }
-
-            const check =
-                (10 - (sum % 10)) % 10;
-
-            return check === Number(isbn[12]);
-        }
-
-
-        return false;
-    }
+        );
+    });
 
 
     /* =====================================================
-       ISBN GENERATE
+       VALIDATE PRINT SELECTION
     ===================================================== */
 
-    $("#isbnGenerate")
-        ?.addEventListener(
-            "click",
-            generateISBN
-        );
-
-
-    function generateISBN() {
-
-        let items = [];
-
+    function validatePrintSelection(
+        poCheckbox,
+        boxCheckbox,
+        poBoxCheckbox
+    ) {
 
         if (
-            state.isbn.inputMode ===
-            "manual"
+            !poCheckbox?.checked &&
+            !boxCheckbox?.checked &&
+            !poBoxCheckbox?.checked
         ) {
 
-            const isbnInputs =
-                $$(".isbn-manual");
-
-            const titleInputs =
-                $$(".title-manual");
-
-            const editionInputs =
-                $$(".edition-manual");
-
-
-            isbnInputs.forEach(
-                (input, index) => {
-
-                    const value =
-                        input.value.trim();
-
-                    if (!value) return;
-
-                    items.push({
-                        isbn: value,
-                        title:
-                            titleInputs[index]
-                                ?.value
-                                ?.trim()
-                            || "",
-                        edition:
-                            editionInputs[index]
-                                ?.value
-                                ?.trim()
-                            || ""
-                    });
-                }
-            );
-
-        } else {
-
-            const status =
-                $("#isbnExcelStatus");
-
-            try {
-
-                const rows =
-                    JSON.parse(
-                        status?.dataset?.fileRows
-                        || "[]"
-                    );
-
-                rows.slice(1).forEach(row => {
-
-                    if (!row[0]) return;
-
-                    items.push({
-                        isbn:
-                            String(row[0]),
-                        title:
-                            String(row[1] || ""),
-                        edition:
-                            String(row[2] || "")
-                    });
-                });
-
-            } catch {
-                items = [];
-            }
-        }
-
-
-        if (!items.length) {
-
             showToast(
-                "Please enter or upload at least one ISBN.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        const invalid =
-            items.filter(
-                item =>
-                    !validateISBN(item.isbn)
-            );
-
-
-        if (invalid.length) {
-
-            showToast(
-                `${invalid.length} ISBN value(s) are invalid. ISBN-10 or ISBN-13 is required.`,
                 "error",
-                "Invalid ISBN"
+                "Print Option Required",
+                "Please select PO Number, Box Number, or PO + Box Number."
             );
 
-            $("#isbnStatus").textContent =
-                "Invalid ISBN detected.";
-
-            return;
+            return false;
         }
 
 
-        try {
-
-            const pdf =
-                createISBNPDF(
-                    items
-                );
-
-            downloadBlob(
-                pdf.output("blob"),
-                `ISBN_LABELS_${timestampForFilename()}.pdf`
-            );
-
-
-            $("#isbnStatus").textContent =
-                `${items.length} ISBN label(s) generated.`;
-
-
-            showToast(
-                `${items.length} ISBN label(s) generated successfully.`,
-                "success",
-                "PDF Generated"
-            );
-
-        } catch (error) {
-
-            console.error(error);
-
-            showToast(
-                error.message ||
-                "Unable to generate ISBN PDF.",
-                "error"
-            );
-        }
+        return true;
     }
 
 
     /* =====================================================
-       CREATE ISBN PDF
+       BUILD JOBS
     ===================================================== */
 
-    function createISBNPDF(items) {
-
-        const {
-            jsPDF
-        } = window.jspdf;
-
-
-        const dims =
-            getPageDimensions(
-                state.isbn.size
-            );
-
-
-        const orientation =
-            dims.width > dims.height
-                ? "landscape"
-                : "portrait";
-
-
-        const pdf =
-            new jsPDF({
-                orientation,
-                unit: "mm",
-                format: [
-                    dims.width,
-                    dims.height
-                ]
-            });
-
-
-        const perPage =
-            Math.max(
-                1,
-                Number(
-                    $("#isbnLabelsPerPage")
-                        ?.value
-                ) || 1
-            );
-
-
-        items.forEach(
-            (item, index) => {
-
-                if (
-                    index > 0 &&
-                    index % perPage === 0
-                ) {
-                    pdf.addPage(
-                        [
-                            dims.width,
-                            dims.height
-                        ],
-                        orientation
-                    );
-                }
-
-
-                drawISBNLabel(
-                    pdf,
-                    item,
-                    index % perPage,
-                    perPage,
-                    dims
-                );
-            }
-        );
-
-
-        return pdf;
-    }
-
-
-    function drawISBNLabel(
-        pdf,
-        item,
-        position,
-        perPage,
-        dims
+    function buildJobs(
+        poList,
+        start,
+        end,
+        copies
     ) {
 
-        const margin = 8;
-
-        const availableHeight =
-            dims.height -
-            margin * 2;
-
-
-        const slotHeight =
-            availableHeight /
-            perPage;
-
-
-        const y =
-            margin +
-            position *
-            slotHeight;
-
-
-        const x =
-            margin;
-
-
-        const width =
-            dims.width -
-            margin * 2;
-
-
-        if ($("#isbnBorder")?.checked) {
-
-            drawBorder(
-                pdf,
-                x,
-                y + 2,
-                width,
-                slotHeight - 4,
-                $("#isbnBorderStyle")?.value
-            );
-        }
-
-
-        pdf.setFont(
-            $("#isbnFont")?.value
-            || "Arial",
-            "normal"
-        );
-
-
-        pdf.setFontSize(
-            Number(
-                $("#isbnFontSize")?.value
-            ) || 10
-        );
-
-
-        pdf.setTextColor(20, 20, 20);
-
-
-        const barcodeX =
-            x + width / 2 - 35;
-
-        const barcodeY =
-            y + 13;
-
-
-        drawFakeBarcode(
-            pdf,
-            barcodeX,
-            barcodeY,
-            70,
-            22,
-            cleanISBN(item.isbn)
-        );
-
-
-        pdf.setFontSize(9);
-
-        pdf.text(
-            formatISBNDisplay(item.isbn),
-            x + width / 2,
-            barcodeY + 29,
-            {
-                align: "center"
-            }
-        );
-
-
-        if (item.title) {
-
-            pdf.setFontSize(8);
-
-            pdf.text(
-                item.title,
-                x + width / 2,
-                barcodeY + 36,
-                {
-                    align: "center",
-                    maxWidth:
-                        width - 15
-                }
-            );
-        }
-
-
-        if (item.edition) {
-
-            pdf.setFontSize(7);
-
-            pdf.text(
-                item.edition,
-                x + width / 2,
-                barcodeY + 43,
-                {
-                    align: "center"
-                }
-            );
-        }
-
-
-        if ($("#isbnTaxBorder")?.checked) {
-
-            pdf.setLineWidth(.5);
-
-            pdf.rect(
-                x + 3,
-                y + 5,
-                width - 6,
-                slotHeight - 10
-            );
-        }
-    }
-
-
-    /* =====================================================
-       FAKE BARCODE
-       Browser-only fallback visual barcode.
-    ===================================================== */
-
-    function drawFakeBarcode(
-        pdf,
-        x,
-        y,
-        width,
-        height,
-        value
-    ) {
-
-        let cursor = x;
-
-        const pattern =
-            value
-                .split("")
-                .map(
-                    char =>
-                        char.charCodeAt(0)
-                );
-
-
-        let i = 0;
-
-        while (
-            cursor <
-            x + width
-        ) {
-
-            const code =
-                pattern[
-                    i %
-                    pattern.length
-                ] || 7;
-
-
-            const barWidth =
-                0.35 +
-                (
-                    code % 4
-                ) * .22;
-
-
-            if (
-                i % 2 === 0
-            ) {
-
-                pdf.setFillColor(
-                    0,
-                    0,
-                    0
-                );
-
-                pdf.rect(
-                    cursor,
-                    y,
-                    barWidth,
-                    height,
-                    "F"
-                );
-            }
-
-
-            cursor += barWidth;
-
-            i++;
-        }
-    }
-
-
-    /* =====================================================
-       GENERATE COCO
-    ===================================================== */
-
-    $("#cocoGenerate")
-        ?.addEventListener(
-            "click",
-            generateCoco
-        );
-
-
-    async function generateCoco() {
-
-        try {
-
-            const range =
-                getBoxRange(
-                    "#cocoStartBox",
-                    "#cocoEndBox"
-                );
-
-
-            const copies =
-                Number(
-                    $("#cocoCopiesPerBox")
-                        ?.value
-                ) || 1;
-
-
-            if (copies < 1) {
-
-                throw new Error(
-                    "Copies per box must be at least 1."
-                );
-            }
-
-
-            const labelsPerPage =
-                Number(
-                    $("#cocoLabelsPerPage")
-                        ?.value
-                ) || 1;
-
-
-            if (labelsPerPage < 1) {
-
-                throw new Error(
-                    "Labels per page must be at least 1."
-                );
-            }
-
-
-            const pos =
-                getCocoPOs();
-
-
-            if (!pos.length) {
-
-                throw new Error(
-                    "Please enter at least one PO number."
-                );
-            }
-
-
-            const printPO =
-                $("#cocoPrintPO")?.checked;
-
-
-            const printBox =
-                $("#cocoPrintBox")?.checked;
-
-
-            const printPOBox =
-                $("#cocoPrintPOBox")?.checked;
-
-
-            if (
-                !printPO &&
-                !printBox &&
-                !printPOBox
-            ) {
-
-                throw new Error(
-                    "Select at least one print-content option."
-                );
-            }
-
-
-            const generated =
-                [];
-
-
-            for (const po of pos) {
-
-                const pdf =
-                    createPOPDF({
-                        po,
-                        start:
-                            range.start,
-                        end:
-                            range.end,
-                        copies,
-                        labelsPerPage,
-                        tool: "coco"
-                    });
-
-
-                const boxStart =
-                    range.start;
-
-
-                const boxEnd =
-                    range.end;
-
-
-                const filename =
-                    makePOFilename(
-                        po,
-                        boxStart,
-                        boxEnd
-                    );
-
-
-                generated.push({
-                    po,
-                    filename,
-                    blob:
-                        pdf.output("blob")
-                });
-            }
-
-
-            await downloadGeneratedFiles(
-                generated,
-                {
-                    tool: "coco"
-                }
-            );
-
-
-            $("#cocoStatus").textContent =
-                `${generated.length} PO PDF(s) generated successfully.`;
-
-        } catch (error) {
-
-            console.error(error);
-
-            $("#cocoStatus").textContent =
-                error.message;
-
-
-            showToast(
-                error.message,
-                "error",
-                "Generation Failed"
-            );
-        }
-    }
-
-
-    /* =====================================================
-       GENERATE OTHER PO
-    ===================================================== */
-
-    $("#otherGenerate")
-        ?.addEventListener(
-            "click",
-            generateOther
-        );
-
-
-    async function generateOther() {
-
-        try {
-
-            const range =
-                getBoxRange(
-                    "#otherStartBox",
-                    "#otherEndBox"
-                );
-
-
-            const copies =
-                Number(
-                    $("#otherCopiesPerBox")
-                        ?.value
-                ) || 1;
-
-
-            const labelsPerPage =
-                Number(
-                    $("#otherLabelsPerPage")
-                        ?.value
-                ) || 1;
-
-
-            const pos =
-                getOtherPOs();
-
-
-            if (!pos.length) {
-
-                throw new Error(
-                    "Please enter at least one PO number."
-                );
-            }
-
-
-            const generated = [];
-
-
-            for (const po of pos) {
-
-                const pdf =
-                    createPOPDF({
-                        po,
-                        start:
-                            range.start,
-                        end:
-                            range.end,
-                        copies,
-                        labelsPerPage,
-                        tool: "other"
-                    });
-
-
-                generated.push({
-                    po,
-                    filename:
-                        makePOFilename(
-                            po,
-                            range.start,
-                            range.end
-                        ),
-                    blob:
-                        pdf.output("blob")
-                });
-            }
-
-
-            await downloadGeneratedFiles(
-                generated,
-                {
-                    tool: "other"
-                }
-            );
-
-
-            $("#otherStatus").textContent =
-                `${generated.length} PO PDF(s) generated successfully.`;
-
-        } catch (error) {
-
-            console.error(error);
-
-            $("#otherStatus").textContent =
-                error.message;
-
-
-            showToast(
-                error.message,
-                "error",
-                "Generation Failed"
-            );
-        }
-    }
-
-
-    /* =====================================================
-       CREATE PO PDF
-    ===================================================== */
-
-    function createPOPDF(options) {
-
-        const {
-            po,
-            start,
-            end,
-            copies,
-            labelsPerPage,
-            tool
-        } = options;
-
-
-        const {
-            jsPDF
-        } = window.jspdf;
-
-
-        const config =
-            tool === "other"
-                ? getOtherConfig()
-                : getCocoConfig();
-
-
-        const dims =
-            getPageDimensions(
-                config.size,
-                config.customWidth,
-                config.customHeight
-            );
-
-
-        const orientation =
-            dims.width > dims.height
-                ? "landscape"
-                : "portrait";
-
-
-        const pdf =
-            new jsPDF({
-                orientation,
-                unit: "mm",
-                format: [
-                    dims.width,
-                    dims.height
-                ]
-            });
-
-
-        const boxes = [];
-
+        const jobs = [];
+
+
+        /*
+         * No 200 restriction.
+         *
+         * WARNING:
+         * Very large ranges naturally generate very large
+         * output files.
+         */
 
         for (
             let box = start;
@@ -2264,1348 +1567,377 @@
         ) {
 
             for (
-                let copy = 0;
-                copy < copies;
+                let copy = 1;
+                copy <= copies;
                 copy++
             ) {
 
-                boxes.push(box);
+                jobs.push({
+                    po: poList,
+                    box,
+                    copy
+                });
+
             }
         }
 
 
-        boxes.forEach(
-            (box, index) => {
-
-                if (
-                    index > 0 &&
-                    index % labelsPerPage === 0
-                ) {
-
-                    pdf.addPage(
-                        [
-                            dims.width,
-                            dims.height
-                        ],
-                        orientation
-                    );
-                }
+        return jobs;
+    }
 
 
-                const position =
-                    index % labelsPerPage;
+    /* =====================================================
+       PDF LABEL DRAWING
+    ===================================================== */
+
+    function drawPDFLabel(
+        doc,
+        po,
+        box,
+        options = {}
+    ) {
+
+        const {
+            printMode = "po-box",
+            pageBorder = true,
+            poBorder = true,
+            boxBorder = true,
+            outerBorder = false,
+            cutting = true,
+            scissor = true,
+            bold = true,
+            font = "helvetica",
+            fontSize = 16
+        } = options;
 
 
-                drawPOLabel(
-                    pdf,
-                    {
-                        po,
-                        box,
-                        position,
-                        labelsPerPage,
-                        dims,
-                        config
-                    }
-                );
-            }
+        const pageWidth =
+            doc.internal.pageSize.getWidth();
+
+        const pageHeight =
+            doc.internal.pageSize.getHeight();
+
+
+        const margin = 12;
+
+        const labelX = margin;
+        const labelY = margin;
+
+        const labelW =
+            pageWidth - margin * 2;
+
+        const labelH =
+            pageHeight - margin * 2;
+
+
+        /* PAGE BORDER */
+
+        if (pageBorder) {
+
+            doc.setLineWidth(.7);
+
+            doc.setDrawColor(
+                17,
+                24,
+                39
+            );
+
+            doc.rect(
+                6,
+                6,
+                pageWidth - 12,
+                pageHeight - 12
+            );
+        }
+
+
+        /* OUTER LABEL BORDER */
+
+        if (outerBorder) {
+
+            doc.setLineWidth(1.3);
+
+            doc.rect(
+                labelX,
+                labelY,
+                labelW,
+                labelH
+            );
+        }
+
+
+        doc.setFont(
+            font,
+            bold ? "bold" : "normal"
         );
 
 
-        return pdf;
-    }
-
-
-    /* =====================================================
-       COCO CONFIG
-    ===================================================== */
-
-    function getCocoConfig() {
-
-        return {
-
-            size:
-                state.coco.size,
-
-            customWidth:
-                Number(
-                    $("#cocoCustomWidth")
-                        ?.value
-                ),
-
-            customHeight:
-                Number(
-                    $("#cocoCustomHeight")
-                        ?.value
-                ),
-
-            printPO:
-                $("#cocoPrintPO")
-                    ?.checked,
-
-            printBox:
-                $("#cocoPrintBox")
-                    ?.checked,
-
-            printPOBox:
-                $("#cocoPrintPOBox")
-                    ?.checked,
-
-            pageBorder:
-                $("#cocoPageBorder")
-                    ?.checked,
-
-            poBorder:
-                $("#cocoPOBorder")
-                    ?.checked,
-
-            boxBorder:
-                $("#cocoBoxBorder")
-                    ?.checked,
-
-            combinedBorder:
-                $("#cocoPOBoxOuterBorder")
-                    ?.checked,
-
-            taxBorder:
-                $("#cocoTaxBorder")
-                    ?.checked,
-
-            masterBorder:
-                $("#cocoBorder")
-                    ?.checked,
-
-            cutting:
-                $("#cocoCutting")
-                    ?.checked,
-
-            scissor:
-                $("#cocoScissorLine")
-                    ?.checked,
-
-            bold:
-                $("#cocoBoldText")
-                    ?.checked,
-
-            font:
-                $("#cocoFont")
-                    ?.value
-                || "Arial",
-
-            fontSize:
-                Number(
-                    $("#cocoFontSize")
-                        ?.value
-                ) || 12,
-
-            borderStyle:
-                $("#cocoBorderStyle")
-                    ?.value
-                || "solid-dark",
-
-            vertical:
-                $("#cocoVertical")
-                    ?.checked
-        };
-    }
-
-
-    /* =====================================================
-       OTHER CONFIG
-    ===================================================== */
-
-    function getOtherConfig() {
-
-        return {
-
-            size:
-                state.other.size,
-
-            customWidth:
-                Number(
-                    $("#otherCustomWidth")
-                        ?.value
-                ),
-
-            customHeight:
-                Number(
-                    $("#otherCustomHeight")
-                        ?.value
-                ),
-
-            printPO:
-                $("#otherPrintPO")
-                    ?.checked,
-
-            printBox:
-                $("#otherPrintBox")
-                    ?.checked,
-
-            printPOBox:
-                $("#otherPrintPOBox")
-                    ?.checked,
-
-            pageBorder:
-                $("#otherPageBorder")
-                    ?.checked,
-
-            poBorder:
-                $("#otherPOBorder")
-                    ?.checked,
-
-            boxBorder:
-                $("#otherBoxBorder")
-                    ?.checked,
-
-            combinedBorder:
-                $("#otherPOBoxOuterBorder")
-                    ?.checked,
-
-            taxBorder:
-                $("#otherTaxBorder")
-                    ?.checked,
-
-            masterBorder:
-                $("#otherBorder")
-                    ?.checked,
-
-            cutting:
-                $("#otherCutting")
-                    ?.checked,
-
-            scissor:
-                $("#otherCutting")
-                    ?.checked,
-
-            bold: true,
-
-            font:
-                "Arial",
-
-            fontSize:
-                12,
-
-            borderStyle:
-                $("#otherBorderStyle")
-                    ?.value
-                || "solid-dark"
-        };
-    }
-
-
-    /* =====================================================
-       DRAW PO LABEL
-    ===================================================== */
-
-    function drawPOLabel(
-        pdf,
-        {
-            po,
-            box,
-            position,
-            labelsPerPage,
-            dims,
-            config
-        }
-    ) {
-
-        const margin = 8;
-
-
-        /*
-         * PAGE BORDER
-         */
-
-        if (config.pageBorder) {
-
-            drawBorder(
-                pdf,
-                3,
-                3,
-                dims.width - 6,
-                dims.height - 6,
-                config.borderStyle
-            );
-        }
-
-
-        const availableHeight =
-            dims.height -
-            margin * 2;
-
-
-        const slotHeight =
-            availableHeight /
-            labelsPerPage;
-
-
-        const slotY =
-            margin +
-            position *
-            slotHeight;
-
-
-        const labelMargin = 4;
-
-
-        const labelX =
-            margin +
-            labelMargin;
-
-
-        const labelY =
-            slotY +
-            labelMargin;
-
-
-        const labelWidth =
-            dims.width -
-            margin * 2 -
-            labelMargin * 2;
-
-
-        const labelHeight =
-            slotHeight -
-            labelMargin * 2;
-
-
-        /*
-         * MASTER LABEL BORDER
-         */
-
-        if (config.masterBorder) {
-
-            drawBorder(
-                pdf,
-                labelX,
-                labelY,
-                labelWidth,
-                labelHeight,
-                config.borderStyle
-            );
-        }
-
-
-        /*
-         * CONTENT
-         */
-
         const centerX =
-            dims.width / 2;
+            pageWidth / 2;
 
 
         let currentY =
-            labelY +
-            labelHeight / 2;
+            pageHeight * .34;
 
 
-        const hasPO =
-            config.printPO ||
-            config.printPOBox;
-
-
-        const hasBox =
-            config.printBox ||
-            config.printPOBox;
-
-
-        const spacing = 8;
-
+        /* PO */
 
         if (
-            hasPO &&
-            hasBox
+            printMode === "po" ||
+            printMode === "po-box"
         ) {
 
-            currentY -= 16;
-
-        } else if (hasPO || hasBox) {
-
-            currentY -= 5;
-        }
-
-
-        /*
-         * PO
-         */
-
-        if (hasPO) {
-
-            const poText =
-                po;
-
-
-            const poWidth =
-                Math.min(
-                    labelWidth - 15,
-                    Math.max(
-                        35,
-                        pdf.getTextWidth(
-                            poText
-                        ) + 14
-                    )
-                );
-
-
-            const poHeight =
-                18;
-
-
-            if (config.poBorder) {
-
-                drawBorder(
-                    pdf,
-                    centerX - poWidth / 2,
-                    currentY - poHeight / 2,
-                    poWidth,
-                    poHeight,
-                    config.borderStyle
-                );
-            }
-
-
-            setPDFText(
-                pdf,
-                config
-            );
-
-
-            pdf.text(
-                poText,
-                centerX,
-                currentY + 1.5,
-                {
-                    align: "center"
-                }
-            );
-
-
-            currentY +=
-                poHeight +
-                spacing;
-        }
-
-
-        /*
-         * CUT LINE
-         */
-
-        if (
-            config.cutting &&
-            hasPO &&
-            hasBox
-        ) {
-
-            drawScissorCutLine(
-                pdf,
-                centerX,
-                currentY - 3,
-                labelWidth
-            );
-
-            currentY += 5;
-        }
-
-
-        /*
-         * BOX NUMBER
-         */
-
-        if (hasBox) {
-
-            const boxText =
-                formatBoxNumber(box);
+            const text =
+                String(po || "");
 
 
             const boxWidth =
                 Math.min(
-                    labelWidth - 15,
+                    labelW * .8,
                     Math.max(
-                        45,
-                        pdf.getTextWidth(
-                            boxText
-                        ) + 18
+                        65,
+                        doc.getTextWidth(text) + 24
                     )
                 );
 
 
-            const boxHeight =
-                20;
+            const boxX =
+                centerX - boxWidth / 2;
 
 
-            if (config.boxBorder) {
+            if (poBorder) {
 
-                drawBorder(
-                    pdf,
-                    centerX - boxWidth / 2,
-                    currentY - boxHeight / 2,
+                doc.setLineWidth(.8);
+
+                doc.rect(
+                    boxX,
+                    currentY - 15,
                     boxWidth,
-                    boxHeight,
-                    config.borderStyle
+                    30
                 );
             }
 
 
-            setPDFText(
-                pdf,
-                config
+            doc.setFontSize(
+                Number(fontSize) || 16
             );
 
 
-            pdf.text(
-                boxText,
+            doc.text(
+                text,
                 centerX,
-                currentY + 1.8,
+                currentY + 4,
                 {
                     align: "center"
                 }
             );
+
+
+            currentY += 48;
         }
 
 
-        /*
-         * COMBINED OUTER BORDER
-         */
+        /* CUTTING LINE */
 
-        if (config.combinedBorder) {
+        if (
+            printMode === "po-box" &&
+            cutting
+        ) {
 
-            const combinedX =
-                centerX -
-                Math.min(
-                    labelWidth - 10,
-                    95
-                ) / 2;
+            doc.setLineWidth(.5);
 
-
-            const combinedWidth =
-                Math.min(
-                    labelWidth - 10,
-                    95
-                );
-
-
-            const combinedY =
-                labelY +
-                labelHeight / 2 -
-                36;
-
-
-            const combinedHeight =
-                Math.min(
-                    labelHeight - 10,
-                    72
-                );
-
-
-            drawBorder(
-                pdf,
-                combinedX,
-                combinedY,
-                combinedWidth,
-                combinedHeight,
-                config.borderStyle
-            );
-        }
-
-
-        /*
-         * TAX BORDER
-         */
-
-        if (config.taxBorder) {
-
-            const taxX =
-                labelX + 5;
-
-
-            const taxY =
-                labelY + 5;
-
-
-            const taxW =
-                labelWidth - 10;
-
-
-            const taxH =
-                labelHeight - 10;
-
-
-            pdf.setLineWidth(.5);
-
-            pdf.setDrawColor(
-                60,
-                60,
-                60
-            );
-
-
-            pdf.rect(
-                taxX,
-                taxY,
-                taxW,
-                taxH
-            );
-
-
-            pdf.setFontSize(5.5);
-
-            pdf.setTextColor(
+            doc.setDrawColor(
                 80,
                 80,
                 80
             );
 
 
-            pdf.text(
-                "TAX",
-                taxX + 2,
-                taxY + 5
-            );
+            const lineY =
+                currentY - 13;
+
+
+            /*
+             * Dashed horizontal line
+             */
+
+            const left =
+                labelX + 18;
+
+            const right =
+                labelX + labelW - 18;
+
+            const dash = 4;
+            const gap = 3;
+
+
+            for (
+                let x = left;
+                x < right;
+                x += dash + gap
+            ) {
+
+                doc.line(
+                    x,
+                    lineY,
+                    Math.min(
+                        x + dash,
+                        right
+                    ),
+                    lineY
+                );
+            }
+
+
+            if (scissor) {
+
+                doc.setFont(
+                    "helvetica",
+                    "normal"
+                );
+
+                doc.setFontSize(11);
+
+                doc.text(
+                    "✂",
+                    centerX,
+                    lineY + 3,
+                    {
+                        align: "center"
+                    }
+                );
+            }
+
+
+            currentY += 30;
         }
 
 
-        /*
-         * SCISSOR AT BOTTOM
-         */
+        /* BOX */
 
         if (
-            config.cutting &&
-            config.scissor
+            printMode === "box" ||
+            printMode === "po-box"
         ) {
 
-            drawBottomScissor(
-                pdf,
-                centerX,
-                labelY +
-                labelHeight -
-                6
-            );
-        }
-    }
+            const text =
+                `BOX NO. ${box}`;
 
 
-    /* =====================================================
-       PDF TEXT
-    ===================================================== */
-
-    function setPDFText(
-        pdf,
-        config
-    ) {
-
-        pdf.setTextColor(
-            15,
-            15,
-            15
-        );
-
-
-        pdf.setFont(
-            config.font || "Arial",
-            config.bold
-                ? "bold"
-                : "normal"
-        );
-
-
-        pdf.setFontSize(
-            config.fontSize || 12
-        );
-    }
-
-
-    /* =====================================================
-       BORDER DRAWER
-    ===================================================== */
-
-    function drawBorder(
-        pdf,
-        x,
-        y,
-        width,
-        height,
-        style
-    ) {
-
-        pdf.setDrawColor(
-            20,
-            20,
-            20
-        );
-
-
-        switch (style) {
-
-            case "double":
-
-                pdf.setLineWidth(.7);
-
-                pdf.rect(
-                    x,
-                    y,
-                    width,
-                    height
-                );
-
-                pdf.setLineWidth(.35);
-
-                pdf.rect(
-                    x + 2,
-                    y + 2,
-                    width - 4,
-                    height - 4
-                );
-
-                break;
-
-
-            case "bold":
-
-                pdf.setLineWidth(1.4);
-
-                pdf.rect(
-                    x,
-                    y,
-                    width,
-                    height
-                );
-
-                break;
-
-
-            case "dashed":
-
-                pdf.setLineWidth(.6);
-
-                drawDashedRect(
-                    pdf,
-                    x,
-                    y,
-                    width,
-                    height
-                );
-
-                break;
-
-
-            case "dotted":
-
-                pdf.setLineWidth(.4);
-
-                drawDottedRect(
-                    pdf,
-                    x,
-                    y,
-                    width,
-                    height
-                );
-
-                break;
-
-
-            case "double-dark":
-
-                pdf.setLineWidth(1);
-
-                pdf.rect(
-                    x,
-                    y,
-                    width,
-                    height
-                );
-
-                pdf.setLineWidth(.45);
-
-                pdf.rect(
-                    x + 2.5,
-                    y + 2.5,
-                    width - 5,
-                    height - 5
-                );
-
-                break;
-
-
-            case "triple":
-
-                pdf.setLineWidth(.8);
-
-                pdf.rect(
-                    x,
-                    y,
-                    width,
-                    height
-                );
-
-                pdf.setLineWidth(.4);
-
-                pdf.rect(
-                    x + 2,
-                    y + 2,
-                    width - 4,
-                    height - 4
-                );
-
-                pdf.setLineWidth(.25);
-
-                pdf.rect(
-                    x + 4,
-                    y + 4,
-                    width - 8,
-                    height - 8
-                );
-
-                break;
-
-
-            case "solid-light":
-
-                pdf.setLineWidth(.25);
-
-                pdf.rect(
-                    x,
-                    y,
-                    width,
-                    height
-                );
-
-                break;
-
-
-            case "solid-medium":
-
-                pdf.setLineWidth(.65);
-
-                pdf.rect(
-                    x,
-                    y,
-                    width,
-                    height
-                );
-
-                break;
-
-
-            case "solid-dark":
-            default:
-
-                pdf.setLineWidth(.5);
-
-                pdf.rect(
-                    x,
-                    y,
-                    width,
-                    height
-                );
-        }
-    }
-
-
-    /* =====================================================
-       DASHED RECT
-    ===================================================== */
-
-    function drawDashedRect(
-        pdf,
-        x,
-        y,
-        w,
-        h
-    ) {
-
-        const dash = 3;
-        const gap = 2;
-
-
-        drawDashedLine(
-            pdf,
-            x,
-            y,
-            x + w,
-            y,
-            dash,
-            gap
-        );
-
-
-        drawDashedLine(
-            pdf,
-            x + w,
-            y,
-            x + w,
-            y + h,
-            dash,
-            gap
-        );
-
-
-        drawDashedLine(
-            pdf,
-            x + w,
-            y + h,
-            x,
-            y + h,
-            dash,
-            gap
-        );
-
-
-        drawDashedLine(
-            pdf,
-            x,
-            y + h,
-            x,
-            y,
-            dash,
-            gap
-        );
-    }
-
-
-    function drawDashedLine(
-        pdf,
-        x1,
-        y1,
-        x2,
-        y2,
-        dash,
-        gap
-    ) {
-
-        const dx =
-            x2 - x1;
-
-        const dy =
-            y2 - y1;
-
-        const distance =
-            Math.sqrt(
-                dx * dx +
-                dy * dy
-            );
-
-
-        const ux =
-            dx / distance;
-
-        const uy =
-            dy / distance;
-
-
-        let current = 0;
-
-
-        while (
-            current <
-            distance
-        ) {
-
-            const end =
+            const boxWidth =
                 Math.min(
-                    current + dash,
-                    distance
-                );
-
-
-            pdf.line(
-                x1 + ux * current,
-                y1 + uy * current,
-                x1 + ux * end,
-                y1 + uy * end
-            );
-
-
-            current +=
-                dash + gap;
-        }
-    }
-
-
-    /* =====================================================
-       DOTTED RECT
-    ===================================================== */
-
-    function drawDottedRect(
-        pdf,
-        x,
-        y,
-        w,
-        h
-    ) {
-
-        const step = 3;
-
-
-        for (
-            let px = x;
-            px <= x + w;
-            px += step
-        ) {
-
-            pdf.circle(
-                px,
-                y,
-                .25,
-                "F"
-            );
-
-            pdf.circle(
-                px,
-                y + h,
-                .25,
-                "F"
-            );
-        }
-
-
-        for (
-            let py = y;
-            py <= y + h;
-            py += step
-        ) {
-
-            pdf.circle(
-                x,
-                py,
-                .25,
-                "F"
-            );
-
-            pdf.circle(
-                x + w,
-                py,
-                .25,
-                "F"
-            );
-        }
-    }
-
-
-    /* =====================================================
-       SCISSOR CUT LINE
-    ===================================================== */
-
-    function drawScissorCutLine(
-        pdf,
-        centerX,
-        y,
-        width
-    ) {
-
-        const left =
-            centerX -
-            Math.min(
-                width / 2,
-                42
-            );
-
-
-        const right =
-            centerX +
-            Math.min(
-                width / 2,
-                42
-            );
-
-
-        const start =
-            left + 7;
-
-
-        const end =
-            right - 7;
-
-
-        pdf.setDrawColor(
-            20,
-            20,
-            20
-        );
-
-
-        pdf.setLineWidth(.35);
-
-
-        drawDashedLine(
-            pdf,
-            start,
-            y,
-            end,
-            y,
-            2.5,
-            1.8
-        );
-
-
-        pdf.setFont(
-            "Arial",
-            "normal"
-        );
-
-
-        pdf.setFontSize(8);
-
-
-        pdf.text(
-            "✂",
-            left,
-            y + 2,
-            {
-                align: "center"
-            }
-        );
-
-
-        pdf.text(
-            "✂",
-            right,
-            y + 2,
-            {
-                align: "center"
-            }
-        );
-    }
-
-
-    /* =====================================================
-       BOTTOM SCISSOR
-    ===================================================== */
-
-    function drawBottomScissor(
-        pdf,
-        centerX,
-        y
-    ) {
-
-        pdf.setFont(
-            "Arial",
-            "normal"
-        );
-
-
-        pdf.setFontSize(9);
-
-
-        pdf.text(
-            "✂",
-            centerX,
-            y,
-            {
-                align: "center"
-            }
-        );
-    }
-
-
-    /* =====================================================
-       DOWNLOAD LOGIC
-    ===================================================== */
-
-    async function downloadGeneratedFiles(
-        files,
-        options = {}
-    ) {
-
-        if (!files.length) {
-
-            throw new Error(
-                "No PDF files were generated."
-            );
-        }
-
-
-        /*
-         * ONE PDF
-         * Direct download.
-         */
-
-        if (files.length === 1) {
-
-            downloadBlob(
-                files[0].blob,
-                files[0].filename
-            );
-
-
-            showToast(
-                files[0].filename,
-                "success",
-                "PDF Downloaded"
-            );
-
-            return;
-        }
-
-
-        const merged =
-            options.tool === "other"
-                ? $("#otherMergedPDF")?.checked
-                : $("#cocoMergedPDF")?.checked;
-
-
-        const zip =
-            options.tool === "other"
-                ? $("#otherZIP")?.checked
-                : $("#cocoZIP")?.checked;
-
-
-        const separate =
-            options.tool === "other"
-                ? $("#otherSeparatePDF")?.checked
-                : $("#cocoSeparatePDF")?.checked;
-
-
-        /*
-         * MERGED PDF
-         */
-
-        if (merged) {
-
-            const mergedBlob =
-                await mergePDFBlobs(
-                    files.map(
-                        file => file.blob
+                    labelW * .8,
+                    Math.max(
+                        90,
+                        doc.getTextWidth(text) + 28
                     )
                 );
 
 
-            const filename =
-                `MULTIPLE_PO_MERGED_${timestampForFilename()}.pdf`;
+            const boxX =
+                centerX - boxWidth / 2;
 
 
-            downloadBlob(
-                mergedBlob,
-                filename
+            if (boxBorder) {
+
+                doc.setLineWidth(.8);
+
+                doc.rect(
+                    boxX,
+                    currentY - 15,
+                    boxWidth,
+                    30
+                );
+            }
+
+
+            doc.setFont(
+                font,
+                bold ? "bold" : "normal"
+            );
+
+            doc.setFontSize(
+                Number(fontSize) || 16
             );
 
 
-            showToast(
-                "All PO labels were merged into one PDF.",
-                "success",
-                "Merged PDF Downloaded"
+            doc.text(
+                text,
+                centerX,
+                currentY + 4,
+                {
+                    align: "center"
+                }
             );
-
-
-            return;
         }
-
-
-        /*
-         * ZIP
-         */
-
-        if (zip || separate) {
-
-            await downloadZIP(
-                files
-            );
-
-            return;
-        }
-
-
-        /*
-         * Fallback:
-         * If user selected neither,
-         * ZIP is safest for multiple PDFs.
-         */
-
-        await downloadZIP(
-            files
-        );
     }
 
 
     /* =====================================================
-       ZIP
+       CREATE PDF BLOB
     ===================================================== */
 
-    async function downloadZIP(files) {
+    function createPDFBlob(
+        po,
+        start,
+        end,
+        options
+    ) {
 
-        if (!window.JSZip) {
+        if (
+            !window.jspdf ||
+            !window.jspdf.jsPDF
+        ) {
 
             throw new Error(
-                "ZIP library is not loaded."
+                "jsPDF library is not loaded."
             );
         }
 
 
-        const zip =
-            new JSZip();
+        const {
+            jsPDF
+        } = window.jspdf;
 
 
-        files.forEach(file => {
-
-            zip.file(
-                sanitizeFilename(
-                    file.filename
-                ),
-                file.blob
-            );
-        });
-
-
-        const blob =
-            await zip.generateAsync({
-                type: "blob",
-                compression: "DEFLATE",
-                compressionOptions: {
-                    level: 6
-                }
+        const doc =
+            new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4"
             });
 
 
-        const filename =
-            `BOOKSWAGON_LABELS_${timestampForFilename()}.zip`;
+        let firstPage = true;
 
 
-        downloadBlob(
-            blob,
-            filename
-        );
+        for (
+            let box = start;
+            box <= end;
+            box++
+        ) {
+
+            if (!firstPage) {
+
+                doc.addPage();
+            }
 
 
-        showToast(
-            `${files.length} separate PDF files packed into one ZIP.`,
-            "success",
-            "ZIP Downloaded"
-        );
-    }
+            firstPage = false;
 
 
-    /* =====================================================
-       MERGE PDF
-       ===================================================== */
-
-    async function mergePDFBlobs(blobs) {
-
-        /*
-         * jsPDF alone is not a PDF merger.
-         *
-         * To keep this browser-only version dependency-free,
-         * we create a fresh merged document and copy the
-         * generated pages by regenerating them.
-         *
-         * For the actual PO workflow, ZIP remains the
-         * reliable separate-PDF method.
-         */
-
-        if (!blobs.length) {
-            throw new Error(
-                "Nothing to merge."
+            drawPDFLabel(
+                doc,
+                po,
+                box,
+                options
             );
         }
 
 
-        /*
-         * Fallback notice:
-         * return first PDF if no dedicated PDF merger
-         * library exists.
-         *
-         * ZIP should be used when exact original PDFs
-         * must remain separate.
-         */
-
-        return blobs[0];
+        return doc.output(
+            "blob"
+        );
     }
 
 
@@ -3622,796 +1954,1401 @@
             URL.createObjectURL(blob);
 
 
-        const link =
+        const anchor =
             document.createElement("a");
 
 
-        link.href = url;
-
-        link.download =
-            sanitizeFilename(filename);
+        anchor.href = url;
+        anchor.download = filename;
 
 
-        document.body.appendChild(
-            link
-        );
+        document.body.appendChild(anchor);
 
+        anchor.click();
 
-        link.click();
-
-
-        link.remove();
+        anchor.remove();
 
 
         setTimeout(() => {
 
-            URL.revokeObjectURL(
-                url
-            );
+            URL.revokeObjectURL(url);
 
-        }, 1500);
+        }, 1000);
     }
 
 
     /* =====================================================
-       FILE NAME
+       ZIP CREATION
     ===================================================== */
 
-    function makePOFilename(
-        po,
-        start,
-        end
+    async function downloadAsZIP(
+        files,
+        zipName
     ) {
 
-        const cleanPO =
-            sanitizeFilename(
-                po
-            )
-            .replace(
-                /\.pdf$/i,
-                ""
-            );
-
-
-        return `${cleanPO}_BOX_${start}-${end}_${timestampForFilename()}.pdf`;
-    }
-
-
-    function sanitizeFilename(value) {
-
-        return String(value || "file")
-            .replace(
-                /[<>:"/\\|?*\x00-\x1F]/g,
-                "_"
-            )
-            .replace(
-                /\s+/g,
-                " "
-            )
-            .trim();
-    }
-
-
-    function timestampForFilename() {
-
-        const now =
-            new Date();
-
-
-        const pad =
-            number =>
-                String(number)
-                    .padStart(2, "0");
-
-
-        const date =
-            `${now.getFullYear()}-${pad(
-                now.getMonth() + 1
-            )}-${pad(
-                now.getDate()
-            )}`;
-
-
-        const time =
-            `${pad(
-                now.getHours()
-            )}-${pad(
-                now.getMinutes()
-            )}-${pad(
-                now.getSeconds()
-            )}`;
-
-
-        return `${date}_${time}`;
-    }
-
-
-    /* =====================================================
-       RESET COCO
-    ===================================================== */
-
-    $("#cocoReset")
-        ?.addEventListener(
-            "click",
-            () => {
-
-                [
-                    "#cocoStartBox",
-                    "#cocoEndBox",
-                    "#cocoCopiesPerBox",
-                    "#cocoLabelsPerPage"
-                ].forEach(
-                    selector => {
-
-                        const element =
-                            $(selector);
-
-                        if (!element) return;
-
-                        if (
-                            selector ===
-                            "#cocoStartBox"
-                        ) {
-                            element.value = 1;
-                        }
-
-                        if (
-                            selector ===
-                            "#cocoEndBox"
-                        ) {
-                            element.value = 200;
-                        }
-
-                        if (
-                            selector ===
-                            "#cocoCopiesPerBox"
-                        ) {
-                            element.value = 1;
-                        }
-
-                        if (
-                            selector ===
-                            "#cocoLabelsPerPage"
-                        ) {
-                            element.value = 1;
-                        }
-                    }
-                );
-
-
-                showToast(
-                    "CocoBlue settings reset.",
-                    "success",
-                    "Reset Complete"
-                );
-
-
-                updateCocoPreview();
-            }
-        );
-
-
-    /* =====================================================
-       RESET OTHER
-    ===================================================== */
-
-    $("#otherReset")
-        ?.addEventListener(
-            "click",
-            () => {
-
-                $("#otherStartBox").value = 1;
-
-                $("#otherEndBox").value = 200;
-
-                $("#otherCopiesPerBox").value = 1;
-
-                $("#otherLabelsPerPage").value = 1;
-
-
-                showToast(
-                    "Other PO settings reset.",
-                    "success",
-                    "Reset Complete"
-                );
-
-
-                updateOtherPreview();
-            }
-        );
-
-
-    /* =====================================================
-       RESET ISBN
-    ===================================================== */
-
-    $("#isbnReset")
-        ?.addEventListener(
-            "click",
-            () => {
-
-                $$(".isbn-manual")
-                    .forEach(
-                        input =>
-                            input.value = ""
-                    );
-
-
-                $$(".title-manual")
-                    .forEach(
-                        input =>
-                            input.value = ""
-                    );
-
-
-                $$(".edition-manual")
-                    .forEach(
-                        input =>
-                            input.value = "N"
-                    );
-
-
-                updateISBNPreview();
-
-
-                showToast(
-                    "ISBN settings reset.",
-                    "success",
-                    "Reset Complete"
-                );
-            }
-        );
-
-
-    /* =====================================================
-       ADDRESS PREVIEW
-    ===================================================== */
-
-    $("#cocoFrom")
-        ?.addEventListener(
-            "input",
-            () => {
-
-                $("#cocoFromPreview")
-                    .textContent =
-                    $("#cocoFrom").value
-                    || "FROM";
-            }
-        );
-
-
-    $("#cocoTo")
-        ?.addEventListener(
-            "input",
-            () => {
-
-                $("#cocoToPreview")
-                    .textContent =
-                    $("#cocoTo").value
-                    || "TO";
-            }
-        );
-
-
-    /* =====================================================
-       ADDRESS PDF
-    ===================================================== */
-
-    $("#cocoAddressGenerate")
-        ?.addEventListener(
-            "click",
-            generateAddressPDF
-        );
-
-
-    function generateAddressPDF() {
-
-        const from =
-            $("#cocoFrom")
-                ?.value
-                ?.trim();
-
-
-        const to =
-            $("#cocoTo")
-                ?.value
-                ?.trim();
-
-
-        if (!from && !to) {
-
-            showToast(
-                "Please enter at least one address.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        const {
-            jsPDF
-        } = window.jspdf;
-
-
-        const pdf =
-            new jsPDF({
-                orientation: "portrait",
-                unit: "mm",
-                format: [101.6, 152.4]
-            });
-
-
         if (
-            $("#cocoAddressBorder")
-                ?.checked
+            typeof JSZip === "undefined"
         ) {
 
-            drawBorder(
-                pdf,
-                5,
-                5,
-                91.6,
-                142.4,
-                $("#cocoAddressBorderStyle")
-                    ?.value
+            throw new Error(
+                "JSZip library is not loaded."
             );
         }
 
 
-        pdf.setFont(
-            $("#cocoAddressFont")
-                ?.value
-            || "Arial",
-            "normal"
-        );
+        const zip =
+            new JSZip();
 
 
-        pdf.setFontSize(
-            Number(
-                $("#cocoAddressFontSize")
-                    ?.value
-            ) || 10
-        );
+        files.forEach(file => {
 
-
-        pdf.setTextColor(
-            20,
-            20,
-            20
-        );
-
-
-        pdf.setFontSize(7);
-
-        pdf.setFont(
-            "Arial",
-            "bold"
-        );
-
-
-        pdf.text(
-            "FROM",
-            10,
-            25
-        );
-
-
-        pdf.setFont(
-            "Arial",
-            "normal"
-        );
-
-
-        pdf.setFontSize(9);
-
-
-        const fromLines =
-            pdf.splitTextToSize(
-                from || "",
-                82
+            zip.file(
+                file.name,
+                file.blob
             );
 
-
-        pdf.text(
-            fromLines,
-            10,
-            32
-        );
-
-
-        pdf.setFont(
-            "Arial",
-            "bold"
-        );
-
-
-        pdf.setFontSize(7);
-
-
-        pdf.text(
-            "TO",
-            10,
-            70
-        );
-
-
-        pdf.setFont(
-            "Arial",
-            "normal"
-        );
-
-
-        pdf.setFontSize(9);
-
-
-        const toLines =
-            pdf.splitTextToSize(
-                to || "",
-                82
-            );
-
-
-        pdf.text(
-            toLines,
-            10,
-            77
-        );
-
-
-        if (
-            $("#cocoAddressTaxBorder")
-                ?.checked
-        ) {
-
-            pdf.rect(
-                8,
-                8,
-                85.6,
-                136.4
-            );
-        }
+        });
 
 
         const blob =
-            pdf.output("blob");
+            await zip.generateAsync({
+                type: "blob",
+                compression: "DEFLATE",
+                compressionOptions: {
+                    level: 6
+                }
+            });
 
 
         downloadBlob(
             blob,
-            `ADDRESS_LABEL_${timestampForFilename()}.pdf`
-        );
-
-
-        $("#cocoAddressStatus")
-            .textContent =
-            "Address PDF generated.";
-
-
-        showToast(
-            "Address PDF generated successfully.",
-            "success",
-            "PDF Generated"
+            zipName
         );
     }
 
 
     /* =====================================================
-       COCO FILENAME PREVIEW
+       COCOBLUE GENERATE
     ===================================================== */
 
-    function updateCocoFilename() {
+    $("#cocoGenerate")?.addEventListener(
+        "click",
+        async () => {
 
-        const po =
-            getCocoPOs()[0]
-            || "PO";
+            try {
 
-
-        const start =
-            Number(
-                $("#cocoStartBox")
-                    ?.value
-            ) || 1;
-
-
-        const end =
-            Number(
-                $("#cocoEndBox")
-                    ?.value
-            ) || 200;
-
-
-        const filename =
-            makePOFilename(
-                po,
-                start,
-                end
-            );
-
-
-        $("#cocoFilenamePreview")
-            .textContent =
-            filename;
-    }
-
-
-    /* =====================================================
-       DOWNLOAD OPTION MUTUAL BEHAVIOUR
-    ===================================================== */
-
-    [
-        [
-            "#cocoMergedPDF",
-            [
-                "#cocoSeparatePDF",
-                "#cocoZIP"
-            ]
-        ],
-
-        [
-            "#cocoZIP",
-            [
-                "#cocoMergedPDF"
-            ]
-        ],
-
-        [
-            "#cocoSeparatePDF",
-            [
-                "#cocoMergedPDF"
-            ]
-        ],
-
-        [
-            "#otherMergedPDF",
-            [
-                "#otherSeparatePDF",
-                "#otherZIP"
-            ]
-        ],
-
-        [
-            "#otherZIP",
-            [
-                "#otherMergedPDF"
-            ]
-        ],
-
-        [
-            "#otherSeparatePDF",
-            [
-                "#otherMergedPDF"
-            ]
-        ]
-    ].forEach(
-        ([source, targets]) => {
-
-            $(source)?.addEventListener(
-                "change",
-                () => {
-
-                    if (
-                        !$(source).checked
-                    ) {
-                        return;
-                    }
-
-                    targets.forEach(
-                        target => {
-
-                            const checkbox =
-                                $(target);
-
-                            if (
-                                checkbox &&
-                                checkbox.checked
-                            ) {
-
-                                checkbox.checked =
-                                    false;
-                            }
-                        }
+                const range =
+                    validateRange(
+                        $("#cocoStartBox"),
+                        $("#cocoEndBox")
                     );
+
+
+                if (!range) {
+                    return;
                 }
-            );
-        }
-    );
 
 
-    /* =====================================================
-       PO + BOX LOGIC
-    ===================================================== */
-
-    function synchronizePrintOptions(
-        prefix
-    ) {
-
-        const po =
-            $(`#${prefix}PrintPO`);
-
-        const box =
-            $(`#${prefix}PrintBox`);
-
-        const both =
-            $(`#${prefix}PrintPOBox`);
+                const poList =
+                    getCocoPOs();
 
 
-        if (!po || !box || !both) {
-            return;
-        }
+                if (!poList.length) {
 
-
-        [po, box, both]
-            .forEach(
-                element => {
-
-                    element.addEventListener(
-                        "change",
-                        () => {
-
-                            /*
-                             * No forced locking.
-                             * User controls every option.
-                             */
-                        }
+                    showToast(
+                        "error",
+                        "PO Required",
+                        "Please enter at least one PO number."
                     );
-                }
-            );
-    }
-
-
-    synchronizePrintOptions("coco");
-
-    synchronizePrintOptions("other");
-
-
-    /* =====================================================
-       KEYBOARD ESC
-    ===================================================== */
-
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Escape"
-            ) {
-
-                const modal =
-                    $("#featureConfirmModal");
-
-
-                if (
-                    modal &&
-                    !modal.classList.contains(
-                        "hidden"
-                    )
-                ) {
-
-                    closeFeatureConfirmation();
 
                     return;
                 }
 
 
                 if (
-                    state.activeTool
+                    !validatePrintSelection(
+                        $("#cocoPrintPO"),
+                        $("#cocoPrintBox"),
+                        $("#cocoPrintPOBox")
+                    )
+                ) {
+                    return;
+                }
+
+
+                const copies =
+                    getPositiveInteger(
+                        $("#cocoCopiesPerBox"),
+                        1
+                    );
+
+
+                const separate =
+                    $("#cocoSeparatePDF")?.checked;
+
+                const zip =
+                    $("#cocoZIP")?.checked;
+
+                const merged =
+                    $("#cocoMergedPDF")?.checked;
+
+
+                const options = {
+
+                    printMode:
+                        getPrintMode(
+                            $("#cocoPrintPO"),
+                            $("#cocoPrintBox"),
+                            $("#cocoPrintPOBox")
+                        ),
+
+                    pageBorder:
+                        $("#cocoPageBorder")?.checked,
+
+                    poBorder:
+                        $("#cocoPOBorder")?.checked,
+
+                    boxBorder:
+                        $("#cocoBoxBorder")?.checked,
+
+                    outerBorder:
+                        $("#cocoPOBoxOuterBorder")?.checked ||
+                        $("#cocoBorder")?.checked,
+
+                    cutting:
+                        $("#cocoCutting")?.checked,
+
+                    scissor:
+                        $("#cocoScissorLine")?.checked,
+
+                    bold:
+                        $("#cocoBoldText")?.checked,
+
+                    font:
+                        String(
+                            $("#cocoFont")?.value ||
+                            "Helvetica"
+                        ).toLowerCase(),
+
+                    fontSize:
+                        getPositiveInteger(
+                            $("#cocoFontSize"),
+                            16
+                        )
+                };
+
+
+                const status =
+                    $("#cocoStatus");
+
+
+                if (status) {
+                    status.textContent =
+                        "Generating PDF...";
+                }
+
+
+                /*
+                 * Single PO:
+                 * direct PDF download.
+                 */
+
+                if (
+                    poList.length === 1 &&
+                    !zip &&
+                    !merged
                 ) {
 
-                    closeTool();
+                    const blob =
+                        createPDFBlob(
+                            poList[0],
+                            range.start,
+                            range.end,
+                            options
+                        );
+
+
+                    downloadBlob(
+                        blob,
+                        `${safeFilename(poList[0])}_BOX_${range.start}-${range.end}.pdf`
+                    );
+
+
+                    if (status) {
+                        status.textContent =
+                            "PDF generated successfully.";
+                    }
+
+
+                    showToast(
+                        "success",
+                        "PDF Ready",
+                        "Your PDF has been downloaded directly."
+                    );
+
+
+                    return;
                 }
+
+
+                /*
+                 * Multiple PO + MERGED
+                 */
+
+                if (
+                    merged &&
+                    !zip
+                ) {
+
+                    const {
+                        jsPDF
+                    } = window.jspdf;
+
+
+                    const doc =
+                        new jsPDF({
+                            orientation: "portrait",
+                            unit: "mm",
+                            format: "a4"
+                        });
+
+
+                    let first =
+                        true;
+
+
+                    poList.forEach(po => {
+
+                        for (
+                            let box = range.start;
+                            box <= range.end;
+                            box++
+                        ) {
+
+                            for (
+                                let copy = 1;
+                                copy <= copies;
+                                copy++
+                            ) {
+
+                                if (!first) {
+                                    doc.addPage();
+                                }
+
+                                first = false;
+
+
+                                drawPDFLabel(
+                                    doc,
+                                    po,
+                                    box,
+                                    options
+                                );
+                            }
+                        }
+
+                    });
+
+
+                    doc.save(
+                        `BOOKSWAGON_MERGED_PO_LABELS.pdf`
+                    );
+
+
+                    if (status) {
+                        status.textContent =
+                            "Merged PDF generated successfully.";
+                    }
+
+
+                    showToast(
+                        "success",
+                        "Merged PDF Ready",
+                        "All selected PO labels were merged into one PDF."
+                    );
+
+
+                    return;
+                }
+
+
+                /*
+                 * Multiple PO + ZIP
+                 */
+
+                if (
+                    poList.length > 1 ||
+                    zip
+                ) {
+
+                    const files = [];
+
+
+                    for (
+                        const po of poList
+                    ) {
+
+                        const blob =
+                            createPDFBlob(
+                                po,
+                                range.start,
+                                range.end,
+                                options
+                            );
+
+
+                        files.push({
+                            name:
+                                `${safeFilename(po)}_BOX_${range.start}-${range.end}.pdf`,
+                            blob
+                        });
+                    }
+
+
+                    if (zip || poList.length > 1) {
+
+                        await downloadAsZIP(
+                            files,
+                            `BOOKSWAGON_PO_LABELS_${Date.now()}.zip`
+                        );
+
+
+                        if (status) {
+                            status.textContent =
+                                "ZIP file generated successfully.";
+                        }
+
+
+                        showToast(
+                            "success",
+                            "ZIP Ready",
+                            `${files.length} PDF file(s) were packed into one ZIP file.`
+                        );
+
+
+                        return;
+                    }
+                }
+
+
+                /*
+                 * Fallback
+                 */
+
+                if (
+                    separate &&
+                    poList.length === 1
+                ) {
+
+                    const blob =
+                        createPDFBlob(
+                            poList[0],
+                            range.start,
+                            range.end,
+                            options
+                        );
+
+
+                    downloadBlob(
+                        blob,
+                        `${safeFilename(poList[0])}.pdf`
+                    );
+
+
+                    showToast(
+                        "success",
+                        "PDF Ready",
+                        "PDF downloaded successfully."
+                    );
+                }
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                $("#cocoStatus").textContent =
+                    "Generation failed.";
+
+                showToast(
+                    "error",
+                    "Generation Error",
+                    error.message ||
+                    "Unable to generate the PDF."
+                );
             }
         }
     );
 
 
     /* =====================================================
-       MODAL BUTTONS
+       OTHER PO GENERATE
     ===================================================== */
 
-    $("#featureConfirmOK")
-        ?.addEventListener(
-            "click",
-            confirmFeatureChange
-        );
+    $("#otherGenerate")?.addEventListener(
+        "click",
+        async () => {
+
+            try {
+
+                const range =
+                    validateRange(
+                        $("#otherStartBox"),
+                        $("#otherEndBox")
+                    );
 
 
-    $("#featureConfirmCancel")
-        ?.addEventListener(
-            "click",
-            closeFeatureConfirmation
-        );
+                if (!range) {
+                    return;
+                }
 
 
-    $("#featureConfirmModal")
-        ?.addEventListener(
-            "click",
-            event => {
+                const poList =
+                    getOtherPOs();
+
+
+                if (!poList.length) {
+
+                    showToast(
+                        "error",
+                        "PO Required",
+                        "Please enter at least one PO number."
+                    );
+
+                    return;
+                }
+
 
                 if (
-                    event.target.id ===
-                    "featureConfirmModal"
+                    !validatePrintSelection(
+                        $("#otherPrintPO"),
+                        $("#otherPrintBox"),
+                        $("#otherPrintPOBox")
+                    )
+                ) {
+                    return;
+                }
+
+
+                const options = {
+
+                    printMode:
+                        getPrintMode(
+                            $("#otherPrintPO"),
+                            $("#otherPrintBox"),
+                            $("#otherPrintPOBox")
+                        ),
+
+                    pageBorder:
+                        $("#otherPageBorder")?.checked,
+
+                    poBorder:
+                        $("#otherPOBorder")?.checked,
+
+                    boxBorder:
+                        $("#otherBoxBorder")?.checked,
+
+                    outerBorder:
+                        $("#otherPOBoxOuterBorder")?.checked ||
+                        $("#otherBorder")?.checked,
+
+                    cutting:
+                        $("#otherCutting")?.checked,
+
+                    scissor: true,
+
+                    bold: true
+                };
+
+
+                const zip =
+                    $("#otherZIP")?.checked;
+
+                const merged =
+                    $("#otherMergedPDF")?.checked;
+
+
+                if (
+                    merged &&
+                    !zip
                 ) {
 
-                    closeFeatureConfirmation();
+                    const {
+                        jsPDF
+                    } = window.jspdf;
+
+
+                    const doc =
+                        new jsPDF({
+                            orientation: "portrait",
+                            unit: "mm",
+                            format: "a4"
+                        });
+
+
+                    let first = true;
+
+
+                    poList.forEach(po => {
+
+                        for (
+                            let box = range.start;
+                            box <= range.end;
+                            box++
+                        ) {
+
+                            if (!first) {
+                                doc.addPage();
+                            }
+
+                            first = false;
+
+
+                            drawPDFLabel(
+                                doc,
+                                po,
+                                box,
+                                options
+                            );
+                        }
+
+                    });
+
+
+                    doc.save(
+                        "BOOKSWAGON_OTHER_PO_MERGED.pdf"
+                    );
+
+
+                    showToast(
+                        "success",
+                        "Merged PDF Ready",
+                        "All Other PO labels were merged into one PDF."
+                    );
+
+
+                    return;
                 }
-            }
-        );
 
 
-    /* =====================================================
-       UPDATE PREVIEW WHEN SELECTS CHANGE
-    ===================================================== */
-
-    [
-        "#cocoFont",
-        "#cocoFontSize",
-        "#cocoBorderStyle",
-        "#cocoTaxBorder",
-        "#otherBorderStyle",
-        "#isbnFont",
-        "#isbnFontSize",
-        "#isbnBorderStyle"
-    ].forEach(selector => {
-
-        $(selector)?.addEventListener(
-            "change",
-            updateAllPreviews
-        );
-    });
+                const files = [];
 
 
-    /* =====================================================
-       CONTACT MAP
-    ===================================================== */
+                for (
+                    const po of poList
+                ) {
 
-    document.addEventListener(
-        "click",
-        event => {
+                    const blob =
+                        createPDFBlob(
+                            po,
+                            range.start,
+                            range.end,
+                            options
+                        );
 
-            const link =
-                event.target.closest(
-                    'a[href*="maps.app.goo.gl"]'
+
+                    files.push({
+                        name:
+                            `${safeFilename(po)}_BOX_${range.start}-${range.end}.pdf`,
+                        blob
+                    });
+                }
+
+
+                /*
+                 * One PDF = direct PDF.
+                 * Multiple PDFs = ZIP.
+                 */
+
+                if (
+                    files.length === 1 &&
+                    !zip
+                ) {
+
+                    downloadBlob(
+                        files[0].blob,
+                        files[0].name
+                    );
+
+
+                    showToast(
+                        "success",
+                        "PDF Ready",
+                        "PDF downloaded directly."
+                    );
+
+
+                    return;
+                }
+
+
+                await downloadAsZIP(
+                    files,
+                    `BOOKSWAGON_OTHER_PO_${Date.now()}.zip`
                 );
 
 
-            if (!link) return;
+                showToast(
+                    "success",
+                    "ZIP Ready",
+                    `${files.length} PDF file(s) were packed into one ZIP.`
+                );
 
-            /*
-             * Let browser open the supplied
-             * Google Maps location normally.
-             */
+            } catch (error) {
+
+                console.error(error);
+
+                showToast(
+                    "error",
+                    "Generation Error",
+                    error.message ||
+                    "Unable to generate the PDF."
+                );
+            }
         }
     );
 
 
     /* =====================================================
-       INITIALIZATION
+       SBMO GENERATE
+    ===================================================== */
+
+    function getSBMOPOs() {
+
+        const individual =
+            collectPOsFromInputs(
+                ".sbmo-po"
+            );
+
+
+        const comma =
+            parseCommaSeparatedPO(
+                $("#sbmoCommaPO")?.value
+            );
+
+
+        return getUniquePOs([
+            ...individual,
+            ...comma
+        ]);
+    }
+
+
+    $("#sbmoGenerate")?.addEventListener(
+        "click",
+        async () => {
+
+            try {
+
+                const start =
+                    getPositiveInteger(
+                        $("#sbmoStartBox"),
+                        1
+                    );
+
+
+                const end =
+                    getPositiveInteger(
+                        $("#sbmoEndBox"),
+                        start
+                    );
+
+
+                if (end < start) {
+
+                    showToast(
+                        "error",
+                        "Invalid Range",
+                        "End Box Number must be greater than or equal to Start Box Number."
+                    );
+
+                    return;
+                }
+
+
+                const poList =
+                    getSBMOPOs();
+
+
+                if (!poList.length) {
+
+                    showToast(
+                        "error",
+                        "PO Required",
+                        "Please enter at least one PO number."
+                    );
+
+                    return;
+                }
+
+
+                const options = {
+
+                    printMode:
+                        getPrintMode(
+                            $("#sbmoPrintPO"),
+                            $("#sbmoPrintBox"),
+                            $("#sbmoPrintPOBox")
+                        ),
+
+                    pageBorder: true,
+
+                    poBorder:
+                        $("#sbmoPOBorder")?.checked,
+
+                    boxBorder:
+                        $("#sbmoBoxBorder")?.checked,
+
+                    outerBorder: false,
+
+                    cutting:
+                        $("#sbmoCutting")?.checked,
+
+                    scissor: true,
+
+                    bold: true
+                };
+
+
+                const zip =
+                    $("#sbmoZIP")?.checked;
+
+                const merged =
+                    $("#sbmoMergedPDF")?.checked;
+
+
+                if (
+                    merged &&
+                    !zip
+                ) {
+
+                    const {
+                        jsPDF
+                    } = window.jspdf;
+
+
+                    const doc =
+                        new jsPDF({
+                            orientation: "portrait",
+                            unit: "mm",
+                            format: "a4"
+                        });
+
+
+                    let first = true;
+
+
+                    poList.forEach(po => {
+
+                        for (
+                            let box = start;
+                            box <= end;
+                            box++
+                        ) {
+
+                            if (!first) {
+                                doc.addPage();
+                            }
+
+                            first = false;
+
+
+                            drawPDFLabel(
+                                doc,
+                                po,
+                                box,
+                                options
+                            );
+                        }
+
+                    });
+
+
+                    doc.save(
+                        "BOOKSWAGON_SBMO_MERGED.pdf"
+                    );
+
+
+                    showToast(
+                        "success",
+                        "Merged PDF Ready",
+                        "All SBMO labels were merged into one PDF."
+                    );
+
+
+                    return;
+                }
+
+
+                const files = [];
+
+
+                for (
+                    const po of poList
+                ) {
+
+                    const blob =
+                        createPDFBlob(
+                            po,
+                            start,
+                            end,
+                            options
+                        );
+
+
+                    files.push({
+                        name:
+                            `${safeFilename(po)}_SBMO_BOX_${start}-${end}.pdf`,
+                        blob
+                    });
+                }
+
+
+                if (
+                    files.length === 1 &&
+                    !zip
+                ) {
+
+                    downloadBlob(
+                        files[0].blob,
+                        files[0].name
+                    );
+
+
+                    showToast(
+                        "success",
+                        "PDF Ready",
+                        "SBMO PDF downloaded directly."
+                    );
+
+
+                    return;
+                }
+
+
+                await downloadAsZIP(
+                    files,
+                    `BOOKSWAGON_SBMO_${Date.now()}.zip`
+                );
+
+
+                showToast(
+                    "success",
+                    "ZIP Ready",
+                    `${files.length} SBMO PDF file(s) packed into one ZIP.`
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showToast(
+                    "error",
+                    "SBMO Error",
+                    error.message ||
+                    "Unable to generate SBMO PDF."
+                );
+            }
+        }
+    );
+
+
+    /* =====================================================
+       ADDRESS PDF
+    ===================================================== */
+
+    $("#cocoAddressGenerate")?.addEventListener(
+        "click",
+        () => {
+
+            try {
+
+                if (
+                    !window.jspdf
+                ) {
+
+                    throw new Error(
+                        "jsPDF library is not loaded."
+                    );
+                }
+
+
+                const {
+                    jsPDF
+                } = window.jspdf;
+
+
+                const doc =
+                    new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: "a4"
+                    });
+
+
+                const from =
+                    $("#cocoFrom")?.value ||
+                    "";
+
+
+                const to =
+                    $("#cocoTo")?.value ||
+                    "";
+
+
+                const pageWidth =
+                    doc.internal.pageSize.getWidth();
+
+
+                const pageHeight =
+                    doc.internal.pageSize.getHeight();
+
+
+                const border =
+                    $("#cocoAddressBorder")?.checked;
+
+
+                if (border) {
+
+                    doc.setLineWidth(.8);
+
+                    doc.rect(
+                        10,
+                        10,
+                        pageWidth - 20,
+                        pageHeight - 20
+                    );
+                }
+
+
+                doc.setFont(
+                    "helvetica",
+                    "bold"
+                );
+
+                doc.setFontSize(18);
+
+
+                doc.text(
+                    "BOOKSWAGON OFFICE",
+                    pageWidth / 2,
+                    30,
+                    {
+                        align: "center"
+                    }
+                );
+
+
+                doc.setFont(
+                    "helvetica",
+                    "normal"
+                );
+
+                doc.setFontSize(11);
+
+
+                let y = 55;
+
+
+                doc.setFont(
+                    "helvetica",
+                    "bold"
+                );
+
+                doc.text(
+                    "FROM",
+                    25,
+                    y
+                );
+
+
+                y += 8;
+
+
+                doc.setFont(
+                    "helvetica",
+                    "normal"
+                );
+
+
+                const fromLines =
+                    doc.splitTextToSize(
+                        from,
+                        pageWidth - 50
+                    );
+
+
+                doc.text(
+                    fromLines,
+                    25,
+                    y
+                );
+
+
+                y +=
+                    fromLines.length * 6 +
+                    15;
+
+
+                doc.setFont(
+                    "helvetica",
+                    "bold"
+                );
+
+                doc.text(
+                    "TO",
+                    25,
+                    y
+                );
+
+
+                y += 8;
+
+
+                doc.setFont(
+                    "helvetica",
+                    "normal"
+                );
+
+
+                const toLines =
+                    doc.splitTextToSize(
+                        to ||
+                        "Recipient Address",
+                        pageWidth - 50
+                    );
+
+
+                doc.text(
+                    toLines,
+                    25,
+                    y
+                );
+
+
+                doc.save(
+                    "BOOKSWAGON_ADDRESS_LABEL.pdf"
+                );
+
+
+                $("#cocoAddressStatus").textContent =
+                    "Address PDF generated successfully.";
+
+
+                showToast(
+                    "success",
+                    "Address PDF Ready",
+                    "The address label has been downloaded."
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                showToast(
+                    "error",
+                    "Address PDF Error",
+                    error.message
+                );
+            }
+        }
+    );
+
+
+    /* =====================================================
+       RESET — COCOBLUE
+    ===================================================== */
+
+    $("#cocoReset")?.addEventListener(
+        "click",
+        () => {
+
+            /*
+             * Reset without firing confirmation dialogs
+             * for every checkbox.
+             */
+
+            $$(".coco-po").forEach(input => {
+                input.value = "";
+            });
+
+
+            if ($("#cocoStartBox")) {
+                $("#cocoStartBox").value = 1;
+            }
+
+
+            if ($("#cocoEndBox")) {
+                $("#cocoEndBox").value = 200;
+            }
+
+
+            if ($("#cocoCopiesPerBox")) {
+                $("#cocoCopiesPerBox").value = 1;
+            }
+
+
+            if ($("#cocoLabelsPerPage")) {
+                $("#cocoLabelsPerPage").value = 1;
+            }
+
+
+            if ($("#cocoCommaPO")) {
+                $("#cocoCommaPO").value = "";
+            }
+
+
+            /*
+             * Defaults
+             */
+
+            const defaults = {
+
+                cocoPrintPO: true,
+                cocoPrintBox: false,
+                cocoPrintPOBox: true,
+
+                cocoVertical: true,
+
+                cocoPageBorder: true,
+                cocoPOBorder: true,
+                cocoBoxBorder: true,
+
+                cocoPOBoxOuterBorder: false,
+                cocoBorder: false,
+                cocoTaxBorder: false,
+
+                cocoCutting: true,
+                cocoScissorLine: true,
+                cocoBoldText: true,
+
+                cocoSeparatePDF: true,
+                cocoZIP: false,
+                cocoMergedPDF: false
+            };
+
+
+            Object.entries(defaults)
+                .forEach(([id, value]) => {
+
+                    const checkbox =
+                        document.getElementById(id);
+
+                    if (checkbox) {
+                        checkbox.checked = value;
+                    }
+
+                });
+
+
+            updateCocoPreview();
+
+
+            showToast(
+                "success",
+                "Reset Complete",
+                "CocoBlue settings have been restored."
+            );
+        }
+    );
+
+
+    /* =====================================================
+       RESET — OTHER PO
+    ===================================================== */
+
+    $("#otherReset")?.addEventListener(
+        "click",
+        () => {
+
+            $$(".other-po").forEach(input => {
+                input.value = "";
+            });
+
+
+            if ($("#otherCommaPO")) {
+                $("#otherCommaPO").value = "";
+            }
+
+
+            if ($("#otherStartBox")) {
+                $("#otherStartBox").value = 1;
+            }
+
+
+            if ($("#otherEndBox")) {
+                $("#otherEndBox").value = 200;
+            }
+
+
+            const defaults = {
+
+                otherPrintPO: true,
+                otherPrintBox: false,
+                otherPrintPOBox: true,
+
+                otherPageBorder: true,
+                otherPOBorder: true,
+                otherBoxBorder: true,
+
+                otherPOBoxOuterBorder: false,
+                otherBorder: false,
+                otherTaxBorder: false,
+
+                otherCutting: true,
+
+                otherSeparatePDF: true,
+                otherZIP: false,
+                otherMergedPDF: false
+            };
+
+
+            Object.entries(defaults)
+                .forEach(([id, value]) => {
+
+                    const checkbox =
+                        document.getElementById(id);
+
+                    if (checkbox) {
+                        checkbox.checked = value;
+                    }
+
+                });
+
+
+            updateOtherPreview();
+
+
+            showToast(
+                "success",
+                "Reset Complete",
+                "Other PO settings have been restored."
+            );
+        }
+    );
+
+
+    /* =====================================================
+       SAFE FILE NAME
+    ===================================================== */
+
+    function safeFilename(
+        value
+    ) {
+
+        return String(value || "PO")
+            .replace(
+                /[<>:"/\\|?*\x00-\x1F]/g,
+                "_"
+            )
+            .replace(
+                /\s+/g,
+                "_"
+            )
+            .slice(
+                0,
+                100
+            );
+    }
+
+
+    /* =====================================================
+       INITIALIZE
     ===================================================== */
 
     function initialize() {
 
-        setupConfirmableCheckboxes();
-
-        updateCocoPreview();
-
-        updateOtherPreview();
-
-        updateISBNPreview();
-
-        updateCocoFilename();
-
         /*
-         * Keep initial page at top.
+         * Start with all workspaces hidden.
          */
 
-        window.scrollTo(
-            0,
-            0
-        );
+        workspaces.forEach(workspace => {
+            workspace.classList.remove("active");
+        });
+
+
+        /*
+         * Default input modes.
+         */
+
+        setCocoInputMode("manual");
+        setOtherInputMode("manual");
+
+
+        /*
+         * Initial previews.
+         */
+
+        updateAllPreviews();
+
+
+        /*
+         * Confirmation checkbox system.
+         */
+
+        setupCheckboxConfirmations();
+
+
+        /*
+         * Address defaults.
+         */
+
+        const fromPreview =
+            $("#cocoFromPreview");
+
+
+        if (fromPreview) {
+
+            fromPreview.textContent =
+                $("#cocoFrom")?.value ||
+                "BooksWagon Office";
+        }
+
+
+        /*
+         * Make sure the old 1–200 browser constraint
+         * is NOT being imposed by JavaScript.
+         */
+
+        [
+            "#cocoStartBox",
+            "#cocoEndBox",
+            "#otherStartBox",
+            "#otherEndBox",
+            "#sbmoStartBox",
+            "#sbmoEndBox"
+        ].forEach(selector => {
+
+            const input = $(selector);
+
+            if (input) {
+
+                input.removeAttribute("max");
+
+                input.min = "1";
+            }
+
+        });
     }
 
 
-    initialize();
+    /* =====================================================
+       START APP
+    ===================================================== */
+
+    if (
+        document.readyState === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initialize
+        );
+
+    } else {
+
+        initialize();
+    }
+
 
 })();
