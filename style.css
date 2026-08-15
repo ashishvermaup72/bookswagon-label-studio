@@ -1,8 +1,8 @@
 /* =========================================================
    BOOKSWAGON LABEL STUDIO
-   FINAL STYLE
+   FINAL CSS
    NO LOGO
-   BOOKSTORE THEME
+   ORANGE / CREAM / BLACK BOOKSTORE THEME
 ========================================================= */
 
 :root {
@@ -14,7 +14,7 @@
     --cream-dark: #ebe6dc;
 
     --black: #1c1c1a;
-    --black-soft: #282724;
+    --black-soft: #292825;
 
     --white: #ffffff;
 
@@ -22,9 +22,6 @@
     --muted: #76716a;
 
     --border: #ddd7cc;
-
-    --success: #176b45;
-    --danger: #b83725;
 
     --shadow:
         0 14px 38px rgba(25, 22, 18, 0.08);
@@ -50,9 +47,7 @@ html {
 
 body {
     margin: 0;
-
     background: var(--cream);
-
     color: var(--text);
 
     font-family:
@@ -94,39 +89,22 @@ textarea {
 
 .top-bar {
     min-height: 34px;
+    padding: 7px 5%;
 
-    padding:
-        7px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    background:
-        var(--orange);
+    gap: 20px;
 
-    color:
-        var(--white);
+    background: var(--orange);
+    color: var(--white);
 
-    display:
-        flex;
+    font-size: 10px;
+    font-weight: 800;
 
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    gap:
-        20px;
-
-    font-size:
-        10px;
-
-    font-weight:
-        800;
-
-    letter-spacing:
-        0.12em;
-
-    text-transform:
-        uppercase;
+    letter-spacing: .12em;
+    text-transform: uppercase;
 }
 
 
@@ -135,158 +113,107 @@ textarea {
 ========================================================= */
 
 .site-header {
-    position:
-        sticky;
-
-    top:
-        0;
-
-    z-index:
-        100;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 
     background:
-        rgba(247, 244, 237, 0.97);
+        rgba(247, 244, 237, .97);
 
     border-bottom:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     backdrop-filter:
         blur(8px);
 }
 
 .header-inner {
-    width:
-        min(1400px, 92%);
+    width: min(1400px, 92%);
+    min-height: 76px;
 
-    min-height:
-        76px;
+    margin: 0 auto;
 
-    margin:
-        0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    gap:
-        25px;
+    gap: 25px;
 }
 
 
-/* BRAND — NO LOGO */
+/* NO LOGO */
 
 .brand {
-    display:
-        flex;
-
-    align-items:
-        center;
+    display: flex;
+    align-items: center;
 }
 
 .brand-text strong {
-    display:
-        block;
+    display: block;
 
     font-family:
         Georgia,
         "Times New Roman",
         serif;
 
-    font-size:
-        18px;
-
-    letter-spacing:
-        0.04em;
+    font-size: 18px;
+    letter-spacing: .04em;
 }
 
 .brand-text span {
-    display:
-        block;
+    display: block;
 
-    margin-top:
-        2px;
+    margin-top: 2px;
 
-    color:
-        var(--muted);
+    color: var(--muted);
 
-    font-size:
-        9px;
-
-    letter-spacing:
-        0.18em;
+    font-size: 9px;
+    letter-spacing: .18em;
 }
 
 
 /* =========================================================
-   NAVIGATION
+   NAV
 ========================================================= */
 
 .main-nav {
-    display:
-        flex;
+    display: flex;
+    align-items: center;
+    gap: 28px;
 
-    align-items:
-        center;
+    color: #4e4a44;
 
-    gap:
-        28px;
-
-    color:
-        #4e4a44;
-
-    font-size:
-        13px;
+    font-size: 13px;
 }
 
 .main-nav a {
-    transition:
-        color 0.2s ease;
+    transition: color .2s ease;
 }
 
 .main-nav a:hover {
-    color:
-        var(--orange);
+    color: var(--orange);
 }
 
 .contact-button {
-    padding:
-        11px 17px;
+    padding: 11px 17px;
 
     border:
-        1px solid
-        #bdb5aa;
+        1px solid #bdb5aa;
 
-    border-radius:
-        7px;
+    border-radius: 7px;
 
-    background:
-        transparent;
+    background: transparent;
 
-    font-size:
-        12px;
+    font-size: 12px;
+    font-weight: 800;
 
-    font-weight:
-        800;
-
-    transition:
-        0.2s ease;
+    transition: .2s ease;
 }
 
 .contact-button:hover {
-    background:
-        var(--black);
-
-    color:
-        white;
-
-    border-color:
-        var(--black);
+    background: var(--black);
+    border-color: var(--black);
+    color: white;
 }
 
 
@@ -295,71 +222,56 @@ textarea {
 ========================================================= */
 
 .hero-section {
-    overflow:
-        hidden;
+    overflow: hidden;
 
     background:
         radial-gradient(
             circle at 82% 20%,
-            rgba(255,255,255,0.18),
+            rgba(255,255,255,.18),
             transparent 33%
         ),
         var(--orange);
 
-    color:
-        white;
+    color: white;
 }
 
 .hero-inner {
-    width:
-        min(1400px, 92%);
+    width: min(1400px, 92%);
+    min-height: 520px;
 
-    min-height:
-        520px;
+    margin: 0 auto;
 
-    margin:
-        0 auto;
-
-    display:
-        grid;
+    display: grid;
 
     grid-template-columns:
-        1.08fr 0.92fr;
+        1.08fr .92fr;
 
-    align-items:
-        center;
+    align-items: center;
 
-    gap:
-        45px;
+    gap: 45px;
 }
 
 .hero-content {
-    max-width:
-        700px;
+    max-width: 700px;
 }
 
 .hero-label {
-    display:
-        inline-block;
+    display: inline-block;
 
     padding:
         7px 11px;
 
     border:
-        1px solid
-        rgba(255,255,255,0.4);
+        1px solid rgba(255,255,255,.4);
 
     border-radius:
         999px;
 
-    font-size:
-        10px;
-
-    font-weight:
-        900;
+    font-size: 10px;
+    font-weight: 900;
 
     letter-spacing:
-        0.15em;
+        .15em;
 }
 
 .hero-content h1 {
@@ -375,10 +287,10 @@ textarea {
         clamp(43px, 5vw, 72px);
 
     line-height:
-        0.98;
+        .98;
 
     letter-spacing:
-        -0.04em;
+        -.04em;
 }
 
 .hero-content h1 span {
@@ -394,7 +306,7 @@ textarea {
         0;
 
     color:
-        rgba(255,255,255,0.86);
+        rgba(255,255,255,.86);
 
     font-size:
         16px;
@@ -441,7 +353,7 @@ textarea {
         900;
 
     transition:
-        0.2s ease;
+        .2s ease;
 }
 
 .hero-primary {
@@ -459,8 +371,7 @@ textarea {
 
 .hero-secondary {
     border:
-        1px solid
-        rgba(255,255,255,0.45);
+        1px solid rgba(255,255,255,.45);
 
     color:
         white;
@@ -468,7 +379,7 @@ textarea {
 
 .hero-secondary:hover {
     background:
-        rgba(255,255,255,0.12);
+        rgba(255,255,255,.12);
 }
 
 .hero-points {
@@ -486,14 +397,11 @@ textarea {
 
     font-size:
         11px;
-
-    color:
-        rgba(255,255,255,0.94);
 }
 
 
 /* =========================================================
-   HERO BOOK ART
+   HERO BOOK
 ========================================================= */
 
 .hero-visual {
@@ -533,7 +441,7 @@ textarea {
 
     box-shadow:
         0 28px 55px
-        rgba(0,0,0,0.25);
+        rgba(0,0,0,.25);
 }
 
 .back-book {
@@ -602,7 +510,7 @@ textarea {
         10px;
 
     letter-spacing:
-        0.18em;
+        .18em;
 
     color:
         var(--muted);
@@ -637,7 +545,7 @@ textarea {
 
 
 /* =========================================================
-   SECTIONS
+   COMMON SECTIONS
 ========================================================= */
 
 .tools-section,
@@ -673,7 +581,7 @@ textarea {
         900;
 
     letter-spacing:
-        0.16em;
+        .16em;
 }
 
 .section-heading h2 {
@@ -733,8 +641,7 @@ textarea {
         white;
 
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     border-radius:
         var(--radius);
@@ -749,8 +656,8 @@ textarea {
         column;
 
     transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+        transform .2s ease,
+        box-shadow .2s ease;
 }
 
 .tool-card:hover {
@@ -861,8 +768,7 @@ textarea {
         6px 9px;
 
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     border-radius:
         999px;
@@ -909,7 +815,7 @@ textarea {
         900;
 
     transition:
-        0.2s ease;
+        .2s ease;
 }
 
 .tool-button:hover {
@@ -927,7 +833,7 @@ textarea {
         grid;
 
     grid-template-columns:
-        repeat(4, 1fr);
+        repeat(4,1fr);
 
     gap:
         14px;
@@ -941,8 +847,7 @@ textarea {
         white;
 
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     border-radius:
         12px;
@@ -961,17 +866,17 @@ textarea {
     border-radius:
         9px;
 
-    background:
-        var(--black);
-
-    color:
-        white;
-
     display:
         grid;
 
     place-items:
         center;
+
+    background:
+        var(--black);
+
+    color:
+        white;
 
     font-size:
         9px;
@@ -1011,7 +916,7 @@ textarea {
 
 .workspace-section {
     width:
-        min(1400px, 92%);
+        min(1400px,92%);
 
     margin:
         0 auto;
@@ -1053,7 +958,7 @@ textarea {
         900;
 
     letter-spacing:
-        0.16em;
+        .16em;
 }
 
 .workspace-header h2 {
@@ -1085,8 +990,7 @@ textarea {
         10px 15px;
 
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     border-radius:
         7px;
@@ -1104,7 +1008,7 @@ textarea {
         800;
 
     transition:
-        0.2s ease;
+        .2s ease;
 }
 
 .back-button:hover {
@@ -1131,8 +1035,7 @@ textarea {
         18px;
 
     border-bottom:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 }
 
 .workspace-tab {
@@ -1156,9 +1059,6 @@ textarea {
 
     font-weight:
         900;
-
-    transition:
-        0.2s ease;
 }
 
 .workspace-tab.active,
@@ -1170,14 +1070,15 @@ textarea {
         white;
 }
 
-.tool-mode.hidden {
+.tool-mode.hidden,
+.hidden {
     display:
         none !important;
 }
 
 
 /* =========================================================
-   WORKSPACE GRID
+   GRID
 ========================================================= */
 
 .workspace-grid {
@@ -1185,8 +1086,8 @@ textarea {
         grid;
 
     grid-template-columns:
-        minmax(0, 1.05fr)
-        minmax(430px, 0.95fr);
+        minmax(0,1.05fr)
+        minmax(430px,.95fr);
 
     gap:
         20px;
@@ -1205,7 +1106,7 @@ textarea {
 
 
 /* =========================================================
-   WORKSPACE CARDS
+   CARDS
 ========================================================= */
 
 .workspace-card {
@@ -1216,8 +1117,7 @@ textarea {
         white;
 
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     border-radius:
         var(--radius);
@@ -1295,7 +1195,7 @@ textarea {
 
 
 /* =========================================================
-   TABS
+   INPUTS
 ========================================================= */
 
 .mini-tabs {
@@ -1314,8 +1214,7 @@ textarea {
         8px 12px;
 
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     border-radius:
         7px;
@@ -1342,17 +1241,12 @@ textarea {
         white;
 }
 
-
-/* =========================================================
-   FORM GRID
-========================================================= */
-
 .po-grid {
     display:
         grid;
 
     grid-template-columns:
-        repeat(2, 1fr);
+        repeat(2,1fr);
 
     gap:
         8px;
@@ -1366,8 +1260,7 @@ textarea {
         100%;
 
     border:
-        1px solid
-        #cbc4ba;
+        1px solid #cbc4ba;
 
     border-radius:
         7px;
@@ -1411,8 +1304,7 @@ textarea {
         var(--orange);
 
     box-shadow:
-        0 0 0 3px
-        rgba(239,107,36,0.10);
+        0 0 0 3px rgba(239,107,36,.10);
 }
 
 
@@ -1439,7 +1331,7 @@ textarea {
 
 
 /* =========================================================
-   UPLOAD BOX
+   UPLOAD
 ========================================================= */
 
 .upload-box {
@@ -1450,8 +1342,7 @@ textarea {
         20px;
 
     border:
-        2px dashed
-        #cfc8bd;
+        2px dashed #cfc8bd;
 
     border-radius:
         10px;
@@ -1481,7 +1372,7 @@ textarea {
         pointer;
 
     transition:
-        0.2s ease;
+        .2s ease;
 }
 
 .upload-box:hover {
@@ -1510,10 +1401,8 @@ textarea {
         10px;
 }
 
-.file-status {
-    margin-top:
-        8px;
-
+.file-status,
+.status-text {
     color:
         var(--muted);
 
@@ -1526,7 +1415,7 @@ textarea {
 
 
 /* =========================================================
-   PAGE GRID
+   PAGE SETTINGS
 ========================================================= */
 
 .page-grid {
@@ -1534,7 +1423,7 @@ textarea {
         grid;
 
     grid-template-columns:
-        repeat(4, 1fr);
+        repeat(4,1fr);
 
     gap:
         8px;
@@ -1548,8 +1437,7 @@ textarea {
         10px;
 
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     border-radius:
         8px;
@@ -1564,7 +1452,7 @@ textarea {
         left;
 
     transition:
-        0.2s ease;
+        .2s ease;
 }
 
 .page-choice strong {
@@ -1619,7 +1507,7 @@ textarea {
 
 
 /* =========================================================
-   FOUR / TWO FIELDS
+   FIELDS
 ========================================================= */
 
 .four-fields {
@@ -1627,7 +1515,7 @@ textarea {
         grid;
 
     grid-template-columns:
-        repeat(4, 1fr);
+        repeat(4,1fr);
 
     gap:
         9px;
@@ -1646,155 +1534,81 @@ textarea {
 
 
 /* =========================================================
-   SETTING ROW
+   CHECKBOX OPTIONS
 ========================================================= */
 
-.setting-row {
+.check-option {
+    width:
+        100%;
+
     min-height:
-        58px;
+        44px;
+
+    margin:
+        7px 0;
 
     padding:
-        12px 0;
+        10px 12px;
 
-    border-top:
-        1px solid
-        var(--border);
+    border:
+        1px solid var(--border);
 
-    border-bottom:
-        1px solid
-        var(--border);
+    border-radius:
+        8px;
+
+    background:
+        #faf8f4;
 
     display:
-        flex;
+        flex !important;
 
     align-items:
         center;
 
-    justify-content:
-        space-between;
-
     gap:
-        15px;
-}
+        10px;
 
-.setting-row + .setting-row {
-    margin-top:
-        2px;
-}
-
-.setting-row strong {
-    display:
-        block;
-
-    font-size:
-        12px;
-}
-
-.setting-row small {
-    display:
-        block;
-
-    margin-top:
-        3px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        9px;
-}
-
-
-/* =========================================================
-   SWITCH
-========================================================= */
-
-.switch {
-    position:
-        relative;
-
-    width:
-        48px;
-
-    height:
-        26px;
-
-    flex:
-        0 0 auto;
-}
-
-.switch input {
-    position:
-        absolute;
-
-    opacity:
-        0;
-
-    width:
-        0;
-
-    height:
-        0;
-}
-
-.switch span {
-    position:
-        absolute;
-
-    inset:
-        0;
-
-    border-radius:
-        999px;
-
-    background:
-        #c7c2b9;
+    cursor:
+        pointer;
 
     transition:
-        0.2s ease;
+        .2s ease;
 }
 
-.switch span::before {
-    content:
-        "";
-
-    position:
-        absolute;
-
-    width:
-        20px;
-
-    height:
-        20px;
-
-    left:
-        3px;
-
-    top:
-        3px;
-
-    border-radius:
-        50%;
-
-    background:
-        white;
-
-    box-shadow:
-        0 1px 4px
-        rgba(0,0,0,0.12);
-
-    transition:
-        0.2s ease;
-}
-
-.switch input:checked + span {
-    background:
+.check-option:hover {
+    border-color:
         var(--orange);
+
+    background:
+        var(--orange-soft);
 }
 
-.switch input:checked + span::before {
-    transform:
-        translateX(22px);
+.check-option input {
+    width:
+        18px !important;
+
+    height:
+        18px !important;
+
+    min-width:
+        18px;
+
+    accent-color:
+        var(--orange);
+
+    cursor:
+        pointer;
+}
+
+.check-option span {
+    color:
+        var(--text);
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
 }
 
 
@@ -1818,8 +1632,7 @@ textarea {
         11px;
 
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     border-radius:
         8px;
@@ -1850,6 +1663,17 @@ textarea {
         var(--orange-soft);
 }
 
+.layout-option input {
+    width:
+        17px !important;
+
+    height:
+        17px !important;
+
+    accent-color:
+        var(--orange);
+}
+
 .layout-option strong {
     display:
         block;
@@ -1874,16 +1698,18 @@ textarea {
 
 
 /* =========================================================
-   FILE NAME PREVIEW
+   FILE NAME
 ========================================================= */
 
 .file-name-preview {
     padding:
         10px;
 
+    margin-top:
+        10px;
+
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     border-radius:
         7px;
@@ -1906,6 +1732,12 @@ textarea {
 }
 
 .file-name-preview strong {
+    display:
+        block;
+
+    margin-top:
+        4px;
+
     color:
         var(--black);
 }
@@ -1936,7 +1768,7 @@ textarea {
 
     box-shadow:
         0 18px 45px
-        rgba(0,0,0,0.18);
+        rgba(0,0,0,.18);
 }
 
 .preview-heading {
@@ -1967,7 +1799,7 @@ textarea {
         900;
 
     letter-spacing:
-        0.15em;
+        .15em;
 }
 
 .preview-heading h3 {
@@ -2041,7 +1873,7 @@ textarea {
 
 
 /* =========================================================
-   DYNAMIC PAGE PREVIEW
+   PAGE PREVIEW
 ========================================================= */
 
 .dynamic-page-preview {
@@ -2064,12 +1896,11 @@ textarea {
         var(--black);
 
     border:
-        1px solid
-        #d5d0c8;
+        1px solid #d5d0c8;
 
     box-shadow:
         0 25px 60px
-        rgba(0,0,0,0.35);
+        rgba(0,0,0,.35);
 
     display:
         flex;
@@ -2081,96 +1912,10 @@ textarea {
         center;
 
     transition:
-        width 0.25s ease,
-        height 0.25s ease,
-        border 0.2s ease;
+        width .25s ease,
+        height .25s ease,
+        border .2s ease;
 }
-
-.dynamic-label-preview {
-    width:
-        80%;
-
-    min-height:
-        72%;
-
-    padding:
-        20px;
-
-    border:
-        0;
-
-    display:
-        flex;
-
-    flex-direction:
-        column;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    gap:
-        12px;
-
-    text-align:
-        center;
-
-    transition:
-        0.2s ease;
-}
-
-.dynamic-label-preview strong {
-    max-width:
-        100%;
-
-    word-break:
-        break-word;
-
-    font-size:
-        19px;
-}
-
-.dynamic-label-preview strong:last-of-type {
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-size:
-        27px;
-}
-
-.preview-dotted-line {
-    color:
-        #65615b;
-
-    font-size:
-        14px;
-
-    letter-spacing:
-        4px;
-
-    line-height:
-        1;
-}
-
-.preview-scissor {
-    margin-top:
-        4px;
-
-    font-size:
-        18px;
-
-    line-height:
-        1;
-}
-
-
-/* =========================================================
-   DYNAMIC PAGE SIZE CLASSES
-========================================================= */
 
 .dynamic-page-preview.size-4x6 {
     width:
@@ -2204,6 +1949,106 @@ textarea {
         390px;
 }
 
+.dynamic-label-preview {
+    width:
+        80%;
+
+    min-height:
+        72%;
+
+    padding:
+        20px;
+
+    border:
+        2px solid transparent;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        11px;
+
+    text-align:
+        center;
+
+    transition:
+        .2s ease;
+}
+
+.dynamic-label-preview strong {
+    max-width:
+        100%;
+
+    word-break:
+        break-word;
+
+    font-size:
+        19px;
+}
+
+.dynamic-label-preview .preview-box-number {
+    padding:
+        10px 17px;
+
+    border:
+        2px solid
+        var(--black);
+
+    background:
+        #fffdf8;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size:
+        22px;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        .01em;
+}
+
+.preview-dotted-line {
+    color:
+        #5d5953;
+
+    font-family:
+        monospace;
+
+    font-size:
+        13px;
+
+    letter-spacing:
+        3px;
+
+    line-height:
+        1;
+}
+
+.preview-scissor {
+    margin-top:
+        2px;
+
+    font-size:
+        18px;
+
+    line-height:
+        1;
+}
+
 
 /* =========================================================
    PREVIEW INFO
@@ -2214,7 +2059,7 @@ textarea {
         grid;
 
     grid-template-columns:
-        repeat(3, 1fr);
+        repeat(3,1fr);
 
     gap:
         8px;
@@ -2229,13 +2074,13 @@ textarea {
 
     border:
         1px solid
-        rgba(255,255,255,0.09);
+        rgba(255,255,255,.09);
 
     border-radius:
         7px;
 
     background:
-        rgba(255,255,255,0.05);
+        rgba(255,255,255,.05);
 }
 
 .preview-info span {
@@ -2303,7 +2148,7 @@ textarea {
         900;
 
     transition:
-        0.2s ease;
+        .2s ease;
 }
 
 .secondary-button {
@@ -2316,7 +2161,7 @@ textarea {
 
 .secondary-button:hover {
     background:
-        #e8e1d5;
+        #e7dfd2;
 }
 
 .primary-button {
@@ -2342,11 +2187,11 @@ textarea {
     color:
         #aaa39a;
 
-    font-size:
-        10px;
-
     text-align:
         center;
+
+    font-size:
+        10px;
 }
 
 
@@ -2372,7 +2217,7 @@ textarea {
 
     box-shadow:
         0 25px 60px
-        rgba(0,0,0,0.35);
+        rgba(0,0,0,.35);
 
     word-break:
         break-word;
@@ -2411,8 +2256,7 @@ textarea {
         0;
 
     border-top:
-        1px solid
-        #ddd;
+        1px solid #ddd;
 
     margin:
         18px 0;
@@ -2436,7 +2280,7 @@ textarea {
         grid;
 
     grid-template-columns:
-        1fr 1.45fr 0.85fr;
+        1fr 1.45fr .85fr;
 
     gap:
         7px;
@@ -2478,7 +2322,7 @@ textarea {
 
     box-shadow:
         0 25px 60px
-        rgba(0,0,0,0.35);
+        rgba(0,0,0,.35);
 }
 
 .barcode-preview {
@@ -2505,11 +2349,11 @@ textarea {
 }
 
 .isbn-bar {
-    height:
-        100%;
-
     display:
         block;
+
+    height:
+        100%;
 
     flex:
         0 0 auto;
@@ -2541,7 +2385,7 @@ textarea {
 
 .contact-section {
     width:
-        min(1400px, 92%);
+        min(1400px,92%);
 
     margin:
         5px auto 70px;
@@ -2582,7 +2426,7 @@ textarea {
         900;
 
     letter-spacing:
-        0.15em;
+        .15em;
 }
 
 .contact-section h2 {
@@ -2652,7 +2496,7 @@ textarea {
 
 .footer-inner {
     width:
-        min(1400px, 92%);
+        min(1400px,92%);
 
     margin:
         0 auto;
@@ -2718,7 +2562,7 @@ textarea {
         10px;
 
     transition:
-        color 0.2s ease;
+        color .2s ease;
 }
 
 .footer-column a:hover {
@@ -2728,7 +2572,7 @@ textarea {
 
 .footer-bottom {
     width:
-        min(1400px, 92%);
+        min(1400px,92%);
 
     margin:
         0 auto;
@@ -2738,7 +2582,7 @@ textarea {
 
     border-top:
         1px solid
-        rgba(255,255,255,0.08);
+        rgba(255,255,255,.08);
 
     display:
         flex;
@@ -2766,7 +2610,7 @@ textarea {
 
 
 /* =========================================================
-   FOCUS / ACCESSIBILITY
+   FOCUS
 ========================================================= */
 
 button:focus-visible,
@@ -2776,7 +2620,7 @@ textarea:focus-visible,
 a:focus-visible {
     outline:
         3px solid
-        rgba(239,107,36,0.35);
+        rgba(239,107,36,.35);
 
     outline-offset:
         2px;
@@ -2797,12 +2641,12 @@ a:focus-visible {
 
     .tool-grid {
         grid-template-columns:
-            repeat(2, 1fr);
+            repeat(2,1fr);
     }
 
     .feature-grid {
         grid-template-columns:
-            repeat(2, 1fr);
+            repeat(2,1fr);
     }
 
     .main-nav {
@@ -2859,7 +2703,7 @@ a:focus-visible {
 
     .four-fields {
         grid-template-columns:
-            repeat(2, 1fr);
+            repeat(2,1fr);
     }
 
     .isbn-row {
@@ -2911,7 +2755,7 @@ a:focus-visible {
 
     .dynamic-page-preview {
         transform:
-            scale(0.82);
+            scale(.82);
     }
 
     .preview-stage {
