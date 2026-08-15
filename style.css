@@ -1,1406 +1,1604 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+/* =========================================================
+   BOOKS LABEL STUDIO
+   FINAL CSS
+========================================================= */
+
+:root {
+    --bg: #f4f7fb;
+    --card: #ffffff;
+    --soft: #f8fafc;
+    --primary: #1757a6;
+    --primary-dark: #103e78;
+    --primary-light: #eaf2ff;
+    --text: #172033;
+    --muted: #667085;
+    --border: #d8e0eb;
+    --border-dark: #b8c4d3;
+    --success: #16834b;
+    --danger: #d92d20;
+    --warning: #b54708;
+    --shadow: 0 8px 25px rgba(15, 23, 42, .07);
+    --radius: 14px;
+    --small-radius: 9px;
+    --transition: .18s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family:
+        "Segoe UI",
+        Arial,
+        Helvetica,
+        sans-serif;
+    line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    cursor: not-allowed;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.app-header {
+    min-height: 78px;
+    padding: 14px clamp(16px, 4vw, 55px);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.brand-area {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.brand-logo {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            #4a82d4
+        );
+
+    color: #fff;
+    font-size: 24px;
+    font-weight: 900;
+
+    box-shadow:
+        0 6px 18px
+        rgba(23, 87, 166, .22);
+}
+
+.brand-text h1 {
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 800;
+}
+
+.brand-text p {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.header-right label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   CATEGORY NAV
+========================================================= */
+
+.category-nav {
+    display: flex;
+    gap: 8px;
+
+    padding:
+        11px
+        clamp(12px, 4vw, 55px);
+
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+
+    overflow-x: auto;
+}
+
+.category-btn {
+    flex: 0 0 auto;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
-    <title>Books Label Studio Tool</title>
+    padding: 10px 17px;
+
+    border: 1px solid transparent;
+    border-radius: 9px;
+
+    background: transparent;
+    color: var(--muted);
+
+    font-size: 13px;
+    font-weight: 750;
+
+    transition: var(--transition);
+}
+
+.category-btn:hover {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.category-btn.active {
+    color: #fff;
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            #2f6cc2
+        );
 
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="style.css">
+    box-shadow:
+        0 5px 15px
+        rgba(23, 87, 166, .2);
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.main-content {
+    width: min(1500px, calc(100% - 32px));
+    margin: 30px auto 45px;
+    flex: 1;
+}
 
-    <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-    <!-- SheetJS / Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+.tool-section {
+    display: none;
+    animation: sectionIn .2s ease;
+}
+
+.tool-section.active {
+    display: block;
+}
+
+@keyframes sectionIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
-    <!-- QR Code -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-</head>
+/* =========================================================
+   SECTION HEADING
+========================================================= */
 
-<body>
+.section-heading {
+    margin-bottom: 22px;
+}
 
-<div class="app">
+.section-label {
+    display: inline-block;
+
+    color: var(--primary);
 
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
-    <header class="topbar">
-
-        <div class="brand">
-            <div class="brand-icon">B</div>
+    font-size: 11px;
+    font-weight: 900;
 
-            <div>
-                <h1>Books Label Studio Tool</h1>
-                <p>Books Label &amp; Barcode Management Studio</p>
-            </div>
-        </div>
-
-        <div class="header-actions">
-
-            <div class="language-box">
-                <label for="languageSelect">Language</label>
-
-                <select id="languageSelect">
-                    <option value="en">English</option>
-                    <option value="hi">हिंदी</option>
-                </select>
-            </div>
-
-        </div>
-
-    </header>
-
-
-    <!-- =====================================================
-         MAIN NAVIGATION
-    ====================================================== -->
-    <nav class="main-nav">
-
-        <button
-            type="button"
-            class="nav-btn active"
-            data-section="cocoBlueSection">
-            Coco Blue PO
-        </button>
-
-        <button
-            type="button"
-            class="nav-btn"
-            data-section="otherPOSection">
-            Other PO
-        </button>
-
-        <button
-            type="button"
-            class="nav-btn"
-            data-section="isbnSection">
-            ISBN Barcode
-        </button>
-
-        <button
-            type="button"
-            class="nav-btn"
-            data-section="addressSection">
-            Address Sticker
-        </button>
-
-    </nav>
-
-
-    <!-- =====================================================
-         MAIN CONTENT
-    ====================================================== -->
-    <main class="main-content">
-
-
-        <!-- =================================================
-             COCO BLUE PO
-        ================================================== -->
-        <section
-            id="cocoBlueSection"
-            class="tool-section active-section">
-
-            <div class="section-header">
-
-                <div>
-                    <span class="section-kicker">LABEL STUDIO</span>
-                    <h2>Coco Blue PO</h2>
-                    <p>
-                        Create PO and Box labels with flexible repeat
-                        and page settings.
-                    </p>
-                </div>
-
-            </div>
-
-
-            <!-- =============================================
-                 COCO BLUE SUB CATEGORY
-            ============================================== -->
-            <div class="sub-category-tabs">
-
-                <button
-                    type="button"
-                    class="sub-tab active"
-                    data-subsection="cocoIndividual">
-                    Individual
-                </button>
-
-                <button
-                    type="button"
-                    class="sub-tab"
-                    data-subsection="cocoMultiple">
-                    Multiple
-                </button>
-
-                <button
-                    type="button"
-                    class="sub-tab"
-                    data-subsection="cocoExcel">
-                    Excel Upload
-                </button>
-
-                <button
-                    type="button"
-                    class="sub-tab"
-                    data-subsection="cocoAddress">
-                    Address Print
-                </button>
-
-            </div>
-
-
-            <!-- =============================================
-                 INDIVIDUAL / MULTIPLE INPUT
-            ============================================== -->
-            <div
-                id="cocoIndividual"
-                class="sub-panel active-sub-panel">
-
-                <div class="card">
-
-                    <div class="card-title">
-                        <h3>PO Numbers</h3>
-                        <span>Maximum 40 manual PO fields</span>
-                    </div>
-
-                    <div
-                        id="manualInput"
-                        class="manual-po-grid">
-
-                        <div class="input-group">
-                            <label>PO 01</label>
-                            <input
-                                type="text"
-                                class="po-input"
-                                placeholder="Enter PO number">
-                        </div>
-
-                        <div class="input-group">
-                            <label>PO 02</label>
-                            <input
-                                type="text"
-                                class="po-input"
-                                placeholder="Enter PO number">
-                        </div>
-
-                        <div class="input-group">
-                            <label>PO 03</label>
-                            <input
-                                type="text"
-                                class="po-input"
-                                placeholder="Enter PO number">
-                        </div>
-
-                        <div class="input-group">
-                            <label>PO 04</label>
-                            <input
-                                type="text"
-                                class="po-input"
-                                placeholder="Enter PO number">
-                        </div>
-
-                        <div class="input-group">
-                            <label>PO 05</label>
-                            <input
-                                type="text"
-                                class="po-input"
-                                placeholder="Enter PO number">
-                        </div>
-
-                        <div class="input-group">
-                            <label>PO 06</label>
-                            <input
-                                type="text"
-                                class="po-input"
-                                placeholder="Enter PO number">
-                        </div>
-
-                        <div class="input-group">
-                            <label>PO 07</label>
-                            <input
-                                type="text"
-                                class="po-input"
-                                placeholder="Enter PO number">
-                        </div>
-
-                        <div class="input-group">
-                            <label>PO 08</label>
-                            <input
-                                type="text"
-                                class="po-input"
-                                placeholder="Enter PO number">
-                        </div>
-
-                        <div class="input-group">
-                            <label>PO 09</label>
-                            <input
-                                type="text"
-                                class="po-input"
-                                placeholder="Enter PO number">
-                        </div>
-
-                        <div class="input-group">
-                            <label>PO 10</label>
-                            <input
-                                type="text"
-                                class="po-input"
-                                placeholder="Enter PO number">
-                        </div>
-
-                    </div>
-
-
-                    <div class="multiple-po-box">
-
-                        <label for="multiplePO">
-                            Multiple PO Numbers
-                        </label>
-
-                        <textarea
-                            id="multiplePO"
-                            placeholder="Enter PO numbers separated by commas&#10;Example: BW01, BW02, BW03"></textarea>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =============================================
-                 EXCEL PANEL
-            ============================================== -->
-            <div
-                id="cocoExcel"
-                class="sub-panel">
-
-                <div class="card">
-
-                    <div class="card-title">
-                        <h3>Excel Upload</h3>
-                        <span>Upload PO numbers from Excel</span>
-                    </div>
-
-                    <div
-                        id="excelInput"
-                        class="upload-box">
-
-                        <input
-                            type="file"
-                            id="excelFile"
-                            accept=".xlsx,.xls,.csv">
-
-                        <label for="excelFile" class="upload-label">
-                            Choose Excel File
-                        </label>
-
-                        <p>
-                            First column should contain PO numbers.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =============================================
-                 COCO BLUE ADDRESS
-            ============================================== -->
-            <div
-                id="cocoAddress"
-                class="sub-panel">
-
-                <div class="card">
-
-                    <div class="card-title">
-                        <h3>Address Print</h3>
-                    </div>
-
-                    <div class="address-grid">
-
-                        <div class="input-group">
-                            <label>From</label>
-
-                            <textarea
-                                id="cocoFromAddress"
-                                placeholder="Company Name&#10;Customer Name&#10;Full Address"></textarea>
-                        </div>
-
-                        <div class="input-group">
-                            <label>To</label>
-
-                            <textarea
-                                id="cocoToAddress"
-                                placeholder="Customer Name&#10;Full Address"></textarea>
-                        </div>
-
-                    </div>
-
-                </div>
+    letter-spacing: .12em;
 
-            </div>
+    margin-bottom: 4px;
+}
 
+.section-heading h2 {
+    font-size: clamp(25px, 3vw, 35px);
+    line-height: 1.15;
+    margin-bottom: 7px;
+}
+
+.section-heading p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   SUB NAV
+========================================================= */
 
-            <!-- =================================================
-                 LABEL SETTINGS
-            ================================================== -->
-            <div class="settings-layout">
+.sub-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
 
-                <!-- LEFT -->
-                <div class="settings-column">
+.sub-category-btn {
+    padding: 10px 15px;
 
-                    <!-- BOX REPEAT -->
-                    <div class="card">
+    border: 1px solid var(--border);
+    border-radius: 9px;
 
-                        <div class="card-title">
-                            <h3>Box Repeat Settings</h3>
-                        </div>
+    background: #fff;
+    color: var(--muted);
 
-                        <div class="form-grid">
+    font-size: 13px;
+    font-weight: 750;
 
-                            <div class="input-group">
-                                <label for="startBox">
-                                    Start Box Number
-                                </label>
+    transition: var(--transition);
+}
 
-                                <input
-                                    type="number"
-                                    id="startBox"
-                                    min="1"
-                                    value="1">
-                            </div>
+.sub-category-btn:hover {
+    color: var(--primary);
+    border-color: #a8bddb;
+    background: var(--primary-light);
+}
 
-                            <div class="input-group">
-                                <label for="endBox">
-                                    End Box Number
-                                </label>
+.sub-category-btn.active {
+    color: var(--primary);
+    border-color: #a9c3e8;
+    background: var(--primary-light);
+}
+
+
+/* =========================================================
+   MODE PANELS
+========================================================= */
+
+.mode-panel,
+.other-po-panel,
+.address-mode-panel {
+    display: none;
+}
 
-                                <input
-                                    type="number"
-                                    id="endBox"
-                                    min="1"
-                                    value="10">
-                            </div>
+.mode-panel.active,
+.other-po-panel.active,
+.address-mode-panel.active {
+    display: block;
+}
 
-                            <div class="input-group">
-                                <label for="repeatCount">
-                                    Repeat Count
-                                </label>
 
-                                <input
-                                    type="number"
-                                    id="repeatCount"
-                                    min="1"
-                                    value="1">
-                            </div>
+/* =========================================================
+   PANEL CARD
+========================================================= */
 
-                        </div>
+.panel-card {
+    margin-bottom: 18px;
+    padding: 20px;
+
+    background: var(--card);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    margin-bottom: 17px;
+    padding-bottom: 13px;
+
+    border-bottom: 1px solid #edf1f6;
+}
+
+.panel-title h3 {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.panel-title p {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.panel-title > span {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.limit-badge {
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    background: var(--primary-light);
+    color: var(--primary);
+
+    font-size: 10px !important;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   FIELD
+========================================================= */
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field label {
+    color: #344054;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.required {
+    color: var(--danger);
+}
+
+.optional {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+
+    border: 1px solid var(--border-dark);
+    border-radius: var(--small-radius);
+
+    background: #fff;
+    color: var(--text);
+
+    outline: none;
+
+    transition:
+        border-color var(--transition),
+        box-shadow var(--transition),
+        background var(--transition);
+}
+
+input,
+select {
+    min-height: 43px;
+    padding: 9px 12px;
+}
+
+textarea {
+    min-height: 115px;
+    padding: 11px 12px;
+    resize: vertical;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+    border-color: #8fa0b5;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(23, 87, 166, .10);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background: #eef1f5;
+    color: #98a2b3;
+    border-color: #d8dee7;
+    opacity: .65;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.two-column-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.three-column-fields {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.address-two-column {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+
+/* =========================================================
+   PO INPUT GRID
+========================================================= */
+
+.po-input-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(170px, 1fr)
+        );
+
+    gap: 12px;
+}
+
+.po-manual-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.po-manual-field label {
+    color: #344054;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   UPLOAD
+========================================================= */
+
+.upload-area {
+    min-height: 170px;
+
+    padding: 25px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    border: 2px dashed #b6c7dc;
+    border-radius: 12px;
+
+    background: #f8fbff;
+
+    text-align: center;
+}
+
+.upload-area input[type="file"] {
+    max-width: 100%;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    padding: 0;
+}
+
+.upload-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+    padding: 9px 18px;
+
+    border-radius: 9px;
 
+    background: var(--primary);
+    color: #fff;
 
-                        <div class="checkbox-list">
+    font-size: 13px;
+    font-weight: 800;
 
-                            <label class="check-row">
+    cursor: pointer;
 
-                                <input
-                                    type="checkbox"
-                                    id="pageFlowSamePO">
+    transition: var(--transition);
+}
 
-                                <span>
-                                    Page Flow — Same PO
-                                </span>
+.upload-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
 
-                            </label>
+.upload-area p {
+    color: var(--muted);
+    font-size: 12px;
+}
 
-                        </div>
+
+/* =========================================================
+   EXCEL PREVIEW
+========================================================= */
 
-                    </div>
+.excel-preview {
+    width: 100%;
+    margin-top: 15px;
+    overflow: auto;
+}
 
+.excel-preview table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
 
-                    <!-- LABEL CONTENT -->
-                    <div class="card">
+.excel-preview th,
+.excel-preview td {
+    padding: 8px;
+    border: 1px solid var(--border);
+    text-align: left;
+}
 
-                        <div class="card-title">
-                            <h3>Label Features</h3>
-                        </div>
+.excel-preview th {
+    background: #eef4ff;
+    color: var(--primary);
+    font-weight: 800;
+}
 
-                        <div class="checkbox-list">
+.excel-preview tr:nth-child(even) td {
+    background: #fafcff;
+}
 
-                            <label class="check-row">
 
-                                <input
-                                    type="checkbox"
-                                    id="showPO"
-                                    checked>
+/* =========================================================
+   SETTINGS
+========================================================= */
 
-                                <span>PO Number</span>
+.settings-grid {
+    display: grid;
 
-                            </label>
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
 
+    gap: 18px;
+}
 
-                            <label class="check-row">
+.settings-column {
+    min-width: 0;
+}
 
-                                <input
-                                    type="checkbox"
-                                    id="showBox"
-                                    checked>
 
-                                <span>Box Number</span>
+/* =========================================================
+   CHECKBOX FEATURES
+========================================================= */
 
-                            </label>
+.feature-checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 
+.feature-check {
+    min-height: 43px;
 
-                            <label class="check-row">
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
-                                <input
-                                    type="checkbox"
-                                    id="poPlusBox">
+    padding: 10px 12px;
 
-                                <span>
-                                    PO Number + Box Number
-                                </span>
+    border: 1px solid #e2e7ee;
+    border-radius: 10px;
 
-                            </label>
+    background: #fbfcfe;
 
-                        </div>
+    cursor: pointer;
 
-                    </div>
+    font-size: 13px;
+    font-weight: 650;
 
+    transition: var(--transition);
+}
 
-                    <!-- BORDER SETTINGS -->
-                    <div class="card">
+.feature-check:hover {
+    background: #f5f8fc;
+    border-color: #bdcadb;
+}
 
-                        <div class="card-title">
-                            <h3>Border Settings</h3>
-                        </div>
+.feature-check input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
 
-                        <div class="checkbox-list">
+.checkmark {
+    width: 18px;
+    height: 18px;
 
-                            <label class="check-row">
+    flex: 0 0 18px;
 
-                                <input
-                                    type="checkbox"
-                                    id="combinedBorder">
+    border: 1.5px solid #aab7c8;
+    border-radius: 5px;
 
-                                <span>
-                                    Combined Border
-                                </span>
+    background: #fff;
 
-                            </label>
+    position: relative;
+}
 
+.feature-check input:checked + .checkmark {
+    border-color: var(--primary);
+    background: var(--primary);
+}
 
-                            <label class="check-row">
+.feature-check input:checked + .checkmark::after {
+    content: "";
 
-                                <input
-                                    type="checkbox"
-                                    id="poBorder">
+    position: absolute;
 
-                                <span>
-                                    PO Border
-                                </span>
+    width: 5px;
+    height: 9px;
 
-                            </label>
+    left: 5px;
+    top: 2px;
 
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
 
-                            <label class="check-row">
+    transform: rotate(45deg);
+}
 
-                                <input
-                                    type="checkbox"
-                                    id="boxBorder">
+.feature-check:has(input:disabled) {
+    opacity: .42;
+    cursor: not-allowed;
+    background: #f0f2f5;
+}
 
-                                <span>
-                                    Box Border
-                                </span>
 
-                            </label>
+/* =========================================================
+   SWITCH
+========================================================= */
 
+.switch-row {
+    margin-top: 15px;
 
-                            <label class="check-row">
+    display: flex;
+    align-items: center;
+    gap: 9px;
 
-                                <input
-                                    type="checkbox"
-                                    id="cutLine">
+    color: #344054;
 
-                                <span>
-                                    Cut Line / Scissor Mark
-                                </span>
+    font-size: 13px;
+    font-weight: 650;
 
-                            </label>
+    cursor: pointer;
+}
 
+.switch-row input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
 
-                            <label class="check-row">
+.switch-ui {
+    width: 39px;
+    height: 22px;
 
-                                <input
-                                    type="checkbox"
-                                    id="pageBorder">
+    border-radius: 20px;
 
-                                <span>
-                                    Page Border
-                                </span>
+    background: #c7d0dc;
 
-                            </label>
+    position: relative;
 
-                        </div>
+    transition: var(--transition);
+}
 
-                    </div>
+.switch-ui::after {
+    content: "";
 
+    position: absolute;
 
-                    <!-- FONT SETTINGS -->
-                    <div class="card">
+    width: 17px;
+    height: 17px;
 
-                        <div class="card-title">
-                            <h3>PO Number Font</h3>
-                        </div>
+    top: 2.5px;
+    left: 3px;
 
-                        <div class="form-grid">
+    border-radius: 50%;
 
-                            <div class="input-group">
+    background: #fff;
 
-                                <label for="poFont">
-                                    Font
-                                </label>
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
 
-                                <select id="poFont">
+    transition: var(--transition);
+}
 
-                                    <option>Arial</option>
-                                    <option>Calibri</option>
-                                    <option>Cambria</option>
-                                    <option>Century Gothic</option>
-                                    <option>Courier New</option>
-                                    <option>Georgia</option>
-                                    <option>Helvetica</option>
-                                    <option>Impact</option>
-                                    <option>Lucida Console</option>
-                                    <option>Lucida Sans</option>
-                                    <option>Microsoft Sans Serif</option>
-                                    <option>Palatino Linotype</option>
-                                    <option>Segoe UI</option>
-                                    <option>Tahoma</option>
-                                    <option>Times New Roman</option>
-                                    <option>Trebuchet MS</option>
-                                    <option>Verdana</option>
-                                </select>
+.switch-row input:checked + .switch-ui {
+    background: var(--primary);
+}
 
-                            </div>
+.switch-row input:checked + .switch-ui::after {
+    transform: translateX(16px);
+}
 
 
-                            <div class="input-group">
+/* =========================================================
+   FONT STYLE CONTROLS
+========================================================= */
 
-                                <label for="poFontSize">
-                                    Font Size
-                                </label>
+.text-style-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 
-                                <select id="poFontSize">
+    margin-top: 13px;
+}
 
-                                    <option value="10">10</option>
-                                    <option value="12">12</option>
-                                    <option value="14">14</option>
-                                    <option value="16">16</option>
-                                    <option value="18">18</option>
-                                    <option value="20">20</option>
-                                    <option value="22">22</option>
-                                    <option value="24">24</option>
-                                    <option value="26">26</option>
-                                    <option value="28">28</option>
-                                    <option value="30">30</option>
-                                    <option value="32">32</option>
-                                    <option value="34">34</option>
-                                    <option value="36">36</option>
-                                    <option value="38">38</option>
-                                    <option value="40">40</option>
-                                    <option value="42">42</option>
-                                    <option value="44">44</option>
-                                    <option value="46">46</option>
-                                    <option value="48">48</option>
+.text-style-controls label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 
-                                </select>
+    padding: 8px 11px;
 
-                            </div>
+    border: 1px solid var(--border);
+    border-radius: 8px;
 
-                        </div>
+    background: #f8fafc;
 
+    cursor: pointer;
 
-                        <div class="font-style-buttons">
+    color: #344054;
 
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="poBold">
-                                <span>B</span>
-                            </label>
+    font-size: 12px;
+    font-weight: 700;
+}
 
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="poItalic">
-                                <span>I</span>
-                            </label>
+.text-style-controls label:hover {
+    border-color: #a8bdd9;
+    background: var(--primary-light);
+}
 
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="poUnderline">
-                                <span>U</span>
-                            </label>
+.text-style-controls input {
+    width: 15px;
+    height: 15px;
+    min-height: auto;
+    accent-color: var(--primary);
+    box-shadow: none;
+}
 
-                        </div>
 
-                    </div>
+/* =========================================================
+   CUSTOM SIZE
+========================================================= */
 
+.custom-size-panel {
+    margin-top: 14px;
+    padding-top: 14px;
 
-                    <!-- BOX FONT -->
-                    <div class="card">
+    border-top: 1px dashed var(--border);
+}
 
-                        <div class="card-title">
-                            <h3>Box Number Font</h3>
-                        </div>
+.custom-size-panel.hidden {
+    display: none;
+}
 
-                        <div class="form-grid">
+.custom-size-panel.is-disabled {
+    opacity: .45;
+}
 
-                            <div class="input-group">
 
-                                <label for="boxFont">
-                                    Font
-                                </label>
+/* =========================================================
+   SELECTED PAGE
+========================================================= */
 
-                                <select id="boxFont">
+.selected-page-info {
+    margin-top: 15px;
 
-                                    <option>Arial</option>
-                                    <option>Calibri</option>
-                                    <option>Cambria</option>
-                                    <option>Century Gothic</option>
-                                    <option>Courier New</option>
-                                    <option>Georgia</option>
-                                    <option>Helvetica</option>
-                                    <option>Impact</option>
-                                    <option>Lucida Console</option>
-                                    <option>Lucida Sans</option>
-                                    <option>Microsoft Sans Serif</option>
-                                    <option>Palatino Linotype</option>
-                                    <option>Segoe UI</option>
-                                    <option>Tahoma</option>
-                                    <option>Times New Roman</option>
-                                    <option>Trebuchet MS</option>
-                                    <option>Verdana</option>
+    padding: 11px 13px;
 
-                                </select>
+    border-radius: 9px;
 
-                            </div>
+    background: var(--primary-light);
 
+    color: var(--primary);
 
-                            <div class="input-group">
+    font-size: 13px;
+    font-weight: 800;
+}
 
-                                <label for="boxFontSize">
-                                    Font Size
-                                </label>
 
-                                <select id="boxFontSize">
+/* =========================================================
+   PREVIEW
+========================================================= */
 
-                                    <option value="10">10</option>
-                                    <option value="12">12</option>
-                                    <option value="14">14</option>
-                                    <option value="16">16</option>
-                                    <option value="18">18</option>
-                                    <option value="20">20</option>
-                                    <option value="22">22</option>
-                                    <option value="24">24</option>
-                                    <option value="26">26</option>
-                                    <option value="28">28</option>
-                                    <option value="30">30</option>
-                                    <option value="32">32</option>
-                                    <option value="34">34</option>
-                                    <option value="36">36</option>
-                                    <option value="38">38</option>
-                                    <option value="40">40</option>
-                                    <option value="42">42</option>
-                                    <option value="44">44</option>
-                                    <option value="46">46</option>
-                                    <option value="48">48</option>
+.preview-card {
+    overflow: hidden;
+}
 
-                                </select>
+.preview-container {
+    min-height: 410px;
 
-                            </div>
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-                        </div>
+    padding: 22px;
 
+    border: 1px dashed #bcc8d8;
+    border-radius: 11px;
 
-                        <div class="font-style-buttons">
+    background:
+        repeating-conic-gradient(
+            #f8fafc 0% 25%,
+            #edf1f6 0% 50%
+        )
+        50% / 18px 18px;
 
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="boxBold">
-                                <span>B</span>
-                            </label>
+    overflow: auto;
+}
 
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="boxItalic">
-                                <span>I</span>
-                            </label>
+.preview-page {
+    position: relative;
 
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    id="boxUnderline">
-                                <span>U</span>
-                            </label>
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-                        </div>
+    background: #fff;
 
-                    </div>
+    border: 1px solid #d4dce7;
 
-                </div>
+    box-shadow:
+        0 8px 25px
+        rgba(15,23,42,.12);
 
+    flex: 0 0 auto;
 
-                <!-- RIGHT -->
-                <div class="settings-column">
+    transition:
+        width .2s ease,
+        height .2s ease;
+}
 
-                    <!-- PAGE SETTINGS -->
-                    <div class="card">
+.preview-label {
+    width: calc(100% - 12px);
+    height: calc(100% - 12px);
 
-                        <div class="card-title">
-                            <h3>Page Settings</h3>
-                        </div>
+    display: flex;
+    flex-direction: column;
 
-                        <div class="form-grid">
+    align-items: center;
+    justify-content: center;
 
-                            <div class="input-group">
+    gap: 9px;
 
-                                <label for="pageSize">
-                                    Page Size
-                                </label>
+    text-align: center;
 
-                                <select id="pageSize">
+    background: #fff;
 
-                                    <option value="4x6">
-                                        4 × 6 Inches
-                                    </option>
+    overflow: hidden;
+}
 
-                                    <option value="70x35">
-                                        70 × 35 mm
-                                    </option>
+.preview-po,
+.preview-box {
+    max-width: 95%;
 
-                                    <option value="a4">
-                                        A4
-                                    </option>
+    padding: 7px 12px;
 
-                                    <option value="custom">
-                                        Custom Size
-                                    </option>
+    text-align: center;
 
-                                </select>
+    word-break: break-word;
 
-                            </div>
+    color: #111827;
+}
 
+.preview-po {
+    font-weight: 800;
+}
 
-                            <div class="input-group">
+.preview-box {
+    font-weight: 700;
+}
 
-                                <label for="orientation">
-                                    Orientation
-                                </label>
+#previewPage.cut-lines {
+    border: 2px dashed #7b8798;
+}
 
-                                <select id="orientation">
+#previewLabel.combined-border {
+    border: 3px solid #111827;
+}
 
-                                    <option value="portrait">
-                                        Portrait
-                                    </option>
+#previewPO.individual-border {
+    border: 2px solid #111827;
+    border-radius: 5px;
+}
 
-                                    <option value="landscape">
-                                        Landscape
-                                    </option>
+#previewBox.individual-border {
+    border: 2px solid #111827;
+    border-radius: 5px;
+}
 
-                                </select>
+#previewPage.page-border {
+    border: 2px solid #111827;
+}
 
-                            </div>
 
-                        </div>
+/* =========================================================
+   ISBN
+========================================================= */
 
+.isbn-note {
+    margin-top: 12px;
 
-                        <!-- CUSTOM SIZE -->
-                        <div
-                            id="customSize"
-                            class="custom-size hidden">
+    padding: 10px 12px;
 
-                            <div class="form-grid">
+    border-radius: 8px;
 
-                                <div class="input-group">
+    background: #f8fafc;
 
-                                    <label for="customWidth">
-                                        Width (mm)
-                                    </label>
+    color: var(--muted);
 
-                                    <input
-                                        type="number"
-                                        id="customWidth"
-                                        min="1"
-                                        step="0.1"
-                                        placeholder="Width">
+    font-size: 12px;
+}
 
-                                </div>
+.barcode-preview {
+    min-height: 220px;
 
+    padding: 25px;
 
-                                <div class="input-group">
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-                                    <label for="customHeight">
-                                        Height (mm)
-                                    </label>
+    gap: 10px;
 
-                                    <input
-                                        type="number"
-                                        id="customHeight"
-                                        min="1"
-                                        step="0.1"
-                                        placeholder="Height">
+    background: #fafcff;
 
-                                </div>
+    border: 1px dashed var(--border-dark);
+    border-radius: 12px;
 
-                            </div>
+    overflow: auto;
+}
 
-                        </div>
+#isbnBarcodeSvg {
+    max-width: 100%;
+}
 
-                    </div>
+#isbnBarcodeText {
+    font-size: 13px;
+    font-weight: 750;
+    text-align: center;
+    word-break: break-all;
+}
 
 
-                    <!-- PAGE INFORMATION -->
-                    <div class="card page-info-card">
+/* =========================================================
+   ADDRESS
+========================================================= */
 
-                        <div class="card-title">
-                            <h3>Selected Page</h3>
-                        </div>
+.address-editor {
+    min-width: 0;
+}
 
-                        <div id="selectedPageInfo">
-                            4 × 6 Inches
-                        </div>
+.address-editor > textarea {
+    width: 100%;
+    min-height: 190px;
+}
 
-                    </div>
+.address-settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
 
+    margin-top: 14px;
+}
 
-                    <!-- PREVIEW -->
-                    <div class="card preview-card">
+.address-editor > .feature-check {
+    margin-top: 13px;
+}
 
-                        <div class="card-title">
+.map-link-box {
+    margin-top: 14px;
 
-                            <div>
-                                <h3>Live Preview</h3>
-                                <span>
-                                    Preview updates automatically
-                                </span>
-                            </div>
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
-                        </div>
+    padding: 10px 12px;
 
-                        <div
-                            id="previewArea"
-                            class="preview-area">
+    border-radius: 9px;
 
-                            <p>
-                                Your label preview will appear here.
-                            </p>
+    background: #f8fafc;
 
-                        </div>
+    font-size: 12px;
+}
 
-                    </div>
+.map-link-box span {
+    color: var(--muted);
+    font-weight: 700;
+}
 
-                </div>
+.map-link-box a {
+    color: var(--primary);
+    font-weight: 750;
+}
 
-            </div>
+.map-link-box a:hover {
+    text-decoration: underline;
+}
 
+.qr-preview {
+    min-height: 190px;
 
-            <!-- =================================================
-                 ACTIONS
-            ================================================== -->
-            <div class="action-bar">
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-                <button
-                    type="button"
-                    id="resetBtn"
-                    class="btn btn-secondary">
+    padding: 20px;
 
-                    Reset
+    border: 1px dashed var(--border-dark);
+    border-radius: 12px;
 
-                </button>
+    background: #fafcff;
+}
 
 
-                <button
-                    type="button"
-                    id="generateBtn"
-                    class="btn btn-primary">
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
 
-                    Generate PDF
+.action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
 
-                </button>
+    margin-top: 20px;
+    padding-top: 18px;
 
-            </div>
+    border-top: 1px solid var(--border);
+}
 
+.primary-btn,
+.secondary-btn {
+    min-height: 44px;
 
-            <!-- STATUS -->
-            <div
-                id="status"
-                class="status-message">
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-                Ready
+    padding: 10px 20px;
 
-            </div>
+    border-radius: 9px;
 
-        </section>
+    font-size: 13px;
+    font-weight: 800;
 
+    transition: var(--transition);
+}
 
-        <!-- =====================================================
-             OTHER PO
-        ====================================================== -->
-        <section
-            id="otherPOSection"
-            class="tool-section">
+.primary-btn {
+    border: 1px solid var(--primary);
 
-            <div class="section-header">
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            #2f6dc5
+        );
 
-                <div>
-                    <span class="section-kicker">LABEL STUDIO</span>
-                    <h2>Other PO</h2>
-                    <p>
-                        Other PO label generation.
-                    </p>
-                </div>
+    color: #fff;
 
-            </div>
+    box-shadow:
+        0 6px 15px
+        rgba(23,87,166,.18);
+}
 
-            <div class="placeholder-tool">
+.primary-btn:hover {
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-dark),
+            var(--primary)
+        );
 
-                <h3>Other PO</h3>
+    transform: translateY(-1px);
+}
 
-                <p>
-                    Individual, Multiple and Excel Upload options
-                    will be available here.
-                </p>
+.primary-btn:active {
+    transform: translateY(0);
+}
 
-            </div>
+.secondary-btn {
+    border: 1px solid var(--border-dark);
 
-        </section>
+    background: #fff;
+    color: #344054;
+}
 
+.secondary-btn:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
 
-        <!-- =====================================================
-             ISBN BARCODE
-        ====================================================== -->
-        <section
-            id="isbnSection"
-            class="tool-section">
+.primary-btn:disabled,
+.secondary-btn:disabled {
+    opacity: .5;
+    transform: none;
+}
 
-            <div class="section-header">
 
-                <div>
-                    <span class="section-kicker">BARCODE TOOL</span>
+/* =========================================================
+   TOAST
+========================================================= */
 
-                    <h2>ISBN Barcode Generator</h2>
+.toast {
+    position: fixed;
 
-                    <p>
-                        Generate barcode labels — not QR codes.
-                    </p>
+    top: 24px;
+    left: 50%;
 
-                </div>
+    transform:
+        translate(-50%, -20px);
 
-            </div>
+    min-width: 280px;
+    max-width: min(90vw, 520px);
 
+    padding: 12px 18px;
 
-            <div class="card">
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
 
-                <div class="form-grid">
+    border-radius: 10px;
 
-                    <div class="input-group">
+    background: #172033;
+    color: #fff;
 
-                        <label for="isbnInput">
-                            ISBN
-                        </label>
+    font-size: 13px;
+    font-weight: 750;
 
-                        <input
-                            type="text"
-                            id="isbnInput"
-                            placeholder="Enter ISBN">
+    box-shadow:
+        0 12px 35px
+        rgba(15,23,42,.22);
 
-                    </div>
+    opacity: 0;
 
+    pointer-events: none;
 
-                    <div class="input-group">
+    z-index: 99999;
 
-                        <label for="bookTitle">
-                            Book Title
-                        </label>
+    transition:
+        opacity .2s ease,
+        transform .2s ease;
+}
 
-                        <input
-                            type="text"
-                            id="bookTitle"
-                            placeholder="Enter book title">
+.toast.show {
+    opacity: 1;
 
-                    </div>
+    transform:
+        translate(-50%, 0);
+}
 
+.toast.success {
+    background: var(--success);
+}
 
-                    <div class="input-group">
+.toast.error {
+    background: var(--danger);
+}
 
-                        <label for="edition">
-                            Edition
-                            <span class="optional">
-                                Optional
-                            </span>
-                        </label>
+.toast.warning {
+    background: var(--warning);
+}
 
-                        <input
-                            type="text"
-                            id="edition"
-                            placeholder="Edition">
+#toastIcon {
+    font-weight: 900;
+}
 
-                    </div>
 
-                </div>
+/* =========================================================
+   MODAL
+========================================================= */
 
-                <div class="barcode-preview">
+.modal {
+    position: fixed;
+    inset: 0;
 
-                    <div id="isbnBarcodePreview">
-                    </div>
+    display: none;
+    align-items: center;
+    justify-content: center;
 
-                </div>
+    padding: 20px;
 
-            </div>
+    background:
+        rgba(15,23,42,.5);
 
-        </section>
+    backdrop-filter: blur(4px);
 
+    z-index: 100000;
+}
 
-        <!-- =====================================================
-             ADDRESS STICKER
-        ====================================================== -->
-        <section
-            id="addressSection"
-            class="tool-section">
+.modal.show {
+    display: flex;
+}
 
-            <div class="section-header">
+.modal-box {
+    width: min(450px, 100%);
 
-                <div>
+    position: relative;
 
-                    <span class="section-kicker">
-                        ADDRESS TOOL
-                    </span>
+    padding: 25px;
 
-                    <h2>Address Sticker</h2>
+    background: #fff;
 
-                    <p>
-                        Create From and To address stickers.
-                    </p>
+    border-radius: 15px;
 
-                </div>
+    box-shadow:
+        0 25px 70px
+        rgba(15,23,42,.25);
+}
 
-            </div>
+.modal-box h3 {
+    margin-bottom: 7px;
+    font-size: 19px;
+}
 
+.modal-box p {
+    color: var(--muted);
+    font-size: 14px;
+}
 
-            <div class="sub-category-tabs">
+.modal-close {
+    position: absolute;
 
-                <button
-                    type="button"
-                    class="sub-tab active"
-                    data-address-mode="manual">
+    top: 11px;
+    right: 11px;
 
-                    Manual
+    width: 35px;
+    height: 35px;
 
-                </button>
+    border: none;
+    border-radius: 8px;
 
-                <button
-                    type="button"
-                    class="sub-tab"
-                    data-address-mode="excel">
+    background: #f2f4f7;
+    color: #344054;
 
-                    Excel Upload
+    font-size: 22px;
+}
 
-                </button>
+.modal-close:hover {
+    background: #e4e7ec;
+}
 
-            </div>
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
 
+    margin-top: 22px;
+}
 
-            <div class="card">
 
-                <div class="address-grid">
+/* =========================================================
+   FOOTER
+========================================================= */
 
-                    <!-- FROM -->
-                    <div class="input-group">
+.app-footer {
+    min-height: 70px;
 
-                        <label for="fromAddress">
-                            From Address
-                        </label>
+    padding:
+        18px
+        clamp(16px, 4vw, 55px);
 
-                        <textarea
-                            id="fromAddress"
-                            placeholder="Example:&#10;Company Name&#10;Customer Name&#10;Full Address"></textarea>
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-                    </div>
+    gap: 20px;
 
+    background: #fff;
 
-                    <!-- TO -->
-                    <div class="input-group">
+    border-top: 1px solid var(--border);
 
-                        <label for="toAddress">
-                            To Address
-                        </label>
+    color: var(--muted);
 
-                        <textarea
-                            id="toAddress"
-                            placeholder="Example:&#10;Customer Name&#10;Full Address"></textarea>
+    font-size: 12px;
+}
 
-                    </div>
+.app-footer > div:first-child {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
 
-                </div>
+.app-footer strong {
+    color: var(--text);
+    font-size: 13px;
+}
 
-            </div>
+.contact-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
+.contact-area a {
+    color: var(--primary);
+    font-weight: 750;
+}
 
-            <!-- ADDRESS PAGE SETTINGS -->
-            <div class="card">
+.contact-area a:hover {
+    text-decoration: underline;
+}
 
-                <div class="card-title">
-                    <h3>Address Sticker Settings</h3>
-                </div>
 
-                <div class="form-grid">
+/* =========================================================
+   DISABLED / LOCKED VISUAL
+========================================================= */
 
-                    <div class="input-group">
+.locked-control {
+    opacity: .42 !important;
+    filter: grayscale(.5);
+    pointer-events: none;
+}
 
-                        <label>
-                            Page Size
-                        </label>
+.locked-control input,
+.locked-control select,
+.locked-control button {
+    cursor: not-allowed !important;
+}
 
-                        <select id="addressPageSize">
 
-                            <option value="4x6">
-                                4 × 6 Inches
-                            </option>
+/* =========================================================
+   RESPONSIVE — 1100
+========================================================= */
 
-                            <option value="70x35">
-                                70 × 35 mm
-                            </option>
+@media (max-width: 1100px) {
 
-                            <option value="a4">
-                                A4
-                            </option>
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
 
-                            <option value="custom">
-                                Custom Size
-                            </option>
+}
 
-                        </select>
 
-                    </div>
+/* =========================================================
+   RESPONSIVE — 800
+========================================================= */
 
+@media (max-width: 800px) {
 
-                    <div class="input-group">
+    .address-two-column {
+        grid-template-columns: 1fr;
+    }
 
-                        <label>
-                            Orientation
-                        </label>
+    .three-column-fields {
+        grid-template-columns: 1fr;
+    }
 
-                        <select id="addressOrientation">
+    .two-column-fields {
+        grid-template-columns: 1fr;
+    }
 
-                            <option value="portrait">
-                                Portrait
-                            </option>
+    .address-settings {
+        grid-template-columns: 1fr;
+    }
 
-                            <option value="landscape">
-                                Landscape
-                            </option>
+}
 
-                        </select>
 
-                    </div>
+/* =========================================================
+   RESPONSIVE — 650
+========================================================= */
 
-                </div>
+@media (max-width: 650px) {
 
+    .app-header {
+        position: static;
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-                <div
-                    id="addressCustomSize"
-                    class="custom-size hidden">
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
 
-                    <div class="form-grid">
+    .category-nav {
+        padding: 9px 10px;
+    }
 
-                        <div class="input-group">
+    .main-content {
+        width: calc(100% - 20px);
+        margin: 20px auto 35px;
+    }
 
-                            <label>
-                                Width (mm)
-                            </label>
+    .panel-card {
+        padding: 15px;
+    }
 
-                            <input
-                                type="number"
-                                id="addressCustomWidth"
-                                min="1">
+    .po-input-grid {
+        grid-template-columns: 1fr;
+    }
 
-                        </div>
+    .action-bar {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
 
-                        <div class="input-group">
+    .primary-btn,
+    .secondary-btn {
+        width: 100%;
+    }
 
-                            <label>
-                                Height (mm)
-                            </label>
+    .app-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-                            <input
-                                type="number"
-                                id="addressCustomHeight"
-                                min="1">
+    .contact-area {
+        flex-wrap: wrap;
+    }
 
-                        </div>
+}
 
-                    </div>
 
-                </div>
+/* =========================================================
+   RESPONSIVE — 420
+========================================================= */
 
-            </div>
+@media (max-width: 420px) {
 
+    .brand-text h1 {
+        font-size: 17px;
+    }
 
-            <!-- ADDRESS QR -->
-            <div class="card">
+    .brand-text p {
+        font-size: 10px;
+    }
 
-                <div class="card-title">
+    .sub-navigation {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
 
-                    <div>
-                        <h3>Location QR Code</h3>
-                        <span>
-                            Scan to open the registered location
-                        </span>
-                    </div>
+    .sub-category-btn {
+        width: 100%;
+    }
 
-                </div>
+    .preview-container {
+        padding: 12px;
+    }
 
-                <div
-                    id="addressQR"
-                    class="qr-preview">
-                </div>
+}
 
-            </div>
 
-        </section>
+/* =========================================================
+   PRINT
+========================================================= */
 
-    </main>
+@media print {
 
+    .app-header,
+    .category-nav,
+    .section-heading,
+    .sub-navigation,
+    .panel-card:not(.preview-card),
+    .action-bar,
+    .app-footer,
+    .toast,
+    .modal {
+        display: none !important;
+    }
 
-    <!-- =====================================================
-         FOOTER
-    ====================================================== -->
-    <footer class="footer">
+    body {
+        background: #fff;
+    }
 
-        <div>
+    .main-content {
+        width: 100%;
+        margin: 0;
+    }
 
-            <strong>
-                Books Label Studio Tool
-            </strong>
+    .tool-section {
+        display: none !important;
+    }
 
-            <span>
-                © All Rights Reserved
-            </span>
+    .tool-section.active {
+        display: block !important;
+    }
 
-        </div>
+    .preview-container {
+        border: none;
+        padding: 0;
+        background: #fff;
+    }
 
-
-        <div class="footer-contact">
-
-            <span>
-                Email:
-                <a href="mailto:ashish.verma@bookswagon.in">
-                    ashish.verma@bookswagon.in
-                </a>
-            </span>
-
-            <span>
-                Contact
-            </span>
-
-        </div>
-
-    </footer>
-
-</div>
-
-
-<!-- =========================================================
-     TOAST / POPUP
-========================================================== -->
-<div
-    id="toast"
-    class="toast"
-    role="status"
-    aria-live="polite">
-
-    <span id="toastMessage">
-        Ready
-    </span>
-
-</div>
-
-
-<!-- =========================================================
-     CONFIRMATION POPUP
-========================================================== -->
-<div
-    id="confirmationModal"
-    class="modal hidden">
-
-    <div class="modal-content">
-
-        <button
-            type="button"
-            id="closeModal"
-            class="modal-close"
-            aria-label="Close">
-
-            ×
-
-        </button>
-
-        <h3 id="modalTitle">
-            Confirmation
-        </h3>
-
-        <p id="modalMessage">
-            Are you sure?
-        </p>
-
-        <div class="modal-actions">
-
-            <button
-                type="button"
-                id="modalCancel"
-                class="btn btn-secondary">
-
-                Cancel
-
-            </button>
-
-            <button
-                type="button"
-                id="modalConfirm"
-                class="btn btn-primary">
-
-                Confirm
-
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- =========================================================
-     QR LOCATION DATA
-========================================================== -->
-<script>
-    window.BOOKS_STUDIO_CONFIG = {
-        mapUrl: "https://maps.app.goo.gl/7McYApm1u9x4QSj7A",
-        email: "ashish.verma@bookswagon.in"
-    };
-</script>
-
-
-<!-- Main JS -->
-<script src="script.js"></script>
-
-</body>
-</html>
+    .preview-page {
+        box-shadow: none;
+    }
+}
