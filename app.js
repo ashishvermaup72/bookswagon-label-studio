@@ -1,1581 +1,1595 @@
-/* =========================================================
-   BOOKSWAGON LABEL STUDIO
-   BOOKSTORE THEME
-========================================================= */
+// ============================================================
+// BOOKSWAGON LABEL STUDIO
+// FINAL JAVASCRIPT ENGINE
+// ============================================================
 
-:root {
-    --orange: #ef6b24;
-    --orange-dark: #d95212;
-    --orange-soft: #fff1e8;
+const { jsPDF } = window.jspdf;
 
-    --cream: #f7f5ef;
-    --cream-dark: #ece9df;
 
-    --black: #1d1d1b;
-    --black-soft: #292825;
+// ============================================================
+// GLOBAL STATE
+// ============================================================
 
-    --white: #ffffff;
+let uploadedPOs = [];
+let currentPageSize = "4x6";
+let zoom = 1;
 
-    --text: #252525;
-    --muted: #77736d;
 
-    --border: #ded9cf;
+// ============================================================
+// ELEMENTS
+// ============================================================
 
-    --green: #075b3c;
+const manualTab = document.getElementById("manualTab");
+const excelTab = document.getElementById("excelTab");
 
-    --shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+const manualPOArea = document.getElementById("manualPOArea");
+const excelPOArea = document.getElementById("excelPOArea");
 
-    --radius: 14px;
+const excelFile = document.getElementById("excelFile");
+const excelFileStatus =
+    document.getElementById("excelFileStatus");
+
+const poInputs =
+    document.querySelectorAll(".po-input");
+
+const pageSizeButtons =
+    document.querySelectorAll(".page-size-button");
+
+const customWidth =
+    document.getElementById("customWidth");
+
+const customHeight =
+    document.getElementById("customHeight");
+
+const startBox =
+    document.getElementById("startBox");
+
+const endBox =
+    document.getElementById("endBox");
+
+const labelsPerPage =
+    document.getElementById("labelsPerPage");
+
+const pageCount =
+    document.getElementById("pageCount");
+
+const borderEnabled =
+    document.getElementById("borderEnabled");
+
+const borderStyle =
+    document.getElementById("borderStyle");
+
+const fontFamily =
+    document.getElementById("fontFamily");
+
+const fontSize =
+    document.getElementById("fontSize");
+
+const fontWeight =
+    document.getElementById("fontWeight");
+
+const previewPO =
+    document.getElementById("previewPO");
+
+const previewBox =
+    document.getElementById("previewBox");
+
+const labelPreview =
+    document.getElementById("labelPreview");
+
+const summaryPageSize =
+    document.getElementById("summaryPageSize");
+
+const summaryLabels =
+    document.getElementById("summaryLabels");
+
+const summaryPages =
+    document.getElementById("summaryPages");
+
+const generationStatus =
+    document.getElementById("generationStatus");
+
+const generatePDFButton =
+    document.getElementById("generatePDFButton");
+
+const resetButton =
+    document.getElementById("resetButton");
+
+const newProjectButton =
+    document.getElementById("newProjectButton");
+
+const zoomIn =
+    document.getElementById("zoomIn");
+
+const zoomOut =
+    document.getElementById("zoomOut");
+
+const zoomValue =
+    document.getElementById("zoomValue");
+
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function getActiveInputMode() {
+    return excelTab.classList.contains("active")
+        ? "excel"
+        : "manual";
 }
 
 
-/* =========================================================
-   RESET
-========================================================= */
+function getPOs() {
 
-* {
-    box-sizing: border-box;
-}
+    if (getActiveInputMode() === "excel") {
+        return [...uploadedPOs];
+    }
 
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    margin: 0;
-    background: var(--cream);
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-    line-height: 1.5;
-}
-
-img {
-    max-width: 100%;
-    display: block;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-button,
-input,
-select {
-    font: inherit;
+    return Array.from(poInputs)
+        .map(input => input.value.trim())
+        .filter(Boolean);
 }
 
 
-/* =========================================================
-   ANNOUNCEMENT BAR
-========================================================= */
-
-.announcement-bar {
-    min-height: 34px;
-    padding: 7px 5%;
-    background: var(--orange);
-    color: white;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-.site-header {
-    background: rgba(247, 245, 239, 0.97);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(8px);
-}
-
-.header-inner {
-    width: min(1400px, 92%);
-    min-height: 78px;
-    margin: auto;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 25px;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-}
-
-.brand-icon {
-    width: 43px;
-    height: 43px;
-
-    background: var(--orange);
-    color: white;
-
-    border-radius: 9px;
-
-    display: grid;
-    place-items: center;
-
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 21px;
-    font-weight: 900;
-}
-
-.brand-name-block strong {
-    display: block;
-
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 17px;
-    letter-spacing: 0.03em;
-}
-
-.brand-name-block span {
-    display: block;
-    margin-top: 2px;
-
-    font-size: 9px;
-    color: var(--muted);
-    letter-spacing: 0.18em;
-}
-
-.main-navigation {
-    display: flex;
-    align-items: center;
-    gap: 27px;
-
-    font-size: 13px;
-    color: #4c4944;
-}
-
-.main-navigation a {
-    transition: color 0.2s ease;
-}
-
-.main-navigation a:hover {
-    color: var(--orange);
-}
-
-.header-actions {
-    display: flex;
-    align-items: center;
-}
-
-.nav-button {
-    border: 1px solid #bbb4a8;
-    background: transparent;
-
-    padding: 11px 17px;
-    border-radius: 7px;
-
-    font-weight: 700;
-    font-size: 12px;
-
-    color: var(--black);
-}
-
-.nav-button:hover {
-    background: var(--black);
-    color: white;
-}
-
-
-/* =========================================================
-   HERO
-========================================================= */
-
-.hero-section {
-    background:
-        radial-gradient(
-            circle at 80% 20%,
-            rgba(255, 255, 255, 0.15),
-            transparent 35%
-        ),
-        var(--orange);
-
-    color: white;
-    overflow: hidden;
-}
-
-.hero-inner {
-    width: min(1400px, 92%);
-    min-height: 525px;
-    margin: auto;
-
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-
-    align-items: center;
-
-    gap: 40px;
-}
-
-.hero-copy {
-    max-width: 700px;
-}
-
-.hero-kicker {
-    display: inline-block;
-
-    padding: 7px 11px;
-
-    border: 1px solid rgba(255,255,255,0.35);
-    border-radius: 999px;
-
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.15em;
-}
-
-.hero-copy h1 {
-    margin: 20px 0 17px;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: clamp(42px, 5vw, 72px);
-
-    line-height: 0.98;
-
-    letter-spacing: -0.04em;
-}
-
-.hero-copy h1 span {
-    color: #fff2d9;
-}
-
-.hero-copy p {
-    max-width: 650px;
-
-    margin: 0;
-
-    color: rgba(255,255,255,0.84);
-
-    font-size: 16px;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 10px;
-
-    margin-top: 29px;
-}
-
-.hero-primary-button,
-.hero-secondary-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    min-height: 46px;
-
-    padding: 0 19px;
-
-    border-radius: 7px;
-
-    font-weight: 800;
-    font-size: 12px;
-
-    transition: 0.2s ease;
-}
-
-.hero-primary-button {
-    background: var(--black);
-    color: white;
-}
-
-.hero-primary-button:hover {
-    background: #000;
-}
-
-.hero-secondary-button {
-    border: 1px solid rgba(255,255,255,0.45);
-    color: white;
-}
-
-.hero-secondary-button:hover {
-    background: rgba(255,255,255,0.12);
-}
-
-.hero-points {
-    margin-top: 24px;
-
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-
-    font-size: 11px;
-    color: rgba(255,255,255,0.9);
-}
-
-
-/* =========================================================
-   HERO BOOK ART
-========================================================= */
-
-.hero-art {
-    position: relative;
-    height: 400px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.book-card {
-    position: absolute;
-
-    width: 265px;
-    height: 335px;
-
-    border-radius: 4px;
-
-    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-}
-
-.book-card-back {
-    background: #232320;
-    transform:
-        rotate(-11deg)
-        translateX(-45px);
-}
-
-.book-card-middle {
-    background: #f3ead8;
-    transform:
-        rotate(7deg)
-        translateX(40px);
-}
-
-.book-card-front {
-    background:
-        linear-gradient(
-            145deg,
-            #f9f4e8,
-            #e9dfc9
+function getLayoutMode() {
+
+    const selected =
+        document.querySelector(
+            'input[name="layoutMode"]:checked'
         );
 
-    color: var(--black);
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    text-align: center;
-
-    transform: rotate(-1deg);
-}
-
-.book-card-front span {
-    font-size: 11px;
-    letter-spacing: 0.17em;
-    color: var(--muted);
-}
-
-.book-card-front strong {
-    margin-top: 15px;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 35px;
-}
-
-.book-card-front small {
-    margin-top: 12px;
-
-    font-size: 12px;
-    color: var(--orange);
-
-    font-weight: 800;
+    return selected
+        ? selected.value
+        : "same";
 }
 
 
-/* =========================================================
-   MAIN GENERATOR
-========================================================= */
+function safeFileName(value) {
 
-.generator-section {
-    width: min(1400px, 92%);
-    margin: 0 auto;
-
-    padding: 70px 0 45px;
-}
-
-.section-heading {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-
-    gap: 20px;
-
-    margin-bottom: 26px;
-}
-
-.section-heading.centered {
-    display: block;
-    text-align: center;
-}
-
-.section-kicker {
-    color: var(--orange-dark);
-
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: 0.16em;
-}
-
-.section-heading h2 {
-    margin: 8px 0 7px;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 38px;
-    line-height: 1.1;
-}
-
-.section-heading p {
-    margin: 0;
-
-    color: var(--muted);
-
-    font-size: 13px;
-}
-
-.ready-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-
-    padding: 8px 12px;
-
-    border-radius: 999px;
-
-    background: #fff;
-    border: 1px solid var(--border);
-
-    font-size: 11px;
-}
-
-.ready-dot {
-    width: 7px;
-    height: 7px;
-
-    background: var(--green);
-
-    border-radius: 50%;
+    return String(value)
+        .replace(
+            /[^a-zA-Z0-9_-]/g,
+            "_"
+        );
 }
 
 
-/* =========================================================
-   GENERATOR GRID
-========================================================= */
+function getPositiveNumber(value, fallback) {
 
-.generator-grid {
-    display: grid;
+    const number =
+        Number(value);
 
-    grid-template-columns:
-        minmax(0, 1.05fr)
-        minmax(420px, 0.95fr);
-
-    gap: 25px;
-
-    align-items: start;
-}
-
-.control-area {
-    display: grid;
-    gap: 15px;
+    return Number.isFinite(number) &&
+           number > 0
+        ? number
+        : fallback;
 }
 
 
-/* =========================================================
-   CONTROL CARD
-========================================================= */
+// ============================================================
+// INPUT MODE
+// ============================================================
 
-.control-card {
-    background: var(--white);
+manualTab.addEventListener(
+    "click",
+    () => {
 
-    border: 1px solid var(--border);
+        manualTab.classList.add("active");
+        excelTab.classList.remove("active");
 
-    border-radius: var(--radius);
+        manualPOArea.classList.remove("hidden");
+        excelPOArea.classList.add("hidden");
 
-    padding: 22px;
+        updateAll();
+    }
+);
 
-    box-shadow: var(--shadow);
-}
 
-.control-card-heading {
-    display: flex;
-    align-items: center;
-    gap: 11px;
+excelTab.addEventListener(
+    "click",
+    () => {
+
+        excelTab.classList.add("active");
+        manualTab.classList.remove("active");
+
+        excelPOArea.classList.remove("hidden");
+        manualPOArea.classList.add("hidden");
+
+        updateAll();
+    }
+);
+
+
+// ============================================================
+// EXCEL UPLOAD
+// ============================================================
+
+excelFile.addEventListener(
+    "change",
+    async (event) => {
+
+        const file =
+            event.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        try {
+
+            excelFileStatus.textContent =
+                "Reading Excel file...";
+
+            const buffer =
+                await file.arrayBuffer();
+
+            const workbook =
+                XLSX.read(
+                    buffer,
+                    {
+                        type: "array"
+                    }
+                );
 
-    margin-bottom: 20px;
-}
+            if (
+                !workbook.SheetNames ||
+                workbook.SheetNames.length === 0
+            ) {
 
-.number-badge {
-    width: 31px;
-    height: 31px;
+                throw new Error(
+                    "No worksheet found."
+                );
 
-    background: var(--orange-soft);
-    color: var(--orange-dark);
+            }
 
-    border-radius: 7px;
+            const firstSheet =
+                workbook.Sheets[
+                    workbook.SheetNames[0]
+                ];
 
-    display: grid;
-    place-items: center;
+            const rows =
+                XLSX.utils.sheet_to_json(
+                    firstSheet,
+                    {
+                        header: 1,
+                        defval: ""
+                    }
+                );
 
-    font-size: 10px;
-    font-weight: 900;
-}
+            uploadedPOs = [];
 
-.control-card-heading h3 {
-    margin: 0;
+            rows.forEach(
+                (row, index) => {
 
-    font-family: Georgia, "Times New Roman", serif;
+                    if (
+                        !row ||
+                        row.length === 0
+                    ) {
+                        return;
+                    }
 
-    font-size: 20px;
-}
+                    const value =
+                        String(
+                            row[0]
+                        ).trim();
 
-.control-card-heading p {
-    margin: 2px 0 0;
+                    if (!value) {
+                        return;
+                    }
 
-    color: var(--muted);
+                    const normalized =
+                        value
+                            .toLowerCase()
+                            .trim();
 
-    font-size: 10px;
-}
+                    const headerNames = [
+                        "po",
+                        "po number",
+                        "po no",
+                        "po no.",
+                        "po_number",
+                        "purchase order"
+                    ];
 
+                    if (
+                        index === 0 &&
+                        headerNames.includes(
+                            normalized
+                        )
+                    ) {
+                        return;
+                    }
 
-/* =========================================================
-   TABS
-========================================================= */
+                    uploadedPOs.push(value);
+                }
+            );
 
-.input-tabs {
-    display: flex;
-    gap: 7px;
+            uploadedPOs =
+                [...new Set(uploadedPOs)];
 
-    margin-bottom: 16px;
+            if (
+                uploadedPOs.length === 0
+            ) {
 
-    border-bottom: 1px solid var(--border);
+                excelFileStatus.textContent =
+                    "No PO numbers found.";
 
-    padding-bottom: 10px;
-}
+                alert(
+                    "No PO numbers found in the first column."
+                );
 
-.input-tab {
-    border: 0;
+                return;
+            }
 
-    background: transparent;
+            excelFileStatus.textContent =
+                `${uploadedPOs.length} PO(s) loaded`;
 
-    color: var(--muted);
+            updateAll();
 
-    padding: 7px 11px;
+        }
 
-    border-radius: 6px;
+        catch (error) {
 
-    font-size: 12px;
-    font-weight: 800;
-}
+            console.error(error);
 
-.input-tab.active,
-.input-tab:hover {
-    background: var(--black);
-    color: white;
-}
+            excelFileStatus.textContent =
+                "Excel reading failed.";
 
+            alert(
+                "Unable to read the Excel file."
+            );
+        }
 
-/* =========================================================
-   PO INPUT
-========================================================= */
+    }
+);
 
-.po-input-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
 
-    gap: 9px;
-}
+// ============================================================
+// PAGE SIZE
+// ============================================================
 
-.po-input,
-.box-settings-grid input,
-.box-settings-grid select,
-.design-two-column select,
-.custom-size-row input {
-    width: 100%;
-    height: 42px;
+pageSizeButtons.forEach(
+    (button) => {
 
-    border: 1px solid #ccc7be;
+        button.addEventListener(
+            "click",
+            () => {
 
-    border-radius: 7px;
+                pageSizeButtons.forEach(
+                    item =>
+                        item.classList.remove(
+                            "active"
+                        )
+                );
 
-    padding: 0 11px;
+                button.classList.add("active");
 
-    background: #fff;
+                currentPageSize =
+                    button.dataset.pageSize;
 
-    color: var(--text);
-
-    outline: none;
-}
-
-.po-input:focus,
-.box-settings-grid input:focus,
-.box-settings-grid select:focus,
-.design-two-column select:focus,
-.custom-size-row input:focus {
-    border-color: var(--orange);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(239,107,36,0.1);
-}
-
-
-/* =========================================================
-   EXCEL
-========================================================= */
-
-.excel-po-area {
-    display: grid;
-    gap: 10px;
-}
-
-.excel-upload-box {
-    min-height: 145px;
-
-    border: 2px dashed #cfc8bd;
-
-    background: #fbfaf6;
-
-    border-radius: 10px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    text-align: center;
-
-    gap: 6px;
-
-    cursor: pointer;
-}
-
-.excel-upload-box:hover {
-    border-color: var(--orange);
-    background: var(--orange-soft);
-}
-
-.upload-symbol {
-    width: 35px;
-    height: 35px;
-
-    display: grid;
-    place-items: center;
-
-    background: var(--orange);
-
-    color: white;
-
-    border-radius: 50%;
-
-    font-size: 22px;
-}
-
-.excel-upload-box strong {
-    font-family: Georgia, "Times New Roman", serif;
-}
-
-.excel-upload-box small {
-    color: var(--muted);
-    font-size: 11px;
-}
-
-.file-status {
-    color: var(--muted);
-    font-size: 11px;
-}
-
-.hidden {
-    display: none !important;
-}
-
-
-/* =========================================================
-   PAGE SIZE
-========================================================= */
-
-.page-size-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 10px;
-}
-
-.page-size-button {
-    min-height: 78px;
-
-    border: 1px solid var(--border);
-
-    background: #fbfaf7;
-
-    border-radius: 9px;
-
-    text-align: left;
-
-    padding: 12px;
-
-    transition: 0.2s ease;
-}
-
-.page-size-button strong {
-    display: block;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 16px;
-}
-
-.page-size-button span {
-    display: block;
-
-    margin-top: 5px;
-
-    color: var(--muted);
-
-    font-size: 10px;
-}
-
-.page-size-button.active,
-.page-size-button:hover {
-    background: var(--orange-soft);
-
-    border-color: var(--orange);
-
-    transform: translateY(-1px);
-}
-
-.custom-size-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-
-    gap: 10px;
-
-    margin-top: 11px;
-}
-
-
-/* =========================================================
-   LAYOUT OPTIONS
-========================================================= */
-
-.layout-choice-group {
-    display: grid;
-
-    gap: 8px;
-
-    margin-bottom: 17px;
-}
-
-.layout-option {
-    display: grid;
-
-    grid-template-columns: auto 1fr;
-
-    gap: 10px;
-
-    padding: 12px;
-
-    border: 1px solid var(--border);
-
-    border-radius: 8px;
-
-    background: #fbfaf7;
-
-    cursor: pointer;
-}
-
-.layout-option.active {
-    border-color: var(--orange);
-
-    background: var(--orange-soft);
-}
-
-.layout-option input {
-    accent-color: var(--orange);
-}
-
-.layout-option strong {
-    display: block;
-
-    font-size: 12px;
-}
-
-.layout-option span {
-    display: block;
-
-    margin-top: 3px;
-
-    color: var(--muted);
-
-    font-size: 10px;
-}
-
-.box-settings-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
-    gap: 9px;
-}
-
-.box-settings-grid label,
-.design-two-column label {
-    display: block;
-
-    margin-bottom: 6px;
-
-    color: #5f5b55;
-
-    font-size: 10px;
-
-    font-weight: 800;
-}
-
-
-/* =========================================================
-   DESIGN
-========================================================= */
-
-.setting-line {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding-bottom: 16px;
-
-    margin-bottom: 16px;
-
-    border-bottom: 1px solid var(--border);
-}
-
-.setting-line strong {
-    display: block;
-
-    font-size: 12px;
-}
-
-.setting-line span {
-    display: block;
-
-    margin-top: 3px;
-
-    color: var(--muted);
-
-    font-size: 10px;
-}
-
-.design-two-column {
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 10px;
-
-    margin-top: 10px;
-}
-
-
-/* =========================================================
-   SWITCH
-========================================================= */
-
-.switch {
-    position: relative;
-
-    width: 48px;
-    height: 26px;
-}
-
-.switch input {
-    opacity: 0;
-
-    width: 0;
-    height: 0;
-}
-
-.switch-slider {
-    position: absolute;
-
-    inset: 0;
-
-    background: #c7c2b9;
-
-    border-radius: 999px;
-
-    cursor: pointer;
-
-    transition: 0.2s ease;
-}
-
-.switch-slider::before {
-    content: "";
-
-    position: absolute;
-
-    width: 20px;
-    height: 20px;
-
-    left: 3px;
-    top: 3px;
-
-    background: white;
-
-    border-radius: 50%;
-
-    transition: 0.2s ease;
-}
-
-.switch input:checked + .switch-slider {
-    background: var(--orange);
-}
-
-.switch input:checked + .switch-slider::before {
-    transform: translateX(22px);
-}
-
-
-/* =========================================================
-   PREVIEW
-========================================================= */
-
-.preview-area {
-    background: var(--black);
-
-    color: white;
-
-    border-radius: var(--radius);
-
-    padding: 20px;
-
-    box-shadow: 0 18px 45px rgba(0,0,0,0.18);
-
-    position: sticky;
-
-    top: 95px;
-}
-
-.preview-topbar {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    margin-bottom: 16px;
-}
-
-.preview-topbar h3 {
-    margin: 5px 0 0;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 21px;
-}
-
-.preview-zoom {
-    display: flex;
-
-    align-items: center;
-
-    gap: 6px;
-}
-
-.preview-zoom button {
-    width: 29px;
-    height: 29px;
-
-    border: 1px solid rgba(255,255,255,0.18);
-
-    color: white;
-
-    background: rgba(255,255,255,0.07);
-
-    border-radius: 6px;
-}
-
-.preview-zoom span {
-    min-width: 43px;
-
-    text-align: center;
-
-    color: #c7c4be;
-
-    font-size: 10px;
-}
-
-
-/* =========================================================
-   PREVIEW CANVAS
-========================================================= */
-
-.preview-canvas {
-    min-height: 570px;
-
-    padding: 32px;
-
-    border-radius: 9px;
-
-    display: grid;
-
-    place-items: center;
-
-    overflow: hidden;
-
-    background:
-        linear-gradient(
-            45deg,
-            #262522 25%,
-            transparent 25%
-        ),
-        linear-gradient(
-            -45deg,
-            #262522 25%,
-            transparent 25%
-        ),
-        linear-gradient(
-            45deg,
-            transparent 75%,
-            #262522 75%
-        ),
-        linear-gradient(
-            -45deg,
-            transparent 75%,
-            #262522 75%
+                updateAll();
+            }
         );
 
-    background-size: 24px 24px;
+    }
+);
 
-    background-position:
-        0 0,
-        0 12px,
-        12px -12px,
-        -12px 0px;
-}
 
-.label-preview {
-    width: 290px;
-    height: 435px;
+function getPageSize() {
 
-    background: #fff;
+    if (currentPageSize === "4x6") {
 
-    color: #1e1e1c;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    align-items: center;
-
-    gap: 18px;
-
-    box-shadow:
-        0 25px 60px rgba(0,0,0,0.35);
-
-    transform-origin: center center;
-
-    text-align: center;
-
-    padding: 30px;
-}
-
-.preview-po {
-    font-family: Arial, sans-serif;
-
-    font-size: 22px;
-
-    font-weight: 700;
-}
-
-.preview-box {
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 30px;
-
-    font-weight: 700;
-}
-
-
-/* =========================================================
-   PREVIEW SUMMARY
-========================================================= */
-
-.preview-summary {
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    gap: 8px;
-
-    margin-top: 13px;
-}
-
-.preview-summary > div {
-    padding: 10px;
-
-    border:
-
-        1px solid
-        rgba(255,255,255,0.1);
-
-    border-radius: 7px;
-
-    background:
-        rgba(255,255,255,0.05);
-}
-
-.preview-summary span {
-    display: block;
-
-    color: #a7a39c;
-
-    font-size: 9px;
-}
-
-.preview-summary strong {
-    display: block;
-
-    margin-top: 3px;
-
-    font-size: 12px;
-}
-
-
-/* =========================================================
-   PREVIEW BUTTONS
-========================================================= */
-
-.preview-actions {
-    display: grid;
-
-    grid-template-columns: 130px 1fr;
-
-    gap: 9px;
-
-    margin-top: 13px;
-}
-
-.reset-button,
-.generate-button {
-    height: 46px;
-
-    border-radius: 7px;
-
-    font-weight: 800;
-
-    border: 0;
-
-    cursor: pointer;
-}
-
-.reset-button {
-    background: #f2efe8;
-
-    color: var(--black);
-}
-
-.reset-button:hover {
-    background: white;
-}
-
-.generate-button {
-    background: var(--orange);
-
-    color: white;
-}
-
-.generate-button:hover {
-    background: var(--orange-dark);
-}
-
-.generation-status {
-    margin: 9px 0 0;
-
-    color: #9e9990;
-
-    text-align: center;
-
-    font-size: 10px;
-}
-
-
-/* =========================================================
-   FEATURES
-========================================================= */
-
-.features-section {
-    width: min(1400px, 92%);
-
-    margin: 0 auto;
-
-    padding: 55px 0 70px;
-}
-
-.feature-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    gap: 14px;
-
-    margin-top: 25px;
-}
-
-.feature-card {
-    background: white;
-
-    border: 1px solid var(--border);
-
-    border-radius: 11px;
-
-    padding: 21px;
-
-    box-shadow: var(--shadow);
-}
-
-.feature-number {
-    color: var(--orange);
-
-    font-size: 10px;
-
-    font-weight: 900;
-}
-
-.feature-card h3 {
-    margin: 11px 0 8px;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 19px;
-}
-
-.feature-card p {
-    margin: 0;
-
-    color: var(--muted);
-
-    font-size: 11px;
-}
-
-
-/* =========================================================
-   HELP
-========================================================= */
-
-.help-section {
-    width: min(1400px, 92%);
-
-    margin: 0 auto 70px;
-
-    padding: 38px;
-
-    background: var(--black);
-
-    color: white;
-
-    border-radius: 15px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 25px;
-}
-
-.help-section h2 {
-    margin: 8px 0;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 31px;
-}
-
-.help-section p {
-    margin: 0;
-
-    color: #bdb9b1;
-
-    font-size: 12px;
-}
-
-.help-button {
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    min-height: 44px;
-
-    padding: 0 18px;
-
-    background: var(--orange);
-
-    color: white;
-
-    border-radius: 7px;
-
-    font-size: 12px;
-
-    font-weight: 800;
-
-    white-space: nowrap;
-}
-
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.site-footer {
-    background: #181817;
-
-    color: white;
-}
-
-.footer-inner {
-    width: min(1400px, 92%);
-
-    margin: auto;
-
-    padding: 45px 0 32px;
-
-    display: flex;
-
-    justify-content: space-between;
-
-    gap: 40px;
-}
-
-.footer-brand {
-    display: flex;
-
-    align-items: center;
-
-    gap: 11px;
-}
-
-.footer-icon {
-    background: var(--orange);
-}
-
-.footer-brand strong {
-    display: block;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 14px;
-}
-
-.footer-brand p {
-    margin: 4px 0 0;
-
-    color: #929089;
-
-    font-size: 10px;
-}
-
-.footer-links {
-    display: flex;
-
-    gap: 55px;
-}
-
-.footer-links div {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 7px;
-}
-
-.footer-links strong {
-    color: white;
-
-    font-size: 11px;
-
-    margin-bottom: 3px;
-}
-
-.footer-links a {
-    color: #aaa69f;
-
-    font-size: 10px;
-}
-
-.footer-links a:hover {
-    color: var(--orange);
-}
-
-.footer-bottom {
-    width: min(1400px, 92%);
-
-    margin: auto;
-
-    padding: 17px 0 22px;
-
-    border-top:
-        1px solid
-        rgba(255,255,255,0.08);
-
-    display: flex;
-
-    justify-content: space-between;
-
-    gap: 20px;
-
-    color: #85827c;
-
-    font-size: 10px;
-}
-
-.footer-bottom strong {
-    color: white;
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (max-width: 1100px) {
-
-    .hero-inner {
-        grid-template-columns: 1fr;
-        padding: 55px 0;
+        return {
+            width: 101.6,
+            height: 152.4,
+            label: "4 × 6 inch"
+        };
     }
 
-    .hero-art {
-        height: 320px;
+
+    if (currentPageSize === "a4") {
+
+        return {
+            width: 210,
+            height: 297,
+            label: "A4"
+        };
     }
 
-    .generator-grid {
-        grid-template-columns: 1fr;
+
+    if (currentPageSize === "70x35") {
+
+        return {
+            width: 70,
+            height: 35,
+            label: "70 × 35 mm"
+        };
     }
 
-    .preview-area {
-        position: relative;
-        top: auto;
+
+    const width =
+        getPositiveNumber(
+            customWidth.value,
+            null
+        );
+
+    const height =
+        getPositiveNumber(
+            customHeight.value,
+            null
+        );
+
+    if (!width || !height) {
+        return null;
     }
 
-    .feature-grid {
-        grid-template-columns:
-            repeat(2, 1fr);
+    return {
+        width,
+        height,
+        label: `${width} × ${height} mm`
+    };
+}
+
+
+// ============================================================
+// SETTINGS
+// ============================================================
+
+function getSettings() {
+
+    let start =
+        parseInt(
+            startBox.value,
+            10
+        );
+
+    let end =
+        parseInt(
+            endBox.value,
+            10
+        );
+
+    let perPage =
+        parseInt(
+            labelsPerPage.value,
+            10
+        );
+
+    let pages =
+        parseInt(
+            pageCount.value,
+            10
+        );
+
+    if (
+        !Number.isFinite(start) ||
+        start < 1
+    ) {
+        start = 1;
     }
 
-    .main-navigation {
-        display: none;
+    if (
+        !Number.isFinite(end) ||
+        end < start
+    ) {
+        end = start;
     }
+
+    if (
+        !Number.isFinite(perPage) ||
+        perPage < 1
+    ) {
+        perPage = 1;
+    }
+
+    if (
+        !Number.isFinite(pages) ||
+        pages < 1
+    ) {
+        pages = 1;
+    }
+
+    return {
+        start,
+        end,
+        perPage,
+        pages
+    };
+}
+
+
+// ============================================================
+// LABEL/PAGE GRID
+// ============================================================
+
+function getGrid(count) {
+
+    const grids = {
+
+        1: [1, 1],
+        2: [1, 2],
+        3: [1, 3],
+        4: [2, 2],
+        5: [2, 3],
+        6: [2, 3],
+        7: [2, 4],
+        8: [2, 4],
+        9: [3, 3],
+        10: [2, 5]
+
+    };
+
+    return grids[count] || [2, 5];
+}
+
+
+// ============================================================
+// BUILD OUTPUT PAGES
+// ============================================================
+
+function buildOutputPages() {
+
+    const pos =
+        getPOs();
+
+    const {
+        start,
+        end,
+        perPage,
+        pages
+    } =
+        getSettings();
+
+    const mode =
+        getLayoutMode();
+
+    const outputPages = [];
+
+
+    // ========================================================
+    // SAME BOX MODE
+    // ========================================================
+
+    if (mode === "same") {
+
+        pos.forEach(
+            po => {
+
+                for (
+                    let pageNo = 1;
+                    pageNo <= pages;
+                    pageNo++
+                ) {
+
+                    const pageLabels = [];
+
+                    for (
+                        let i = 0;
+                        i < perPage;
+                        i++
+                    ) {
+
+                        pageLabels.push({
+                            po,
+                            box: start
+                        });
+
+                    }
+
+                    outputPages.push(
+                        pageLabels
+                    );
+                }
+
+            }
+        );
+
+        return outputPages;
+    }
+
+
+    // ========================================================
+    // SEQUENTIAL MODE
+    // ========================================================
+
+    pos.forEach(
+        po => {
+
+            let currentBox =
+                start;
+
+            let currentPageLabels =
+                [];
+
+            while (
+                currentBox <= end
+            ) {
+
+                currentPageLabels.push({
+
+                    po,
+                    box: currentBox
+
+                });
+
+                currentBox++;
+
+
+                if (
+                    currentPageLabels.length ===
+                    perPage
+                    ||
+                    currentBox > end
+                ) {
+
+                    outputPages.push(
+                        currentPageLabels
+                    );
+
+                    currentPageLabels = [];
+
+                }
+
+            }
+
+        }
+    );
+
+
+    return outputPages;
+}
+
+
+// ============================================================
+// PREVIEW
+// ============================================================
+
+function updatePreview() {
+
+    const pos =
+        getPOs();
+
+    const settings =
+        getSettings();
+
+    const mode =
+        getLayoutMode();
+
+
+    previewPO.textContent =
+        pos.length > 0
+            ? pos[0]
+            : "BWG123";
+
+
+    previewBox.textContent =
+        `BOX ${settings.start}`;
+
+
+    const page =
+        getPageSize();
+
+
+    summaryPageSize.textContent =
+        page
+            ? page.label
+            : "Custom";
+
+
+    summaryLabels.textContent =
+        settings.perPage;
+
+
+    let totalPages = 1;
+
+
+    if (pos.length > 0) {
+
+        if (mode === "same") {
+
+            totalPages =
+                pos.length *
+                settings.pages;
+
+        }
+
+        else {
+
+            const boxCount =
+                settings.end -
+                settings.start +
+                1;
+
+            totalPages =
+                Math.ceil(
+                    (
+                        pos.length *
+                        boxCount
+                    )
+                    /
+                    settings.perPage
+                );
+
+        }
+
+    }
+
+
+    summaryPages.textContent =
+        totalPages;
+
+
+    updatePreviewDesign();
+}
+
+
+// ============================================================
+// PREVIEW DESIGN
+// ============================================================
+
+function updatePreviewDesign() {
+
+    // --------------------------------------------------------
+    // BORDER
+    // --------------------------------------------------------
+
+    if (
+        !borderEnabled.checked
+    ) {
+
+        labelPreview.style.border =
+            "none";
+
+    }
+
+    else {
+
+        const styles = {
+
+            "solid-dark":
+                "3px solid #1d1d1b",
+
+            "solid-medium":
+                "2px solid #555",
+
+            "solid-light":
+                "1px solid #aaa",
+
+            "double":
+                "4px double #333",
+
+            "dashed":
+                "2px dashed #555"
+
+        };
+
+        labelPreview.style.border =
+            styles[
+                borderStyle.value
+            ] ||
+            styles["solid-dark"];
+    }
+
+
+    // --------------------------------------------------------
+    // FONT
+    // --------------------------------------------------------
+
+    previewPO.style.fontFamily =
+        fontFamily.value;
+
+    previewBox.style.fontFamily =
+        fontFamily.value;
+
+
+    const size =
+        parseInt(
+            fontSize.value,
+            10
+        ) || 10;
+
+
+    previewPO.style.fontSize =
+        `${size}px`;
+
+
+    previewBox.style.fontSize =
+        `${Math.min(
+            40,
+            size + 8
+        )}px`;
+
+
+    previewPO.style.fontWeight =
+        fontWeight.value;
+
+    previewBox.style.fontWeight =
+        fontWeight.value;
+
+
+    // --------------------------------------------------------
+    // ZOOM
+    // --------------------------------------------------------
+
+    labelPreview.style.transform =
+        `scale(${zoom})`;
+
+    zoomValue.textContent =
+        `${Math.round(
+            zoom * 100
+        )}%`;
+}
+
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+
+poInputs.forEach(
+    input => {
+
+        input.addEventListener(
+            "input",
+            updateAll
+        );
+
+    }
+);
+
+
+[
+    customWidth,
+    customHeight,
+    startBox,
+    endBox,
+    labelsPerPage,
+    pageCount,
+    borderEnabled,
+    borderStyle,
+    fontFamily,
+    fontSize,
+    fontWeight
+].forEach(
+    element => {
+
+        element.addEventListener(
+            "input",
+            updateAll
+        );
+
+        element.addEventListener(
+            "change",
+            updateAll
+        );
+
+    }
+);
+
+
+// ============================================================
+// LAYOUT RADIO BUTTONS
+// ============================================================
+
+document
+    .querySelectorAll(
+        'input[name="layoutMode"]'
+    )
+    .forEach(
+        radio => {
+
+            radio.addEventListener(
+                "change",
+                () => {
+
+                    document
+                        .querySelectorAll(
+                            ".layout-option"
+                        )
+                        .forEach(
+                            card =>
+                                card.classList.remove(
+                                    "active"
+                                )
+                        );
+
+
+                    const activeCard =
+                        radio.closest(
+                            ".layout-option"
+                        );
+
+
+                    if (activeCard) {
+
+                        activeCard.classList.add(
+                            "active"
+                        );
+
+                    }
+
+
+                    updateAll();
+                }
+            );
+
+        }
+    );
+
+
+// ============================================================
+// ZOOM
+// ============================================================
+
+zoomIn.addEventListener(
+    "click",
+    () => {
+
+        zoom =
+            Math.min(
+                1.5,
+                zoom + 0.1
+            );
+
+        updatePreviewDesign();
+    }
+);
+
+
+zoomOut.addEventListener(
+    "click",
+    () => {
+
+        zoom =
+            Math.max(
+                0.6,
+                zoom - 0.1
+            );
+
+        updatePreviewDesign();
+    }
+);
+
+
+// ============================================================
+// PDF FONT MAPPING
+// ============================================================
+
+function getPDFFont() {
+
+    switch (
+        fontFamily.value
+    ) {
+
+        case "Georgia":
+            return "times";
+
+        case "Times New Roman":
+            return "times";
+
+        default:
+            return "helvetica";
+    }
+}
+
+
+// ============================================================
+// PDF BORDER
+// ============================================================
+
+function drawPDFBorder(
+    pdf,
+    width,
+    height
+) {
+
+    if (
+        !borderEnabled.checked
+    ) {
+        return;
+    }
+
+
+    switch (
+        borderStyle.value
+    ) {
+
+        case "solid-dark":
+
+            pdf.setDrawColor(
+                30,
+                30,
+                30
+            );
+
+            pdf.setLineWidth(
+                0.8
+            );
+
+            pdf.rect(
+                3,
+                3,
+                width - 6,
+                height - 6
+            );
+
+            break;
+
+
+        case "solid-medium":
+
+            pdf.setDrawColor(
+                85,
+                85,
+                85
+            );
+
+            pdf.setLineWidth(
+                0.5
+            );
+
+            pdf.rect(
+                3,
+                3,
+                width - 6,
+                height - 6
+            );
+
+            break;
+
+
+        case "solid-light":
+
+            pdf.setDrawColor(
+                160,
+                160,
+                160
+            );
+
+            pdf.setLineWidth(
+                0.25
+            );
+
+            pdf.rect(
+                3,
+                3,
+                width - 6,
+                height - 6
+            );
+
+            break;
+
+
+        case "double":
+
+            pdf.setDrawColor(
+                50,
+                50,
+                50
+            );
+
+            pdf.setLineWidth(
+                0.5
+            );
+
+            pdf.rect(
+                3,
+                3,
+                width - 6,
+                height - 6
+            );
+
+            pdf.setLineWidth(
+                0.25
+            );
+
+            pdf.rect(
+                6,
+                6,
+                width - 12,
+                height - 12
+            );
+
+            break;
+
+
+        case "dashed":
+
+            pdf.setDrawColor(
+                80,
+                80,
+                80
+            );
+
+            pdf.setLineWidth(
+                0.4
+            );
+
+            pdf.setLineDashPattern(
+                [2, 2],
+                0
+            );
+
+            pdf.rect(
+                3,
+                3,
+                width - 6,
+                height - 6
+            );
+
+            pdf.setLineDashPattern(
+                [],
+                0
+            );
+
+            break;
+
+    }
+}
+
+
+// ============================================================
+// DRAW LABEL
+// ============================================================
+
+function drawLabel(
+    pdf,
+    label,
+    x,
+    y,
+    width,
+    height
+) {
+
+    const size =
+        parseInt(
+            fontSize.value,
+            10
+        ) || 10;
+
+
+    const font =
+        getPDFFont();
+
+
+    const weight =
+        fontWeight.value ===
+        "bold"
+            ? "bold"
+            : "normal";
+
+
+    pdf.setTextColor(
+        25,
+        25,
+        25
+    );
+
+
+    pdf.setFont(
+        font,
+        weight
+    );
+
+
+    // --------------------------------------------------------
+    // PO NUMBER
+    // --------------------------------------------------------
+
+    pdf.setFontSize(
+        size
+    );
+
+
+    pdf.text(
+        String(label.po),
+        x + width / 2,
+        y + height * 0.43,
+        {
+            align: "center"
+        }
+    );
+
+
+    // --------------------------------------------------------
+    // BOX NUMBER
+    // --------------------------------------------------------
+
+    pdf.setFontSize(
+        Math.min(
+            40,
+            size + 8
+        )
+    );
+
+
+    pdf.text(
+        `BOX ${label.box}`,
+        x + width / 2,
+        y + height * 0.60,
+        {
+            align: "center"
+        }
+    );
+}
+
+
+// ============================================================
+// PDF GENERATION
+// ============================================================
+
+generatePDFButton.addEventListener(
+    "click",
+    () => {
+
+        const pos =
+            getPOs();
+
+
+        if (
+            pos.length === 0
+        ) {
+
+            alert(
+                "Please enter at least one PO number."
+            );
+
+            return;
+        }
+
+
+        const page =
+            getPageSize();
+
+
+        if (!page) {
+
+            alert(
+                "Please select a valid page size."
+            );
+
+            return;
+        }
+
+
+        const outputPages =
+            buildOutputPages();
+
+
+        if (
+            outputPages.length === 0
+        ) {
+
+            alert(
+                "No labels available."
+            );
+
+            return;
+        }
+
+
+        generationStatus.textContent =
+            "Generating PDF...";
+
+
+        const orientation =
+            page.width > page.height
+                ? "landscape"
+                : "portrait";
+
+
+        const pdf =
+            new jsPDF({
+                orientation,
+                unit: "mm",
+                format: [
+                    page.width,
+                    page.height
+                ]
+            });
+
+
+        // ====================================================
+        // EACH PDF PAGE
+        // ====================================================
+
+        outputPages.forEach(
+            (pageLabels, pageIndex) => {
+
+                if (
+                    pageIndex > 0
+                ) {
+
+                    pdf.addPage(
+                        [
+                            page.width,
+                            page.height
+                        ],
+                        orientation
+                    );
+
+                }
+
+
+                drawPDFBorder(
+                    pdf,
+                    page.width,
+                    page.height
+                );
+
+
+                const count =
+                    pageLabels.length;
+
+
+                const [
+                    rows,
+                    columns
+                ] =
+                    getGrid(count);
+
+
+                const cellWidth =
+                    page.width /
+                    columns;
+
+
+                const cellHeight =
+                    page.height /
+                    rows;
+
+
+                pageLabels.forEach(
+                    (label, index) => {
+
+                        const row =
+                            Math.floor(
+                                index /
+                                columns
+                            );
+
+
+                        const column =
+                            index %
+                            columns;
+
+
+                        const x =
+                            column *
+                            cellWidth;
+
+
+                        const y =
+                            row *
+                            cellHeight;
+
+
+                        drawLabel(
+                            pdf,
+                            label,
+                            x,
+                            y,
+                            cellWidth,
+                            cellHeight
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        // ====================================================
+        // FILE NAME
+        // ====================================================
+
+        const firstPO =
+            safeFileName(
+                pos[0]
+            );
+
+
+        const filename =
+            `${firstPO}_BooksWagon_Labels.pdf`;
+
+
+        pdf.save(
+            filename
+        );
+
+
+        generationStatus.textContent =
+            `PDF generated successfully — ${outputPages.length} page(s)`;
+    }
+);
+
+
+// ============================================================
+// RESET
+// ============================================================
+
+function resetAll() {
+
+    // PO
+
+    poInputs.forEach(
+        input => {
+            input.value = "";
+        }
+    );
+
+
+    uploadedPOs = [];
+
+
+    excelFile.value =
+        "";
+
+
+    excelFileStatus.textContent =
+        "No file selected";
+
+
+    // Mode
+
+    manualTab.classList.add(
+        "active"
+    );
+
+    excelTab.classList.remove(
+        "active"
+    );
+
+    manualPOArea.classList.remove(
+        "hidden"
+    );
+
+    excelPOArea.classList.add(
+        "hidden"
+    );
+
+
+    // Page size
+
+    currentPageSize =
+        "4x6";
+
+
+    pageSizeButtons.forEach(
+        button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.pageSize ===
+                    "4x6"
+            );
+
+        }
+    );
+
+
+    customWidth.value = "";
+    customHeight.value = "";
+
+
+    // Box
+
+    startBox.value = 1;
+    endBox.value = 10;
+
+    labelsPerPage.value = 1;
+    pageCount.value = 1;
+
+
+    // Layout
+
+    const sameMode =
+        document.querySelector(
+            'input[name="layoutMode"][value="same"]'
+        );
+
+
+    if (sameMode) {
+
+        sameMode.checked = true;
+
+    }
+
+
+    document
+        .querySelectorAll(
+            ".layout-option"
+        )
+        .forEach(
+            card =>
+                card.classList.remove(
+                    "active"
+                )
+        );
+
+
+    const sameCard =
+        sameMode
+            ? sameMode.closest(
+                ".layout-option"
+            )
+            : null;
+
+
+    if (sameCard) {
+
+        sameCard.classList.add(
+            "active"
+        );
+
+    }
+
+
+    // Design
+
+    borderEnabled.checked =
+        false;
+
+    borderStyle.value =
+        "solid-dark";
+
+    fontFamily.value =
+        "Arial";
+
+    fontSize.value =
+        "10";
+
+    fontWeight.value =
+        "normal";
+
+
+    // Zoom
+
+    zoom = 1;
+
+
+    generationStatus.textContent =
+        "Ready to generate";
+
+
+    updateAll();
+}
+
+
+resetButton.addEventListener(
+    "click",
+    resetAll
+);
+
+
+newProjectButton.addEventListener(
+    "click",
+    () => {
+
+        resetAll();
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+);
+
+
+// ============================================================
+// UPDATE
+// ============================================================
+
+function updateAll() {
+
+    updatePreview();
 
 }
 
 
-@media (max-width: 700px) {
+// ============================================================
+// INITIALIZE
+// ============================================================
 
-    .announcement-bar {
-        display: none;
-    }
-
-    .header-inner {
-        min-height: 66px;
-    }
-
-    .header-actions {
-        display: none;
-    }
-
-    .hero-copy h1 {
-        font-size: 43px;
-    }
-
-    .hero-art {
-        transform: scale(0.84);
-    }
-
-    .po-input-grid,
-    .page-size-grid,
-    .design-two-column,
-    .custom-size-row {
-        grid-template-columns: 1fr;
-    }
-
-    .box-settings-grid {
-        grid-template-columns:
-            repeat(2, 1fr);
-    }
-
-    .preview-canvas {
-        min-height: 470px;
-        padding: 20px;
-    }
-
-    .label-preview {
-        width: 220px;
-        height: 330px;
-    }
-
-    .feature-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .help-section {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .footer-inner {
-        flex-direction: column;
-    }
-
-    .footer-bottom {
-        flex-direction: column;
-    }
-
-}
-
-
-@media (max-width: 450px) {
-
-    .hero-copy h1 {
-        font-size: 36px;
-    }
-
-    .hero-buttons {
-        flex-direction: column;
-    }
-
-    .box-settings-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .preview-actions {
-        grid-template-columns: 1fr;
-    }
-
-}
+updateAll();
