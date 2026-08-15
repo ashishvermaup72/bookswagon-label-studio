@@ -1,2444 +1,1201 @@
-"use strict";
-
-/* =========================================================
-   BOOKSWAGON LABEL STUDIO — FINAL JS
-========================================================= */
-
-const CONFIG = {
-    email: "ashish.verma@bookswagon.in",
-    address:
-        "Ground Floor, 2/14, Ansari Rd, Old Delhi, Daryaganj, Delhi, 110002",
-    maps: "https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
-};
-
-let currentTool = "Coco Blue";
-let excelRows = [];
-let addressExcelRows = [];
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-const $ = selector => document.querySelector(selector);
-const $$ = selector => [...document.querySelectorAll(selector)];
-
-function escapeHTML(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+:root {
+    --navy: #203d72;
+    --dark: #132b54;
+    --yellow: #ffc83d;
+    --bg: #f4f6f9;
+    --white: #ffffff;
+    --text: #172033;
+    --muted: #6b7483;
+    --border: #dce2ea;
+    --green: #149c60;
+    --red: #d83d3d;
+    --shadow: 0 10px 30px rgba(20, 45, 85, 0.10);
 }
 
-function safeFilename(value) {
-    return String(value || "LABEL")
-        .replace(/[^a-z0-9_-]+/gi, "_")
-        .slice(0, 80);
+* {
+    box-sizing: border-box;
 }
 
-function toast(message, type = "success") {
-    const container = $("#toastContainer");
-
-    if (!container) {
-        console.log(message);
-        return;
-    }
-
-    const item = document.createElement("div");
-
-    item.className =
-        type === "error"
-            ? "toast error"
-            : "toast";
-
-    item.textContent = message;
-
-    container.appendChild(item);
-
-    setTimeout(() => {
-        item.remove();
-    }, 2800);
+html {
+    scroll-behavior: smooth;
 }
 
-
-/* =========================================================
-   LOAD JSZIP IF NOT AVAILABLE
-========================================================= */
-
-function ensureJSZip() {
-    return new Promise((resolve, reject) => {
-
-        if (window.JSZip) {
-            resolve(window.JSZip);
-            return;
-        }
-
-        const script = document.createElement("script");
-
-        script.src =
-            "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-
-        script.onload = () => {
-            if (window.JSZip) {
-                resolve(window.JSZip);
-            } else {
-                reject(
-                    new Error("JSZip could not be loaded.")
-                );
-            }
-        };
-
-        script.onerror = () => {
-            reject(
-                new Error("Unable to load ZIP library.")
-            );
-        };
-
-        document.head.appendChild(script);
-    });
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-
-/* =========================================================
-   CREATE 20 PO FIELDS
-========================================================= */
-
-function createPOFields() {
-
-    const grid = $("#poGrid");
-
-    if (!grid) return;
-
-    grid.innerHTML = "";
-
-    for (let i = 1; i <= 20; i++) {
-
-        const wrapper = document.createElement("div");
-
-        wrapper.className = "po-field";
-
-        const label = document.createElement("span");
-
-        label.textContent = `PO ${i}`;
-
-        const input = document.createElement("input");
-
-        input.type = "text";
-        input.className = "po-input";
-        input.placeholder = `PO Number ${i}`;
-
-        wrapper.appendChild(label);
-        wrapper.appendChild(input);
-
-        grid.appendChild(wrapper);
-    }
+button,
+input,
+select,
+textarea {
+    font: inherit;
 }
 
-
-/* =========================================================
-   PARSE MULTIPLE VALUES
-========================================================= */
-
-function parseList(value) {
-
-    return String(value || "")
-        .split(/[\n,;|]+/)
-        .map(item => item.trim())
-        .filter(Boolean);
+button {
+    cursor: pointer;
 }
 
-
-/* =========================================================
-   FIND EXCEL VALUE
-========================================================= */
-
-function findValue(row, possibleNames) {
-
-    if (!row || typeof row !== "object") {
-        return "";
-    }
-
-    const keys = Object.keys(row);
-
-    for (const name of possibleNames) {
-
-        const wanted =
-            name
-                .toLowerCase()
-                .replace(/[\s_-]/g, "");
-
-        const matchedKey = keys.find(key => {
-
-            return (
-                key
-                    .toLowerCase()
-                    .replace(/[\s_-]/g, "") === wanted
-            );
-
-        });
-
-        if (
-            matchedKey &&
-            row[matchedKey] !== undefined &&
-            row[matchedKey] !== null
-        ) {
-            return String(row[matchedKey]).trim();
-        }
-    }
-
-    return "";
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
-
-/* =========================================================
-   GET PO / ISBN LIST
-========================================================= */
-
-function getPOList() {
-
-    const manual =
-        $$(".po-input")
-            .map(input => input.value.trim())
-            .filter(Boolean);
-
-    const bulk =
-        parseList(
-            $("#bulkPO")?.value
-        );
-
-    const excel =
-        excelRows
-            .map(row =>
-                findValue(row, [
-                    "PO",
-                    "PO Number",
-                    "PONumber",
-                    "ISBN",
-                    "ISBN Number"
-                ])
-            )
-            .filter(Boolean);
-
-    return [
-        ...new Set([
-            ...manual,
-            ...bulk,
-            ...excel
-        ])
-    ];
+.container {
+    width: min(1180px, calc(100% - 30px));
+    margin: auto;
 }
 
+/* =========================
+   HEADER
+========================= */
 
-/* =========================================================
-   EXCEL PREVIEW
-========================================================= */
-
-function showExcelPreview(rows, targetSelector) {
-
-    const container = $(targetSelector);
-
-    if (!container) return;
-
-    if (!rows || !rows.length) {
-        container.innerHTML = "";
-        return;
-    }
-
-    const columns = Object.keys(rows[0]);
-
-    let html = "<table>";
-    html += "<thead><tr>";
-
-    columns.forEach(column => {
-        html += `<th>${escapeHTML(column)}</th>`;
-    });
-
-    html += "</tr></thead>";
-    html += "<tbody>";
-
-    rows.slice(0, 10).forEach(row => {
-
-        html += "<tr>";
-
-        columns.forEach(column => {
-
-            html +=
-                `<td>${escapeHTML(row[column])}</td>`;
-
-        });
-
-        html += "</tr>";
-    });
-
-    html += "</tbody>";
-    html += "</table>";
-
-    container.innerHTML = html;
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--navy);
+    border-bottom: 3px solid var(--yellow);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, .15);
 }
 
-
-/* =========================================================
-   PO / ISBN EXCEL UPLOAD
-========================================================= */
-
-const excelFile = $("#excelFile");
-
-if (excelFile) {
-
-    excelFile.addEventListener("change", async event => {
-
-        const file = event.target.files[0];
-
-        if (!file) return;
-
-        try {
-
-            if (!window.XLSX) {
-                throw new Error(
-                    "Excel library is not loaded."
-                );
-            }
-
-            const buffer =
-                await file.arrayBuffer();
-
-            const workbook =
-                XLSX.read(
-                    buffer,
-                    {
-                        type: "array"
-                    }
-                );
-
-            const sheet =
-                workbook.Sheets[
-                    workbook.SheetNames[0]
-                ];
-
-            excelRows =
-                XLSX.utils.sheet_to_json(
-                    sheet,
-                    {
-                        defval: ""
-                    }
-                );
-
-            const status = $("#excelStatus");
-
-            if (status) {
-                status.textContent =
-                    `${excelRows.length} Excel row(s) loaded successfully.`;
-            }
-
-            showExcelPreview(
-                excelRows,
-                "#excelPreview"
-            );
-
-            toast(
-                `${excelRows.length} Excel row(s) loaded.`
-            );
-
-            updatePreview();
-
-        } catch (error) {
-
-            console.error(error);
-
-            toast(
-                "Could not read the Excel file.",
-                "error"
-            );
-        }
-    });
+.topbar-inner {
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-
-/* =========================================================
-   ADDRESS EXCEL UPLOAD
-========================================================= */
-
-const addressExcelFile =
-    $("#addressExcelFile");
-
-if (addressExcelFile) {
-
-    addressExcelFile.addEventListener(
-        "change",
-        async event => {
-
-            const file =
-                event.target.files[0];
-
-            if (!file) return;
-
-            try {
-
-                if (!window.XLSX) {
-                    throw new Error(
-                        "Excel library is not loaded."
-                    );
-                }
-
-                const buffer =
-                    await file.arrayBuffer();
-
-                const workbook =
-                    XLSX.read(
-                        buffer,
-                        {
-                            type: "array"
-                        }
-                    );
-
-                const sheet =
-                    workbook.Sheets[
-                        workbook.SheetNames[0]
-                    ];
-
-                addressExcelRows =
-                    XLSX.utils.sheet_to_json(
-                        sheet,
-                        {
-                            defval: ""
-                        }
-                    );
-
-                const status =
-                    $("#addressExcelStatus");
-
-                if (status) {
-                    status.textContent =
-                        `${addressExcelRows.length} address row(s) loaded.`;
-                }
-
-                showExcelPreview(
-                    addressExcelRows,
-                    "#addressExcelPreview"
-                );
-
-                if (addressExcelRows.length) {
-                    applyAddressRow(
-                        addressExcelRows[0]
-                    );
-                }
-
-                toast(
-                    `${addressExcelRows.length} address row(s) loaded.`
-                );
-
-            } catch (error) {
-
-                console.error(error);
-
-                toast(
-                    "Could not read address Excel file.",
-                    "error"
-                );
-            }
-        }
-    );
+.brand {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
 }
 
-
-/* =========================================================
-   APPLY ADDRESS ROW
-========================================================= */
-
-function applyAddressRow(row) {
-
-    const name =
-        findValue(row, [
-            "Name",
-            "Customer Name",
-            "Company",
-            "Company Name",
-            "To Name"
-        ]);
-
-    const address =
-        findValue(row, [
-            "Address",
-            "To Address",
-            "Shipping Address"
-        ]);
-
-    const city =
-        findValue(row, [
-            "City"
-        ]);
-
-    const state =
-        findValue(row, [
-            "State"
-        ]);
-
-    const pin =
-        findValue(row, [
-            "PIN",
-            "Pincode",
-            "Pin Code",
-            "Postal Code"
-        ]);
-
-    const completeAddress =
-        [
-            address,
-            city,
-            state,
-            pin
-        ]
-        .filter(Boolean)
-        .join(", ");
-
-    if ($("#toName")) {
-        $("#toName").value = name;
-    }
-
-    if ($("#toAddress")) {
-        $("#toAddress").value =
-            completeAddress;
-    }
-
-    if ($("#stickerToName")) {
-        $("#stickerToName").value =
-            name;
-    }
-
-    if ($("#stickerToAddress")) {
-        $("#stickerToAddress").value =
-            completeAddress;
-    }
-
-    updateAddressPreview();
+.nav {
+    display: flex;
+    gap: 25px;
 }
 
-
-/* =========================================================
-   OPEN TOOL
-========================================================= */
-
-function openTool(tool) {
-
-    currentTool = tool;
-
-    const workspace =
-        $("#workspace");
-
-    if (!workspace) return;
-
-    workspace.classList.add("active");
-
-    if ($("#workspaceTitle")) {
-        $("#workspaceTitle").textContent =
-            `${tool} Generator`;
-    }
-
-    if ($("#workspaceDescription")) {
-
-        $("#workspaceDescription").textContent =
-            tool === "Address Sticker"
-                ? "Create From BooksWagon → To Customer / Company address stickers."
-                : `Create ${tool} labels with Excel and address support.`;
-    }
-
-    $$(".tool-select-btn")
-        .forEach(button => {
-
-            button.classList.toggle(
-                "active",
-                button.dataset.selectTool === tool
-            );
-
-        });
-
-    configureToolUI();
-
-    workspace.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
+.nav a {
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
 }
 
+/* =========================
+   HERO
+========================= */
 
-/* =========================================================
-   TOOL UI
-========================================================= */
-
-function configureToolUI() {
-
-    const isAddressSticker =
-        currentTool === "Address Sticker";
-
-    const isISBN =
-        currentTool === "ISBN";
-
-    const poSection =
-        $("#poSection");
-
-    const boxSection =
-        $("#boxSection");
-
-    const poAddressSection =
-        $("#poAddressSection");
-
-    const addressSection =
-        $("#addressSection");
-
-    const printSection =
-        $("#printSection");
-
-    const borderSection =
-        $("#borderSection");
-
-    const fontSection =
-        $("#fontSection");
-
-    const cutSection =
-        $("#cutSection");
-
-    const previewSection =
-        $("#labelPreviewSection");
-
-    if (poSection) {
-        poSection.style.display =
-            isAddressSticker
-                ? "none"
-                : "";
-    }
-
-    if (boxSection) {
-        boxSection.style.display =
-            isAddressSticker || isISBN
-                ? "none"
-                : "";
-    }
-
-    if (poAddressSection) {
-        poAddressSection.style.display =
-            !isAddressSticker &&
-            !isISBN
-                ? ""
-                : "none";
-    }
-
-    if (addressSection) {
-        addressSection.style.display =
-            isAddressSticker
-                ? ""
-                : "none";
-    }
-
-    if (printSection) {
-        printSection.style.display =
-            isAddressSticker
-                ? "none"
-                : "";
-    }
-
-    if (borderSection) {
-        borderSection.style.display =
-            isAddressSticker
-                ? "none"
-                : "";
-    }
-
-    if (fontSection) {
-        fontSection.style.display =
-            isAddressSticker
-                ? "none"
-                : "";
-    }
-
-    if (cutSection) {
-        cutSection.style.display =
-            isAddressSticker
-                ? "none"
-                : "";
-    }
-
-    if (previewSection) {
-        previewSection.style.display =
-            isAddressSticker
-                ? "none"
-                : "";
-    }
-
-    updatePreview();
-    updateAddressPreview();
+.hero {
+    background: var(--navy);
+    color: #fff;
+    padding: 65px 0 80px;
 }
 
-
-/* =========================================================
-   TOOL CARD EVENTS
-========================================================= */
-
-$$(".tool-card")
-    .forEach(card => {
-
-        card.addEventListener(
-            "click",
-            () => {
-                openTool(
-                    card.dataset.tool
-                );
-            }
-        );
-
-    });
-
-
-$$(".tool-select-btn")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-                openTool(
-                    button.dataset.selectTool
-                );
-            }
-        );
-
-    });
-
-
-const closeWorkspace =
-    $("#closeWorkspace");
-
-if (closeWorkspace) {
-
-    closeWorkspace.addEventListener(
-        "click",
-        () => {
-
-            $("#workspace")
-                ?.classList.remove("active");
-
-            $("#tools")
-                ?.scrollIntoView({
-                    behavior: "smooth"
-                });
-        }
-    );
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap: 50px;
+    align-items: center;
 }
 
+.kicker {
+    color: var(--yellow);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
 
-/* =========================================================
+.hero h1 {
+    margin: 12px 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(42px, 6vw, 68px);
+    line-height: 1;
+}
+
+.hero h1 span {
+    color: var(--yellow);
+}
+
+.hero p {
+    max-width: 620px;
+    color: rgba(255, 255, 255, .75);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn {
+    min-height: 42px;
+    padding: 0 17px;
+    border: 0;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 900;
+    transition: .18s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-primary {
+    background: var(--yellow);
+    color: var(--dark);
+}
+
+.btn-secondary {
+    background: #eef1f5;
+    color: var(--navy);
+}
+
+.btn-outline {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, .4);
+}
+
+.book-preview {
+    width: 220px;
+    height: 300px;
+    margin: auto;
+    padding: 25px;
+    background: #f8f5e9;
+    color: var(--navy);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    box-shadow: 20px 25px 50px rgba(0, 0, 0, .3);
+    transform: rotate(-2deg);
+}
+
+.book-preview h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 28px;
+}
+
+/* =========================
+   SECTIONS
+========================= */
+
+.section {
+    padding: 70px 0;
+}
+
+.section-heading {
+    margin-bottom: 30px;
+}
+
+.section-heading span {
+    color: var(--navy);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+}
+
+.section-heading h2 {
+    margin: 6px 0;
+    color: var(--navy);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 34px;
+}
+
+.section-heading p {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* =========================
+   TOOL CARDS
+========================= */
+
+.tool-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.tool-card {
+    width: 100%;
+    padding: 24px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--yellow);
+    box-shadow: var(--shadow);
+    text-align: left;
+    transition: .2s ease;
+}
+
+.tool-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(20, 45, 85, .14);
+}
+
+.tool-number {
+    color: #b68b00;
+    font-size: 9px;
+    font-weight: 900;
+}
+
+.tool-card h3 {
+    margin: 9px 0;
+    color: var(--navy);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 21px;
+}
+
+.tool-card p {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 15px;
+}
+
+.tags span {
+    padding: 4px 7px;
+    background: #eef2f7;
+    color: var(--navy);
+    font-size: 8px;
+    font-weight: 900;
+}
+
+/* =========================
+   WORKSPACE
+========================= */
+
+.workspace {
+    display: none;
+    padding: 30px 0 70px;
+}
+
+.workspace.active {
+    display: block;
+}
+
+.workspace-card {
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.workspace-header {
+    padding: 25px 28px;
+    background: var(--navy);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.workspace-header h2 {
+    margin: 5px 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 27px;
+}
+
+.workspace-header p {
+    margin: 0;
+    color: rgba(255, 255, 255, .7);
+    font-size: 10px;
+}
+
+.workspace-body {
+    padding: 28px;
+}
+
+/* =========================
+   TOOL SELECTOR
+========================= */
+
+.tool-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 25px;
+}
+
+.tool-select-btn {
+    padding: 10px 16px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 900;
+    transition: .18s ease;
+}
+
+.tool-select-btn:hover {
+    border-color: var(--navy);
+}
+
+.tool-select-btn.active {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+}
+
+/* =========================
+   CONFIGURATION
+========================= */
+
+.config-section {
+    padding: 25px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.section-title {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 17px;
+}
+
+.step {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--yellow);
+    color: var(--dark);
+    font-size: 9px;
+    font-weight: 900;
+}
+
+.section-title h3 {
+    margin: 0;
+    color: var(--navy);
+    font-size: 14px;
+}
+
+.section-title p {
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 900;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 10px;
+    background: #fff;
+    color: var(--text);
+    border: 1px solid #ccd3dd;
+    border-radius: 4px;
+    outline: none;
+    transition: .15s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(32, 61, 114, .08);
+}
+
+textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+/* =========================
+   PAGE SIZE LOCK
+========================= */
+
+input:disabled,
+select:disabled {
+    cursor: not-allowed;
+    opacity: .55;
+    background: #edf0f4;
+}
+
+.locked {
+    opacity: .45;
+    pointer-events: none;
+    background: #edf0f4 !important;
+}
+
+/* =========================
    INPUT TABS
-========================================================= */
+========================= */
 
-$$(".input-tab")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const target =
-                    button.dataset.input;
-
-                if (!target) return;
-
-                $$(".input-tab")
-                    .forEach(item => {
-
-                        item.classList.toggle(
-                            "active",
-                            item === button
-                        );
-
-                    });
-
-                $("#individualInput")
-                    ?.classList.toggle(
-                        "active",
-                        target === "individual"
-                    );
-
-                $("#bulkInput")
-                    ?.classList.toggle(
-                        "active",
-                        target === "bulk"
-                    );
-
-                $("#excelInput")
-                    ?.classList.toggle(
-                        "active",
-                        target === "excel"
-                    );
-            }
-        );
-
-    });
-
-
-/* =========================================================
-   ADDRESS TABS
-========================================================= */
-
-$$("[data-address-input]")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const type =
-                    button.dataset.addressInput;
-
-                $$("[data-address-input]")
-                    .forEach(item => {
-
-                        item.classList.toggle(
-                            "active",
-                            item === button
-                        );
-
-                    });
-
-                $("#addressManualPanel")
-                    ?.classList.toggle(
-                        "active",
-                        type === "manual"
-                    );
-
-                $("#addressExcelPanel")
-                    ?.classList.toggle(
-                        "active",
-                        type === "excel"
-                    );
-
-            }
-        );
-
-    });
-
-
-/* =========================================================
-   SIMPLE CHECKBOXES
-   NO CONFIRMATION POPUP
-========================================================= */
-
-$$(".feature-checkbox input")
-    .forEach(checkbox => {
-
-        checkbox.addEventListener(
-            "change",
-            () => {
-
-                const feature =
-                    checkbox.dataset.feature ||
-                    "Feature";
-
-                if (checkbox.checked) {
-
-                    toast(
-                        `${feature} enabled.`
-                    );
-
-                } else {
-
-                    toast(
-                        `${feature} disabled.`,
-                        "error"
-                    );
-                }
-
-                updatePreview();
-            }
-        );
-
-    });
-
-
-/* =========================================================
-   PRINT MODE
-========================================================= */
-
-function getPrintMode() {
-
-    const po =
-        $("#printPO")?.checked || false;
-
-    const box =
-        $("#printBox")?.checked || false;
-
-    const both =
-        $("#printPOBox")?.checked || false;
-
-    if (both || (po && box)) {
-        return "both";
-    }
-
-    if (po) {
-        return "po";
-    }
-
-    if (box) {
-        return "box";
-    }
-
-    return "none";
+.input-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
 }
 
-
-/* =========================================================
-   UPDATE PREVIEW
-========================================================= */
-
-function updatePreview() {
-
-    const previewPO =
-        $("#previewPO");
-
-    const previewBox =
-        $("#previewBox");
-
-    if (!previewPO || !previewBox) {
-        return;
-    }
-
-    const mode =
-        getPrintMode();
-
-    const po =
-        getPOList()[0] ||
-        "PO NUMBER";
-
-    const box =
-        $("#startBox")?.value ||
-        "1";
-
-    previewPO.textContent =
-        po;
-
-    previewBox.textContent =
-        `BOX NO. ${box}`;
-
-    previewPO.classList.toggle(
-        "hidden-preview",
-        !(
-            mode === "po" ||
-            mode === "both"
-        )
-    );
-
-    previewBox.classList.toggle(
-        "hidden-preview",
-        !(
-            mode === "box" ||
-            mode === "both"
-        )
-    );
-
-    $("#previewCut")
-        ?.classList.toggle(
-            "hidden-preview",
-            !(
-                mode === "both" &&
-                $("#cutLine")?.checked
-            )
-        );
-
-    updatePreviewStyle();
+.input-tab {
+    padding: 9px 13px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 900;
+    transition: .15s ease;
 }
 
-
-/* =========================================================
-   PREVIEW STYLE
-========================================================= */
-
-function updatePreviewStyle() {
-
-    const labelPreview =
-        $("#labelPreview");
-
-    const previewContent =
-        $("#previewContent");
-
-    const previewPO =
-        $("#previewPO");
-
-    const previewBox =
-        $("#previewBox");
-
-    if (
-        !labelPreview ||
-        !previewContent
-    ) {
-        return;
-    }
-
-    const color =
-        $("#borderColor")?.value ||
-        "#111827";
-
-    const borderSize =
-        $("#borderSize")?.value ||
-        "medium";
-
-    const borderWidth =
-        borderSize === "thin"
-            ? 1
-            : borderSize === "thick"
-                ? 4
-                : 2;
-
-    const borderStyle =
-        $("#borderStyle")?.value ||
-        "solid";
-
-    labelPreview.style.border =
-        $("#pageBorder")?.checked
-            ? `${borderWidth}px ${borderStyle} ${color}`
-            : "0";
-
-    if (previewPO) {
-
-        previewPO.style.border =
-            $("#poBorder")?.checked
-                ? `${borderWidth}px ${borderStyle} ${color}`
-                : "0";
-    }
-
-    if (previewBox) {
-
-        previewBox.style.border =
-            $("#boxBorder")?.checked
-                ? `${borderWidth}px ${borderStyle} ${color}`
-                : "0";
-    }
-
-    previewContent.style.border =
-        $("#combinedBorder")?.checked
-            ? `${borderWidth}px ${borderStyle} ${color}`
-            : "0";
-
-    const fonts = {
-        helvetica:
-            "Arial, Helvetica, sans-serif",
-
-        times:
-            "Times New Roman, Times, serif",
-
-        courier:
-            "Courier New, Courier, monospace",
-
-        georgia:
-            "Georgia, serif"
-    };
-
-    previewContent.style.fontFamily =
-        fonts[
-            $("#fontFamily")?.value
-        ] || fonts.helvetica;
-
-    previewContent.style.fontSize =
-        `${$("#fontSize")?.value || 18}px`;
-
-    previewContent.style.fontWeight =
-        $("#fontBold")?.checked
-            ? "900"
-            : "400";
-
-    previewContent.style.fontStyle =
-        $("#fontItalic")?.checked
-            ? "italic"
-            : "normal";
-
-    previewContent.style.textDecoration =
-        $("#fontUnderline")?.checked
-            ? "underline"
-            : "none";
+.input-tab:hover {
+    border-color: var(--navy);
 }
 
-
-/* =========================================================
-   ADDRESS PREVIEW
-========================================================= */
-
-function updateAddressPreview() {
-
-    const isSticker =
-        currentTool === "Address Sticker";
-
-    const fromName =
-        isSticker
-            ? $("#stickerFromName")?.value
-            : $("#fromName")?.value;
-
-    const fromAddress =
-        isSticker
-            ? $("#stickerFromAddress")?.value
-            : $("#fromAddress")?.value;
-
-    const toName =
-        isSticker
-            ? $("#stickerToName")?.value
-            : $("#toName")?.value;
-
-    const toAddress =
-        isSticker
-            ? $("#stickerToAddress")?.value
-            : $("#toAddress")?.value;
-
-    if ($("#previewFromName")) {
-
-        $("#previewFromName").textContent =
-            fromName ||
-            "BooksWagon";
-    }
-
-    if ($("#previewFromAddress")) {
-
-        $("#previewFromAddress").textContent =
-            fromAddress ||
-            CONFIG.address;
-    }
-
-    if ($("#previewToName")) {
-
-        $("#previewToName").textContent =
-            toName ||
-            "XYZ Company";
-    }
-
-    if ($("#previewToAddress")) {
-
-        $("#previewToAddress").textContent =
-            toAddress ||
-            "Customer / Company Address";
-    }
+.input-tab.active {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
 }
 
-
-/* =========================================================
-   LIVE INPUT UPDATE
-========================================================= */
-
-document.addEventListener(
-    "input",
-    event => {
-
-        if (
-            event.target.matches(
-                "input, textarea, select"
-            )
-        ) {
-
-            updatePreview();
-            updateAddressPreview();
-        }
-    }
-);
-
-document.addEventListener(
-    "change",
-    event => {
-
-        if (
-            event.target.matches(
-                "input, textarea, select"
-            )
-        ) {
-
-            updatePreview();
-            updateAddressPreview();
-        }
-    }
-);
-
-
-/* =========================================================
-   PAGE FORMAT
-========================================================= */
-
-function getPageFormat() {
-
-    const size =
-        $("#pageSize")?.value ||
-        "A4";
-
-    if (size === "A4") {
-        return "a4";
-    }
-
-    if (size === "A5") {
-        return "a5";
-    }
-
-    if (size === "A6") {
-        return "a6";
-    }
-
-    if (size === "LETTER") {
-        return "letter";
-    }
-
-    if (size === "LEGAL") {
-        return "legal";
-    }
-
-    return [
-        Number(
-            $("#customWidth")?.value
-        ) || 210,
-
-        Number(
-            $("#customHeight")?.value
-        ) || 297
-    ];
+.input-panel {
+    display: none;
 }
 
-
-/* =========================================================
-   HEX → RGB
-========================================================= */
-
-function hexToRGB(hex) {
-
-    let value =
-        String(hex || "#111827")
-            .replace("#", "");
-
-    if (value.length === 3) {
-
-        value =
-            value
-                .split("")
-                .map(x => x + x)
-                .join("");
-    }
-
-    return {
-        r: parseInt(
-            value.substring(0, 2),
-            16
-        ),
-
-        g: parseInt(
-            value.substring(2, 4),
-            16
-        ),
-
-        b: parseInt(
-            value.substring(4, 6),
-            16
-        )
-    };
+.input-panel.active {
+    display: block;
 }
 
+/* =========================
+   PO INPUTS
+========================= */
 
-/* =========================================================
-   PDF BORDER
-========================================================= */
-
-function drawBorder(
-    doc,
-    x,
-    y,
-    width,
-    height
-) {
-
-    const style =
-        $("#borderStyle")?.value ||
-        "solid";
-
-    if (style === "dashed") {
-
-        doc.setLineDashPattern(
-            [4, 3],
-            0
-        );
-
-        doc.rect(
-            x,
-            y,
-            width,
-            height
-        );
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-        return;
-    }
-
-    if (style === "dotted") {
-
-        doc.setLineDashPattern(
-            [1, 2],
-            0
-        );
-
-        doc.rect(
-            x,
-            y,
-            width,
-            height
-        );
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-        return;
-    }
-
-    if (style === "double") {
-
-        doc.rect(
-            x,
-            y,
-            width,
-            height
-        );
-
-        doc.rect(
-            x + 2,
-            y + 2,
-            width - 4,
-            height - 4
-        );
-
-        return;
-    }
-
-    doc.rect(
-        x,
-        y,
-        width,
-        height
-    );
+.po-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
 }
 
+.po-field {
+    position: relative;
+}
 
-/* =========================================================
-   DRAW LABEL
-========================================================= */
+.po-field span {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9aa3b2;
+    font-size: 8px;
+    font-weight: 900;
+    pointer-events: none;
+}
 
-function drawLabel(
-    doc,
-    po,
-    box
-) {
+.po-field input {
+    padding-left: 38px;
+}
 
-    const width =
-        doc.internal.pageSize.getWidth();
+/* =========================
+   EXCEL
+========================= */
 
-    const height =
-        doc.internal.pageSize.getHeight();
+.excel-box {
+    padding: 22px;
+    background: #f8fafc;
+    border: 1px dashed #aeb8c6;
+    border-radius: 5px;
+}
 
-    const center =
-        width / 2;
+.excel-box h4 {
+    margin: 0 0 7px;
+    color: var(--navy);
+    font-size: 13px;
+}
 
-    const rgb =
-        hexToRGB(
-            $("#borderColor")?.value
-        );
+.excel-box p {
+    margin: 0 0 15px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.7;
+}
 
-    const borderWidth =
-        $("#borderSize")?.value === "thin"
-            ? 0.5
-            : $("#borderSize")?.value === "thick"
-                ? 1.8
-                : 1;
+.excel-box input[type="file"] {
+    padding: 8px;
+    background: #fff;
+    cursor: pointer;
+}
 
-    doc.setDrawColor(
-        rgb.r,
-        rgb.g,
-        rgb.b
-    );
+.excel-status {
+    margin-top: 10px;
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 900;
+}
 
-    doc.setLineWidth(
-        borderWidth
-    );
+.excel-preview {
+    max-height: 240px;
+    overflow: auto;
+    margin-top: 15px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
 
-    if (
-        $("#pageBorder")?.checked
-    ) {
+.excel-preview:empty {
+    display: none;
+}
 
-        drawBorder(
-            doc,
-            7,
-            7,
-            width - 14,
-            height - 14
-        );
+.excel-preview table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.excel-preview th,
+.excel-preview td {
+    padding: 8px;
+    border: 1px solid var(--border);
+    text-align: left;
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+.excel-preview th {
+    background: var(--navy);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+/* =========================
+   ADDRESS
+========================= */
+
+.address-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.address-card {
+    padding: 18px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+}
+
+.address-card h4 {
+    margin: 0 0 12px;
+    color: var(--navy);
+    font-size: 12px;
+}
+
+.address-card textarea {
+    min-height: 130px;
+}
+
+/* =========================
+   ADDRESS STICKER
+========================= */
+
+.address-sticker-preview {
+    width: min(100%, 650px);
+    min-height: 300px;
+    margin: 25px auto;
+    padding: 28px;
+    background: #fff;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: center;
+    border: 2px solid #111827;
+    box-shadow: var(--shadow);
+}
+
+.address-side {
+    padding: 20px;
+}
+
+.address-side:first-child {
+    border-right: 1px dashed #888;
+}
+
+.address-side small {
+    display: block;
+    margin-bottom: 8px;
+    color: #888;
+    font-size: 9px;
+    font-weight: 900;
+}
+
+.address-side strong {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--navy);
+    font-size: 18px;
+}
+
+.address-side div {
+    white-space: pre-line;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* =========================
+   ISBN BARCODE
+========================= */
+
+.isbn-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.isbn-card {
+    padding: 18px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+}
+
+.isbn-card h4 {
+    margin: 0 0 12px;
+    color: var(--navy);
+    font-size: 12px;
+}
+
+.isbn-card small {
+    display: block;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 9px;
+    line-height: 1.6;
+}
+
+.isbn-barcode-preview {
+    margin: 25px auto;
+    padding: 25px;
+    min-height: 220px;
+    max-width: 600px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.isbn-barcode-preview svg {
+    max-width: 100%;
+}
+
+.isbn-barcode-preview .book-title {
+    margin-top: 12px;
+    color: var(--navy);
+    font-weight: 900;
+    font-size: 15px;
+}
+
+.isbn-barcode-preview .edition {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* =========================
+   CHECKBOX
+========================= */
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.feature-checkbox {
+    min-height: 44px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border);
+    background: #fff;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 4px;
+    transition: .15s ease;
+}
+
+.feature-checkbox:hover {
+    border-color: var(--navy);
+    background: #fafbfd;
+}
+
+.feature-checkbox input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.custom-check {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    position: relative;
+    border: 2px solid #aab3c0;
+    border-radius: 3px;
+    background: #fff;
+    transition: .15s;
+}
+
+.feature-checkbox input:checked + .custom-check {
+    background: var(--navy);
+    border-color: var(--navy);
+}
+
+.feature-checkbox input:checked + .custom-check::after {
+    content: "✓";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--yellow);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.checkbox-text {
+    font-size: 10px;
+    font-weight: 800;
+}
+
+/* =========================
+   PREVIEW
+========================= */
+
+.preview-section {
+    margin-top: 28px;
+    padding: 25px;
+    background: #eef1f5;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+}
+
+.preview-page {
+    width: min(100%, 600px);
+    min-height: 420px;
+    margin: auto;
+    padding: 30px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s ease;
+}
+
+.preview-content {
+    width: 85%;
+    padding: 20px;
+    text-align: center;
+    transition: .2s ease;
+}
+
+.preview-po,
+.preview-box {
+    min-width: 180px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 22px;
+    margin: 5px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.preview-cut {
+    margin: 12px 0;
+    color: #555;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.hidden-preview {
+    display: none !important;
+}
+
+/* =========================
+   DOWNLOAD
+========================= */
+
+.workspace-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+/* =========================
+   SUPPORT
+========================= */
+
+.support-card {
+    padding: 30px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    border-radius: 5px;
+}
+
+.support-card h2 {
+    margin: 5px 0 10px;
+    color: var(--navy);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 30px;
+}
+
+.address-link,
+.email-link {
+    display: block;
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.8;
+    margin-bottom: 6px;
+}
+
+.address-link:hover,
+.email-link:hover {
+    color: #315da8;
+    text-decoration: underline;
+}
+
+.created {
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.created strong {
+    color: var(--navy);
+}
+
+.qr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.qr-card {
+    padding: 15px;
+    background: #f7f8fa;
+    border: 1px solid var(--border);
+    text-align: center;
+    border-radius: 5px;
+}
+
+.qr-card h4 {
+    margin: 0 0 10px;
+    color: var(--navy);
+    font-size: 10px;
+}
+
+.qr-code {
+    width: 140px;
+    height: 140px;
+    margin: auto;
+    display: grid;
+    place-items: center;
+    background: #fff;
+}
+
+.qr-code img,
+.qr-code canvas {
+    max-width: 130px;
+    max-height: 130px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    background: var(--navy);
+    color: #fff;
+    border-top: 5px solid var(--yellow);
+}
+
+.footer-grid {
+    padding: 35px 0;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 30px;
+}
+
+.footer-brand {
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.footer-grid strong {
+    color: var(--yellow);
+    font-size: 10px;
+}
+
+.footer-grid p,
+.footer-grid a {
+    color: rgba(255, 255, 255, .68);
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.footer-grid a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    padding: 13px 0;
+    border-top: 1px solid rgba(255, 255, 255, .1);
+    color: rgba(255, 255, 255, .5);
+    font-size: 9px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+#toastContainer {
+    position: fixed;
+    top: 82px;
+    right: 18px;
+    z-index: 99999;
+    width: min(350px, calc(100vw - 30px));
+    pointer-events: none;
+}
+
+.toast {
+    padding: 13px 15px;
+    margin-bottom: 8px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green);
+    box-shadow: var(--shadow);
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 800;
+    animation: toastIn .2s ease;
+}
+
+.toast.error {
+    color: var(--red);
+    border-left-color: var(--red);
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(15px);
     }
 
-    let font =
-        "helvetica";
-
-    const selectedFont =
-        $("#fontFamily")?.value;
-
-    if (selectedFont === "times") {
-        font = "times";
-    }
-
-    if (selectedFont === "courier") {
-        font = "courier";
-    }
-
-    let fontStyle =
-        "normal";
-
-    const bold =
-        $("#fontBold")?.checked;
-
-    const italic =
-        $("#fontItalic")?.checked;
-
-    if (bold && italic) {
-        fontStyle = "bolditalic";
-    } else if (bold) {
-        fontStyle = "bold";
-    } else if (italic) {
-        fontStyle = "italic";
-    }
-
-    doc.setFont(
-        font,
-        fontStyle
-    );
-
-    doc.setFontSize(
-        Number(
-            $("#fontSize")?.value
-        ) || 18
-    );
-
-    const mode =
-        getPrintMode();
-
-    let y =
-        height / 2 - 30;
-
-
-    /* ---------------- PO ---------------- */
-
-    if (
-        mode === "po" ||
-        mode === "both"
-    ) {
-
-        const text =
-            String(po);
-
-        const textWidth =
-            doc.getTextWidth(text);
-
-        if (
-            $("#poBorder")?.checked
-        ) {
-
-            drawBorder(
-                doc,
-                center -
-                    (textWidth + 30) / 2,
-                y - 13,
-                textWidth + 30,
-                26
-            );
-        }
-
-        doc.text(
-            text,
-            center,
-            y + 5,
-            {
-                align: "center"
-            }
-        );
-
-        y += 48;
-    }
-
-
-    /* ---------------- CUT LINE ---------------- */
-
-    if (
-        mode === "both" &&
-        $("#cutLine")?.checked
-    ) {
-
-        doc.setLineDashPattern(
-            [4, 3],
-            0
-        );
-
-        doc.setLineWidth(0.5);
-
-        doc.line(
-            20,
-            y - 10,
-            width - 20,
-            y - 10
-        );
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-        if (
-            $("#scissorMark")?.checked
-        ) {
-
-            doc.setFont(
-                "helvetica",
-                "normal"
-            );
-
-            doc.setFontSize(10);
-
-            doc.text(
-                "✂",
-                center,
-                y - 5,
-                {
-                    align: "center"
-                }
-            );
-
-            doc.setFont(
-                font,
-                fontStyle
-            );
-
-            doc.setFontSize(
-                Number(
-                    $("#fontSize")?.value
-                ) || 18
-            );
-        }
-
-        y += 22;
-    }
-
-
-    /* ---------------- BOX ---------------- */
-
-    if (
-        mode === "box" ||
-        mode === "both"
-    ) {
-
-        const text =
-            `BOX NO. ${box}`;
-
-        const textWidth =
-            doc.getTextWidth(text);
-
-        if (
-            $("#boxBorder")?.checked
-        ) {
-
-            drawBorder(
-                doc,
-                center -
-                    (textWidth + 30) / 2,
-                y - 13,
-                textWidth + 30,
-                26
-            );
-        }
-
-        doc.text(
-            text,
-            center,
-            y + 5,
-            {
-                align: "center"
-            }
-        );
-    }
-
-
-    /* ---------------- COMBINED BORDER ---------------- */
-
-    if (
-        $("#combinedBorder")?.checked
-    ) {
-
-        drawBorder(
-            doc,
-            18,
-            height / 2 - 80,
-            width - 36,
-            160
-        );
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
+/* =========================
+   MOBILE
+========================= */
 
-/* =========================================================
-   BUILD PO PDF
-========================================================= */
+@media (max-width: 1050px) {
 
-function buildPOPDF(po) {
-
-    if (!window.jspdf) {
-        throw new Error(
-            "jsPDF library is not loaded."
-        );
+    .tool-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    const JsPDF =
-        window.jspdf.jsPDF;
-
-    const doc =
-        new JsPDF({
-
-            orientation:
-                $("#orientation")?.value ||
-                "portrait",
-
-            unit: "mm",
-
-            format:
-                getPageFormat()
-        });
-
-    const start =
-        Math.max(
-            1,
-            Number(
-                $("#startBox")?.value
-            ) || 1
-        );
-
-    const end =
-        Math.max(
-            start,
-            Number(
-                $("#endBox")?.value
-            ) || start
-        );
-
-    const copies =
-        Math.max(
-            1,
-            Number(
-                $("#copies")?.value
-            ) || 1
-        );
-
-    let firstPage = true;
-
-    for (
-        let box = start;
-        box <= end;
-        box++
-    ) {
-
-        for (
-            let copy = 0;
-            copy < copies;
-            copy++
-        ) {
-
-            if (!firstPage) {
-                doc.addPage();
-            }
-
-            firstPage = false;
-
-            drawLabel(
-                doc,
-                po,
-                box
-            );
-        }
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    return doc;
+    .po-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .isbn-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
+@media (max-width: 900px) {
 
-/* =========================================================
-   ADDRESS PDF
-========================================================= */
-
-function buildAddressPDF(
-    fromName,
-    fromAddress,
-    toName,
-    toAddress
-) {
-
-    if (!window.jspdf) {
-        throw new Error(
-            "jsPDF library is not loaded."
-        );
+    .hero-grid {
+        grid-template-columns: 1fr;
     }
 
-    const JsPDF =
-        window.jspdf.jsPDF;
+    .support-card {
+        grid-template-columns: 1fr;
+    }
 
-    const doc =
-        new JsPDF({
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 
-            orientation: "landscape",
-
-            unit: "mm",
-
-            format: "a6"
-        });
-
-    const width =
-        doc.internal.pageSize.getWidth();
-
-    const height =
-        doc.internal.pageSize.getHeight();
-
-
-    /* Outer border */
-
-    doc.setDrawColor(
-        17,
-        24,
-        39
-    );
-
-    doc.setLineWidth(1);
-
-    doc.rect(
-        6,
-        6,
-        width - 12,
-        height - 12
-    );
-
-
-    /* Heading */
-
-    doc.setFont(
-        "helvetica",
-        "bold"
-    );
-
-    doc.setFontSize(11);
-
-    doc.text(
-        "FROM",
-        15,
-        22
-    );
-
-    doc.text(
-        "TO",
-        width / 2 + 10,
-        22
-    );
-
-
-    /* Names */
-
-    doc.setFontSize(14);
-
-    doc.text(
-        fromName ||
-        "BooksWagon",
-        15,
-        33
-    );
-
-    doc.text(
-        toName ||
-        "Customer / Company",
-        width / 2 + 10,
-        33
-    );
-
-
-    /* Addresses */
-
-    doc.setFont(
-        "helvetica",
-        "normal"
-    );
-
-    doc.setFontSize(9);
-
-    const fromLines =
-        doc.splitTextToSize(
-            fromAddress ||
-            CONFIG.address,
-            width / 2 - 30
-        );
-
-    const toLines =
-        doc.splitTextToSize(
-            toAddress ||
-            "Customer Address",
-            width / 2 - 30
-        );
-
-    doc.text(
-        fromLines,
-        15,
-        44
-    );
-
-    doc.text(
-        toLines,
-        width / 2 + 10,
-        44
-    );
-
-
-    /* Divider */
-
-    doc.setLineDashPattern(
-        [3, 3],
-        0
-    );
-
-    doc.line(
-        width / 2,
-        12,
-        width / 2,
-        height - 12
-    );
-
-    doc.setLineDashPattern(
-        [],
-        0
-    );
-
-    return doc;
+    .isbn-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
+@media (max-width: 650px) {
 
-/* =========================================================
-   DOWNLOAD BLOB
-========================================================= */
+    .container {
+        width: min(100% - 20px, 1180px);
+    }
 
-function downloadBlob(
-    blob,
-    filename
-) {
+    .nav {
+        display: none;
+    }
 
-    const url =
-        URL.createObjectURL(blob);
+    .hero {
+        padding: 45px 0 60px;
+    }
 
-    const link =
-        document.createElement("a");
+    .hero h1 {
+        font-size: 45px;
+    }
 
-    link.href = url;
+    .hero-buttons {
+        flex-direction: column;
+    }
 
-    link.download = filename;
+    .hero-buttons .btn {
+        width: 100%;
+    }
 
-    document.body.appendChild(link);
+    .tool-grid,
+    .form-grid,
+    .po-grid,
+    .checkbox-grid,
+    .address-grid,
+    .isbn-grid,
+    .address-sticker-preview,
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
 
-    link.click();
+    .workspace-body {
+        padding: 18px;
+    }
 
-    link.remove();
+    .workspace-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-    setTimeout(() => {
-        URL.revokeObjectURL(url);
-    }, 1000);
+    .workspace-actions {
+        flex-direction: column;
+    }
+
+    .workspace-actions .btn {
+        width: 100%;
+    }
+
+    .address-side:first-child {
+        border-right: 0;
+        border-bottom: 1px dashed #888;
+    }
+
+    .qr-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .preview-page {
+        min-height: 300px;
+        padding: 15px;
+    }
+
+    .preview-content {
+        width: 100%;
+    }
+
+    #toastContainer {
+        top: 72px;
+        right: 10px;
+        width: calc(100vw - 20px);
+    }
 }
 
+/* =========================
+   PRINT
+========================= */
 
-/* =========================================================
-   GENERATE ADDRESS STICKERS
-========================================================= */
+@media print {
 
-async function generateAddressStickers() {
-
-    if (!addressExcelRows.length) {
-
-        const doc =
-            buildAddressPDF(
-                $("#stickerFromName")?.value,
-                $("#stickerFromAddress")?.value,
-                $("#stickerToName")?.value,
-                $("#stickerToAddress")?.value
-            );
-
-        doc.save(
-            "BooksWagon_Address_Sticker.pdf"
-        );
-
-        toast(
-            "Address sticker PDF downloaded."
-        );
-
-        return;
+    .topbar,
+    .hero,
+    .tool-grid,
+    .workspace-header,
+    .workspace-actions,
+    footer,
+    #support {
+        display: none !important;
     }
 
+    body {
+        background: #fff;
+    }
 
-    const JSZipClass =
-        await ensureJSZip();
+    .workspace {
+        display: block !important;
+        padding: 0;
+    }
 
-    const zip =
-        new JSZipClass();
+    .workspace-card {
+        border: 0;
+        box-shadow: none;
+    }
 
-
-    addressExcelRows.forEach(
-        (row, index) => {
-
-            const name =
-                findValue(
-                    row,
-                    [
-                        "Name",
-                        "Customer Name",
-                        "Company",
-                        "Company Name",
-                        "To Name"
-                    ]
-                );
-
-            const address =
-                findValue(
-                    row,
-                    [
-                        "Address",
-                        "To Address",
-                        "Shipping Address"
-                    ]
-                );
-
-            const city =
-                findValue(
-                    row,
-                    ["City"]
-                );
-
-            const state =
-                findValue(
-                    row,
-                    ["State"]
-                );
-
-            const pin =
-                findValue(
-                    row,
-                    [
-                        "PIN",
-                        "Pincode",
-                        "Pin Code",
-                        "Postal Code"
-                    ]
-                );
-
-            const completeAddress =
-                [
-                    address,
-                    city,
-                    state,
-                    pin
-                ]
-                .filter(Boolean)
-                .join(", ");
-
-
-            const doc =
-                buildAddressPDF(
-                    $("#stickerFromName")?.value ||
-                    "BooksWagon",
-
-                    $("#stickerFromAddress")?.value ||
-                    CONFIG.address,
-
-                    name ||
-                    "Customer / Company",
-
-                    completeAddress ||
-                    "Customer Address"
-                );
-
-
-            zip.file(
-                `Address_Sticker_${index + 1}.pdf`,
-                doc.output("blob")
-            );
-        }
-    );
-
-
-    const blob =
-        await zip.generateAsync({
-            type: "blob"
-        });
-
-
-    downloadBlob(
-        blob,
-        "BooksWagon_Address_Stickers.zip"
-    );
-
-
-    toast(
-        `${addressExcelRows.length} address stickers downloaded.`
-    );
+    .workspace-body {
+        padding: 0;
+    }
 }
-
-
-/* =========================================================
-   GENERATE PO / ISBN
-========================================================= */
-
-async function generatePOLabels() {
-
-    const list =
-        getPOList();
-
-    if (!list.length) {
-
-        toast(
-            "Please enter or upload at least one PO / ISBN.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (
-        currentTool !== "ISBN" &&
-        getPrintMode() === "none"
-    ) {
-
-        toast(
-            "Select PO Number, Box Number or PO + Box.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    const merge =
-        $("#mergePDF")?.checked;
-
-    const zipRequested =
-        $("#zipPDF")?.checked;
-
-
-    /* =====================================================
-       ZIP
-    ===================================================== */
-
-    if (zipRequested) {
-
-        const JSZipClass =
-            await ensureJSZip();
-
-        const zip =
-            new JSZipClass();
-
-
-        list.forEach(po => {
-
-            const doc =
-                buildPOPDF(po);
-
-            zip.file(
-                `${safeFilename(po)}.pdf`,
-                doc.output("blob")
-            );
-
-        });
-
-
-        const blob =
-            await zip.generateAsync({
-                type: "blob"
-            });
-
-
-        downloadBlob(
-            blob,
-            `${safeFilename(currentTool)}_Labels.zip`
-        );
-
-
-        toast(
-            "ZIP downloaded successfully."
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       MERGED PDF
-    ===================================================== */
-
-    if (merge) {
-
-        const JsPDF =
-            window.jspdf.jsPDF;
-
-        const merged =
-            new JsPDF({
-
-                orientation:
-                    $("#orientation")?.value ||
-                    "portrait",
-
-                unit: "mm",
-
-                format:
-                    getPageFormat()
-            });
-
-
-        let firstPage = true;
-
-
-        const start =
-            Math.max(
-                1,
-                Number(
-                    $("#startBox")?.value
-                ) || 1
-            );
-
-        const end =
-            Math.max(
-                start,
-                Number(
-                    $("#endBox")?.value
-                ) || start
-            );
-
-        const copies =
-            Math.max(
-                1,
-                Number(
-                    $("#copies")?.value
-                ) || 1
-            );
-
-
-        for (const po of list) {
-
-            for (
-                let box = start;
-                box <= end;
-                box++
-            ) {
-
-                for (
-                    let copy = 0;
-                    copy < copies;
-                    copy++
-                ) {
-
-                    if (!firstPage) {
-                        merged.addPage();
-                    }
-
-                    firstPage = false;
-
-                    drawLabel(
-                        merged,
-                        po,
-                        box
-                    );
-                }
-            }
-        }
-
-
-        merged.save(
-            `${safeFilename(currentTool)}_MERGED.pdf`
-        );
-
-
-        toast(
-            "Merged PDF downloaded."
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       SEPARATE PDFs
-    ===================================================== */
-
-    list.forEach(po => {
-
-        const doc =
-            buildPOPDF(po);
-
-        doc.save(
-            `${safeFilename(po)}_${safeFilename(currentTool)}.pdf`
-        );
-
-    });
-
-
-    toast(
-        `${list.length} PDF file(s) generated.`
-    );
-}
-
-
-/* =========================================================
-   MAIN GENERATE BUTTON
-========================================================= */
-
-const generateButton =
-    $("#generateButton");
-
-if (generateButton) {
-
-    generateButton.addEventListener(
-        "click",
-        async () => {
-
-            try {
-
-                generateButton.disabled =
-                    true;
-
-                generateButton.textContent =
-                    "Generating...";
-
-
-                if (
-                    currentTool ===
-                    "Address Sticker"
-                ) {
-
-                    await generateAddressStickers();
-
-                } else {
-
-                    await generatePOLabels();
-
-                }
-
-            } catch (error) {
-
-                console.error(error);
-
-                toast(
-                    error.message ||
-                    "Generation failed.",
-                    "error"
-                );
-
-            } finally {
-
-                generateButton.disabled =
-                    false;
-
-                generateButton.textContent =
-                    "Generate PDF";
-            }
-        }
-    );
-}
-
-
-/* =========================================================
-   RESET
-========================================================= */
-
-const resetButton =
-    $("#resetButton");
-
-if (resetButton) {
-
-    resetButton.addEventListener(
-        "click",
-        () => {
-
-            $$(".po-input")
-                .forEach(input => {
-                    input.value = "";
-                });
-
-
-            if ($("#bulkPO")) {
-                $("#bulkPO").value = "";
-            }
-
-
-            if ($("#startBox")) {
-                $("#startBox").value = "1";
-            }
-
-
-            if ($("#endBox")) {
-                $("#endBox").value = "200";
-            }
-
-
-            if ($("#copies")) {
-                $("#copies").value = "1";
-            }
-
-
-            $$(".feature-checkbox input")
-                .forEach(checkbox => {
-                    checkbox.checked = false;
-                });
-
-
-            if ($("#toName")) {
-                $("#toName").value = "";
-            }
-
-
-            if ($("#toAddress")) {
-                $("#toAddress").value = "";
-            }
-
-
-            if ($("#stickerToName")) {
-                $("#stickerToName").value = "";
-            }
-
-
-            if ($("#stickerToAddress")) {
-                $("#stickerToAddress").value = "";
-            }
-
-
-            excelRows = [];
-            addressExcelRows = [];
-
-
-            if ($("#excelStatus")) {
-                $("#excelStatus").textContent =
-                    "No Excel file selected.";
-            }
-
-
-            if ($("#addressExcelStatus")) {
-                $("#addressExcelStatus").textContent =
-                    "No address Excel selected.";
-            }
-
-
-            if ($("#excelPreview")) {
-                $("#excelPreview").innerHTML = "";
-            }
-
-
-            if ($("#addressExcelPreview")) {
-                $("#addressExcelPreview").innerHTML = "";
-            }
-
-
-            updatePreview();
-            updateAddressPreview();
-
-
-            toast(
-                "Settings reset successfully."
-            );
-        }
-    );
-}
-
-
-/* =========================================================
-   QR CODE
-========================================================= */
-
-function makeQR(
-    id,
-    text
-) {
-
-    const element =
-        document.getElementById(id);
-
-    if (!element) return;
-
-    element.innerHTML = "";
-
-    if (typeof QRCode === "undefined") {
-        return;
-    }
-
-    new QRCode(
-        element,
-        {
-            text: text,
-
-            width: 130,
-
-            height: 130,
-
-            correctLevel:
-                QRCode.CorrectLevel.M
-        }
-    );
-}
-
-
-makeQR(
-    "addressQR",
-    CONFIG.maps
-);
-
-makeQR(
-    "emailQR",
-    `mailto:${CONFIG.email}`
-);
-
-
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        createPOFields();
-
-        openTool(
-            "Coco Blue"
-        );
-
-        updatePreview();
-
-        updateAddressPreview();
-
-    }
-);
-
-
-/*
-=========================================================
-IMPORTANT
-=========================================================
-
-HTML HEAD should contain:
-
-jsPDF
-XLSX
-QRCode
-
-Example:
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-JSZip is loaded automatically by this file when ZIP is required.
-
-=========================================================
-*/
