@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     "use strict";
 
     /* =========================================================
@@ -39,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================================================
-       HELPERS
+       BASIC HELPERS
     ========================================================== */
 
     function requirePDF() {
@@ -50,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
             );
             return false;
         }
+
         return true;
     }
 
@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
             );
             return false;
         }
+
         return true;
     }
 
@@ -78,29 +79,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function timestamp() {
-        const d = new Date();
+    function getTimestamp() {
+        const now = new Date();
 
         return {
             date:
-                `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`,
+                `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`,
 
             time:
-                `${pad2(d.getHours())}-${pad2(d.getMinutes())}-${pad2(d.getSeconds())}`
+                `${pad2(now.getHours())}-${pad2(now.getMinutes())}-${pad2(now.getSeconds())}`
         };
     }
 
 
     function downloadBlob(blob, filename) {
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const link = document.createElement("a");
 
-        a.href = url;
-        a.download = filename;
+        link.href = url;
+        link.download = filename;
 
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
 
         setTimeout(() => {
             URL.revokeObjectURL(url);
@@ -108,26 +109,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function downloadPDF(pdf, filename) {
-        try {
-            downloadBlob(
-                pdf.output("blob"),
-                filename
-            );
-            return true;
-        } catch (error) {
-            console.error(error);
-            alert("PDF download failed.");
-            return false;
-        }
-    }
-
-
-    async function downloadZip(files, filename) {
+    async function downloadZIP(files, filename) {
 
         if (!ZIP) {
             alert(
-                "ZIP library load nahi hui."
+                "ZIP library load nahi hui.\n\n" +
+                "Please refresh the page."
             );
             return false;
         }
@@ -135,10 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const zip = new ZIP();
 
         files.forEach(file => {
-            zip.file(
-                file.name,
-                file.blob
-            );
+            zip.file(file.name, file.blob);
         });
 
         const blob =
@@ -146,10 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 type: "blob"
             });
 
-        downloadBlob(
-            blob,
-            filename
-        );
+        downloadBlob(blob, filename);
 
         return true;
     }
@@ -169,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         }
 
+
         if (type === "a4") {
             return {
                 width: 210,
@@ -177,6 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         }
 
+
         if (type === "70x35") {
             return {
                 width: 70,
@@ -184,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 label: "70 × 35 mm"
             };
         }
+
 
         if (type === "custom") {
 
@@ -202,7 +186,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return {
                 width,
                 height,
-                label: `${width} × ${height} mm`
+                label:
+                    `${width} × ${height} mm`
             };
         }
 
@@ -217,7 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function pdfFont(font) {
+    function getPDFSpaceFont(font) {
+
         if (
             font === "Georgia" ||
             font === "Times New Roman"
@@ -233,51 +219,54 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    /* =========================================================
+       BORDER
+    ========================================================== */
+
+    const borderCSS = {
+
+        "solid-dark":
+            "3px solid #111827",
+
+        "solid-medium":
+            "2px solid #667085",
+
+        "solid-light":
+            "1px solid #98A2B3",
+
+        "double":
+            "4px double #344054",
+
+        "dashed":
+            "2px dashed #667085",
+
+        "dotted":
+            "2px dotted #667085",
+
+        "bold":
+            "5px solid #111827",
+
+        "double-dark":
+            "5px double #111827",
+
+        "inner":
+            "2px inset #475467",
+
+        "outer":
+            "4px outset #475467",
+
+        "triple":
+            "6px double #111827",
+
+        "text-box":
+            "2px solid #1D2939"
+    };
+
+
     function getBorderCSS(style) {
-
-        const borders = {
-
-            "solid-dark":
-                "3px solid #1c1c1a",
-
-            "solid-medium":
-                "2px solid #555",
-
-            "solid-light":
-                "1px solid #aaa",
-
-            "double":
-                "4px double #333",
-
-            "dashed":
-                "2px dashed #555",
-
-            "dotted":
-                "2px dotted #555",
-
-            "bold":
-                "5px solid #111",
-
-            "double-dark":
-                "5px double #111",
-
-            "inner":
-                "2px inset #444",
-
-            "outer":
-                "4px outset #444",
-
-            "triple":
-                "6px double #222",
-
-            "text-box":
-                "2px solid #222"
-
-        };
-
         return (
-            borders[style] ||
-            borders["solid-dark"]
+            borderCSS[style] ||
+            borderCSS["solid-dark"]
         );
     }
 
@@ -294,34 +283,62 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const configs = {
 
-            "solid-dark": [.8, 25],
-            "solid-medium": [.5, 80],
-            "solid-light": [.25, 160],
-            "double": [.5, 45],
-            "dashed": [.4, 80],
-            "dotted": [.4, 80],
-            "bold": [1.4, 10],
-            "double-dark": [1, 20],
-            "inner": [.5, 50],
-            "outer": [1, 50],
-            "triple": [.6, 30],
-            "text-box": [.7, 30]
+        const styles = {
 
+            "solid-dark":
+                [0.8, 20],
+
+            "solid-medium":
+                [0.5, 70],
+
+            "solid-light":
+                [0.25, 150],
+
+            "double":
+                [0.5, 55],
+
+            "dashed":
+                [0.4, 80],
+
+            "dotted":
+                [0.4, 80],
+
+            "bold":
+                [1.4, 10],
+
+            "double-dark":
+                [1, 15],
+
+            "inner":
+                [0.5, 50],
+
+            "outer":
+                [1, 50],
+
+            "triple":
+                [0.6, 30],
+
+            "text-box":
+                [0.7, 30]
         };
 
-        const cfg =
-            configs[style] ||
-            configs["solid-dark"];
+
+        const config =
+            styles[style] ||
+            styles["solid-dark"];
+
 
         pdf.setDrawColor(
-            cfg[1],
-            cfg[1],
-            cfg[1]
+            config[1],
+            config[1],
+            config[1]
         );
 
-        pdf.setLineWidth(cfg[0]);
+        pdf.setLineWidth(
+            config[0]
+        );
+
 
         if (style === "dashed") {
             pdf.setLineDashPattern(
@@ -330,12 +347,14 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
 
+
         if (style === "dotted") {
             pdf.setLineDashPattern(
-                [.5, 1.5],
+                [0.5, 1.5],
                 0
             );
         }
+
 
         pdf.rect(
             3,
@@ -344,12 +363,14 @@ document.addEventListener("DOMContentLoaded", () => {
             height - 6
         );
 
+
         if (
             style === "double" ||
             style === "double-dark"
         ) {
+
             pdf.setLineDashPattern([], 0);
-            pdf.setLineWidth(.3);
+            pdf.setLineWidth(0.3);
 
             pdf.rect(
                 6,
@@ -359,9 +380,11 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
 
+
         if (style === "triple") {
+
             pdf.setLineDashPattern([], 0);
-            pdf.setLineWidth(.25);
+            pdf.setLineWidth(0.25);
 
             pdf.rect(
                 7,
@@ -370,10 +393,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 height - 14
             );
         }
+
 
         if (style === "inner") {
+
             pdf.setLineDashPattern([], 0);
-            pdf.setLineWidth(.35);
+            pdf.setLineWidth(0.35);
 
             pdf.rect(
                 7,
@@ -382,6 +407,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 height - 14
             );
         }
+
 
         pdf.setLineDashPattern([], 0);
     }
@@ -404,7 +430,9 @@ document.addEventListener("DOMContentLoaded", () => {
             100
         );
 
-        pdf.setLineWidth(.35);
+        pdf.setLineWidth(
+            0.35
+        );
 
         pdf.setLineDashPattern(
             [1, 1],
@@ -422,34 +450,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function getGrid(count) {
-
-        const grids = {
-            1: [1, 1],
-            2: [1, 2],
-            3: [1, 3],
-            4: [2, 2],
-            5: [2, 3],
-            6: [2, 3],
-            7: [2, 4],
-            8: [2, 4],
-            9: [3, 3],
-            10: [2, 5]
-        };
-
-        return grids[count] || [1, count];
-    }
-
-
     /* =========================================================
-       PREVIEW SIZE
+       PAGE PREVIEW
     ========================================================== */
 
     function updatePagePreview(
         element,
-        type,
-        customW,
-        customH
+        size,
+        customWidth,
+        customHeight
     ) {
 
         if (!element) {
@@ -464,32 +473,37 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         element.classList.add(
-            `size-${type}`
+            `size-${size}`
         );
+
 
         const page =
             getPageSize(
-                type,
-                customW,
-                customH
+                size,
+                customWidth,
+                customHeight
             );
+
 
         if (!page) {
             return;
         }
 
+
         const ratio =
             page.width /
             page.height;
 
+
         let height = 435;
-        let width =
-            height * ratio;
+        let width = height * ratio;
+
 
         if (width > 330) {
             width = 330;
             height = width / ratio;
         }
+
 
         element.style.width =
             `${Math.max(120, width)}px`;
@@ -500,21 +514,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================================================
-       WORKSPACE OPEN
+       TOOL NAVIGATION
     ========================================================== */
 
-    const workspaces =
-        document.querySelectorAll(
-            ".tool-workspace"
-        );
+    function hideAllWorkspaces() {
 
-
-    function hideWorkspaces() {
-        workspaces.forEach(
-            item => {
-                item.style.display = "none";
-            }
-        );
+        document
+            .querySelectorAll(
+                ".tool-workspace"
+            )
+            .forEach(
+                workspace => {
+                    workspace.style.display =
+                        "none";
+                }
+            );
     }
 
 
@@ -529,47 +543,51 @@ document.addEventListener("DOMContentLoaded", () => {
                     "click",
                     () => {
 
-                        hideWorkspaces();
+                        hideAllWorkspaces();
 
-                        const tool =
-                            button.dataset.openTool;
-
-                        let id = "";
+                        let targetId = "";
 
                         if (
-                            tool === "cocoblue"
+                            button.dataset.openTool ===
+                            "cocoblue"
                         ) {
-                            id =
+                            targetId =
                                 "cocoblueWorkspace";
                         }
 
                         if (
-                            tool === "otherpo"
+                            button.dataset.openTool ===
+                            "otherpo"
                         ) {
-                            id =
+                            targetId =
                                 "otherpoWorkspace";
                         }
 
                         if (
-                            tool === "isbn"
+                            button.dataset.openTool ===
+                            "isbn"
                         ) {
-                            id =
+                            targetId =
                                 "isbnWorkspace";
                         }
 
-                        const workspace =
+
+                        const target =
                             document.getElementById(
-                                id
+                                targetId
                             );
 
-                        if (!workspace) {
+
+                        if (!target) {
                             return;
                         }
 
-                        workspace.style.display =
+
+                        target.style.display =
                             "block";
 
-                        workspace.scrollIntoView({
+
+                        target.scrollIntoView({
                             behavior: "smooth",
                             block: "start"
                         });
@@ -590,12 +608,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     "click",
                     () => {
 
-                        hideWorkspaces();
+                        hideAllWorkspaces();
 
                         document
                             .getElementById("tools")
                             ?.scrollIntoView({
-                                behavior: "smooth"
+                                behavior:
+                                    "smooth"
                             });
                     }
                 );
@@ -616,7 +635,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         return Array.from(
-            document.querySelectorAll(".coco-po")
+            document.querySelectorAll(
+                ".coco-po"
+            )
         )
         .map(
             input =>
@@ -655,6 +676,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         cocoInputMode =
                             button.dataset.cocoInput;
 
+
                         document
                             .getElementById(
                                 "cocoManualArea"
@@ -664,6 +686,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 cocoInputMode !==
                                 "manual"
                             );
+
 
                         document
                             .getElementById(
@@ -675,6 +698,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "excel"
                             );
 
+
                         updateCocoPreview();
                     }
                 );
@@ -682,8 +706,14 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
+    /* ---------------------------------------------------------
+       COCO EXCEL
+    ---------------------------------------------------------- */
+
     document
-        .getElementById("cocoExcel")
+        .getElementById(
+            "cocoExcel"
+        )
         .addEventListener(
             "change",
             async event => {
@@ -751,7 +781,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                     "po number",
                                     "po no",
                                     "po no.",
-                                    "po_number"
+                                    "po_number",
+                                    "purchase order"
                                 ].includes(
                                     header
                                 )
@@ -766,7 +797,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                     cocoExcelPOs =
-                        [...new Set(cocoExcelPOs)];
+                        [
+                            ...new Set(
+                                cocoExcelPOs
+                            )
+                        ];
 
                     document.getElementById(
                         "cocoExcelStatus"
@@ -779,13 +814,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     console.error(error);
 
-                    document.getElementById(
-                        "cocoExcelStatus"
-                    ).textContent =
-                        "Excel reading failed.";
-
                     alert(
-                        "Unable to read the Excel file."
+                        "Unable to read PO Excel file."
                     );
                 }
             }
@@ -793,7 +823,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* ---------------------------------------------------------
-       COCO PAGE SIZE
+       COCO SIZE
     ---------------------------------------------------------- */
 
     document
@@ -825,6 +855,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         cocoSize =
                             button.dataset.cocoSize;
 
+
                         document
                             .getElementById(
                                 "cocoCustomSize"
@@ -834,6 +865,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 cocoSize !==
                                 "custom"
                             );
+
 
                         updateCocoPreview();
                     }
@@ -865,28 +897,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 ).value
             ) || start;
 
-        const pagePreview =
+
+        const previewPage =
             document.getElementById(
                 "cocoPreviewPage"
             );
 
-        const label =
+        const previewLabel =
             document.getElementById(
                 "cocoPreviewLabel"
             );
 
-        const poPreview =
-            document.getElementById(
-                "cocoPreviewPO"
-            );
-
-        const boxPreview =
+        const previewBox =
             document.getElementById(
                 "cocoPreviewBox"
             );
 
+
         updatePagePreview(
-            pagePreview,
+            previewPage,
             cocoSize,
             document.getElementById(
                 "cocoCustomWidth"
@@ -896,16 +925,39 @@ document.addEventListener("DOMContentLoaded", () => {
             ).value
         );
 
-        poPreview.textContent =
+
+        document.getElementById(
+            "cocoPreviewPO"
+        ).textContent =
             pos[0] || "";
 
-        boxPreview.textContent =
+
+        /*
+         * Required exact display:
+         * BOX NO. 1
+         */
+
+        previewBox.textContent =
             `BOX NO. ${start}`;
+
+
+        const highlight =
+            document.getElementById(
+                "cocoBoxHighlight"
+            ).checked;
+
+
+        previewBox.style.border =
+            highlight
+                ? "2px solid #111827"
+                : "0";
+
 
         document.getElementById(
             "cocoBoxSummary"
         ).textContent =
             `${start}–${end}`;
+
 
         const page =
             getPageSize(
@@ -918,14 +970,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 ).value
             );
 
+
         if (page) {
 
             document.getElementById(
                 "cocoSizeSummary"
             ).textContent =
                 page.label;
-
         }
+
 
         document.getElementById(
             "cocoSummary"
@@ -935,44 +988,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 end - start + 1
             )} boxes`;
 
-        label.style.border =
+
+        document.getElementById(
+            "cocoPreviewScissor"
+        ).style.display =
             document.getElementById(
-                "cocoBoxHighlight"
+                "cocoCutting"
             ).checked
-                ? "2px solid #1c1c1a"
-                : "0";
+                ? "inline-block"
+                : "none";
 
-        boxPreview.style.border =
+
+        previewLabel.style.border =
             document.getElementById(
-                "cocoBoxHighlight"
+                "cocoBorder"
             ).checked
-                ? "2px solid #1c1c1a"
-                : "0";
-
-        boxPreview.style.fontFamily =
-            document.getElementById(
-                "cocoFont"
-            ).value;
-
-        boxPreview.style.fontSize =
-            `${
-                Number(
+                ? getBorderCSS(
                     document.getElementById(
-                        "cocoFontSize"
+                        "cocoBorderStyle"
                     ).value
-                ) || 10
-            }px`;
-
-        boxPreview.style.fontWeight =
-            document.getElementById(
-                "cocoFontWeight"
-            ).value;
-
-        label.style.border =
-            document.getElementById(
-                "cocoBoxHighlight"
-            ).checked
-                ? "2px solid #1c1c1a"
+                )
                 : "0";
     }
 
@@ -995,226 +1030,43 @@ document.addEventListener("DOMContentLoaded", () => {
         "cocoCustomWidth",
         "cocoCustomHeight"
     ]
-    .forEach(item => {
+    .forEach(
+        item => {
 
-        const elements =
-            item.startsWith(".")
-                ? document.querySelectorAll(item)
-                : [
-                    document.getElementById(item)
-                ];
+            const elements =
+                item.startsWith(".")
+                    ? document.querySelectorAll(item)
+                    : [
+                        document.getElementById(item)
+                    ];
 
-        elements.forEach(
-            element => {
+            elements.forEach(
+                element => {
 
-                if (!element) {
-                    return;
+                    if (!element) {
+                        return;
+                    }
+
+                    element.addEventListener(
+                        "input",
+                        updateCocoPreview
+                    );
+
+                    element.addEventListener(
+                        "change",
+                        updateCocoPreview
+                    );
                 }
-
-                element.addEventListener(
-                    "input",
-                    updateCocoPreview
-                );
-
-                element.addEventListener(
-                    "change",
-                    updateCocoPreview
-                );
-            }
-        );
-    });
+            );
+        }
+    );
 
 
     /* ---------------------------------------------------------
-       COCO LABEL PDF
+       LABEL PDF
     ---------------------------------------------------------- */
 
-    function makeLabelPDF(
-        labels,
-        options
-    ) {
-
-        const pdf =
-            new PDF({
-                orientation:
-                    getOrientation(
-                        options.page
-                    ),
-                unit: "mm",
-                format: [
-                    options.page.width,
-                    options.page.height
-                ]
-            });
-
-        const labelsPerPage =
-            Math.max(
-                1,
-                Number(
-                    options.labelsPerPage
-                ) || 1
-            );
-
-        const totalPages =
-            Math.ceil(
-                labels.length /
-                labelsPerPage
-            );
-
-        for (
-            let pageIndex = 0;
-            pageIndex < totalPages;
-            pageIndex++
-        ) {
-
-            if (
-                pageIndex > 0
-            ) {
-
-                pdf.addPage(
-                    [
-                        options.page.width,
-                        options.page.height
-                    ],
-                    getOrientation(
-                        options.page
-                    )
-                );
-            }
-
-            drawBorder(
-                pdf,
-                options.page.width,
-                options.page.height,
-                options.border,
-                options.borderStyle
-            );
-
-            drawTaxBorder(
-                pdf,
-                options.page.width,
-                options.page.height,
-                options.taxBorder
-            );
-
-            const current =
-                labels.slice(
-                    pageIndex *
-                    labelsPerPage,
-                    (
-                        pageIndex + 1
-                    ) *
-                    labelsPerPage
-                );
-
-            /*
-             * Vertical default.
-             * One label below another.
-             */
-
-            const vertical =
-                options.vertical !== false;
-
-            if (vertical) {
-
-                const cellHeight =
-                    options.page.height /
-                    current.length;
-
-                current.forEach(
-                    (item, index) => {
-
-                        drawLabel(
-                            pdf,
-                            item,
-                            {
-                                x: 0,
-                                y:
-                                    index *
-                                    cellHeight,
-                                width:
-                                    options.page.width,
-                                height:
-                                    cellHeight,
-                                font:
-                                    pdfFont(
-                                        options.font
-                                    ),
-                                fontSize:
-                                    options.fontSize,
-                                cutting:
-                                    options.cutting,
-                                boxHighlight:
-                                    options.boxHighlight
-                            }
-                        );
-                    }
-                );
-
-            } else {
-
-                const [rows, columns] =
-                    getGrid(
-                        current.length
-                    );
-
-                const cellWidth =
-                    options.page.width /
-                    columns;
-
-                const cellHeight =
-                    options.page.height /
-                    rows;
-
-                current.forEach(
-                    (item, index) => {
-
-                        const row =
-                            Math.floor(
-                                index /
-                                columns
-                            );
-
-                        const col =
-                            index %
-                            columns;
-
-                        drawLabel(
-                            pdf,
-                            item,
-                            {
-                                x:
-                                    col *
-                                    cellWidth,
-                                y:
-                                    row *
-                                    cellHeight,
-                                width:
-                                    cellWidth,
-                                height:
-                                    cellHeight,
-                                font:
-                                    pdfFont(
-                                        options.font
-                                    ),
-                                fontSize:
-                                    options.fontSize,
-                                cutting:
-                                    options.cutting,
-                                boxHighlight:
-                                    options.boxHighlight
-                            }
-                        );
-                    }
-                );
-            }
-        }
-
-        return pdf;
-    }
-
-
-    function drawLabel(
+    function drawBoxLabel(
         pdf,
         item,
         options
@@ -1222,24 +1074,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const centerX =
             options.x +
-            options.width /
-            2;
+            options.width / 2;
 
         const centerY =
             options.y +
-            options.height /
-            2;
+            options.height / 2;
 
-
-        /*
-         * PO number only.
-         */
 
         pdf.setTextColor(
-            25,
-            25,
-            25
+            16,
+            24,
+            40
         );
+
 
         pdf.setFont(
             options.font,
@@ -1247,10 +1094,14 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         pdf.setFontSize(
-            Number(
-                options.fontSize
-            ) || 10
+            options.fontSize
         );
+
+
+        /*
+         * PO number ONLY.
+         * No "PO" prefix.
+         */
 
         pdf.text(
             String(item.po),
@@ -1263,7 +1114,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         /*
-         * Dotted separator.
+         * Mandatory dotted divider.
          */
 
         pdf.setFont(
@@ -1275,12 +1126,9 @@ document.addEventListener("DOMContentLoaded", () => {
             8
         );
 
-        const dots =
-            ". . . . . . . . . .";
-
 
         pdf.text(
-            dots,
+            ". . . . . . . . . . . .",
             centerX,
             centerY - 5,
             {
@@ -1290,8 +1138,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         /*
-         * BOX NO. format.
+         * BOX NO. exact format.
          */
+
+        const boxText =
+            `BOX NO. ${item.box}`;
+
 
         pdf.setFont(
             options.font,
@@ -1301,25 +1153,19 @@ document.addEventListener("DOMContentLoaded", () => {
         pdf.setFontSize(
             Math.max(
                 12,
-                Number(
-                    options.fontSize
-                ) + 4
+                options.fontSize + 4
             )
         );
-
-
-        const boxText =
-            `BOX NO. ${item.box}`;
 
 
         const boxWidth =
             Math.min(
                 options.width - 12,
                 Math.max(
-                    35,
+                    42,
                     pdf.getTextWidth(
                         boxText
-                    ) + 16
+                    ) + 18
                 )
             );
 
@@ -1337,20 +1183,16 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             pdf.setDrawColor(
-                25,
-                25,
-                25
+                17,
+                24,
+                39
             );
 
             pdf.rect(
                 centerX -
                 boxWidth / 2,
 
-                centerY -
-
-                boxHeight / 2 +
-
-                7,
+                centerY + 2,
 
                 boxWidth,
 
@@ -1362,7 +1204,7 @@ document.addEventListener("DOMContentLoaded", () => {
         pdf.text(
             boxText,
             centerX,
-            centerY + 13,
+            centerY + 14,
             {
                 align: "center"
             }
@@ -1370,7 +1212,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         /*
-         * Cutting symbol.
+         * Cutting icon.
          */
 
         if (
@@ -1391,7 +1233,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 centerX,
                 options.y +
                 options.height -
-                7,
+                6,
                 {
                     align: "center"
                 }
@@ -1400,8 +1242,232 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    function createPOPDF(
+        labels,
+        options
+    ) {
+
+        const pdf =
+            new PDF({
+                orientation:
+                    getOrientation(
+                        options.page
+                    ),
+
+                unit: "mm",
+
+                format: [
+                    options.page.width,
+                    options.page.height
+                ]
+            });
+
+
+        const perPage =
+            Math.max(
+                1,
+                Number(
+                    options.labelsPerPage
+                ) || 1
+            );
+
+
+        const totalPages =
+            Math.ceil(
+                labels.length /
+                perPage
+            );
+
+
+        for (
+            let pageIndex = 0;
+            pageIndex < totalPages;
+            pageIndex++
+        ) {
+
+            if (pageIndex > 0) {
+
+                pdf.addPage(
+                    [
+                        options.page.width,
+                        options.page.height
+                    ],
+                    getOrientation(
+                        options.page
+                    )
+                );
+            }
+
+
+            drawBorder(
+                pdf,
+                options.page.width,
+                options.page.height,
+                options.border,
+                options.borderStyle
+            );
+
+
+            drawTaxBorder(
+                pdf,
+                options.page.width,
+                options.page.height,
+                options.taxBorder
+            );
+
+
+            const pageLabels =
+                labels.slice(
+                    pageIndex * perPage,
+                    (pageIndex + 1) * perPage
+                );
+
+
+            /*
+             * Vertical layout:
+             * label 1 top
+             * label 2 below
+             * label 3 below
+             */
+
+            if (
+                options.vertical
+            ) {
+
+                const cellHeight =
+                    options.page.height /
+                    pageLabels.length;
+
+
+                pageLabels.forEach(
+                    (
+                        item,
+                        index
+                    ) => {
+
+                        drawBoxLabel(
+                            pdf,
+                            item,
+                            {
+                                x: 0,
+
+                                y:
+                                    index *
+                                    cellHeight,
+
+                                width:
+                                    options.page.width,
+
+                                height:
+                                    cellHeight,
+
+                                font:
+                                    getPDFSpaceFont(
+                                        options.font
+                                    ),
+
+                                fontSize:
+                                    Number(
+                                        options.fontSize
+                                    ) || 10,
+
+                                cutting:
+                                    options.cutting,
+
+                                boxHighlight:
+                                    options.boxHighlight
+                            }
+                        );
+                    }
+                );
+
+
+            } else {
+
+                const [
+                    rows,
+                    columns
+                ] =
+                    getGrid(
+                        pageLabels.length
+                    );
+
+
+                const cellWidth =
+                    options.page.width /
+                    columns;
+
+                const cellHeight =
+                    options.page.height /
+                    rows;
+
+
+                pageLabels.forEach(
+                    (
+                        item,
+                        index
+                    ) => {
+
+                        const row =
+                            Math.floor(
+                                index /
+                                columns
+                            );
+
+                        const column =
+                            index %
+                            columns;
+
+
+                        drawBoxLabel(
+                            pdf,
+                            item,
+                            {
+                                x:
+                                    column *
+                                    cellWidth,
+
+                                y:
+                                    row *
+                                    cellHeight,
+
+                                width:
+                                    cellWidth,
+
+                                height:
+                                    cellHeight,
+
+                                font:
+                                    getPDFSpaceFont(
+                                        options.font
+                                    ),
+
+                                fontSize:
+                                    Number(
+                                        options.fontSize
+                                    ) || 10,
+
+                                cutting:
+                                    options.cutting,
+
+                                boxHighlight:
+                                    options.boxHighlight
+                            }
+                        );
+                    }
+                );
+            }
+        }
+
+
+        return pdf;
+    }
+
+
     /* ---------------------------------------------------------
        COCO GENERATE
+       IMPORTANT:
+       THERE IS NO 200 LIMIT ANYWHERE.
     ---------------------------------------------------------- */
 
     document
@@ -1416,8 +1482,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const pos =
                     getCocoPOs();
+
 
                 if (!pos.length) {
 
@@ -1428,12 +1496,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const start =
                     Number(
                         document.getElementById(
                             "cocoStartBox"
                         ).value
                     );
+
 
                 const end =
                     Number(
@@ -1442,23 +1512,50 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                     );
 
+
                 /*
-                 * No 200 limit.
+                 * NO MAX 200.
+                 *
+                 * Only actual validity check:
+                 * numbers + start <= end.
                  */
 
                 if (
                     !Number.isFinite(start) ||
-                    !Number.isFinite(end) ||
-                    start < 0 ||
-                    end < start
+                    !Number.isFinite(end)
                 ) {
 
                     alert(
-                        "Please enter a valid box range."
+                        "Please enter valid numeric box numbers."
                     );
 
                     return;
                 }
+
+
+                if (
+                    start < 1
+                ) {
+
+                    alert(
+                        "Start Box must be 1 or greater."
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    end < start
+                ) {
+
+                    alert(
+                        "End Box must be greater than or equal to Start Box."
+                    );
+
+                    return;
+                }
+
 
                 const page =
                     getPageSize(
@@ -1471,6 +1568,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                     );
 
+
                 if (!page) {
 
                     alert(
@@ -1480,12 +1578,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const copies =
                     Number(
                         document.getElementById(
                             "cocoCopiesPerBox"
                         ).value
                     ) || 1;
+
 
                 const labelsPerPage =
                     Number(
@@ -1494,11 +1594,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                     ) || 1;
 
+
                 const options = {
 
                     page,
-
-                    copies,
 
                     labelsPerPage,
 
@@ -1544,21 +1643,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 };
 
 
-                const zipEnabled =
-                    document.getElementById(
-                        "cocoZip"
-                    ).checked;
-
-
                 const files = [];
-                const time = timestamp();
+                const stamp =
+                    getTimestamp();
 
+
+                /*
+                 * EACH PO GETS ITS OWN PDF.
+                 */
 
                 for (
                     const po of pos
                 ) {
 
                     const labels = [];
+
 
                     for (
                         let box = start;
@@ -1582,7 +1681,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     const pdf =
-                        makeLabelPDF(
+                        createPOPDF(
                             labels,
                             options
                         );
@@ -1591,7 +1690,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const filename =
                         `${safeName(
                             po
-                        )}_BOX${start}-${end}_${time.date}_${time.time}.pdf`;
+                        )}_BOX${start}-${end}_${stamp.date}_${stamp.time}.pdf`;
 
 
                     const blob =
@@ -1599,59 +1698,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     files.push({
-                        name: filename,
+                        name:
+                            filename,
+
                         blob
                     });
-
-
-                    /*
-                     * Single PDF:
-                     * direct download.
-                     */
-
-                    if (
-                        pos.length === 1
-                    ) {
-
-                        downloadBlob(
-                            blob,
-                            filename
-                        );
-
-                    }
                 }
 
 
                 /*
-                 * Multiple PO:
-                 * ZIP only.
+                 * SINGLE PO = DIRECT PDF
+                 * MULTIPLE PO = AUTOMATIC ZIP
                  */
 
                 if (
-                    pos.length > 1
+                    files.length === 1
                 ) {
 
-                    await downloadZip(
-                        files,
-                        `BooksWagon_${time.date}_${time.time}.zip`
+                    downloadBlob(
+                        files[0].blob,
+                        files[0].name
                     );
 
+
+                    document.getElementById(
+                        "cocoStatus"
+                    ).textContent =
+                        "PDF downloaded successfully.";
+
+                } else {
+
+                    await downloadZIP(
+                        files,
+                        `BooksWagon_CocoBlue_${stamp.date}_${stamp.time}.zip`
+                    );
+
+
+                    document.getElementById(
+                        "cocoStatus"
+                    ).textContent =
+                        `${files.length} separate PO PDFs packed into ZIP.`;
                 }
-
-
-                /*
-                 * Multiple PO ZIP ON/OFF:
-                 * User specifically requested ZIP when
-                 * multiple PDFs are generated, so ZIP is
-                 * automatically used.
-                 */
-
-                document.getElementById(
-                    "cocoStatus"
-                ).textContent =
-                    pos.length > 1
-                        ? `${pos.length} PO PDFs packed into ZIP.`
-                        : "PDF downloaded successfully.";
             }
         );
 
@@ -1673,29 +1760,34 @@ document.addEventListener("DOMContentLoaded", () => {
                         ".coco-po"
                     )
                     .forEach(
-                        input =>
-                            input.value = ""
+                        input => {
+                            input.value = "";
+                        }
                     );
 
+
                 cocoExcelPOs = [];
+
 
                 document.getElementById(
                     "cocoExcel"
                 ).value = "";
+
 
                 document.getElementById(
                     "cocoExcelStatus"
                 ).textContent =
                     "No file selected";
 
+
                 updateCocoPreview();
             }
         );
 
 
-    /* ---------------------------------------------------------
+    /* =========================================================
        COCO MODE
-    ---------------------------------------------------------- */
+    ========================================================== */
 
     document
         .querySelectorAll(
@@ -1719,12 +1811,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
 
+
                         const mode =
                             button.dataset.cocoblueMode;
+
 
                         document
                             .getElementById(
@@ -1734,6 +1829,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "hidden",
                                 mode !== "sticker"
                             );
+
 
                         document
                             .getElementById(
@@ -1775,14 +1871,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
 
+
                         cocoAddressSize =
                             button.dataset.cocoAddressSize;
 
-                        updateCocoAddress();
                     }
                 );
             }
@@ -1796,25 +1893,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 "cocoFrom"
             ).value.trim();
 
+
         const to =
             document.getElementById(
                 "cocoTo"
             ).value.trim();
+
 
         document.getElementById(
             "cocoFromPreview"
         ).textContent =
             from || "FROM";
 
+
         document.getElementById(
             "cocoToPreview"
         ).textContent =
             to || "TO";
 
+
         const preview =
             document.getElementById(
                 "cocoAddressPreview"
             );
+
 
         preview.style.border =
             document.getElementById(
@@ -1827,10 +1929,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 )
                 : "none";
 
+
         preview.style.fontFamily =
             document.getElementById(
                 "cocoAddressFont"
             ).value;
+
 
         preview.style.fontSize =
             `${
@@ -1853,21 +1957,19 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach(
         id => {
 
-            const el =
-                document.getElementById(
-                    id
-                );
+            const element =
+                document.getElementById(id);
 
-            if (!el) {
+            if (!element) {
                 return;
             }
 
-            el.addEventListener(
+            element.addEventListener(
                 "input",
                 updateCocoAddress
             );
 
-            el.addEventListener(
+            element.addEventListener(
                 "change",
                 updateCocoAddress
             );
@@ -1887,15 +1989,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const from =
                     document.getElementById(
                         "cocoFrom"
                     ).value.trim();
 
+
                 const to =
                     document.getElementById(
                         "cocoTo"
                     ).value.trim();
+
 
                 if (
                     !from ||
@@ -1909,10 +2014,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const page =
                     getPageSize(
                         cocoAddressSize
                     );
+
 
                 if (!page) {
 
@@ -1923,18 +2030,25 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const pdf =
                     new PDF({
+
                         orientation:
                             getOrientation(
                                 page
                             ),
-                        unit: "mm",
-                        format: [
-                            page.width,
-                            page.height
-                        ]
+
+                        unit:
+                            "mm",
+
+                        format:
+                            [
+                                page.width,
+                                page.height
+                            ]
                     });
+
 
                 drawBorder(
                     pdf,
@@ -1948,6 +2062,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     ).value
                 );
 
+
                 drawTaxBorder(
                     pdf,
                     page.width,
@@ -1957,14 +2072,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     ).checked
                 );
 
+
                 pdf.setFont(
-                    pdfFont(
+                    getPDFSpaceFont(
                         document.getElementById(
                             "cocoAddressFont"
                         ).value
                     ),
                     "normal"
                 );
+
 
                 pdf.setFontSize(
                     Number(
@@ -1974,7 +2091,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     ) || 10
                 );
 
+
                 let y = 20;
+
 
                 pdf.text(
                     "FROM",
@@ -1982,7 +2101,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     y
                 );
 
+
                 y += 7;
+
 
                 const fromLines =
                     pdf.splitTextToSize(
@@ -1990,16 +2111,18 @@ document.addEventListener("DOMContentLoaded", () => {
                         page.width - 20
                     );
 
+
                 pdf.text(
                     fromLines,
                     10,
                     y
                 );
 
+
                 y +=
-                    fromLines.length *
-                    5 +
+                    fromLines.length * 5 +
                     18;
+
 
                 pdf.text(
                     "TO",
@@ -2007,7 +2130,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     y
                 );
 
+
                 y += 7;
+
 
                 const toLines =
                     pdf.splitTextToSize(
@@ -2015,16 +2140,19 @@ document.addEventListener("DOMContentLoaded", () => {
                         page.width - 20
                     );
 
+
                 pdf.text(
                     toLines,
                     10,
                     y
                 );
 
-                downloadPDF(
-                    pdf,
+
+                downloadBlob(
+                    pdf.output("blob"),
                     "CocoBlue_Address_Label.pdf"
                 );
+
 
                 document.getElementById(
                     "cocoAddressStatus"
@@ -2070,8 +2198,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function getOtherPOs() {
 
         if (
-            otherInputMode ===
-            "excel"
+            otherInputMode === "excel"
         ) {
             return [...otherExcelPOs];
         }
@@ -2111,12 +2238,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
 
+
                         otherInputMode =
                             button.dataset.otherInput;
+
 
                         document
                             .getElementById(
@@ -2128,6 +2258,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "manual"
                             );
 
+
                         document
                             .getElementById(
                                 "otherExcelArea"
@@ -2137,6 +2268,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 otherInputMode !==
                                 "excel"
                             );
+
 
                         updateOtherPreview();
                     }
@@ -2173,7 +2305,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         XLSX_LIB.read(
                             buffer,
                             {
-                                type: "array"
+                                type:
+                                    "array"
                             }
                         );
 
@@ -2193,6 +2326,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     otherExcelPOs = [];
 
+
                     rows.forEach(
                         (row, index) => {
 
@@ -2202,9 +2336,11 @@ document.addEventListener("DOMContentLoaded", () => {
                                     ""
                                 ).trim();
 
+
                             if (!value) {
                                 return;
                             }
+
 
                             if (
                                 index === 0 &&
@@ -2221,11 +2357,13 @@ document.addEventListener("DOMContentLoaded", () => {
                                 return;
                             }
 
+
                             otherExcelPOs.push(
                                 value
                             );
                         }
                     );
+
 
                     otherExcelPOs =
                         [
@@ -2234,10 +2372,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             )
                         ];
 
+
                     document.getElementById(
                         "otherExcelStatus"
                     ).textContent =
                         `${otherExcelPOs.length} PO(s) loaded`;
+
 
                     updateOtherPreview();
 
@@ -2252,6 +2392,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         );
 
+
+    /* ---------------------------------------------------------
+       OTHER SIZE
+    ---------------------------------------------------------- */
 
     document
         .querySelectorAll(
@@ -2275,12 +2419,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
 
+
                         otherSize =
                             button.dataset.otherSize;
+
 
                         document
                             .getElementById(
@@ -2291,6 +2438,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 otherSize !==
                                 "custom"
                             );
+
 
                         updateOtherPreview();
                     }
@@ -2304,12 +2452,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const pos =
             getOtherPOs();
 
+
         const start =
             Number(
                 document.getElementById(
                     "otherStartBox"
                 ).value
             ) || 1;
+
 
         const end =
             Number(
@@ -2318,23 +2468,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 ).value
             ) || start;
 
-        const previewPage =
-            document.getElementById(
-                "otherPreviewPage"
-            );
-
-        const preview =
-            document.getElementById(
-                "otherPreview"
-            );
-
-        const boxPreview =
-            document.getElementById(
-                "otherPreviewBox"
-            );
 
         updatePagePreview(
-            previewPage,
+            document.getElementById(
+                "otherPreviewPage"
+            ),
             otherSize,
             document.getElementById(
                 "otherCustomWidth"
@@ -2344,18 +2482,24 @@ document.addEventListener("DOMContentLoaded", () => {
             ).value
         );
 
+
         document.getElementById(
             "otherPreviewPO"
         ).textContent =
             pos[0] || "";
 
-        boxPreview.textContent =
+
+        document.getElementById(
+            "otherPreviewBox"
+        ).textContent =
             `BOX NO. ${start}`;
+
 
         document.getElementById(
             "otherBoxSummary"
         ).textContent =
             `${start}–${end}`;
+
 
         const page =
             getPageSize(
@@ -2368,6 +2512,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 ).value
             );
 
+
         if (page) {
 
             document.getElementById(
@@ -2376,36 +2521,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 page.label;
         }
 
+
         const highlight =
             document.getElementById(
                 "otherBoxHighlight"
             ).checked;
 
-        preview.style.border =
+
+        document.getElementById(
+            "otherPreviewBox"
+        ).style.border =
             highlight
-                ? "2px solid #1c1c1a"
+                ? "2px solid #111827"
+                : "0";
+
+
+        document.querySelector(
+            "#otherPreview .preview-scissor"
+        ).style.display =
+            document.getElementById(
+                "otherCutting"
+            ).checked
+                ? "inline-block"
                 : "none";
-
-        boxPreview.style.border =
-            highlight
-                ? "2px solid #1c1c1a"
-                : "none";
-
-        document
-            .querySelectorAll(
-                "#otherPreview .preview-scissor"
-            )
-            .forEach(
-                scissor => {
-
-                    scissor.style.display =
-                        document.getElementById(
-                            "otherCutting"
-                        ).checked
-                            ? "inline-block"
-                            : "none";
-                }
-            );
     }
 
 
@@ -2425,68 +2563,56 @@ document.addEventListener("DOMContentLoaded", () => {
         "otherFont",
         "otherFontSize"
     ]
-    .forEach(item => {
+    .forEach(
+        item => {
 
-        const elements =
-            item.startsWith(".")
-                ? document.querySelectorAll(item)
-                : [
-                    document.getElementById(item)
-                ];
+            const elements =
+                item.startsWith(".")
+                    ? document.querySelectorAll(item)
+                    : [
+                        document.getElementById(item)
+                    ];
 
-        elements.forEach(
-            element => {
 
-                if (!element) {
-                    return;
+            elements.forEach(
+                element => {
+
+                    if (!element) {
+                        return;
+                    }
+
+                    element.addEventListener(
+                        "input",
+                        updateOtherPreview
+                    );
+
+                    element.addEventListener(
+                        "change",
+                        updateOtherPreview
+                    );
                 }
-
-                element.addEventListener(
-                    "input",
-                    updateOtherPreview
-                );
-
-                element.addEventListener(
-                    "change",
-                    updateOtherPreview
-                );
-            }
-        );
-    });
+            );
+        }
+    );
 
 
-    document
-        .querySelectorAll(
-            'input[name="otherLayout"]'
-        )
-        .forEach(
-            radio => {
-
-                radio.addEventListener(
-                    "change",
-                    updateOtherPreview
-                );
-            }
-        );
-
-
-    function getOtherLabels(
-        po
-    ) {
+    function getOtherLabels(po) {
 
         const start =
             Number(
                 document.getElementById(
                     "otherStartBox"
                 ).value
-            ) || 1;
+            );
+
 
         const end =
             Number(
                 document.getElementById(
                     "otherEndBox"
                 ).value
-            ) || start;
+            );
+
 
         const copies =
             Number(
@@ -2495,7 +2621,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 ).value
             ) || 1;
 
+
         const labels = [];
+
 
         for (
             let box = start;
@@ -2517,9 +2645,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+
         return labels;
     }
 
+
+    /* ---------------------------------------------------------
+       OTHER GENERATE
+    ---------------------------------------------------------- */
 
     document
         .getElementById(
@@ -2533,8 +2666,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const pos =
                     getOtherPOs();
+
 
                 if (!pos.length) {
 
@@ -2545,12 +2680,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const start =
                     Number(
                         document.getElementById(
                             "otherStartBox"
                         ).value
                     );
+
 
                 const end =
                     Number(
@@ -2559,19 +2696,47 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                     );
 
+
+                /*
+                 * NO 200 LIMIT.
+                 */
+
                 if (
                     !Number.isFinite(start) ||
-                    !Number.isFinite(end) ||
-                    start < 0 ||
-                    end < start
+                    !Number.isFinite(end)
                 ) {
 
                     alert(
-                        "Please enter a valid box range."
+                        "Please enter valid numeric box numbers."
                     );
 
                     return;
                 }
+
+
+                if (
+                    start < 1
+                ) {
+
+                    alert(
+                        "Start Box must be 1 or greater."
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    end < start
+                ) {
+
+                    alert(
+                        "End Box must be greater than or equal to Start Box."
+                    );
+
+                    return;
+                }
+
 
                 const page =
                     getPageSize(
@@ -2584,6 +2749,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                     );
 
+
                 if (!page) {
 
                     alert(
@@ -2592,6 +2758,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     return;
                 }
+
 
                 const options = {
 
@@ -2604,7 +2771,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             ).value
                         ) || 1,
 
-                    vertical: true,
+                    vertical:
+                        true,
 
                     cutting:
                         document.getElementById(
@@ -2642,8 +2810,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                 };
 
+
                 const files = [];
-                const time = timestamp();
+                const stamp =
+                    getTimestamp();
 
 
                 for (
@@ -2651,58 +2821,69 @@ document.addEventListener("DOMContentLoaded", () => {
                 ) {
 
                     const labels =
-                        getOtherLabels(
-                            po
-                        );
+                        getOtherLabels(po);
+
 
                     const pdf =
-                        makeLabelPDF(
+                        createPOPDF(
                             labels,
                             options
                         );
 
+
                     const filename =
                         `${safeName(
                             po
-                        )}_BOX${start}-${end}_${time.date}_${time.time}.pdf`;
+                        )}_BOX${start}-${end}_${stamp.date}_${stamp.time}.pdf`;
 
-                    const blob =
-                        pdf.output("blob");
 
                     files.push({
-                        name: filename,
-                        blob
+
+                        name:
+                            filename,
+
+                        blob:
+                            pdf.output("blob")
                     });
-
-                    if (
-                        pos.length === 1
-                    ) {
-
-                        downloadBlob(
-                            blob,
-                            filename
-                        );
-                    }
                 }
 
+
+                /*
+                 * SINGLE PO:
+                 * direct PDF
+                 *
+                 * MULTIPLE PO:
+                 * automatic ZIP
+                 */
 
                 if (
-                    pos.length > 1
+                    files.length === 1
                 ) {
 
-                    await downloadZip(
-                        files,
-                        `BooksWagon_OtherPO_${time.date}_${time.time}.zip`
+                    downloadBlob(
+                        files[0].blob,
+                        files[0].name
                     );
+
+
+                    document.getElementById(
+                        "otherStatus"
+                    ).textContent =
+                        "PDF downloaded successfully.";
+
+                } else {
+
+                    await downloadZIP(
+                        files,
+                        `BooksWagon_OtherPO_${stamp.date}_${stamp.time}.zip`
+                    );
+
+
+                    document.getElementById(
+                        "otherStatus"
+                    ).textContent =
+                        `${files.length} separate PO PDFs packed into ZIP.`;
                 }
-
-
-                document.getElementById(
-                    "otherStatus"
-                ).textContent =
-                    pos.length > 1
-                        ? `${pos.length} PO PDFs packed into ZIP.`
-                        : "PDF downloaded successfully.";
             }
         );
 
@@ -2720,20 +2901,25 @@ document.addEventListener("DOMContentLoaded", () => {
                         ".other-po"
                     )
                     .forEach(
-                        input =>
-                            input.value = ""
+                        input => {
+                            input.value = "";
+                        }
                     );
 
+
                 otherExcelPOs = [];
+
 
                 document.getElementById(
                     "otherExcel"
                 ).value = "";
 
+
                 document.getElementById(
                     "otherExcelStatus"
                 ).textContent =
                     "No file selected";
+
 
                 updateOtherPreview();
             }
@@ -2741,7 +2927,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================================================
-       OTHER TABS
+       OTHER MODES
     ========================================================== */
 
     document
@@ -2766,12 +2952,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
 
+
                         const mode =
                             button.dataset.otherMode;
+
 
                         document
                             .getElementById(
@@ -2779,9 +2968,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             )
                             .classList.toggle(
                                 "hidden",
-                                mode !==
-                                "sticker"
+                                mode !== "sticker"
                             );
+
 
                         document
                             .getElementById(
@@ -2789,8 +2978,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             )
                             .classList.toggle(
                                 "hidden",
-                                mode !==
-                                "address"
+                                mode !== "address"
                             );
                     }
                 );
@@ -2824,9 +3012,11 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
+
 
                         otherAddressSize =
                             button.dataset.otherAddressSize;
@@ -2843,24 +3033,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 "otherFrom"
             ).value.trim();
 
+
         const to =
             document.getElementById(
                 "otherTo"
             ).value.trim();
+
 
         document.getElementById(
             "otherFromPreview"
         ).textContent =
             from || "FROM";
 
+
         document.getElementById(
             "otherToPreview"
         ).textContent =
             to || "TO";
 
-        document.getElementById(
-            "otherAddressPreview"
-        ).style.border =
+
+        const preview =
+            document.getElementById(
+                "otherAddressPreview"
+            );
+
+
+        preview.style.border =
             document.getElementById(
                 "otherAddressBorder"
             ).checked
@@ -2871,16 +3069,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 )
                 : "none";
 
-        document.getElementById(
-            "otherAddressPreview"
-        ).style.fontFamily =
+
+        preview.style.fontFamily =
             document.getElementById(
                 "otherAddressFont"
             ).value;
 
-        document.getElementById(
-            "otherAddressPreview"
-        ).style.fontSize =
+
+        preview.style.fontSize =
             `${
                 document.getElementById(
                     "otherAddressFontSize"
@@ -2901,19 +3097,19 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach(
         id => {
 
-            const el =
+            const element =
                 document.getElementById(id);
 
-            if (!el) {
+            if (!element) {
                 return;
             }
 
-            el.addEventListener(
+            element.addEventListener(
                 "input",
                 updateOtherAddress
             );
 
-            el.addEventListener(
+            element.addEventListener(
                 "change",
                 updateOtherAddress
             );
@@ -2933,15 +3129,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const from =
                     document.getElementById(
                         "otherFrom"
                     ).value.trim();
 
+
                 const to =
                     document.getElementById(
                         "otherTo"
                     ).value.trim();
+
 
                 if (
                     !from ||
@@ -2955,30 +3154,41 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const page =
                     getPageSize(
                         otherAddressSize
                     );
 
+
                 if (!page) {
+
                     alert(
                         "Invalid page size."
                     );
+
                     return;
                 }
 
+
                 const pdf =
                     new PDF({
+
                         orientation:
                             getOrientation(
                                 page
                             ),
-                        unit: "mm",
-                        format: [
-                            page.width,
-                            page.height
-                        ]
+
+                        unit:
+                            "mm",
+
+                        format:
+                            [
+                                page.width,
+                                page.height
+                            ]
                     });
+
 
                 drawBorder(
                     pdf,
@@ -2992,6 +3202,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     ).value
                 );
 
+
                 drawTaxBorder(
                     pdf,
                     page.width,
@@ -3001,14 +3212,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     ).checked
                 );
 
+
                 pdf.setFont(
-                    pdfFont(
+                    getPDFSpaceFont(
                         document.getElementById(
                             "otherAddressFont"
                         ).value
                     ),
                     "normal"
                 );
+
 
                 pdf.setFontSize(
                     Number(
@@ -3018,7 +3231,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     ) || 10
                 );
 
+
                 let y = 20;
+
 
                 pdf.text(
                     "FROM",
@@ -3026,7 +3241,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     y
                 );
 
+
                 y += 7;
+
 
                 const fromLines =
                     pdf.splitTextToSize(
@@ -3034,16 +3251,18 @@ document.addEventListener("DOMContentLoaded", () => {
                         page.width - 20
                     );
 
+
                 pdf.text(
                     fromLines,
                     10,
                     y
                 );
 
+
                 y +=
-                    fromLines.length *
-                    5 +
+                    fromLines.length * 5 +
                     18;
+
 
                 pdf.text(
                     "TO",
@@ -3051,7 +3270,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     y
                 );
 
+
                 y += 7;
+
 
                 const toLines =
                     pdf.splitTextToSize(
@@ -3059,16 +3280,19 @@ document.addEventListener("DOMContentLoaded", () => {
                         page.width - 20
                     );
 
+
                 pdf.text(
                     toLines,
                     10,
                     y
                 );
 
-                downloadPDF(
-                    pdf,
+
+                downloadBlob(
+                    pdf.output("blob"),
                     "Other_PO_Address_Label.pdf"
                 );
+
 
                 document.getElementById(
                     "otherAddressStatus"
@@ -3133,12 +3357,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
 
+
                         isbnInputMode =
                             button.dataset.isbnInput;
+
 
                         document
                             .getElementById(
@@ -3150,6 +3377,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "manual"
                             );
 
+
                         document
                             .getElementById(
                                 "isbnExcelCard"
@@ -3159,6 +3387,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 isbnInputMode !==
                                 "excel"
                             );
+
 
                         updateISBNPreview();
                     }
@@ -3189,9 +3418,11 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
+
                         button.classList.add(
                             "active"
                         );
+
 
                         isbnSize =
                             button.dataset.isbnSize;
@@ -3232,7 +3463,9 @@ document.addEventListener("DOMContentLoaded", () => {
             return false;
         }
 
-        let sum = 0;
+
+        let total = 0;
+
 
         for (
             let i = 0;
@@ -3240,14 +3473,13 @@ document.addEventListener("DOMContentLoaded", () => {
             i++
         ) {
 
-            sum +=
+            total +=
                 Number(
                     isbn[i]
                 ) *
-                (
-                    10 - i
-                );
+                (10 - i);
         }
+
 
         const last =
             isbn[9].toUpperCase() === "X"
@@ -3256,10 +3488,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     isbn[9]
                 );
 
-        sum += last;
+
+        total += last;
+
 
         return (
-            sum % 11 === 0
+            total % 11 ===
+            0
         );
     }
 
@@ -3274,7 +3509,9 @@ document.addEventListener("DOMContentLoaded", () => {
             return false;
         }
 
-        let sum = 0;
+
+        let total = 0;
+
 
         for (
             let i = 0;
@@ -3282,7 +3519,7 @@ document.addEventListener("DOMContentLoaded", () => {
             i++
         ) {
 
-            sum +=
+            total +=
                 Number(
                     isbn[i]
                 ) *
@@ -3293,14 +3530,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
         }
 
+
         const check =
             (
                 10 -
-                (
-                    sum % 10
-                )
+                (total % 10)
             ) %
             10;
+
 
         return (
             check ===
@@ -3311,13 +3548,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function convertISBN10To13(isbn) {
+    function isbn10To13(isbn) {
 
         const base =
             "978" +
-            isbn.substring(0, 9);
+            isbn.substring(
+                0,
+                9
+            );
 
-        let sum = 0;
+
+        let total = 0;
+
 
         for (
             let i = 0;
@@ -3325,7 +3567,7 @@ document.addEventListener("DOMContentLoaded", () => {
             i++
         ) {
 
-            sum +=
+            total +=
                 Number(
                     base[i]
                 ) *
@@ -3336,14 +3578,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
         }
 
+
         const check =
             (
                 10 -
-                (
-                    sum % 10
-                )
+                (total % 10)
             ) %
             10;
+
 
         return (
             base +
@@ -3354,39 +3596,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function normalizeISBN13(raw) {
 
-        const isbn =
+        const cleaned =
             cleanISBN(raw);
 
+
         if (
-            isbn.length === 13
+            cleaned.length === 13
         ) {
 
-            return validISBN13(isbn)
-                ? isbn
+            return validISBN13(cleaned)
+                ? cleaned
                 : null;
         }
 
+
         if (
-            isbn.length === 10
+            cleaned.length === 10
         ) {
 
             if (
-                !validISBN10(isbn)
+                !validISBN10(
+                    cleaned
+                )
             ) {
                 return null;
             }
 
-            return convertISBN10To13(
-                isbn
+
+            return isbn10To13(
+                cleaned
             );
         }
+
 
         return null;
     }
 
 
     /* ---------------------------------------------------------
-       ISBN TABLES
+       ISBN BARCODE TABLES
     ---------------------------------------------------------- */
 
     const L = {
@@ -3445,16 +3693,21 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
-    function ean13Pattern(isbn) {
+    function eanPattern(isbn) {
 
-        let result = "101";
+        let result =
+            "101";
 
-        const pattern =
-            PARITY[
-                Number(
-                    isbn[0]
-                )
-            ];
+
+        const first =
+            Number(
+                isbn[0]
+            );
+
+
+        const parity =
+            PARITY[first];
+
 
         for (
             let i = 1;
@@ -3467,13 +3720,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     isbn[i]
                 );
 
+
             result +=
-                pattern[i - 1] === "L"
+                parity[i - 1] === "L"
                     ? L[digit]
                     : G[digit];
         }
 
-        result += "01010";
+
+        result +=
+            "01010";
+
 
         for (
             let i = 7;
@@ -3489,13 +3746,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 ];
         }
 
-        result += "101";
+
+        result +=
+            "101";
+
 
         return result;
     }
 
 
-    function drawBarcode(
+    function drawEAN13(
         pdf,
         isbn,
         x,
@@ -3505,19 +3765,20 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
 
         const pattern =
-            ean13Pattern(
-                isbn
-            );
+            eanPattern(isbn);
+
 
         const moduleWidth =
             width /
             pattern.length;
+
 
         pdf.setFillColor(
             0,
             0,
             0
         );
+
 
         for (
             let i = 0;
@@ -3533,9 +3794,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     x +
                     i *
                     moduleWidth,
+
                     y,
-                    moduleWidth + .01,
+
+                    moduleWidth +
+                    .01,
+
                     height,
+
                     "F"
                 );
             }
@@ -3556,63 +3822,64 @@ document.addEventListener("DOMContentLoaded", () => {
             return [...isbnRows];
         }
 
-        const isbn =
+
+        const isbnInputs =
             document.querySelectorAll(
                 ".isbn-manual"
             );
 
-        const title =
+
+        const titleInputs =
             document.querySelectorAll(
                 ".title-manual"
             );
 
-        const edition =
+
+        const editionInputs =
             document.querySelectorAll(
                 ".edition-manual"
             );
 
+
         const rows = [];
 
-        isbn.forEach(
+
+        isbnInputs.forEach(
             (
                 input,
                 index
             ) => {
 
-                const isbnValue =
+                const isbn =
                     input.value.trim();
 
-                const titleValue =
-                    title[index]
-                        .value
-                        .trim();
+                const title =
+                    titleInputs[
+                        index
+                    ].value.trim();
 
-                const editionValue =
-                    edition[index]
-                        .value
-                        .trim();
+                const edition =
+                    editionInputs[
+                        index
+                    ].value.trim();
+
 
                 if (
-                    isbnValue ||
-                    titleValue ||
-                    editionValue
+                    isbn ||
+                    title ||
+                    edition
                 ) {
 
                     rows.push({
-
-                        isbn:
-                            isbnValue,
-
-                        title:
-                            titleValue,
-
+                        isbn,
+                        title,
                         edition:
-                            editionValue ||
-                            "N"
+                            edition || "N"
                     });
                 }
             }
         );
+
 
         return rows;
     }
@@ -3633,42 +3900,53 @@ document.addEventListener("DOMContentLoaded", () => {
                 const file =
                     event.target.files[0];
 
+
                 if (!file) {
                     return;
                 }
 
+
                 if (!requireXLSX()) {
                     return;
                 }
+
 
                 try {
 
                     const buffer =
                         await file.arrayBuffer();
 
+
                     const workbook =
                         XLSX_LIB.read(
                             buffer,
                             {
-                                type: "array"
+                                type:
+                                    "array"
                             }
                         );
+
 
                     const sheet =
                         workbook.Sheets[
                             workbook.SheetNames[0]
                         ];
 
+
                     const rows =
                         XLSX_LIB.utils.sheet_to_json(
                             sheet,
                             {
-                                header: 1,
-                                defval: ""
+                                header:
+                                    1,
+                                defval:
+                                    ""
                             }
                         );
 
+
                     isbnRows = [];
+
 
                     rows.forEach(
                         (
@@ -3682,17 +3960,20 @@ document.addEventListener("DOMContentLoaded", () => {
                                     ""
                                 ).trim();
 
+
                             const title =
                                 String(
                                     row?.[1] ||
                                     ""
                                 ).trim();
 
+
                             const edition =
                                 String(
                                     row?.[2] ||
                                     ""
                                 ).trim();
+
 
                             if (
                                 index === 0 &&
@@ -3706,6 +3987,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 return;
                             }
 
+
                             if (
                                 !isbn &&
                                 !title
@@ -3713,23 +3995,22 @@ document.addEventListener("DOMContentLoaded", () => {
                                 return;
                             }
 
+
                             isbnRows.push({
-
                                 isbn,
-
                                 title,
-
                                 edition:
-                                    edition ||
-                                    "N"
+                                    edition || "N"
                             });
                         }
                     );
+
 
                     document.getElementById(
                         "isbnExcelStatus"
                     ).textContent =
                         `${isbnRows.length} row(s) loaded`;
+
 
                     updateISBNPreview();
 
@@ -3754,20 +4035,24 @@ document.addEventListener("DOMContentLoaded", () => {
         const rows =
             getISBNRows();
 
-        const num =
+
+        const number =
             document.getElementById(
                 "isbnPreviewNumber"
             );
+
 
         const title =
             document.getElementById(
                 "isbnPreviewTitle"
             );
 
+
         const edition =
             document.getElementById(
                 "isbnPreviewEdition"
             );
+
 
         const barcode =
             document.getElementById(
@@ -3777,7 +4062,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!rows.length) {
 
-            num.textContent =
+            number.textContent =
                 "9780000000000";
 
             title.textContent =
@@ -3796,32 +4081,39 @@ document.addEventListener("DOMContentLoaded", () => {
         const row =
             rows[0];
 
+
         const isbn13 =
             normalizeISBN13(
                 row.isbn
             );
 
-        num.textContent =
+
+        number.textContent =
             isbn13 ||
             row.isbn;
 
+
         title.textContent =
             row.title ||
-            "";
+            "Book Title";
+
 
         edition.textContent =
             row.edition ||
             "N";
 
+
         barcode.innerHTML =
             "";
+
 
         if (isbn13) {
 
             const pattern =
-                ean13Pattern(
+                eanPattern(
                     isbn13
                 );
+
 
             pattern
                 .split("")
@@ -3874,7 +4166,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* ---------------------------------------------------------
-       ISBN PDF
+       ISBN GENERATE
     ---------------------------------------------------------- */
 
     document
@@ -3889,8 +4181,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const rows =
                     getISBNRows();
+
 
                 if (!rows.length) {
 
@@ -3901,7 +4195,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+
                 const validRows = [];
+
 
                 for (
                     const row of rows
@@ -3916,6 +4212,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
+
                     if (!row.title) {
 
                         alert(
@@ -3925,24 +4222,26 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
+
                     const isbn13 =
                         normalizeISBN13(
                             row.isbn
                         );
 
+
                     if (!isbn13) {
 
                         alert(
                             `Invalid ISBN: ${row.isbn}\n\n` +
-                            "Spaces and hyphens are accepted, " +
+                            "Spaces and hyphens are allowed, " +
                             "but the ISBN check digit must be valid."
                         );
 
                         return;
                     }
 
-                    validRows.push({
 
+                    validRows.push({
                         isbn:
                             isbn13,
 
@@ -3960,6 +4259,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     getPageSize(
                         isbnSize
                     );
+
+
+                if (!page) {
+
+                    alert(
+                        "Please select a valid page size."
+                    );
+
+                    return;
+                }
 
 
                 const labelsPerPage =
@@ -3990,7 +4299,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 const font =
-                    pdfFont(
+                    getPDFSpaceFont(
                         document.getElementById(
                             "isbnFont"
                         ).value
@@ -4007,19 +4316,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 for (
                     let start = 0;
-                    start <
-                    validRows.length;
-                    start +=
-                        labelsPerPage
+                    start < validRows.length;
+                    start += labelsPerPage
                 ) {
-
-                    const current =
-                        validRows.slice(
-                            start,
-                            start +
-                            labelsPerPage
-                        );
-
 
                     if (
                         start > 0
@@ -4060,6 +4359,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
 
+                    const current =
+                        validRows.slice(
+                            start,
+                            start +
+                            labelsPerPage
+                        );
+
+
                     const [
                         rowsGrid,
                         colsGrid
@@ -4069,12 +4376,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         );
 
 
-                    const cellW =
+                    const cellWidth =
                         page.width /
                         colsGrid;
 
 
-                    const cellH =
+                    const cellHeight =
                         page.height /
                         rowsGrid;
 
@@ -4095,40 +4402,45 @@ document.addEventListener("DOMContentLoaded", () => {
                                 index %
                                 colsGrid;
 
+
                             const x =
                                 c *
-                                cellW;
+                                cellWidth;
+
 
                             const y =
                                 r *
-                                cellH;
+                                cellHeight;
 
 
-                            const barcodeW =
+                            const barcodeWidth =
                                 Math.min(
                                     55,
-                                    cellW - 12
+                                    cellWidth - 12
                                 );
 
 
-                            const barcodeH =
+                            const barcodeHeight =
                                 Math.min(
                                     30,
-                                    cellH * .28
+                                    cellHeight * .28
                                 );
 
 
-                            drawBarcode(
+                            drawEAN13(
                                 pdf,
                                 row.isbn,
                                 x +
                                 (
-                                    cellW -
-                                    barcodeW
+                                    cellWidth -
+                                    barcodeWidth
                                 ) / 2,
+
                                 y + 8,
-                                barcodeW,
-                                barcodeH
+
+                                barcodeWidth,
+
+                                barcodeHeight
                             );
 
 
@@ -4137,6 +4449,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "normal"
                             );
 
+
                             pdf.setFontSize(
                                 Math.min(
                                     11,
@@ -4144,14 +4457,17 @@ document.addEventListener("DOMContentLoaded", () => {
                                 )
                             );
 
+
                             pdf.text(
                                 row.isbn,
+
                                 x +
-                                cellW /
-                                2,
+                                cellWidth / 2,
+
                                 y +
-                                barcodeH +
+                                barcodeHeight +
                                 14,
+
                                 {
                                     align:
                                         "center"
@@ -4164,6 +4480,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "bold"
                             );
 
+
                             pdf.setFontSize(
                                 Math.min(
                                     13,
@@ -4175,18 +4492,20 @@ document.addEventListener("DOMContentLoaded", () => {
                             const titleLines =
                                 pdf.splitTextToSize(
                                     row.title,
-                                    cellW - 12
+                                    cellWidth - 12
                                 );
 
 
                             pdf.text(
                                 titleLines,
+
                                 x +
-                                cellW /
-                                2,
+                                cellWidth / 2,
+
                                 y +
-                                barcodeH +
+                                barcodeHeight +
                                 21,
+
                                 {
                                     align:
                                         "center"
@@ -4199,34 +4518,37 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "normal"
                             );
 
+
                             pdf.setFontSize(
                                 10
                             );
+
 
                             pdf.text(
                                 `Edition: ${
                                     row.edition ||
                                     "N"
                                 }`,
+
                                 x +
-                                cellW /
-                                2,
+                                cellWidth / 2,
+
                                 y +
-                                cellH -
+                                cellHeight -
                                 8,
+
                                 {
                                     align:
                                         "center"
                                 }
                             );
-
                         }
                     );
                 }
 
 
-                downloadPDF(
-                    pdf,
+                downloadBlob(
+                    pdf.output("blob"),
                     "BooksWagon_ISBN_Barcodes.pdf"
                 );
 
@@ -4256,38 +4578,47 @@ document.addEventListener("DOMContentLoaded", () => {
                         ".isbn-manual"
                     )
                     .forEach(
-                        input =>
-                            input.value = ""
+                        input => {
+                            input.value = "";
+                        }
                     );
+
 
                 document
                     .querySelectorAll(
                         ".title-manual"
                     )
                     .forEach(
-                        input =>
-                            input.value = ""
+                        input => {
+                            input.value = "";
+                        }
                     );
+
 
                 document
                     .querySelectorAll(
                         ".edition-manual"
                     )
                     .forEach(
-                        input =>
-                            input.value = ""
+                        input => {
+                            input.value = "";
+                        }
                     );
 
+
                 isbnRows = [];
+
 
                 document.getElementById(
                     "isbnExcel"
                 ).value = "";
 
+
                 document.getElementById(
                     "isbnExcelStatus"
                 ).textContent =
                     "No file selected";
+
 
                 updateISBNPreview();
             }
@@ -4295,7 +4626,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================================================
-       INITIAL
+       INITIALIZE
     ========================================================== */
 
     updateCocoPreview();
