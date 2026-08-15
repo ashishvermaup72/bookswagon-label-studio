@@ -1,1 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>BooksWagon Label Studio</title>
+
+    <meta
+        name="description"
+        content="BooksWagon professional PO label generation workspace."
+    >
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         TOP ANNOUNCEMENT
+    ====================================================== -->
+
+    <div class="announcement-bar">
+        <span>
+            BOOKSWAGON LABEL STUDIO
+        </span>
+
+        <span>
+            Professional PO Label Generator
+        </span>
+    </div>
+
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="site-header">
+
+        <div class="header-inner">
+
+
+            <a
+                href="#"
+                class="brand"
+            >
+
+                <div class="brand-icon">
+                    B
+                </div>
+
+                <div class="brand-name-block">
+
+                    <strong>
+                        BOOKSWAGON
+                    </strong>
+
+                    <span>
+                        LABEL STUDIO
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <nav class="main-navigation">
+
+                <a href="#home">
+                    Home
+                </a>
+
+                <a href="#generator">
+                    Generator
+                </a>
+
+                <a href="#features">
+                    Features
+                </a>
+
+                <a href="#help">
+                    Help
+                </a>
+
+            </nav>
+
+
+            <div class="header-actions">
+
+                <button
+                    type="button"
+                    class="nav-button"
+                    id="newProjectButton"
+                >
+                    New Project
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <main id="home">
+
+
+        <section class="hero-section">
+
+            <div class="hero-inner">
+
+
+                <div class="hero-copy">
+
+                    <span class="hero-kicker">
+                        PROFESSIONAL LABEL WORKSPACE
+                    </span>
+
+                    <h1>
+                        Create clean,
+                        <span>
+                            precise PO labels.
+                        </span>
+                    </h1>
+
+                    <p>
+                        Generate BooksWagon box labels with
+                        complete control over page size,
+                        borders, typography and box layout.
+                    </p>
+
+
+                    <div class="hero-buttons">
+
+                        <a
+                            href="#generator"
+                            class="hero-primary-button"
+                        >
+                            Start Creating
+                        </a>
+
+                        <a
+                            href="#features"
+                            class="hero-secondary-button"
+                        >
+                            Explore Features
+                        </a>
+
+                    </div>
+
+
+                    <div class="hero-points">
+
+                        <span>
+                            ✓ 4 × 6 inch
+                        </span>
+
+                        <span>
+                            ✓ A4
+                        </span>
+
+                        <span>
+                            ✓ 70 × 35 mm
+                        </span>
+
+                        <span>
+                            ✓ Excel Ready
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Decorative book-themed hero -->
+                <div class="hero-art">
+
+                    <div class="book-card book-card-back">
+                    </div>
+
+                    <div class="book-card book-card-middle">
+                    </div>
+
+                    <div class="book-card book-card-front">
+
+                        <span>
+                            PO LABEL
+                        </span>
+
+                        <strong>
+                            BWG123
+                        </strong>
+
+                        <small>
+                            BOX 01
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             GENERATOR HEADER
+        ================================================== -->
+
+        <section
+            class="generator-section"
+            id="generator"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-kicker">
+                        LABEL GENERATOR
+                    </span>
+
+                    <h2>
+                        Build your label
+                    </h2>
+
+                    <p>
+                        Configure your PO and label layout
+                        before generating the final PDF.
+                    </p>
+
+                </div>
+
+
+                <div class="ready-badge">
+
+                    <span class="ready-dot"></span>
+
+                    Ready
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 GENERATOR GRID
+            ================================================== -->
+
+            <div class="generator-grid">
+
+
+                <!-- =============================================
+                     LEFT CONTROL AREA
+                ============================================== -->
+
+                <div class="control-area">
+
+
+                    <!-- PO INPUT -->
+
+                    <section class="control-card">
+
+                        <div class="control-card-heading">
+
+                            <div class="number-badge">
+                                01
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    PO Number
+                                </h3>
+
+                                <p>
+                                    Manual entry or Excel upload
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="input-tabs">
+
+                            <button
+                                type="button"
+                                id="manualTab"
+                                class="input-tab active"
+                            >
+                                Manual Entry
+                            </button>
+
+                            <button
+                                type="button"
+                                id="excelTab"
+                                class="input-tab"
+                            >
+                                Excel Upload
+                            </button>
+
+                        </div>
+
+
+                        <!-- Manual PO -->
+
+                        <div
+                            id="manualPOArea"
+                            class="manual-po-area"
+                        >
+
+                            <div class="po-input-grid">
+
+                                <input
+                                    type="text"
+                                    class="po-input"
+                                    placeholder="PO 01"
+                                >
+
+                                <input
+                                    type="text"
+                                    class="po-input"
+                                    placeholder="PO 02"
+                                >
+
+                                <input
+                                    type="text"
+                                    class="po-input"
+                                    placeholder="PO 03"
+                                >
+
+                                <input
+                                    type="text"
+                                    class="po-input"
+                                    placeholder="PO 04"
+                                >
+
+                                <input
+                                    type="text"
+                                    class="po-input"
+                                    placeholder="PO 05"
+                                >
+
+                                <input
+                                    type="text"
+                                    class="po-input"
+                                    placeholder="PO 06"
+                                >
+
+                                <input
+                                    type="text"
+                                    class="po-input"
+                                    placeholder="PO 07"
+                                >
+
+                                <input
+                                    type="text"
+                                    class="po-input"
+                                    placeholder="PO 08"
+                                >
+
+                                <input
+                                    type="text"
+                                    class="po-input"
+                                    placeholder="PO 09"
+                                >
+
+                                <input
+                                    type="text"
+                                    class="po-input"
+                                    placeholder="PO 10"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Excel -->
+
+                        <div
+                            id="excelPOArea"
+                            class="excel-po-area hidden"
+                        >
+
+                            <label
+                                for="excelFile"
+                                class="excel-upload-box"
+                            >
+
+                                <span class="upload-symbol">
+                                    +
+                                </span>
+
+                                <strong>
+                                    Upload Excel File
+                                </strong>
+
+                                <small>
+                                    First column should contain PO numbers
+                                </small>
+
+                            </label>
+
+                            <input
+                                type="file"
+                                id="excelFile"
+                                accept=".xlsx,.xls,.csv"
+                                hidden
+                            >
+
+                            <div
+                                id="excelFileStatus"
+                                class="file-status"
+                            >
+                                No file selected
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+
+                    <!-- PAGE SIZE -->
+
+                    <section class="control-card">
+
+                        <div class="control-card-heading">
+
+                            <div class="number-badge">
+                                02
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Page Size
+                                </h3>
+
+                                <p>
+                                    Select your printing format
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="page-size-grid">
+
+                            <button
+                                type="button"
+                                class="page-size-button active"
+                                data-page-size="4x6"
+                            >
+
+                                <strong>
+                                    4 × 6
+                                </strong>
+
+                                <span>
+                                    Inch
+                                </span>
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="page-size-button"
+                                data-page-size="a4"
+                            >
+
+                                <strong>
+                                    A4
+                                </strong>
+
+                                <span>
+                                    210 × 297 mm
+                                </span>
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="page-size-button"
+                                data-page-size="70x35"
+                            >
+
+                                <strong>
+                                    70 × 35
+                                </strong>
+
+                                <span>
+                                    mm
+                                </span>
+
+                            </button>
+
+                        </div>
+
+
+                        <div class="custom-size-row">
+
+                            <input
+                                type="number"
+                                id="customWidth"
+                                placeholder="Custom width (mm)"
+                                min="1"
+                            >
+
+                            <input
+                                type="number"
+                                id="customHeight"
+                                placeholder="Custom height (mm)"
+                                min="1"
+                            >
+
+                        </div>
+
+                    </section>
+
+
+
+                    <!-- BOX SETTINGS -->
+
+                    <section class="control-card">
+
+                        <div class="control-card-heading">
+
+                            <div class="number-badge">
+                                03
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Box Layout
+                                </h3>
+
+                                <p>
+                                    Choose how boxes should be arranged
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="layout-choice-group">
+
+                            <label
+                                class="layout-option active"
+                            >
+
+                                <input
+                                    type="radio"
+                                    name="layoutMode"
+                                    value="same"
+                                    checked
+                                >
+
+                                <div>
+
+                                    <strong>
+                                        Repeat Same Box
+                                    </strong>
+
+                                    <span>
+                                        Example: BOX 1 × 2
+                                        on the same page
+                                    </span>
+
+                                </div>
+
+                            </label>
+
+
+                            <label
+                                class="layout-option"
+                            >
+
+                                <input
+                                    type="radio"
+                                    name="layoutMode"
+                                    value="sequential"
+                                >
+
+                                <div>
+
+                                    <strong>
+                                        Sequential Boxes
+                                    </strong>
+
+                                    <span>
+                                        Example: BOX 1 →
+                                        BOX 2 → BOX 3
+                                    </span>
+
+                                </div>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="box-settings-grid">
+
+                            <div>
+
+                                <label>
+                                    Start Box
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="startBox"
+                                    value="1"
+                                    min="1"
+                                >
+
+                            </div>
+
+
+                            <div>
+
+                                <label>
+                                    End Box
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="endBox"
+                                    value="10"
+                                    min="1"
+                                >
+
+                            </div>
+
+
+                            <div>
+
+                                <label>
+                                    Labels / Page
+                                </label>
+
+                                <select
+                                    id="labelsPerPage"
+                                >
+
+                                    <option value="1">
+                                        1
+                                    </option>
+
+                                    <option value="2">
+                                        2
+                                    </option>
+
+                                    <option value="3">
+                                        3
+                                    </option>
+
+                                    <option value="4">
+                                        4
+                                    </option>
+
+                                    <option value="5">
+                                        5
+                                    </option>
+
+                                    <option value="6">
+                                        6
+                                    </option>
+
+                                    <option value="7">
+                                        7
+                                    </option>
+
+                                    <option value="8">
+                                        8
+                                    </option>
+
+                                    <option value="9">
+                                        9
+                                    </option>
+
+                                    <option value="10">
+                                        10
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div>
+
+                                <label>
+                                    Page Count
+                                </label>
+
+                                <select
+                                    id="pageCount"
+                                >
+
+                                    <option value="1">
+                                        1
+                                    </option>
+
+                                    <option value="2">
+                                        2
+                                    </option>
+
+                                    <option value="3">
+                                        3
+                                    </option>
+
+                                    <option value="4">
+                                        4
+                                    </option>
+
+                                    <option value="5">
+                                        5
+                                    </option>
+
+                                    <option value="6">
+                                        6
+                                    </option>
+
+                                    <option value="7">
+                                        7
+                                    </option>
+
+                                    <option value="8">
+                                        8
+                                    </option>
+
+                                    <option value="9">
+                                        9
+                                    </option>
+
+                                    <option value="10">
+                                        10
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+
+                    <!-- DESIGN SETTINGS -->
+
+                    <section class="control-card">
+
+                        <div class="control-card-heading">
+
+                            <div class="number-badge">
+                                04
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Design
+                                </h3>
+
+                                <p>
+                                    Customize your printed label
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Border -->
+
+                        <div class="setting-line">
+
+                            <div>
+
+                                <strong>
+                                    Page Border
+                                </strong>
+
+                                <span>
+                                    Turn border on or off
+                                </span>
+
+                            </div>
+
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    id="borderEnabled"
+                                >
+
+                                <span class="switch-slider">
+                                </span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="design-two-column">
+
+                            <div>
+
+                                <label>
+                                    Border Design
+                                </label>
+
+                                <select
+                                    id="borderStyle"
+                                >
+
+                                    <option value="solid-dark">
+                                        Dark Solid
+                                    </option>
+
+                                    <option value="solid-medium">
+                                        Medium Solid
+                                    </option>
+
+                                    <option value="solid-light">
+                                        Light Solid
+                                    </option>
+
+                                    <option value="double">
+                                        Double
+                                    </option>
+
+                                    <option value="dashed">
+                                        Dashed
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div>
+
+                                <label>
+                                    Font
+                                </label>
+
+                                <select
+                                    id="fontFamily"
+                                >
+
+                                    <option value="Arial">
+                                        Arial
+                                    </option>
+
+                                    <option value="Calibri">
+                                        Calibri
+                                    </option>
+
+                                    <option value="Georgia">
+                                        Georgia
+                                    </option>
+
+                                    <option value="Verdana">
+                                        Verdana
+                                    </option>
+
+                                    <option value="Times New Roman">
+                                        Times New Roman
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="design-two-column">
+
+                            <div>
+
+                                <label>
+                                    Font Size
+                                </label>
+
+                                <select
+                                    id="fontSize"
+                                >
+
+                                    <option value="10">
+                                        10
+                                    </option>
+
+                                    <option value="12">
+                                        12
+                                    </option>
+
+                                    <option value="14">
+                                        14
+                                    </option>
+
+                                    <option value="16">
+                                        16
+                                    </option>
+
+                                    <option value="18">
+                                        18
+                                    </option>
+
+                                    <option value="20">
+                                        20
+                                    </option>
+
+                                    <option value="22">
+                                        22
+                                    </option>
+
+                                    <option value="24">
+                                        24
+                                    </option>
+
+                                    <option value="26">
+                                        26
+                                    </option>
+
+                                    <option value="28">
+                                        28
+                                    </option>
+
+                                    <option value="30">
+                                        30
+                                    </option>
+
+                                    <option value="32">
+                                        32
+                                    </option>
+
+                                    <option value="34">
+                                        34
+                                    </option>
+
+                                    <option value="36">
+                                        36
+                                    </option>
+
+                                    <option value="38">
+                                        38
+                                    </option>
+
+                                    <option value="40">
+                                        40
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div>
+
+                                <label>
+                                    Font Weight
+                                </label>
+
+                                <select
+                                    id="fontWeight"
+                                >
+
+                                    <option value="normal">
+                                        Regular
+                                    </option>
+
+                                    <option value="bold">
+                                        Bold
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     RIGHT PREVIEW
+                ========================================== -->
+
+                <aside class="preview-area">
+
+
+                    <div class="preview-topbar">
+
+                        <div>
+
+                            <span class="section-kicker">
+                                LIVE PREVIEW
+                            </span>
+
+                            <h3>
+                                Label Preview
+                            </h3>
+
+                        </div>
+
+
+                        <div class="preview-zoom">
+
+                            <button
+                                type="button"
+                                id="zoomOut"
+                            >
+                                −
+                            </button>
+
+                            <span
+                                id="zoomValue"
+                            >
+                                100%
+                            </span>
+
+                            <button
+                                type="button"
+                                id="zoomIn"
+                            >
+                                +
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="preview-canvas">
+
+                        <div
+                            id="labelPreview"
+                            class="label-preview"
+                        >
+
+                            <div
+                                id="previewPO"
+                                class="preview-po"
+                            >
+                                BWG123
+                            </div>
+
+
+                            <div
+                                id="previewBox"
+                                class="preview-box"
+                            >
+                                BOX 1
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="preview-summary">
+
+                        <div>
+
+                            <span>
+                                Page
+                            </span>
+
+                            <strong
+                                id="summaryPageSize"
+                            >
+                                4 × 6
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Labels
+                            </span>
+
+                            <strong
+                                id="summaryLabels"
+                            >
+                                1
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Pages
+                            </span>
+
+                            <strong
+                                id="summaryPages"
+                            >
+                                1
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="preview-actions">
+
+                        <button
+                            type="button"
+                            id="resetButton"
+                            class="reset-button"
+                        >
+                            Reset
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="generatePDFButton"
+                            class="generate-button"
+                        >
+                            Generate PDF
+                        </button>
+
+                    </div>
+
+
+                    <p
+                        id="generationStatus"
+                        class="generation-status"
+                    >
+                        Ready to generate
+                    </p>
+
+
+                </aside>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             FEATURE SECTION
+        ================================================== -->
+
+        <section
+            class="features-section"
+            id="features"
+        >
+
+            <div class="section-heading centered">
+
+                <span class="section-kicker">
+                    BUILT FOR DAILY WORK
+                </span>
+
+                <h2>
+                    Everything you need for label generation.
+                </h2>
+
+            </div>
+
+
+            <div class="feature-grid">
+
+                <article class="feature-card">
+
+                    <div class="feature-number">
+                        01
+                    </div>
+
+                    <h3>
+                        Flexible PO Input
+                    </h3>
+
+                    <p>
+                        Enter up to ten PO numbers manually
+                        or load a PO list through Excel.
+                    </p>
+
+                </article>
+
+
+                <article class="feature-card">
+
+                    <div class="feature-number">
+                        02
+                    </div>
+
+                    <h3>
+                        Precise Page Sizes
+                    </h3>
+
+                    <p>
+                        Create labels for 4 × 6 inch,
+                        A4 and 70 × 35 mm formats.
+                    </p>
+
+                </article>
+
+
+                <article class="feature-card">
+
+                    <div class="feature-number">
+                        03
+                    </div>
+
+                    <h3>
+                        Smart Box Layout
+                    </h3>
+
+                    <p>
+                        Repeat the same box or move
+                        sequentially from one box to another.
+                    </p>
+
+                </article>
+
+
+                <article class="feature-card">
+
+                    <div class="feature-number">
+                        04
+                    </div>
+
+                    <h3>
+                        Custom Design
+                    </h3>
+
+                    <p>
+                        Control borders, fonts and
+                        typography before PDF generation.
+                    </p>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             HELP
+        ================================================== -->
+
+        <section
+            class="help-section"
+            id="help"
+        >
+
+            <div>
+
+                <span class="section-kicker">
+                    NEED HELP?
+                </span>
+
+                <h2>
+                    Built to keep your workflow simple.
+                </h2>
+
+                <p>
+                    Configure your label once, preview it,
+                    and generate the PDF when you're ready.
+                </p>
+
+            </div>
+
+
+            <a
+                href="#footer"
+                class="help-button"
+            >
+                Contact Us
+            </a>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer
+        class="site-footer"
+        id="footer"
+    >
+
+        <div class="footer-inner">
+
+
+            <div class="footer-brand">
+
+                <div class="brand-icon footer-icon">
+                    B
+                </div>
+
+                <div>
+
+                    <strong>
+                        BooksWagon Label Studio
+                    </strong>
+
+                    <p>
+                        Professional PO label generation workspace.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <div>
+
+                    <strong>
+                        Workspace
+                    </strong>
+
+                    <a href="#home">
+                        Home
+                    </a>
+
+                    <a href="#generator">
+                        Generator
+                    </a>
+
+                    <a href="#features">
+                        Features
+                    </a>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Support
+                    </strong>
+
+                    <a href="#help">
+                        Help
+                    </a>
+
+                    <a href="#footer">
+                        Contact Us
+                    </a>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Information
+                    </strong>
+
+                    <a href="#footer">
+                        Privacy
+                    </a>
+
+                    <a href="#footer">
+                        Terms
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <span>
+                © 2026 BooksWagon Label Studio
+            </span>
+
+            <span>
+                Designed & Developed by
+                <strong>
+                    Ashish Verma
+                </strong>
+            </span>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
