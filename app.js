@@ -1,22 +1,6 @@
-/* =========================================================
-   BOOKSWAGON LABEL STUDIO
-   FINAL ROBUST APP.JS
-
-   Tools:
-   1. CocoBlue PO
-   2. Other PO
-   3. ISBN Barcode Generator
-
-   Important:
-   - jsPDF is loaded only when PDF is requested.
-   - XLSX is checked only when Excel is used.
-   - UI remains functional even if an external library fails.
-========================================================= */
-
 document.addEventListener("DOMContentLoaded", () => {
 
     "use strict";
-
 
     /* =====================================================
        LIBRARY HELPERS
@@ -58,6 +42,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    function downloadPDF(pdf, filename) {
+
+        try {
+
+            const blob =
+                pdf.output("blob");
+
+            const url =
+                URL.createObjectURL(blob);
+
+            const link =
+                document.createElement("a");
+
+            link.href = url;
+            link.download = filename;
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            link.remove();
+
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 1500);
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "PDF download error:",
+                error
+            );
+
+            alert(
+                "PDF could not be downloaded.\n\n" +
+                "Please refresh the page and try again."
+            );
+
+            return false;
+        }
+    }
+
+
     /* =====================================================
        GENERAL HELPERS
     ====================================================== */
@@ -69,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 /[^a-zA-Z0-9_-]/g,
                 "_"
             );
-
     }
 
 
@@ -86,7 +114,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 height: 152.4,
                 label: "4 × 6 inch"
             };
-
         }
 
 
@@ -97,7 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 height: 297,
                 label: "A4"
             };
-
         }
 
 
@@ -108,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 height: 35,
                 label: "70 × 35 mm"
             };
-
         }
 
 
@@ -120,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const height =
                 Number(customHeight);
 
-
             if (
                 !Number.isFinite(width) ||
                 !Number.isFinite(height) ||
@@ -129,9 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ) {
 
                 return null;
-
             }
-
 
             return {
                 width,
@@ -139,57 +161,40 @@ document.addEventListener("DOMContentLoaded", () => {
                 label:
                     `${width} × ${height} mm`
             };
-
         }
 
-
         return null;
-
     }
 
 
-    function getPDFOrientation(
-        page
-    ) {
+    function getOrientation(page) {
 
         return page.width > page.height
             ? "landscape"
             : "portrait";
-
     }
 
 
-    function getPdfFont(
-        font
-    ) {
+    function getPdfFont(font) {
 
         if (
             font === "Georgia" ||
             font === "Times New Roman"
         ) {
-
             return "times";
-
         }
-
 
         if (
             font === "Courier New"
         ) {
-
             return "courier";
-
         }
 
-
         return "helvetica";
-
     }
 
 
-    function getCssBorder(
-        style
-    ) {
+    function getCssBorder(style) {
 
         const map = {
 
@@ -216,12 +221,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         };
 
-
         return (
             map[style] ||
             map["solid-dark"]
         );
-
     }
 
 
@@ -237,63 +240,51 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-
         const map = {
 
-            "solid-dark":
-                {
-                    width: 0.8,
-                    color: 25
-                },
+            "solid-dark": {
+                width: 0.8,
+                color: 25
+            },
 
-            "solid-medium":
-                {
-                    width: 0.5,
-                    color: 80
-                },
+            "solid-medium": {
+                width: 0.5,
+                color: 80
+            },
 
-            "solid-light":
-                {
-                    width: 0.25,
-                    color: 160
-                },
+            "solid-light": {
+                width: 0.25,
+                color: 160
+            },
 
-            "double":
-                {
-                    width: 0.5,
-                    color: 45
-                },
+            "double": {
+                width: 0.5,
+                color: 45
+            },
 
-            "dashed":
-                {
-                    width: 0.4,
-                    color: 80
-                },
+            "dashed": {
+                width: 0.4,
+                color: 80
+            },
 
-            "dotted":
-                {
-                    width: 0.4,
-                    color: 80
-                },
+            "dotted": {
+                width: 0.4,
+                color: 80
+            },
 
-            "bold":
-                {
-                    width: 1.4,
-                    color: 10
-                }
-
+            "bold": {
+                width: 1.4,
+                color: 10
+            }
         };
-
 
         const cfg =
             map[style] ||
             map["solid-dark"];
 
-
         pdf.setLineWidth(
             cfg.width
         );
-
 
         pdf.setDrawColor(
             cfg.color,
@@ -301,16 +292,13 @@ document.addEventListener("DOMContentLoaded", () => {
             cfg.color
         );
 
-
         if (style === "dashed") {
 
             pdf.setLineDashPattern(
                 [2, 2],
                 0
             );
-
         }
-
 
         if (style === "dotted") {
 
@@ -318,9 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 [0.5, 1.5],
                 0
             );
-
         }
-
 
         pdf.rect(
             3,
@@ -328,7 +314,6 @@ document.addEventListener("DOMContentLoaded", () => {
             width - 6,
             height - 6
         );
-
 
         if (style === "double") {
 
@@ -347,21 +332,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 width - 12,
                 height - 12
             );
-
         }
-
 
         pdf.setLineDashPattern(
             [],
             0
         );
-
     }
 
 
-    function getGrid(
-        count
-    ) {
+    function getGrid(count) {
 
         const grids = {
 
@@ -375,21 +355,16 @@ document.addEventListener("DOMContentLoaded", () => {
             8: [2, 4],
             9: [3, 3],
             10: [2, 5]
-
         };
-
 
         return (
             grids[count] ||
             [2, 5]
         );
-
     }
 
 
-    function readInputs(
-        selector
-    ) {
+    function readInputs(selector) {
 
         return Array.from(
             document.querySelectorAll(
@@ -401,12 +376,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 element.value.trim()
         )
         .filter(Boolean);
-
     }
 
 
     /* =====================================================
-       TOOL WORKSPACE NAVIGATION
+       TOOL NAVIGATION
     ====================================================== */
 
     const workspaces =
@@ -425,7 +399,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
         );
-
     }
 
 
@@ -443,74 +416,56 @@ document.addEventListener("DOMContentLoaded", () => {
                         const tool =
                             button.dataset.openTool;
 
-
                         hideAllWorkspaces();
-
 
                         let targetId = null;
 
-
                         if (
-                            tool ===
-                            "cocoblue"
+                            tool === "cocoblue"
                         ) {
 
                             targetId =
                                 "cocoblueWorkspace";
-
                         }
 
-
                         if (
-                            tool ===
-                            "otherpo"
+                            tool === "otherpo"
                         ) {
 
                             targetId =
                                 "otherpoWorkspace";
-
                         }
 
-
                         if (
-                            tool ===
-                            "isbn"
+                            tool === "isbn"
                         ) {
 
                             targetId =
                                 "isbnWorkspace";
-
                         }
-
 
                         if (!targetId) {
                             return;
                         }
-
 
                         const target =
                             document.getElementById(
                                 targetId
                             );
 
-
                         if (!target) {
                             return;
                         }
 
-
                         target.style.display =
                             "block";
-
 
                         target.scrollIntoView({
                             behavior: "smooth",
                             block: "start"
                         });
-
                     }
                 );
-
             }
         );
 
@@ -528,43 +483,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         hideAllWorkspaces();
 
-
                         const tools =
                             document.getElementById(
                                 "tools"
                             );
-
 
                         if (tools) {
 
                             tools.scrollIntoView({
                                 behavior: "smooth"
                             });
-
                         }
-
                     }
                 );
-
             }
         );
 
 
     /* =====================================================
-       COCOBLUE
+       COCOBLUE PO
     ====================================================== */
 
-    let cocoInputMode =
-        "manual";
-
-    let cocoSize =
-        "4x6";
-
-    let cocoAddressSize =
-        "4x6";
-
-    let cocoExcelPOs =
-        [];
+    let cocoInputMode = "manual";
+    let cocoSize = "4x6";
+    let cocoAddressSize = "4x6";
+    let cocoExcelPOs = [];
 
 
     const cocoPOInputs =
@@ -572,22 +515,16 @@ document.addEventListener("DOMContentLoaded", () => {
             ".coco-po"
         );
 
-
     const cocoExcel =
         document.getElementById(
             "cocoExcel"
         );
-
 
     const cocoExcelStatus =
         document.getElementById(
             "cocoExcelStatus"
         );
 
-
-    /* -----------------------------------------------------
-       COCO INPUT MODE
-    ----------------------------------------------------- */
 
     document
         .querySelectorAll(
@@ -611,46 +548,36 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
-
                         button.classList.add(
                             "active"
                         );
 
-
                         cocoInputMode =
                             button.dataset.cocoInput;
 
-
-                        const manual =
-                            document.getElementById(
+                        document
+                            .getElementById(
                                 "cocoManualArea"
+                            )
+                            .classList.toggle(
+                                "hidden",
+                                cocoInputMode !==
+                                "manual"
                             );
 
-                        const excel =
-                            document.getElementById(
+                        document
+                            .getElementById(
                                 "cocoExcelArea"
+                            )
+                            .classList.toggle(
+                                "hidden",
+                                cocoInputMode !==
+                                "excel"
                             );
-
-
-                        manual.classList.toggle(
-                            "hidden",
-                            cocoInputMode !==
-                            "manual"
-                        );
-
-
-                        excel.classList.toggle(
-                            "hidden",
-                            cocoInputMode !==
-                            "excel"
-                        );
-
 
                         updateCocoPreview();
-
                     }
                 );
-
             }
         );
 
@@ -658,27 +585,17 @@ document.addEventListener("DOMContentLoaded", () => {
     function getCocoPOs() {
 
         if (
-            cocoInputMode ===
-            "excel"
+            cocoInputMode === "excel"
         ) {
 
             return [
                 ...cocoExcelPOs
             ];
-
         }
 
-
-        return readInputs(
-            ".coco-po"
-        );
-
+        return readInputs(".coco-po");
     }
 
-
-    /* -----------------------------------------------------
-       COCO EXCEL
-    ----------------------------------------------------- */
 
     if (cocoExcel) {
 
@@ -689,53 +606,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 const file =
                     event.target.files[0];
 
-
                 if (!file) {
                     return;
                 }
 
-
                 if (!hasXLSX()) {
                     return;
                 }
-
 
                 try {
 
                     cocoExcelStatus.textContent =
                         "Reading Excel...";
 
-
                     const buffer =
                         await file.arrayBuffer();
-
 
                     const workbook =
                         XLSX.read(
                             buffer,
                             {
-                                type:
-                                    "array"
+                                type: "array"
                             }
                         );
-
-
-                    if (
-                        !workbook.SheetNames.length
-                    ) {
-
-                        throw new Error(
-                            "No worksheet found."
-                        );
-
-                    }
-
 
                     const sheet =
                         workbook.Sheets[
                             workbook.SheetNames[0]
                         ];
-
 
                     const rows =
                         XLSX.utils.sheet_to_json(
@@ -746,10 +644,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                         );
 
-
-                    cocoExcelPOs =
-                        [];
-
+                    cocoExcelPOs = [];
 
                     rows.forEach(
                         (
@@ -764,21 +659,17 @@ document.addEventListener("DOMContentLoaded", () => {
                                 return;
                             }
 
-
                             const value =
                                 String(
                                     row[0]
                                 ).trim();
 
-
                             if (!value) {
                                 return;
                             }
 
-
                             const header =
                                 value.toLowerCase();
-
 
                             if (
                                 index === 0 &&
@@ -793,19 +684,14 @@ document.addEventListener("DOMContentLoaded", () => {
                                     header
                                 )
                             ) {
-
                                 return;
-
                             }
-
 
                             cocoExcelPOs.push(
                                 value
                             );
-
                         }
                     );
-
 
                     cocoExcelPOs =
                         [
@@ -814,10 +700,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             )
                         ];
 
-
                     cocoExcelStatus.textContent =
                         `${cocoExcelPOs.length} PO(s) loaded`;
-
 
                     updateCocoPreview();
 
@@ -832,18 +716,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert(
                         "Unable to read the Excel file."
                     );
-
                 }
-
             }
         );
-
     }
 
-
-    /* -----------------------------------------------------
-       COCO PAGE SIZE
-    ----------------------------------------------------- */
 
     document
         .querySelectorAll(
@@ -867,47 +744,34 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
-
                         button.classList.add(
                             "active"
                         );
 
-
                         cocoSize =
                             button.dataset.cocoSize;
 
-
-                        const custom =
-                            document.getElementById(
+                        document
+                            .getElementById(
                                 "cocoCustomSize"
+                            )
+                            .classList.toggle(
+                                "hidden",
+                                cocoSize !==
+                                "custom"
                             );
 
-
-                        custom.classList.toggle(
-                            "hidden",
-                            cocoSize !==
-                            "custom"
-                        );
-
-
                         updateCocoPreview();
-
                     }
                 );
-
             }
         );
 
-
-    /* -----------------------------------------------------
-       COCO PREVIEW
-    ----------------------------------------------------- */
 
     function updateCocoPreview() {
 
         const pos =
             getCocoPOs();
-
 
         const labels =
             Number(
@@ -916,7 +780,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 ).value
             ) || 1;
 
-
         const pagesPerPO =
             Number(
                 document.getElementById(
@@ -924,64 +787,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 ).value
             ) || 1;
 
-
-        const customWidth =
-            document.getElementById(
-                "cocoCustomWidth"
-            ).value;
-
-
-        const customHeight =
-            document.getElementById(
-                "cocoCustomHeight"
-            ).value;
-
-
-        const size =
+        const page =
             getPageSize(
                 cocoSize,
-                customWidth,
-                customHeight
-            );
-
-
-        const preview =
-            document.getElementById(
-                "cocoPreview"
-            );
-
-
-        const fontSize =
-            Number(
                 document.getElementById(
-                    "cocoFontSize"
+                    "cocoCustomWidth"
+                ).value,
+                document.getElementById(
+                    "cocoCustomHeight"
                 ).value
-            ) || 10;
-
-
-        const font =
-            document.getElementById(
-                "cocoFont"
-            ).value;
-
-
-        const weight =
-            document.getElementById(
-                "cocoFontWeight"
-            ).value;
-
-
-        const border =
-            document.getElementById(
-                "cocoBorder"
-            ).checked;
-
-
-        const borderStyle =
-            document.getElementById(
-                "cocoBorderStyle"
-            ).value;
-
+            );
 
         document.getElementById(
             "cocoPreviewPO"
@@ -989,12 +804,10 @@ document.addEventListener("DOMContentLoaded", () => {
             pos[0] ||
             "BWG123";
 
-
         document.getElementById(
             "cocoLabelsSummary"
         ).textContent =
             labels;
-
 
         document.getElementById(
             "cocoPagesSummary"
@@ -1005,14 +818,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 pagesPerPO
             );
 
-
         document.getElementById(
             "cocoSizeSummary"
         ).textContent =
-            size
-                ? size.label
+            page
+                ? page.label
                 : "Custom";
-
 
         document.getElementById(
             "cocoSummary"
@@ -1024,25 +835,40 @@ document.addEventListener("DOMContentLoaded", () => {
             )} pages`;
 
 
-        preview.style.fontFamily =
-            font;
+        const preview =
+            document.getElementById(
+                "cocoPreview"
+            );
 
+        preview.style.fontFamily =
+            document.getElementById(
+                "cocoFont"
+            ).value;
 
         preview.style.fontSize =
-            `${fontSize}px`;
-
+            `${
+                Number(
+                    document.getElementById(
+                        "cocoFontSize"
+                    ).value
+                ) || 10
+            }px`;
 
         preview.style.fontWeight =
-            weight;
-
+            document.getElementById(
+                "cocoFontWeight"
+            ).value;
 
         preview.style.border =
-            border
+            document.getElementById(
+                "cocoBorder"
+            ).checked
                 ? getCssBorder(
-                    borderStyle
+                    document.getElementById(
+                        "cocoBorderStyle"
+                    ).value
                 )
                 : "none";
-
     }
 
 
@@ -1089,39 +915,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 "change",
                 updateCocoPreview
             );
-
         }
     );
 
 
-    /* -----------------------------------------------------
-       COCO STICKER PDF
-    ----------------------------------------------------- */
-
-    const cocoGenerate =
-        document.getElementById(
+    document
+        .getElementById(
             "cocoGenerate"
-        );
-
-
-    if (cocoGenerate) {
-
-        cocoGenerate.addEventListener(
+        )
+        .addEventListener(
             "click",
             () => {
 
                 const PDF =
                     getPDFConstructor();
 
-
                 if (!PDF) {
                     return;
                 }
 
-
                 const pos =
                     getCocoPOs();
-
 
                 if (!pos.length) {
 
@@ -1130,9 +944,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                     return;
-
                 }
-
 
                 const page =
                     getPageSize(
@@ -1145,7 +957,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                     );
 
-
                 if (!page) {
 
                     alert(
@@ -1153,9 +964,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                     return;
-
                 }
-
 
                 const labels =
                     Number(
@@ -1164,7 +973,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                     ) || 1;
 
-
                 const pagesPerPO =
                     Number(
                         document.getElementById(
@@ -1172,12 +980,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).value
                     ) || 1;
 
-
                 const pdf =
                     new PDF({
 
                         orientation:
-                            getPDFOrientation(
+                            getOrientation(
                                 page
                             ),
 
@@ -1189,11 +996,9 @@ document.addEventListener("DOMContentLoaded", () => {
                                 page.width,
                                 page.height
                             ]
-
                     });
 
-
-                let outputPages = 0;
+                let generatedPages = 0;
 
 
                 pos.forEach(
@@ -1206,8 +1011,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         ) {
 
                             if (
-                                outputPages >
-                                0
+                                generatedPages > 0
                             ) {
 
                                 pdf.addPage(
@@ -1215,11 +1019,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                         page.width,
                                         page.height
                                     ],
-                                    getPDFOrientation(
+                                    getOrientation(
                                         page
                                     )
                                 );
-
                             }
 
 
@@ -1249,19 +1052,17 @@ document.addEventListener("DOMContentLoaded", () => {
                                 page.width /
                                 columns;
 
-
                             const cellHeight =
                                 page.height /
                                 rows;
 
 
                             const font =
-                                pdfFont(
+                                getPdfFont(
                                     document.getElementById(
                                         "cocoFont"
                                     ).value
                                 );
-
 
                             const fontSize =
                                 Number(
@@ -1270,18 +1071,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                     ).value
                                 ) || 10;
 
-
                             const weight =
                                 document.getElementById(
                                     "cocoFontWeight"
                                 ).value;
-
-
-                            pdf.setTextColor(
-                                25,
-                                25,
-                                25
-                            );
 
 
                             for (
@@ -1296,18 +1089,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                         columns
                                     );
 
-
-                                const col =
+                                const column =
                                     i %
                                     columns;
 
-
                                 const centerX =
-                                    col *
+                                    column *
                                     cellWidth +
                                     cellWidth /
                                     2;
-
 
                                 const centerY =
                                     row *
@@ -1321,16 +1111,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                     weight
                                 );
 
-
                                 pdf.setFontSize(
                                     fontSize
                                 );
 
-
                                 pdf.text(
-                                    String(
-                                        po
-                                    ),
+                                    String(po),
                                     centerX,
                                     centerY,
                                     {
@@ -1338,19 +1124,18 @@ document.addEventListener("DOMContentLoaded", () => {
                                             "center"
                                     }
                                 );
-
                             }
 
 
-                            outputPages++;
+                            generatedPages++;
 
                         }
-
                     }
                 );
 
 
-                pdf.save(
+                downloadPDF(
+                    pdf,
                     `${safeName(
                         pos[0]
                     )}_CocoBlue_Labels.pdf`
@@ -1360,27 +1145,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById(
                     "cocoStatus"
                 ).textContent =
-                    `Generated ${outputPages} page(s).`;
+                    `Generated ${generatedPages} page(s).`;
 
             }
         );
 
-    }
 
-
-    /* -----------------------------------------------------
-       COCO RESET
-    ----------------------------------------------------- */
-
-    const cocoReset =
-        document.getElementById(
+    document
+        .getElementById(
             "cocoReset"
-        );
-
-
-    if (cocoReset) {
-
-        cocoReset.addEventListener(
+        )
+        .addEventListener(
             "click",
             () => {
 
@@ -1389,29 +1164,21 @@ document.addEventListener("DOMContentLoaded", () => {
                         input.value = ""
                 );
 
-
                 cocoExcelPOs = [];
-
 
                 if (cocoExcel) {
                     cocoExcel.value = "";
                 }
 
-
                 if (cocoExcelStatus) {
 
                     cocoExcelStatus.textContent =
                         "No file selected";
-
                 }
 
-
                 updateCocoPreview();
-
             }
         );
-
-    }
 
 
     /* =====================================================
@@ -1440,18 +1207,14 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )
                             );
 
-
                         button.classList.add(
                             "active"
                         );
 
-
                         cocoAddressSize =
                             button.dataset.cocoAddressSize;
-
                     }
                 );
-
             }
         );
 
@@ -1462,7 +1225,6 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById(
                 "cocoFrom"
             ).value.trim();
-
 
         const to =
             document.getElementById(
@@ -1475,7 +1237,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ).textContent =
             from ||
             "FROM";
-
 
         document.getElementById(
             "cocoToPreview"
@@ -1495,12 +1256,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 "cocoAddressFont"
             ).value;
 
-
         preview.style.fontSize =
-            `${document.getElementById(
-                "cocoAddressFontSize"
-            ).value}px`;
-
+            `${
+                document.getElementById(
+                    "cocoAddressFontSize"
+                ).value
+            }px`;
 
         preview.style.border =
             document.getElementById(
@@ -1512,7 +1273,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     ).value
                 )
                 : "none";
-
     }
 
 
@@ -1532,23 +1292,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     id
                 );
 
-
             if (!element) {
                 return;
             }
-
 
             element.addEventListener(
                 "input",
                 updateCocoAddress
             );
 
-
             element.addEventListener(
                 "change",
                 updateCocoAddress
             );
-
         }
     );
 
@@ -1563,7 +1319,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const PDF =
                     getPDFConstructor();
-
 
                 if (!PDF) {
                     return;
@@ -1589,7 +1344,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                     return;
-
                 }
 
 
@@ -1606,7 +1360,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                     return;
-
                 }
 
 
@@ -1614,7 +1367,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     new PDF({
 
                         orientation:
-                            getPDFOrientation(
+                            getOrientation(
                                 page
                             ),
 
@@ -1626,7 +1379,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 page.width,
                                 page.height
                             ]
-
                     });
 
 
@@ -1644,7 +1396,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 pdf.setFont(
-                    pdfFont(
+                    getPdfFont(
                         document.getElementById(
                             "cocoAddressFont"
                         ).value
@@ -1690,7 +1442,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 y +=
-                    fromLines.length * 5 +
+                    fromLines.length *
+                    5 +
                     18;
 
 
@@ -1718,7 +1471,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
-                pdf.save(
+                downloadPDF(
+                    pdf,
                     "CocoBlue_Address_Label.pdf"
                 );
 
@@ -1744,16 +1498,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     "cocoFrom"
                 ).value = "";
 
-
                 document.getElementById(
                     "cocoTo"
                 ).value = "";
 
-
                 document.getElementById(
                     "cocoAddressBorder"
                 ).checked = false;
-
 
                 updateCocoAddress();
 
@@ -1782,7 +1533,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                         "active"
                                     )
                             );
-
 
                         button.classList.add(
                             "active"
@@ -1816,7 +1566,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     }
                 );
-
             }
         );
 
@@ -1848,14 +1597,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return [
                 ...otherExcelPOs
             ];
-
         }
-
 
         return readInputs(
             ".other-po"
         );
-
     }
 
 
@@ -1914,7 +1660,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     }
                 );
-
             }
         );
 
@@ -1930,16 +1675,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 const file =
                     event.target.files[0];
 
-
                 if (!file) {
                     return;
                 }
 
-
                 if (!hasXLSX()) {
                     return;
                 }
-
 
                 try {
 
@@ -1951,8 +1693,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         XLSX.read(
                             buffer,
                             {
-                                type:
-                                    "array"
+                                type: "array"
                             }
                         );
 
@@ -1973,8 +1714,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         );
 
 
-                    otherExcelPOs =
-                        [];
+                    otherExcelPOs = [];
 
 
                     rows.forEach(
@@ -2009,9 +1749,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     value.toLowerCase()
                                 )
                             ) {
-
                                 return;
-
                             }
 
 
@@ -2047,7 +1785,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert(
                         "Unable to read Other PO Excel."
                     );
-
                 }
 
             }
@@ -2101,7 +1838,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     }
                 );
-
             }
         );
 
@@ -2113,11 +1849,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 'input[name="otherLayout"]:checked'
             );
 
-
         return checked
             ? checked.value
             : "same";
-
     }
 
 
@@ -2126,14 +1860,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const pos =
             getOtherPOs();
 
-
         const labels =
             Number(
                 document.getElementById(
                     "otherLabelsPerPage"
                 ).value
             ) || 1;
-
 
         const pages =
             Number(
@@ -2142,14 +1874,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 ).value
             ) || 1;
 
-
         const start =
             Number(
                 document.getElementById(
                     "otherStartBox"
                 ).value
             ) || 1;
-
 
         const end =
             Number(
@@ -2180,7 +1910,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const boxCount =
                 Math.max(
                     0,
-                    end - start + 1
+                    end -
+                    start +
+                    1
                 );
 
 
@@ -2198,7 +1930,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         labels
                     )
                 );
-
         }
 
 
@@ -2259,7 +1990,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     ).value
                 )
                 : "none";
-
     }
 
 
@@ -2283,23 +2013,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     id
                 );
 
-
             if (!element) {
                 return;
             }
-
 
             element.addEventListener(
                 "input",
                 updateOtherPreview
             );
 
-
             element.addEventListener(
                 "change",
                 updateOtherPreview
             );
-
         }
     );
 
@@ -2320,10 +2046,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-    /* -----------------------------------------------------
-       OTHER PDF
-    ----------------------------------------------------- */
-
     document
         .getElementById(
             "otherGenerate"
@@ -2334,7 +2056,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const PDF =
                     getPDFConstructor();
-
 
                 if (!PDF) {
                     return;
@@ -2417,7 +2138,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     new PDF({
 
                         orientation:
-                            getPDFOrientation(
+                            getOrientation(
                                 page
                             ),
 
@@ -2429,7 +2150,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 page.width,
                                 page.height
                             ]
-
                     });
 
 
@@ -2466,7 +2186,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 );
 
                             }
-
                         }
                     );
 
@@ -2481,7 +2200,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                             while (
-                                current <= end
+                                current <=
+                                end
                             ) {
 
                                 const pageLabels =
@@ -2491,7 +2211,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                 while (
                                     pageLabels.length <
                                     labels &&
-                                    current <= end
+                                    current <=
+                                    end
                                 ) {
 
                                     pageLabels.push({
@@ -2511,10 +2232,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                 );
 
                             }
-
                         }
                     );
-
                 }
 
 
@@ -2533,11 +2252,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                     page.width,
                                     page.height
                                 ],
-                                getPDFOrientation(
+                                getOrientation(
                                     page
                                 )
                             );
-
                         }
 
 
@@ -2567,14 +2285,13 @@ document.addEventListener("DOMContentLoaded", () => {
                             page.width /
                             columns;
 
-
                         const cellHeight =
                             page.height /
                             rows;
 
 
                         const font =
-                            pdfFont(
+                            getPdfFont(
                                 document.getElementById(
                                     "otherFont"
                                 ).value
@@ -2602,13 +2319,13 @@ document.addEventListener("DOMContentLoaded", () => {
                                     );
 
 
-                                const col =
+                                const column =
                                     i %
                                     columns;
 
 
                                 const centerX =
-                                    col *
+                                    column *
                                     cellWidth +
                                     cellWidth /
                                     2;
@@ -2648,8 +2365,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 pdf.setFontSize(
                                     Math.min(
                                         40,
-                                        fontSize +
-                                        8
+                                        fontSize + 8
                                     )
                                 );
 
@@ -2663,15 +2379,14 @@ document.addEventListener("DOMContentLoaded", () => {
                                             "center"
                                     }
                                 );
-
                             }
                         );
-
                     }
                 );
 
 
-                pdf.save(
+                downloadPDF(
+                    pdf,
                     `${safeName(
                         pos[0]
                     )}_Other_PO_Labels.pdf`
@@ -2687,9 +2402,9 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-    /* -----------------------------------------------------
+    /* =====================================================
        OTHER ADDRESS
-    ----------------------------------------------------- */
+    ====================================================== */
 
     document
         .querySelectorAll(
@@ -2724,7 +2439,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     }
                 );
-
             }
         );
 
@@ -2789,23 +2503,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     id
                 );
 
-
             if (!element) {
                 return;
             }
-
 
             element.addEventListener(
                 "input",
                 updateOtherAddress
             );
 
-
             element.addEventListener(
                 "change",
                 updateOtherAddress
             );
-
         }
     );
 
@@ -2820,7 +2530,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const PDF =
                     getPDFConstructor();
-
 
                 if (!PDF) {
                     return;
@@ -2846,7 +2555,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                     return;
-
                 }
 
 
@@ -2856,22 +2564,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
 
-                if (!page) {
-
-                    alert(
-                        "Please select a valid page size."
-                    );
-
-                    return;
-
-                }
-
-
                 const pdf =
                     new PDF({
 
                         orientation:
-                            getPDFOrientation(
+                            getOrientation(
                                 page
                             ),
 
@@ -2883,7 +2580,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 page.width,
                                 page.height
                             ]
-
                     });
 
 
@@ -2901,7 +2597,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 pdf.setFont(
-                    pdfFont(
+                    getPdfFont(
                         document.getElementById(
                             "otherAddressFont"
                         ).value
@@ -2947,7 +2643,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 y +=
-                    fromLines.length * 5 +
+                    fromLines.length *
+                    5 +
                     18;
 
 
@@ -2975,7 +2672,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
-                pdf.save(
+                downloadPDF(
+                    pdf,
                     "Other_PO_Address_Label.pdf"
                 );
 
@@ -3001,16 +2699,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     "otherFrom"
                 ).value = "";
 
-
                 document.getElementById(
                     "otherTo"
                 ).value = "";
 
-
                 document.getElementById(
                     "otherAddressBorder"
                 ).checked = false;
-
 
                 updateOtherAddress();
 
@@ -3056,8 +2751,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             )
                             .classList.toggle(
                                 "hidden",
-                                mode !==
-                                "sticker"
+                                mode !== "sticker"
                             );
 
 
@@ -3067,24 +2761,21 @@ document.addEventListener("DOMContentLoaded", () => {
                             )
                             .classList.toggle(
                                 "hidden",
-                                mode !==
-                                "address"
+                                mode !== "address"
                             );
 
                     }
                 );
-
             }
         );
 
 
     /* =====================================================
-       ISBN BARCODE
+       ISBN
     ====================================================== */
 
     let isbnInputMode =
         "manual";
-
 
     let isbnRows =
         [];
@@ -3148,14 +2839,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     }
                 );
-
             }
         );
 
 
-    function cleanISBN(
-        value
-    ) {
+    function cleanISBN(value) {
 
         return String(
             value || ""
@@ -3164,13 +2852,10 @@ document.addEventListener("DOMContentLoaded", () => {
             /[^0-9Xx]/g,
             ""
         );
-
     }
 
 
-    function toISBN13(
-        value
-    ) {
+    function toISBN13(value) {
 
         const clean =
             cleanISBN(
@@ -3185,7 +2870,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ) {
 
             return clean;
-
         }
 
 
@@ -3219,7 +2903,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             ? 1
                             : 3
                     );
-
             }
 
 
@@ -3235,16 +2918,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             return (
                 base +
-                String(
-                    check
-                )
+                String(check)
             );
-
         }
 
 
         return null;
-
     }
 
 
@@ -3259,7 +2938,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ) {
 
             return false;
-
         }
 
 
@@ -3281,7 +2959,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         ? 1
                         : 3
                 );
-
         }
 
 
@@ -3301,7 +2978,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 isbn[12]
             )
         );
-
     }
 
 
@@ -3398,11 +3074,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             pattern +=
-                parity[i - 1] ===
-                "L"
+                parity[i - 1] === "L"
                     ? L[digit]
                     : G[digit];
-
         }
 
 
@@ -3422,7 +3096,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         isbn[i]
                     )
                 ];
-
         }
 
 
@@ -3431,7 +3104,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         return pattern;
-
     }
 
 
@@ -3469,8 +3141,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ) {
 
             if (
-                pattern[i] ===
-                "1"
+                pattern[i] === "1"
             ) {
 
                 pdf.rect(
@@ -3478,16 +3149,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     i *
                     moduleWidth,
                     y,
-                    moduleWidth +
-                    0.01,
+                    moduleWidth + .01,
                     height,
                     "F"
                 );
-
             }
-
         }
-
     }
 
 
@@ -3501,7 +3168,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return [
                 ...isbnRows
             ];
-
         }
 
 
@@ -3510,12 +3176,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 ".isbn-manual"
             );
 
-
         const titleInputs =
             document.querySelectorAll(
                 ".title-manual"
             );
-
 
         const editionInputs =
             document.querySelectorAll(
@@ -3523,7 +3187,7 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-        const result = [];
+        const rows = [];
 
 
         isbnInputs.forEach(
@@ -3535,12 +3199,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const isbn =
                     input.value.trim();
 
-
                 const title =
                     titleInputs[
                         index
                     ].value.trim();
-
 
                 const edition =
                     editionInputs[
@@ -3554,7 +3216,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     edition
                 ) {
 
-                    result.push({
+                    rows.push({
 
                         isbn,
 
@@ -3563,23 +3225,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         edition:
                             edition ||
                             "N"
-
                     });
-
                 }
-
             }
         );
 
 
-        return result;
-
+        return rows;
     }
 
-
-    /* -----------------------------------------------------
-       ISBN EXCEL
-    ----------------------------------------------------- */
 
     document
         .getElementById(
@@ -3613,8 +3267,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         XLSX.read(
                             buffer,
                             {
-                                type:
-                                    "array"
+                                type: "array"
                             }
                         );
 
@@ -3635,8 +3288,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         );
 
 
-                    isbnRows =
-                        [];
+                    isbnRows = [];
 
 
                     rows.forEach(
@@ -3677,7 +3329,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             ) {
 
                                 return;
-
                             }
 
 
@@ -3687,7 +3338,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             ) {
 
                                 return;
-
                             }
 
 
@@ -3700,7 +3350,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 edition:
                                     edition ||
                                     "N"
-
                             });
 
                         }
@@ -3716,23 +3365,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     updateISBNPreview();
 
                 }
-                catch(error) {
+                catch (error) {
 
                     console.error(error);
 
                     alert(
                         "Unable to read ISBN Excel file."
                     );
-
                 }
-
             }
         );
 
-
-    /* -----------------------------------------------------
-       ISBN PREVIEW
-    ----------------------------------------------------- */
 
     function updateISBNPreview() {
 
@@ -3779,7 +3422,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 "";
 
             return;
-
         }
 
 
@@ -3857,12 +3499,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         barcode.appendChild(
                             bar
                         );
-
                     }
                 );
-
         }
-
     }
 
 
@@ -3884,14 +3523,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 "input",
                 updateISBNPreview
             );
-
         }
     );
 
-
-    /* -----------------------------------------------------
-       ISBN PDF
-    ----------------------------------------------------- */
 
     document
         .getElementById(
@@ -3921,17 +3555,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                     return;
-
                 }
 
 
-                const validated =
-                    [];
+                const validRows = [];
 
 
                 for (
-                    const row
-                    of rows
+                    const row of rows
                 ) {
 
                     if (!row.isbn) {
@@ -3941,7 +3572,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         );
 
                         return;
-
                     }
 
 
@@ -3952,7 +3582,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         );
 
                         return;
-
                     }
 
 
@@ -3974,11 +3603,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         );
 
                         return;
-
                     }
 
 
-                    validated.push({
+                    validRows.push({
 
                         isbn:
                             isbn13,
@@ -3989,7 +3617,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         edition:
                             row.edition ||
                             "N"
-
                     });
 
                 }
@@ -4010,11 +3637,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                     return;
-
                 }
 
 
-                const labels =
+                const labelsPerPage =
                     Number(
                         document.getElementById(
                             "isbnLabelsPerPage"
@@ -4026,7 +3652,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     new PDF({
 
                         orientation:
-                            getPDFOrientation(
+                            getOrientation(
                                 page
                             ),
 
@@ -4038,7 +3664,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 page.width,
                                 page.height
                             ]
-
                     });
 
 
@@ -4050,33 +3675,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     ) || 10;
 
 
-                const border =
-                    document.getElementById(
-                        "isbnBorder"
-                    ).checked;
-
-
-                const borderStyle =
-                    document.getElementById(
-                        "isbnBorderStyle"
-                    ).value;
-
-
-                let generatedPages =
-                    0;
+                let generatedPages = 0;
 
 
                 for (
                     let start = 0;
                     start <
-                    validated.length;
-                    start += labels
+                    validRows.length;
+                    start +=
+                        labelsPerPage
                 ) {
 
                     const pageRows =
-                        validated.slice(
+                        validRows.slice(
                             start,
-                            start + labels
+                            start +
+                            labelsPerPage
                         );
 
 
@@ -4090,11 +3704,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                 page.width,
                                 page.height
                             ],
-                            getPDFOrientation(
+                            getOrientation(
                                 page
                             )
                         );
-
                     }
 
 
@@ -4102,8 +3715,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         pdf,
                         page.width,
                         page.height,
-                        border,
-                        borderStyle
+                        document.getElementById(
+                            "isbnBorder"
+                        ).checked,
+                        document.getElementById(
+                            "isbnBorderStyle"
+                        ).value
                     );
 
 
@@ -4132,25 +3749,25 @@ document.addEventListener("DOMContentLoaded", () => {
                             index
                         ) => {
 
-                            const r =
+                            const gridRow =
                                 Math.floor(
                                     index /
                                     columnsGrid
                                 );
 
 
-                            const c =
+                            const gridColumn =
                                 index %
                                 columnsGrid;
 
 
-                            const x =
-                                c *
+                            const cellX =
+                                gridColumn *
                                 cellWidth;
 
 
-                            const y =
-                                r *
+                            const cellY =
+                                gridRow *
                                 cellHeight;
 
 
@@ -4164,19 +3781,20 @@ document.addEventListener("DOMContentLoaded", () => {
                             const barcodeHeight =
                                 Math.min(
                                     28,
-                                    cellHeight * 0.28
+                                    cellHeight *
+                                    .28
                                 );
 
 
                             drawEAN13(
                                 pdf,
                                 row.isbn,
-                                x +
-                                    (
-                                        cellWidth -
-                                        barcodeWidth
-                                    ) / 2,
-                                y + 8,
+                                cellX +
+                                (
+                                    cellWidth -
+                                    barcodeWidth
+                                ) / 2,
+                                cellY + 8,
                                 barcodeWidth,
                                 barcodeHeight
                             );
@@ -4198,12 +3816,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             pdf.text(
                                 row.isbn,
-                                x +
-                                    cellWidth /
-                                    2,
-                                y +
-                                    barcodeHeight +
-                                    14,
+                                cellX +
+                                cellWidth /
+                                2,
+                                cellY +
+                                barcodeHeight +
+                                14,
                                 {
                                     align:
                                         "center"
@@ -4228,12 +3846,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             pdf.text(
                                 titleLines,
-                                x +
-                                    cellWidth /
-                                    2,
-                                y +
-                                    barcodeHeight +
-                                    21,
+                                cellX +
+                                cellWidth /
+                                2,
+                                cellY +
+                                barcodeHeight +
+                                21,
                                 {
                                     align:
                                         "center"
@@ -4251,12 +3869,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                     row.edition ||
                                     "N"
                                 }`,
-                                x +
-                                    cellWidth /
-                                    2,
-                                y +
-                                    cellHeight -
-                                    8,
+                                cellX +
+                                cellWidth /
+                                2,
+                                cellY +
+                                cellHeight -
+                                8,
                                 {
                                     align:
                                         "center"
@@ -4272,7 +3890,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
 
-                pdf.save(
+                downloadPDF(
+                    pdf,
                     "BooksWagon_ISBN_Barcodes.pdf"
                 );
 
@@ -4280,7 +3899,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById(
                     "isbnStatus"
                 ).textContent =
-                    `Generated ${validated.length} barcode label(s).`;
+                    `Generated ${validRows.length} barcode label(s).`;
 
             }
         );
@@ -4299,9 +3918,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         ".isbn-manual"
                     )
                     .forEach(
-                        element =>
-                            element.value =
-                            ""
+                        input =>
+                            input.value = ""
                     );
 
 
@@ -4310,9 +3928,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         ".title-manual"
                     )
                     .forEach(
-                        element =>
-                            element.value =
-                            ""
+                        input =>
+                            input.value = ""
                     );
 
 
@@ -4321,20 +3938,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         ".edition-manual"
                     )
                     .forEach(
-                        element =>
-                            element.value =
-                            ""
+                        input =>
+                            input.value = ""
                     );
 
 
-                isbnRows =
-                    [];
+                isbnRows = [];
 
 
                 document.getElementById(
                     "isbnExcel"
-                ).value =
-                    "";
+                ).value = "";
 
 
                 document.getElementById(
@@ -4350,7 +3964,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       TOOL TABS INITIAL STATE
+       INITIALIZE
     ====================================================== */
 
     updateCocoPreview();
@@ -4360,12 +3974,8 @@ document.addEventListener("DOMContentLoaded", () => {
     updateISBNPreview();
 
 
-    /* =====================================================
-       DEBUG MESSAGE
-    ====================================================== */
-
     console.log(
-        "BooksWagon Label Studio loaded successfully."
+        "BooksWagon Label Studio JS loaded."
     );
 
 });
