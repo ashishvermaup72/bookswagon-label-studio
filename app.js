@@ -1,6 +1,7 @@
 /* =========================================================
-   BOOKSWAGON LABEL STUDIO
-   FINAL APP.JS
+   BOOKSWAGON PAGES — FINAL SCRIPT.JS
+   Simple Checkbox System
+   No confirmation dialog
 ========================================================= */
 
 "use strict";
@@ -13,13 +14,8 @@
 const CONFIG = {
     email: "ashish.verma@bookswagon.in",
 
-    mapsURL:
-        "https://maps.app.goo.gl/7McYApm1u9x4QSj7A",
-
-    address:
-        "Ground Floor, 2/14, Ansari Rd, Old Delhi, Daryaganj, Delhi, 110002",
-
-    maxPOFields: 20
+    maps:
+        "https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
 };
 
 
@@ -27,231 +23,131 @@ const CONFIG = {
    SHORTCUTS
 ========================================================= */
 
-const $ = (selector, root = document) =>
-    root.querySelector(selector);
+const $ = (selector) =>
+    document.querySelector(selector);
 
-const $$ = (selector, root = document) =>
-    [...root.querySelectorAll(selector)];
-
-
-/* =========================================================
-   UTILITY
-========================================================= */
-
-function escapeHTML(value) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        value ?? "";
-
-    return div.innerHTML;
-}
-
-
-function unique(values) {
-
-    const result = [];
-    const seen = new Set();
-
-    values.forEach(value => {
-
-        const clean =
-            String(value ?? "")
-                .trim();
-
-        if (!clean) {
-            return;
-        }
-
-        const key =
-            clean.toUpperCase();
-
-        if (!seen.has(key)) {
-
-            seen.add(key);
-
-            result.push(clean);
-        }
-
-    });
-
-    return result;
-}
-
-
-function safeFilename(value) {
-
-    return String(value || "PO")
-        .replace(
-            /[<>:"/\\|?*\x00-\x1F]/g,
-            "_"
-        )
-        .replace(
-            /\s+/g,
-            "_"
-        )
-        .slice(0, 100);
-}
+const $$ = (selector) =>
+    [...document.querySelectorAll(selector)];
 
 
 /* =========================================================
    TOAST
 ========================================================= */
 
-function showToast(
-    type,
-    title,
-    message
-) {
+function showToast(message, type = "success") {
 
-    const container =
-        $("#toastContainer");
-
+    const container = $("#toast");
 
     if (!container) {
         return;
     }
 
-
     const toast =
         document.createElement("div");
 
-
     toast.className =
-        `confirmation-toast ${
-            type === "success"
-                ? "toast-success"
-                : "toast-danger"
-        }`;
+        `toast-message ${type}`;
 
+    toast.textContent =
+        message;
 
-    toast.innerHTML = `
-        <div class="toast-title">
-            ${escapeHTML(title)}
-        </div>
-
-        <div class="toast-message">
-            ${escapeHTML(message)}
-        </div>
-    `;
-
-
-    container.appendChild(
-        toast
-    );
-
-
-    requestAnimationFrame(() => {
-
-        toast.classList.add(
-            "show"
-        );
-
-    });
-
+    container.appendChild(toast);
 
     setTimeout(() => {
-
-        toast.classList.remove(
-            "show"
-        );
-
-
-        setTimeout(
-            () => toast.remove(),
-            250
-        );
-
-    }, 3200);
+        toast.remove();
+    }, 2800);
 }
 
 
 /* =========================================================
-   CHECKBOX CONFIRMATION
-   =========================================================
-   
-   IMPORTANT:
-   The confirmation system is already present in HTML.
-   This JS DOES NOT attach another checkbox click handler.
-   
-   That prevents the old double-toggle bug.
+   SIMPLE CHECKBOX
+   NO CONFIRMATION POPUP
 ========================================================= */
 
-function setupCheckboxStateTracking() {
+function setupCheckboxes() {
 
-    $$(
-        'input[type="checkbox"][data-confirm="true"]'
-    )
-    .forEach(checkbox => {
+    $$('.check input[type="checkbox"]')
+        .forEach(checkbox => {
 
-        checkbox.dataset.initialized =
-            "true";
+            checkbox.addEventListener(
+                "change",
+                function () {
 
+                    const feature =
+                        this.dataset.feature ||
+                        "Feature";
 
-        checkbox.addEventListener(
-            "change",
-            () => {
+                    if (this.checked) {
 
-                updateAllPreviews();
+                        showToast(
+                            `${feature} is now enabled.`,
+                            "success"
+                        );
 
-            }
-        );
+                    } else {
 
-    });
+                        showToast(
+                            `${feature} is now disabled.`,
+                            "error"
+                        );
+                    }
+
+                    updatePreviews();
+                }
+            );
+
+        });
 }
 
 
 /* =========================================================
-   TOOL NAVIGATION
+   TOOL CARDS
 ========================================================= */
 
-function setupToolNavigation() {
+function setupToolCards() {
 
-    $$("[data-open-tool]")
+    $$(".tool-card")
         .forEach(card => {
+
+            const openTool = () => {
+
+                const tool =
+                    card.dataset.tool;
+
+                if (!tool) {
+                    return;
+                }
+
+                $$(".workspace")
+                    .forEach(workspace => {
+
+                        workspace.classList.remove(
+                            "active"
+                        );
+
+                    });
+
+                const workspace =
+                    $(`#${tool}Workspace`);
+
+                if (!workspace) {
+                    return;
+                }
+
+                workspace.classList.add(
+                    "active"
+                );
+
+                workspace.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            };
+
 
             card.addEventListener(
                 "click",
-                () => {
-
-                    const tool =
-                        card.dataset.openTool;
-
-
-                    $$(".tool-workspace")
-                        .forEach(section => {
-
-                            section.classList.remove(
-                                "active"
-                            );
-
-                        });
-
-
-                    const workspace =
-                        document.getElementById(
-                            `${tool}Workspace`
-                        );
-
-
-                    if (!workspace) {
-                        return;
-                    }
-
-
-                    workspace.classList.add(
-                        "active"
-                    );
-
-
-                    workspace.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
-
-                }
+                openTool
             );
 
 
@@ -266,38 +162,8 @@ function setupToolNavigation() {
 
                         event.preventDefault();
 
-                        card.click();
-
+                        openTool();
                     }
-
-                }
-            );
-
-        });
-
-
-    $$("[data-close-tool]")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    $$(".tool-workspace")
-                        .forEach(section => {
-
-                            section.classList.remove(
-                                "active"
-                            );
-
-                        });
-
-
-                    $("#tools")
-                        ?.scrollIntoView({
-                            behavior: "smooth"
-                        });
-
                 }
             );
 
@@ -306,53 +172,31 @@ function setupToolNavigation() {
 
 
 /* =========================================================
-   INPUT TABS
+   CLOSE WORKSPACE
 ========================================================= */
 
-function setupCocoTabs() {
+function setupCloseButtons() {
 
-    $$("[data-coco-input]")
+    $$(".close-workspace")
         .forEach(button => {
 
             button.addEventListener(
                 "click",
                 () => {
 
-                    const mode =
-                        button.dataset.cocoInput;
+                    $$(".workspace")
+                        .forEach(workspace => {
 
-
-                    $("#cocoManualArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "manual"
-                        );
-
-
-                    $("#cocoCommaArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "comma"
-                        );
-
-
-                    $("#cocoExcelArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "excel"
-                        );
-
-
-                    $$("[data-coco-input]")
-                        .forEach(tab => {
-
-                            tab.classList.toggle(
-                                "active",
-                                tab === button
+                            workspace.classList.remove(
+                                "active"
                             );
 
                         });
 
+                    $("#tools")
+                        ?.scrollIntoView({
+                            behavior: "smooth"
+                        });
                 }
             );
 
@@ -360,49 +204,71 @@ function setupCocoTabs() {
 }
 
 
-function setupOtherTabs() {
+/* =========================================================
+   TABS
+========================================================= */
 
-    $$("[data-other-input]")
-        .forEach(button => {
+function setupTabs() {
 
-            button.addEventListener(
+    $$(".tab")
+        .forEach(tab => {
+
+            tab.addEventListener(
                 "click",
                 () => {
 
-                    const mode =
-                        button.dataset.otherInput;
+                    const target =
+                        tab.dataset.tab;
+
+                    if (!target) {
+                        return;
+                    }
 
 
-                    $("#otherManualArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "manual"
-                        );
+                    /*
+                     * Coco tabs
+                     */
 
+                    if (
+                        target.startsWith(
+                            "coco-"
+                        )
+                    ) {
 
-                    $("#otherCommaArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "comma"
-                        );
+                        [
+                            "coco-manual",
+                            "coco-bulk",
+                            "coco-excel"
+                        ]
+                        .forEach(id => {
 
+                            const element =
+                                document.getElementById(
+                                    id
+                                );
 
-                    $("#otherExcelArea")
-                        ?.classList.toggle(
-                            "hidden",
-                            mode !== "excel"
-                        );
+                            if (!element) {
+                                return;
+                            }
 
-
-                    $$("[data-other-input]")
-                        .forEach(tab => {
-
-                            tab.classList.toggle(
-                                "active",
-                                tab === button
-                            );
+                            element.style.display =
+                                id === target
+                                    ? "block"
+                                    : "none";
 
                         });
+
+
+                        $$('.tab[data-tab^="coco-"]')
+                            .forEach(item => {
+
+                                item.classList.toggle(
+                                    "active",
+                                    item === tab
+                                );
+
+                            });
+                    }
 
                 }
             );
@@ -417,23 +283,31 @@ function setupOtherTabs() {
 
 function parsePOText(text) {
 
-    return unique(
-        String(text || "")
-            .split(
-                /[\n,;]+/
-            )
-            .map(
-                item =>
-                    item.trim()
-            )
-            .filter(Boolean)
-    );
+    return [
+        ...new Set(
+
+            String(text || "")
+                .split(
+                    /[\n,;]+/
+                )
+                .map(
+                    value =>
+                        value.trim()
+                )
+                .filter(Boolean)
+
+        )
+    ];
 }
 
 
+/* =========================================================
+   COCO PO
+========================================================= */
+
 function getCocoPOs() {
 
-    const individual =
+    const manual =
         $$(".coco-po")
             .map(
                 input =>
@@ -444,21 +318,27 @@ function getCocoPOs() {
 
     const bulk =
         parsePOText(
-            $("#cocoCommaPO")
-                ?.value || ""
+            $("#cocoBulk")
+                ?.value
         );
 
 
-    return unique([
-        ...individual,
-        ...bulk
-    ]);
+    return [
+        ...new Set([
+            ...manual,
+            ...bulk
+        ])
+    ];
 }
 
 
+/* =========================================================
+   OTHER PO
+========================================================= */
+
 function getOtherPOs() {
 
-    const individual =
+    const manual =
         $$(".other-po")
             .map(
                 input =>
@@ -469,21 +349,27 @@ function getOtherPOs() {
 
     const bulk =
         parsePOText(
-            $("#otherCommaPO")
-                ?.value || ""
+            $("#otherBulk")
+                ?.value
         );
 
 
-    return unique([
-        ...individual,
-        ...bulk
-    ]);
+    return [
+        ...new Set([
+            ...manual,
+            ...bulk
+        ])
+    ];
 }
 
 
-function getSBMOPos() {
+/* =========================================================
+   SBMO PO
+========================================================= */
 
-    const individual =
+function getSBMOPOs() {
+
+    const manual =
         $$(".sbmo-po")
             .map(
                 input =>
@@ -494,90 +380,85 @@ function getSBMOPos() {
 
     const bulk =
         parsePOText(
-            $("#sbmoCommaPO")
-                ?.value || ""
+            $("#sbmoBulk")
+                ?.value
         );
 
 
-    return unique([
-        ...individual,
-        ...bulk
-    ]);
+    return [
+        ...new Set([
+            ...manual,
+            ...bulk
+        ])
+    ];
 }
 
 
 /* =========================================================
-   NUMBER HELPERS
+   BOX RANGE
+   NO 200 LIMIT
 ========================================================= */
 
-function getNumber(
-    selector,
-    fallback = 1
-) {
+function getRange(startSelector, endSelector) {
 
-    const element =
-        $(selector);
-
-
-    if (!element) {
-        return fallback;
-    }
-
-
-    const value =
+    const start =
         Number(
-            element.value
+            $(startSelector)?.value
+        );
+
+    const end =
+        Number(
+            $(endSelector)?.value
         );
 
 
     if (
-        !Number.isFinite(value) ||
-        value < 1
+        !Number.isFinite(start) ||
+        !Number.isFinite(end)
     ) {
 
-        return fallback;
+        showToast(
+            "Please enter a valid box range.",
+            "error"
+        );
+
+        return null;
     }
 
 
-    return Math.floor(value);
-}
-
-
-function getRange(
-    startSelector,
-    endSelector
-) {
-
-    const start =
-        getNumber(
-            startSelector,
-            1
-        );
-
-
-    const end =
-        getNumber(
-            endSelector,
-            start
-        );
-
-
-    if (end < start) {
+    if (
+        start < 1 ||
+        end < 1
+    ) {
 
         showToast(
-            "error",
-            "Invalid Box Range",
-            "The End Box must be greater than or equal to the Start Box."
+            "Box numbers must be 1 or greater.",
+            "error"
         );
 
+        return null;
+    }
+
+
+    if (
+        end < start
+    ) {
+
+        showToast(
+            "End Box cannot be smaller than Start Box.",
+            "error"
+        );
 
         return null;
     }
 
 
     return {
-        start,
-        end
+        start:
+            Math.floor(start),
+
+        end:
+            Math.floor(end)
     };
 }
 
@@ -601,11 +482,6 @@ function getPrintMode(
     const both =
         $(bothSelector)?.checked === true;
 
-
-    /*
-     * If PO + Box is explicitly selected,
-     * it wins.
-     */
 
     if (both) {
         return "both";
@@ -631,6 +507,10 @@ function getPrintMode(
 }
 
 
+/* =========================================================
+   VALIDATE PRINT MODE
+========================================================= */
+
 function validatePrintMode(
     poSelector,
     boxSelector,
@@ -648,11 +528,9 @@ function validatePrintMode(
     if (mode === "none") {
 
         showToast(
-            "error",
-            "Print Option Required",
-            "Select PO Number, Box Number, or PO + Box Number."
+            "Select PO Number, Box Number or PO + Box.",
+            "error"
         );
-
 
         return false;
     }
@@ -663,425 +541,188 @@ function validatePrintMode(
 
 
 /* =========================================================
-   PREVIEW BUILDER
-========================================================= */
-
-function buildPreview(
-    po,
-    box,
-    options
-) {
-
-    const mode =
-        options.mode;
-
-
-    let html =
-        "";
-
-
-    /*
-     * PO
-     */
-
-    if (
-        mode === "po" ||
-        mode === "both"
-    ) {
-
-        html += `
-            <div
-                class="${
-                    options.poBorder
-                        ? "preview-item-border"
-                        : ""
-                }"
-            >
-                ${escapeHTML(po)}
-            </div>
-        `;
-    }
-
-
-    /*
-     * Cutting line
-     */
-
-    if (
-        mode === "both" &&
-        options.cutting
-    ) {
-
-        html += `
-            <div class="preview-dotted-line">
-                ${
-                    options.scissor
-                        ? "· · · · · ✂ · · · · ·"
-                        : "· · · · · · · · · ·"
-                }
-            </div>
-        `;
-    }
-
-
-    /*
-     * Box
-     */
-
-    if (
-        mode === "box" ||
-        mode === "both"
-    ) {
-
-        html += `
-            <div
-                class="${
-                    options.boxBorder
-                        ? "preview-box-number"
-                        : ""
-                }"
-            >
-                BOX NO. ${escapeHTML(box)}
-            </div>
-        `;
-    }
-
-
-    /*
-     * Nothing selected
-     */
-
-    if (!html) {
-
-        html = `
-            <span
-                style="
-                    color:#98a2b3;
-                    font-size:11px;
-                "
-            >
-                Select a print option
-            </span>
-        `;
-    }
-
-
-    return `
-        <div
-            class="
-                dynamic-label-preview
-                ${
-                    options.combinedBorder
-                        ? "has-outer-border"
-                        : ""
-                }
-            "
-        >
-            ${html}
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   COCO OPTIONS
-========================================================= */
-
-function getCocoOptions() {
-
-    return {
-
-        mode:
-            getPrintMode(
-                "#cocoPrintPO",
-                "#cocoPrintBox",
-                "#cocoPrintPOBox"
-            ),
-
-        pageBorder:
-            $("#cocoPageBorder")
-                ?.checked === true,
-
-        poBorder:
-            $("#cocoPOBorder")
-                ?.checked === true,
-
-        boxBorder:
-            $("#cocoBoxBorder")
-                ?.checked === true,
-
-        combinedBorder:
-            $("#cocoPOBoxOuterBorder")
-                ?.checked === true,
-
-        cutting:
-            $("#cocoCutting")
-                ?.checked === true,
-
-        scissor:
-            $("#cocoScissorLine")
-                ?.checked === true,
-
-        bold:
-            $("#cocoBoldText")
-                ?.checked === true,
-
-        font:
-            $("#cocoFont")
-                ?.value ||
-            "helvetica",
-
-        fontSize:
-            getNumber(
-                "#cocoFontSize",
-                16
-            ),
-
-        borderStyle:
-            $("#cocoBorderStyle")
-                ?.value ||
-            "solid"
-    };
-}
-
-
-/* =========================================================
-   OTHER OPTIONS
-========================================================= */
-
-function getOtherOptions() {
-
-    return {
-
-        mode:
-            getPrintMode(
-                "#otherPrintPO",
-                "#otherPrintBox",
-                "#otherPrintPOBox"
-            ),
-
-        pageBorder:
-            $("#otherPageBorder")
-                ?.checked === true,
-
-        poBorder:
-            $("#otherPOBorder")
-                ?.checked === true,
-
-        boxBorder:
-            $("#otherBoxBorder")
-                ?.checked === true,
-
-        combinedBorder:
-            $("#otherPOBoxOuterBorder")
-                ?.checked === true,
-
-        cutting:
-            $("#otherCutting")
-                ?.checked === true,
-
-        scissor: true,
-
-        bold: true,
-
-        font: "helvetica",
-
-        fontSize: 16,
-
-        borderStyle: "solid"
-    };
-}
-
-
-/* =========================================================
-   SBMO OPTIONS
-========================================================= */
-
-function getSBMOOptions() {
-
-    return {
-
-        mode:
-            getPrintMode(
-                "#sbmoPrintPO",
-                "#sbmoPrintBox",
-                "#sbmoPrintPOBox"
-            ),
-
-        pageBorder: true,
-
-        poBorder:
-            $("#sbmoPOBorder")
-                ?.checked === true,
-
-        boxBorder:
-            $("#sbmoBoxBorder")
-                ?.checked === true,
-
-        combinedBorder: false,
-
-        cutting:
-            $("#sbmoCutting")
-                ?.checked === true,
-
-        scissor: true,
-
-        bold: true,
-
-        font: "helvetica",
-
-        fontSize: 16,
-
-        borderStyle: "solid"
-    };
-}
-
-
-/* =========================================================
-   PREVIEW UPDATE
+   COCO PREVIEW
 ========================================================= */
 
 function updateCocoPreview() {
 
-    const page =
-        $("#cocoPreviewPage");
+    const preview =
+        $("#cocoPreview");
 
-
-    if (!page) {
+    if (!preview) {
         return;
     }
 
 
-    const poList =
-        getCocoPOs();
-
-
     const po =
-        poList[0] ||
+        getCocoPOs()[0] ||
         "PO NUMBER";
 
 
     const box =
-        $("#cocoStartBox")
+        $("#cocoStart")
             ?.value ||
         "1";
 
 
-    const options =
-        getCocoOptions();
-
-
-    page.innerHTML =
-        buildPreview(
-            po,
-            box,
-            options
+    const mode =
+        getPrintMode(
+            "#cocoPO",
+            "#cocoBox",
+            "#cocoPOBox"
         );
 
 
-    page.style.border =
-        options.pageBorder
-            ? "1.5px solid #101828"
+    const poElement =
+        $("#previewPO");
+
+    const boxElement =
+        $("#previewBox");
+
+    const cutElement =
+        $("#previewCut");
+
+
+    if (
+        !poElement ||
+        !boxElement ||
+        !cutElement
+    ) {
+
+        return;
+    }
+
+
+    poElement.textContent =
+        po;
+
+    boxElement.textContent =
+        `BOX NO. ${box}`;
+
+
+    poElement.style.display =
+        (
+            mode === "po" ||
+            mode === "both"
+        )
+            ? "inline-flex"
+            : "none";
+
+
+    boxElement.style.display =
+        (
+            mode === "box" ||
+            mode === "both"
+        )
+            ? "inline-flex"
+            : "none";
+
+
+    cutElement.style.display =
+        (
+            mode === "both" &&
+            $("#cocoCut")?.checked
+        )
+            ? "block"
+            : "none";
+
+
+    poElement.classList.toggle(
+        "border",
+        $("#cocoPOBorder")
+            ?.checked === true
+    );
+
+
+    boxElement.classList.toggle(
+        "border",
+        $("#cocoBoxBorder")
+            ?.checked === true
+    );
+
+
+    preview.style.border =
+        $("#cocoPageBorder")
+            ?.checked === true
+            ? "1px solid #111827"
             : "0";
-}
 
 
-function updateOtherPreview() {
-
-    const page =
-        $("#otherPreviewPage");
-
-
-    if (!page) {
-        return;
-    }
-
-
-    const poList =
-        getOtherPOs();
-
-
-    const po =
-        poList[0] ||
-        "PO NUMBER";
-
-
-    const box =
-        $("#otherStartBox")
-            ?.value ||
-        "1";
-
-
-    const options =
-        getOtherOptions();
-
-
-    page.innerHTML =
-        buildPreview(
-            po,
-            box,
-            options
+    const label =
+        preview.querySelector(
+            ".preview-label"
         );
 
 
-    page.style.border =
-        options.pageBorder
-            ? "1.5px solid #101828"
-            : "0";
-}
+    if (label) {
+
+        label.style.border =
+            $("#cocoCombinedBorder")
+                ?.checked === true
+                ? "2px solid #111827"
+                : "0";
 
 
-function updateSBMOPreview() {
-
-    const page =
-        $("#sbmoPreviewPage");
-
-
-    if (!page) {
-        return;
+        label.style.fontWeight =
+            $("#cocoBold")
+                ?.checked === true
+                ? "900"
+                : "400";
     }
-
-
-    const poList =
-        getSBMOPos();
-
-
-    const po =
-        poList[0] ||
-        "PO NUMBER";
-
-
-    const box =
-        $("#sbmoStartBox")
-            ?.value ||
-        "1";
-
-
-    const options =
-        getSBMOOptions();
-
-
-    page.innerHTML =
-        buildPreview(
-            po,
-            box,
-            options
-        );
-}
-
-
-function updateAllPreviews() {
-
-    updateCocoPreview();
-
-    updateOtherPreview();
-
-    updateSBMOPreview();
 }
 
 
 /* =========================================================
-   PDF
+   ALL PREVIEWS
+========================================================= */
+
+function updatePreviews() {
+
+    updateCocoPreview();
+}
+
+
+/* =========================================================
+   LIVE INPUT
+========================================================= */
+
+function setupLiveUpdates() {
+
+    document.addEventListener(
+        "input",
+        event => {
+
+            if (
+                event.target.matches(
+                    "input, textarea, select"
+                )
+            ) {
+
+                updatePreviews();
+            }
+        }
+    );
+
+
+    document.addEventListener(
+        "change",
+        event => {
+
+            if (
+                event.target.matches(
+                    "input, textarea, select"
+                )
+            ) {
+
+                updatePreviews();
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   PDF LIBRARY
 ========================================================= */
 
 function getPDFConstructor() {
@@ -1102,52 +743,10 @@ function getPDFConstructor() {
 
 
 /* =========================================================
-   BORDER STYLE
+   DRAW PDF LABEL
 ========================================================= */
 
-function applyPDFBorderStyle(
-    doc,
-    style
-) {
-
-    if (style === "double") {
-
-        doc.setLineWidth(
-            .7
-        );
-
-    } else if (
-        style === "dashed"
-    ) {
-
-        doc.setLineDashPattern(
-            [3, 2],
-            0
-        );
-
-        doc.setLineWidth(
-            .5
-        );
-
-    } else {
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-        doc.setLineWidth(
-            .7
-        );
-    }
-}
-
-
-/* =========================================================
-   DRAW LABEL
-========================================================= */
-
-function drawLabel(
+function drawPDFLabel(
     doc,
     po,
     box,
@@ -1162,13 +761,12 @@ function drawLabel(
         doc.internal.pageSize
             .getHeight();
 
-
     const centerX =
         pageWidth / 2;
 
 
     /*
-     * Page border
+     * PAGE BORDER
      */
 
     if (
@@ -1181,72 +779,49 @@ function drawLabel(
             39
         );
 
-        applyPDFBorderStyle(
-            doc,
-            options.borderStyle
+        doc.setLineWidth(
+            0.7
         );
-
 
         doc.rect(
-            6,
-            6,
-            pageWidth - 12,
-            pageHeight - 12
-        );
-
-
-        doc.setLineDashPattern(
-            [],
-            0
+            7,
+            7,
+            pageWidth - 14,
+            pageHeight - 14
         );
     }
 
 
     /*
-     * Combined outer border
+     * OUTER COMBINED BORDER
      */
 
     if (
-        options.combinedBorder
+        options.combined
     ) {
-
-        doc.setDrawColor(
-            17,
-            24,
-            39
-        );
 
         doc.setLineWidth(
             1
         );
 
         doc.rect(
-            15,
-            15,
-            pageWidth - 30,
-            pageHeight - 30
+            20,
+            20,
+            pageWidth - 40,
+            pageHeight - 40
         );
     }
 
 
     let y =
-        pageHeight * .35;
+        pageHeight * 0.36;
 
-
-    /*
-     * Font
-     */
 
     doc.setFont(
-        options.font || "helvetica",
+        "helvetica",
         options.bold
             ? "bold"
             : "normal"
-    );
-
-
-    doc.setFontSize(
-        options.fontSize || 16
     );
 
 
@@ -1259,65 +834,57 @@ function drawLabel(
         options.mode === "both"
     ) {
 
-        const text =
+        const poText =
             String(po);
+
+
+        doc.setFontSize(
+            18
+        );
 
 
         const textWidth =
             doc.getTextWidth(
-                text
+                poText
             );
-
-
-        const width =
-            Math.max(
-                70,
-                textWidth + 30
-            );
-
-
-        const x =
-            centerX -
-            width / 2;
 
 
         if (
             options.poBorder
         ) {
 
-            doc.setDrawColor(
-                17,
-                24,
-                39
-            );
+            const boxWidth =
+                Math.max(
+                    80,
+                    textWidth + 30
+                );
 
-            applyPDFBorderStyle(
-                doc,
-                options.borderStyle
+
+            doc.setLineWidth(
+                0.9
             );
 
 
             doc.rect(
-                x,
-                y - 16,
-                width,
-                32
-            );
+                centerX -
+                    boxWidth / 2,
 
+                y - 15,
 
-            doc.setLineDashPattern(
-                [],
-                0
+                boxWidth,
+
+                30
             );
         }
 
 
         doc.text(
-            text,
+            poText,
             centerX,
             y + 5,
             {
-                align: "center"
+                align:
+                    "center"
             }
         );
 
@@ -1327,7 +894,7 @@ function drawLabel(
 
 
     /*
-     * Cutting line
+     * CUTTING LINE
      */
 
     if (
@@ -1335,49 +902,36 @@ function drawLabel(
         options.cutting
     ) {
 
-        const left =
-            18;
-
-        const right =
-            pageWidth - 18;
-
-        const lineY =
-            y - 14;
-
-
         doc.setDrawColor(
-            80,
-            80,
-            80
+            70,
+            70,
+            70
         );
 
 
         doc.setLineWidth(
-            .4
+            0.4
         );
 
 
-        const dash = 4;
-        const gap = 3;
+        doc.setLineDashPattern(
+            [3, 3],
+            0
+        );
 
 
-        for (
-            let x = left;
-            x < right;
-            x += dash + gap
-        ) {
+        doc.line(
+            20,
+            y - 15,
+            pageWidth - 20,
+            y - 15
+        );
 
-            doc.line(
-                x,
-                lineY,
-                Math.min(
-                    x + dash,
-                    right
-                ),
-                lineY
-            );
 
-        }
+        doc.setLineDashPattern(
+            [],
+            0
+        );
 
 
         if (
@@ -1392,17 +946,16 @@ function drawLabel(
             doc.text(
                 "✂",
                 centerX,
-                lineY + 3,
+                y - 11,
                 {
                     align:
                         "center"
                 }
             );
-
         }
 
 
-        y += 28;
+        y += 25;
     }
 
 
@@ -1415,65 +968,57 @@ function drawLabel(
         options.mode === "both"
     ) {
 
-        const text =
+        const boxText =
             `BOX NO. ${box}`;
+
+
+        doc.setFontSize(
+            16
+        );
 
 
         const textWidth =
             doc.getTextWidth(
-                text
+                boxText
             );
-
-
-        const width =
-            Math.max(
-                90,
-                textWidth + 30
-            );
-
-
-        const x =
-            centerX -
-            width / 2;
 
 
         if (
             options.boxBorder
         ) {
 
-            doc.setDrawColor(
-                17,
-                24,
-                39
-            );
+            const boxWidth =
+                Math.max(
+                    100,
+                    textWidth + 30
+                );
 
-            applyPDFBorderStyle(
-                doc,
-                options.borderStyle
+
+            doc.setLineWidth(
+                0.9
             );
 
 
             doc.rect(
-                x,
-                y - 16,
-                width,
-                32
-            );
+                centerX -
+                    boxWidth / 2,
 
+                y - 15,
 
-            doc.setLineDashPattern(
-                [],
-                0
+                boxWidth,
+
+                30
             );
         }
 
 
         doc.text(
-            text,
+            boxText,
             centerX,
             y + 5,
             {
-                align: "center"
+                align:
+                    "center"
             }
         );
     }
@@ -1497,13 +1042,18 @@ function createPDF(
 
     const doc =
         new JsPDF({
-            orientation: "portrait",
-            unit: "mm",
-            format: "a4"
+            orientation:
+                "portrait",
+
+            unit:
+                "mm",
+
+            format:
+                "a4"
         });
 
 
-    let first =
+    let firstPage =
         true;
 
 
@@ -1513,18 +1063,16 @@ function createPDF(
         box++
     ) {
 
-        if (!first) {
-
+        if (!firstPage) {
             doc.addPage();
-
         }
 
 
-        first =
+        firstPage =
             false;
 
 
-        drawLabel(
+        drawPDFLabel(
             doc,
             po,
             box,
@@ -1538,7 +1086,7 @@ function createPDF(
 
 
 /* =========================================================
-   MERGED PDF
+   CREATE MERGED PDF
 ========================================================= */
 
 function createMergedPDF(
@@ -1554,13 +1102,18 @@ function createMergedPDF(
 
     const doc =
         new JsPDF({
-            orientation: "portrait",
-            unit: "mm",
-            format: "a4"
+            orientation:
+                "portrait",
+
+            unit:
+                "mm",
+
+            format:
+                "a4"
         });
 
 
-    let first =
+    let firstPage =
         true;
 
 
@@ -1572,16 +1125,16 @@ function createMergedPDF(
             box++
         ) {
 
-            if (!first) {
+            if (!firstPage) {
                 doc.addPage();
             }
 
 
-            first =
+            firstPage =
                 false;
 
 
-            drawLabel(
+            drawPDFLabel(
                 doc,
                 po,
                 box,
@@ -1597,139 +1150,53 @@ function createMergedPDF(
 
 
 /* =========================================================
-   DOWNLOAD
+   COCO OPTIONS
 ========================================================= */
 
-function downloadBlob(
-    blob,
-    filename
-) {
+function getCocoOptions() {
 
-    const url =
-        URL.createObjectURL(
-            blob
-        );
+    return {
 
-
-    const anchor =
-        document.createElement(
-            "a"
-        );
-
-
-    anchor.href =
-        url;
-
-    anchor.download =
-        filename;
-
-
-    document.body.appendChild(
-        anchor
-    );
-
-
-    anchor.click();
-
-
-    anchor.remove();
-
-
-    setTimeout(
-        () =>
-            URL.revokeObjectURL(
-                url
+        mode:
+            getPrintMode(
+                "#cocoPO",
+                "#cocoBox",
+                "#cocoPOBox"
             ),
-        1500
-    );
+
+        pageBorder:
+            $("#cocoPageBorder")
+                ?.checked === true,
+
+        poBorder:
+            $("#cocoPOBorder")
+                ?.checked === true,
+
+        boxBorder:
+            $("#cocoBoxBorder")
+                ?.checked === true,
+
+        combined:
+            $("#cocoCombinedBorder")
+                ?.checked === true,
+
+        cutting:
+            $("#cocoCut")
+                ?.checked === true,
+
+        scissor:
+            $("#cocoScissor")
+                ?.checked === true,
+
+        bold:
+            $("#cocoBold")
+                ?.checked === true
+    };
 }
 
 
 /* =========================================================
-   ZIP
-========================================================= */
-
-async function createZIP(
-    files,
-    filename
-) {
-
-    if (
-        typeof JSZip ===
-        "undefined"
-    ) {
-
-        throw new Error(
-            "ZIP library is not loaded. Please reload the page."
-        );
-    }
-
-
-    const zip =
-        new JSZip();
-
-
-    files.forEach(file => {
-
-        zip.file(
-            file.name,
-            file.blob
-        );
-
-    });
-
-
-    const blob =
-        await zip.generateAsync({
-            type: "blob",
-            compression: "DEFLATE",
-            compressionOptions: {
-                level: 6
-            }
-        });
-
-
-    downloadBlob(
-        blob,
-        filename
-    );
-}
-
-
-/* =========================================================
-   DOWNLOAD MODE
-========================================================= */
-
-function getDownloadMode(
-    zipSelector,
-    mergedSelector
-) {
-
-    const zip =
-        $(zipSelector)
-            ?.checked === true;
-
-    const merged =
-        $(mergedSelector)
-            ?.checked === true;
-
-
-    if (merged) {
-        return "merged";
-    }
-
-
-    if (zip) {
-        return "zip";
-    }
-
-
-    return "separate";
-}
-
-
-/* =========================================================
-   COCO GENERATOR
+   GENERATE COCO
 ========================================================= */
 
 async function generateCoco() {
@@ -1738,8 +1205,8 @@ async function generateCoco() {
 
         const range =
             getRange(
-                "#cocoStartBox",
-                "#cocoEndBox"
+                "#cocoStart",
+                "#cocoEnd"
             );
 
 
@@ -1750,9 +1217,9 @@ async function generateCoco() {
 
         if (
             !validatePrintMode(
-                "#cocoPrintPO",
-                "#cocoPrintBox",
-                "#cocoPrintPOBox"
+                "#cocoPO",
+                "#cocoBox",
+                "#cocoPOBox"
             )
         ) {
 
@@ -1767,11 +1234,9 @@ async function generateCoco() {
         if (!poList.length) {
 
             showToast(
-                "error",
-                "PO Number Required",
-                "Please enter at least one PO number."
+                "Please enter at least one PO number.",
+                "error"
             );
-
 
             return;
         }
@@ -1781,56 +1246,21 @@ async function generateCoco() {
             getCocoOptions();
 
 
-        const mode =
-            getDownloadMode(
-                "#cocoZIP",
-                "#cocoMergedPDF"
-            );
+        const merge =
+            $("#cocoMerge")
+                ?.checked === true;
+
+
+        const zip =
+            $("#cocoZIP")
+                ?.checked === true;
 
 
         /*
-         * ONE PDF
+         * MERGED PDF
          */
 
-        if (
-            poList.length === 1 &&
-            mode === "separate"
-        ) {
-
-            const doc =
-                createPDF(
-                    poList[0],
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `${safeFilename(
-                    poList[0]
-                )}_BOX_${range.start}-${range.end}.pdf`
-            );
-
-
-            showToast(
-                "success",
-                "PDF Downloaded",
-                "Your PO label PDF has been downloaded."
-            );
-
-
-            return;
-        }
-
-
-        /*
-         * MERGED
-         */
-
-        if (
-            mode === "merged"
-        ) {
+        if (merge) {
 
             const doc =
                 createMergedPDF(
@@ -1842,16 +1272,14 @@ async function generateCoco() {
 
 
             doc.save(
-                `BOOKSWAGON_MERGED_${Date.now()}.pdf`
+                "BOOKSWAGON_MERGED_PO_LABELS.pdf"
             );
 
 
             showToast(
-                "success",
-                "Merged PDF Downloaded",
-                "All selected PO labels are in one PDF."
+                "Merged PDF downloaded successfully.",
+                "success"
             );
-
 
             return;
         }
@@ -1861,12 +1289,94 @@ async function generateCoco() {
          * ZIP
          */
 
-        const files = [];
-
-
-        for (
-            const po of poList
+        if (
+            zip &&
+            typeof JSZip !==
+                "undefined"
         ) {
+
+            const zipFile =
+                new JSZip();
+
+
+            poList.forEach(po => {
+
+                const doc =
+                    createPDF(
+                        po,
+                        range.start,
+                        range.end,
+                        options
+                    );
+
+
+                zipFile.file(
+                    `${safeFilename(po)}_BOX_${range.start}-${range.end}.pdf`,
+                    doc.output("blob")
+                );
+
+            });
+
+
+            const blob =
+                await zipFile.generateAsync({
+                    type: "blob"
+                });
+
+
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            const anchor =
+                document.createElement(
+                    "a"
+                );
+
+
+            anchor.href =
+                url;
+
+            anchor.download =
+                "BOOKSWAGON_PO_LABELS.zip";
+
+
+            document.body.appendChild(
+                anchor
+            );
+
+
+            anchor.click();
+
+
+            anchor.remove();
+
+
+            setTimeout(
+                () =>
+                    URL.revokeObjectURL(
+                        url
+                    ),
+                1000
+            );
+
+
+            showToast(
+                "ZIP downloaded successfully.",
+                "success"
+            );
+
+            return;
+        }
+
+
+        /*
+         * SEPARATE PDF
+         */
+
+        poList.forEach(po => {
 
             const doc =
                 createPDF(
@@ -1877,55 +1387,81 @@ async function generateCoco() {
                 );
 
 
-            files.push({
+            doc.save(
+                `${safeFilename(po)}_BOX_${range.start}-${range.end}.pdf`
+            );
 
-                name:
-                    `${safeFilename(
-                        po
-                    )}_BOX_${range.start}-${range.end}.pdf`,
-
-                blob:
-                    doc.output(
-                        "blob"
-                    )
-
-            });
-
-        }
-
-
-        await createZIP(
-            files,
-            `BOOKSWAGON_PO_LABELS_${Date.now()}.zip`
-        );
+        });
 
 
         showToast(
-            "success",
-            "ZIP Downloaded",
-            `${files.length} PDF file(s) were packed into one ZIP.`
+            `${poList.length} PDF file(s) generated.`,
+            "success"
         );
 
     } catch (error) {
 
         console.error(
-            "CocoBlue error:",
+            "CocoBlue:",
             error
         );
 
 
         showToast(
-            "error",
-            "Generation Failed",
             error.message ||
-            "Unable to generate the PDF."
+            "PDF generation failed.",
+            "error"
         );
     }
 }
 
 
 /* =========================================================
-   OTHER PO GENERATOR
+   OTHER OPTIONS
+========================================================= */
+
+function getOtherOptions() {
+
+    return {
+
+        mode:
+            getPrintMode(
+                "#otherPO",
+                "#otherBox",
+                "#otherPOBox"
+            ),
+
+        pageBorder:
+            $("#otherPageBorder")
+                ?.checked === true,
+
+        poBorder:
+            $("#otherPOBorder")
+                ?.checked === true,
+
+        boxBorder:
+            $("#otherBoxBorder")
+                ?.checked === true,
+
+        combined:
+            $("#otherCombined")
+                ?.checked === true,
+
+        cutting:
+            $("#otherCut")
+                ?.checked === true,
+
+        scissor:
+            true,
+
+        bold:
+            true
+    };
+}
+
+
+/* =========================================================
+   GENERATE OTHER PO
 ========================================================= */
 
 async function generateOther() {
@@ -1934,8 +1470,8 @@ async function generateOther() {
 
         const range =
             getRange(
-                "#otherStartBox",
-                "#otherEndBox"
+                "#otherStart",
+                "#otherEnd"
             );
 
 
@@ -1946,9 +1482,9 @@ async function generateOther() {
 
         if (
             !validatePrintMode(
-                "#otherPrintPO",
-                "#otherPrintBox",
-                "#otherPrintPOBox"
+                "#otherPO",
+                "#otherBox",
+                "#otherPOBox"
             )
         ) {
 
@@ -1963,11 +1499,9 @@ async function generateOther() {
         if (!poList.length) {
 
             showToast(
-                "error",
-                "PO Number Required",
-                "Please enter at least one PO number."
+                "Please enter at least one PO number.",
+                "error"
             );
-
 
             return;
         }
@@ -1977,47 +1511,9 @@ async function generateOther() {
             getOtherOptions();
 
 
-        const mode =
-            getDownloadMode(
-                "#otherZIP",
-                "#otherMergedPDF"
-            );
-
-
         if (
-            poList.length === 1 &&
-            mode === "separate"
-        ) {
-
-            const doc =
-                createPDF(
-                    poList[0],
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `${safeFilename(
-                    poList[0]
-                )}_BOX_${range.start}-${range.end}.pdf`
-            );
-
-
-            showToast(
-                "success",
-                "PDF Downloaded",
-                "Your PDF has been downloaded."
-            );
-
-
-            return;
-        }
-
-
-        if (
-            mode === "merged"
+            $("#otherMerge")
+                ?.checked === true
         ) {
 
             const doc =
@@ -2030,27 +1526,20 @@ async function generateOther() {
 
 
             doc.save(
-                `BOOKSWAGON_OTHER_PO_MERGED_${Date.now()}.pdf`
+                "BOOKSWAGON_OTHER_PO_MERGED.pdf"
             );
 
 
             showToast(
-                "success",
-                "Merged PDF Downloaded",
-                "All Other PO labels are in one PDF."
+                "Merged Other PO PDF downloaded.",
+                "success"
             );
-
 
             return;
         }
 
 
-        const files = [];
-
-
-        for (
-            const po of poList
-        ) {
+        poList.forEach(po => {
 
             const doc =
                 createPDF(
@@ -2061,55 +1550,80 @@ async function generateOther() {
                 );
 
 
-            files.push({
+            doc.save(
+                `${safeFilename(po)}_OTHER_PO.pdf`
+            );
 
-                name:
-                    `${safeFilename(
-                        po
-                    )}_BOX_${range.start}-${range.end}.pdf`,
-
-                blob:
-                    doc.output(
-                        "blob"
-                    )
-
-            });
-
-        }
-
-
-        await createZIP(
-            files,
-            `BOOKSWAGON_OTHER_PO_${Date.now()}.zip`
-        );
+        });
 
 
         showToast(
-            "success",
-            "ZIP Downloaded",
-            `${files.length} PDF file(s) packed into ZIP.`
+            "Other PO PDF(s) generated.",
+            "success"
         );
 
     } catch (error) {
 
         console.error(
-            "Other PO error:",
+            "Other PO:",
             error
         );
 
 
         showToast(
-            "error",
-            "Generation Failed",
             error.message ||
-            "Unable to generate the PDF."
+            "Other PO generation failed.",
+            "error"
         );
     }
 }
 
 
 /* =========================================================
-   SBMO GENERATOR
+   SBMO OPTIONS
+========================================================= */
+
+function getSBMOOptions() {
+
+    return {
+
+        mode:
+            getPrintMode(
+                "#sbmoPO",
+                "#sbmoBox",
+                "#sbmoPOBox"
+            ),
+
+        pageBorder:
+            $("#sbmoPageBorder")
+                ?.checked === true,
+
+        poBorder:
+            $("#sbmoPOBorder")
+                ?.checked === true,
+
+        boxBorder:
+            $("#sbmoBoxBorder")
+                ?.checked === true,
+
+        combined:
+            false,
+
+        cutting:
+            $("#sbmoCut")
+                ?.checked === true,
+
+        scissor:
+            true,
+
+        bold:
+            true
+    };
+}
+
+
+/* =========================================================
+   GENERATE SBMO
 ========================================================= */
 
 async function generateSBMO() {
@@ -2118,8 +1632,8 @@ async function generateSBMO() {
 
         const range =
             getRange(
-                "#sbmoStartBox",
-                "#sbmoEndBox"
+                "#sbmoStart",
+                "#sbmoEnd"
             );
 
 
@@ -2130,9 +1644,9 @@ async function generateSBMO() {
 
         if (
             !validatePrintMode(
-                "#sbmoPrintPO",
-                "#sbmoPrintBox",
-                "#sbmoPrintPOBox"
+                "#sbmoPO",
+                "#sbmoBox",
+                "#sbmoPOBox"
             )
         ) {
 
@@ -2141,17 +1655,15 @@ async function generateSBMO() {
 
 
         const poList =
-            getSBMOPos();
+            getSBMOPOs();
 
 
         if (!poList.length) {
 
             showToast(
-                "error",
-                "PO Number Required",
-                "Please enter at least one PO number."
+                "Please enter at least one PO number.",
+                "error"
             );
-
 
             return;
         }
@@ -2161,47 +1673,9 @@ async function generateSBMO() {
             getSBMOOptions();
 
 
-        const mode =
-            getDownloadMode(
-                "#sbmoZIP",
-                "#sbmoMergedPDF"
-            );
-
-
         if (
-            poList.length === 1 &&
-            mode === "separate"
-        ) {
-
-            const doc =
-                createPDF(
-                    poList[0],
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `${safeFilename(
-                    poList[0]
-                )}_SBMO_BOX_${range.start}-${range.end}.pdf`
-            );
-
-
-            showToast(
-                "success",
-                "SBMO PDF Downloaded",
-                "The SBMO PDF has been downloaded."
-            );
-
-
-            return;
-        }
-
-
-        if (
-            mode === "merged"
+            $("#sbmoMerge")
+                ?.checked === true
         ) {
 
             const doc =
@@ -2214,27 +1688,20 @@ async function generateSBMO() {
 
 
             doc.save(
-                `BOOKSWAGON_SBMO_MERGED_${Date.now()}.pdf`
+                "BOOKSWAGON_SBMO_MERGED.pdf"
             );
 
 
             showToast(
-                "success",
-                "Merged PDF Downloaded",
-                "All SBMO labels are in one PDF."
+                "SBMO merged PDF downloaded.",
+                "success"
             );
-
 
             return;
         }
 
 
-        const files = [];
-
-
-        for (
-            const po of poList
-        ) {
+        poList.forEach(po => {
 
             const doc =
                 createPDF(
@@ -2245,461 +1712,199 @@ async function generateSBMO() {
                 );
 
 
-            files.push({
-
-                name:
-                    `${safeFilename(
-                        po
-                    )}_SBMO_BOX_${range.start}-${range.end}.pdf`,
-
-                blob:
-                    doc.output(
-                        "blob"
-                    )
-
-            });
-
-        }
-
-
-        await createZIP(
-            files,
-            `BOOKSWAGON_SBMO_${Date.now()}.zip`
-        );
-
-
-        showToast(
-            "success",
-            "ZIP Downloaded",
-            `${files.length} SBMO PDF file(s) packed into ZIP.`
-        );
-
-    } catch (error) {
-
-        console.error(
-            "SBMO error:",
-            error
-        );
-
-
-        showToast(
-            "error",
-            "Generation Failed",
-            error.message ||
-            "Unable to generate SBMO PDF."
-        );
-    }
-}
-
-
-/* =========================================================
-   ADDRESS PDF
-========================================================= */
-
-function generateAddressPDF() {
-
-    try {
-
-        const JsPDF =
-            getPDFConstructor();
-
-
-        const doc =
-            new JsPDF({
-                orientation: "portrait",
-                unit: "mm",
-                format: "a4"
-            });
-
-
-        const width =
-            doc.internal.pageSize
-                .getWidth();
-
-
-        const height =
-            doc.internal.pageSize
-                .getHeight();
-
-
-        doc.setDrawColor(
-            17,
-            24,
-            39
-        );
-
-        doc.setLineWidth(
-            .8
-        );
-
-
-        doc.rect(
-            10,
-            10,
-            width - 20,
-            height - 20
-        );
-
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
-        doc.setFontSize(
-            18
-        );
-
-
-        doc.text(
-            "BOOKSWAGON OFFICE",
-            width / 2,
-            32,
-            {
-                align:
-                    "center"
-            }
-        );
-
-
-        doc.setFont(
-            "helvetica",
-            "normal"
-        );
-
-        doc.setFontSize(
-            11
-        );
-
-
-        const lines =
-            doc.splitTextToSize(
-                CONFIG.address,
-                width - 50
+            doc.save(
+                `${safeFilename(po)}_SBMO.pdf`
             );
-
-
-        doc.text(
-            lines,
-            25,
-            55
-        );
-
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
-        doc.text(
-            "Email:",
-            25,
-            82
-        );
-
-
-        doc.setFont(
-            "helvetica",
-            "normal"
-        );
-
-        doc.text(
-            CONFIG.email,
-            45,
-            82
-        );
-
-
-        doc.save(
-            "BOOKSWAGON_OFFICE_ADDRESS.pdf"
-        );
-
-
-        showToast(
-            "success",
-            "Address PDF Downloaded",
-            "The office address PDF has been downloaded."
-        );
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-
-        showToast(
-            "error",
-            "Address PDF Failed",
-            error.message
-        );
-    }
-}
-
-
-/* =========================================================
-   EXCEL IMPORT
-========================================================= */
-
-async function importExcelFile(
-    file
-) {
-
-    if (!file) {
-        return [];
-    }
-
-
-    if (
-        typeof XLSX ===
-        "undefined"
-    ) {
-
-        throw new Error(
-            "Excel library is not loaded."
-        );
-    }
-
-
-    const buffer =
-        await file.arrayBuffer();
-
-
-    const workbook =
-        XLSX.read(
-            buffer,
-            {
-                type: "array"
-            }
-        );
-
-
-    const sheet =
-        workbook.Sheets[
-            workbook.SheetNames[0]
-        ];
-
-
-    if (!sheet) {
-        return [];
-    }
-
-
-    const rows =
-        XLSX.utils.sheet_to_json(
-            sheet,
-            {
-                header: 1,
-                defval: ""
-            }
-        );
-
-
-    const values = [];
-
-
-    rows.forEach(row => {
-
-        if (!Array.isArray(row)) {
-            return;
-        }
-
-
-        row.forEach(cell => {
-
-            const value =
-                String(cell || "")
-                    .trim();
-
-
-            if (value) {
-
-                values.push(
-                    value
-                );
-
-            }
 
         });
 
-    });
 
+        showToast(
+            "SBMO PDF(s) generated.",
+            "success"
+        );
 
-    return unique(values);
-}
+    } catch (error) {
 
-
-function setupExcelImport() {
-
-    $("#cocoExcel")
-        ?.addEventListener(
-            "change",
-            async event => {
-
-                try {
-
-                    const values =
-                        await importExcelFile(
-                            event.target.files[0]
-                        );
-
-
-                    $$(".coco-po")
-                        .forEach(
-                            (input, index) => {
-
-                                input.value =
-                                    values[index] ||
-                                    "";
-
-                            }
-                        );
-
-
-                    const status =
-                        $("#cocoExcelStatus");
-
-
-                    if (status) {
-
-                        status.textContent =
-                            `${Math.min(
-                                values.length,
-                                CONFIG.maxPOFields
-                            )} PO(s) loaded.`;
-
-                    }
-
-
-                    updateAllPreviews();
-
-                } catch (error) {
-
-                    showToast(
-                        "error",
-                        "Excel Import Failed",
-                        error.message
-                    );
-
-                }
-
-            }
+        console.error(
+            "SBMO:",
+            error
         );
 
 
-    $("#otherExcel")
-        ?.addEventListener(
-            "change",
-            async event => {
-
-                try {
-
-                    const values =
-                        await importExcelFile(
-                            event.target.files[0]
-                        );
+        showToast(
+            error.message ||
+            "SBMO generation failed.",
+            "error"
+        );
+    }
+}
 
 
-                    $$(".other-po")
-                        .forEach(
-                            (input, index) => {
+/* =========================================================
+   SAFE FILE NAME
+========================================================= */
 
-                                input.value =
-                                    values[index] ||
-                                    "";
+function safeFilename(value) {
 
-                            }
-                        );
-
-
-                    updateAllPreviews();
-
-                } catch (error) {
-
-                    showToast(
-                        "error",
-                        "Excel Import Failed",
-                        error.message
-                    );
-
-                }
-
-            }
+    return String(value || "PO")
+        .replace(
+            /[<>:"/\\|?*\x00-\x1F]/g,
+            "_"
+        )
+        .replace(
+            /\s+/g,
+            "_"
+        )
+        .slice(
+            0,
+            100
         );
 }
 
 
 /* =========================================================
-   QR CODE
+   RESET
 ========================================================= */
 
-function createQR(
-    elementId,
-    value
+function resetWorkspace(
+    workspaceSelector
 ) {
 
-    const element =
-        document.getElementById(
-            elementId
-        );
+    const workspace =
+        $(workspaceSelector);
 
 
-    if (
-        !element ||
-        typeof QRCode ===
-        "undefined"
-    ) {
-
+    if (!workspace) {
         return;
     }
 
 
-    element.innerHTML =
-        "";
+    /*
+     * Text inputs
+     */
+
+    $$(
+        'input[type="text"]',
+        workspace
+    )
+    .forEach(input => {
+
+        input.value =
+            "";
+
+    });
 
 
-    new QRCode(
-        element,
-        {
-            text: value,
-            width: 140,
-            height: 140,
-            correctLevel:
-                QRCode.CorrectLevel.M
+    /*
+     * Textareas
+     */
+
+    $$(
+        "textarea",
+        workspace
+    )
+    .forEach(textarea => {
+
+        textarea.value =
+            "";
+
+    });
+
+
+    /*
+     * Checkboxes
+     */
+
+    $$(
+        'input[type="checkbox"]',
+        workspace
+    )
+    .forEach(checkbox => {
+
+        checkbox.checked =
+            false;
+
+    });
+
+
+    /*
+     * Number inputs
+     */
+
+    $$(
+        'input[type="number"]',
+        workspace
+    )
+    .forEach(input => {
+
+        if (
+            input.id
+                .toLowerCase()
+                .includes("end")
+        ) {
+
+            input.value =
+                "200";
+
+        } else {
+
+            input.value =
+                "1";
         }
-    );
-}
+
+    });
 
 
-function setupQRCodes() {
-
-    createQR(
-        "addressQR",
-        CONFIG.mapsURL
-    );
+    updatePreviews();
 
 
-    createQR(
-        "emailQR",
-        `mailto:${CONFIG.email}`
-    );
-
-
-    createQR(
-        "footerAddressQR",
-        CONFIG.mapsURL
-    );
-
-
-    createQR(
-        "footerEmailQR",
-        `mailto:${CONFIG.email}`
+    showToast(
+        "Tool has been reset.",
+        "success"
     );
 }
 
 
 /* =========================================================
-   BUTTONS
+   RESET BUTTONS
+========================================================= */
+
+function setupResetButtons() {
+
+    $("#cocoReset")
+        ?.addEventListener(
+            "click",
+            () =>
+                resetWorkspace(
+                    "#cocoWorkspace"
+                )
+        );
+
+
+    $("#otherReset")
+        ?.addEventListener(
+            "click",
+            () =>
+                resetWorkspace(
+                    "#otherWorkspace"
+                )
+        );
+
+
+    $("#sbmoReset")
+        ?.addEventListener(
+            "click",
+            () =>
+                resetWorkspace(
+                    "#sbmoWorkspace"
+                )
+        );
+}
+
+
+/* =========================================================
+   GENERATE BUTTONS
 ========================================================= */
 
 function setupGenerateButtons() {
@@ -2727,167 +1932,203 @@ function setupGenerateButtons() {
 
 
 /* =========================================================
-   LIVE PREVIEW
+   EXCEL IMPORT
 ========================================================= */
 
-function setupLivePreview() {
+function setupExcel() {
 
-    document.addEventListener(
-        "input",
-        event => {
+    $("#cocoExcel")
+        ?.addEventListener(
+            "change",
+            async event => {
 
-            if (
-                event.target.matches(
-                    "input, textarea, select"
-                )
-            ) {
+                const file =
+                    event.target.files?.[0];
 
-                updateAllPreviews();
+
+                if (!file) {
+                    return;
+                }
+
+
+                try {
+
+                    if (
+                        typeof XLSX ===
+                        "undefined"
+                    ) {
+
+                        throw new Error(
+                            "Excel library is not loaded."
+                        );
+                    }
+
+
+                    const buffer =
+                        await file.arrayBuffer();
+
+
+                    const workbook =
+                        XLSX.read(
+                            buffer,
+                            {
+                                type:
+                                    "array"
+                            }
+                        );
+
+
+                    const sheet =
+                        workbook.Sheets[
+                            workbook.SheetNames[0]
+                        ];
+
+
+                    const rows =
+                        XLSX.utils.sheet_to_json(
+                            sheet,
+                            {
+                                header:
+                                    1,
+
+                                defval:
+                                    ""
+                            }
+                        );
+
+
+                    const values =
+                        rows
+                            .flat()
+                            .map(
+                                value =>
+                                    String(
+                                        value
+                                    ).trim()
+                            )
+                            .filter(Boolean);
+
+
+                    $$(".coco-po")
+                        .forEach(
+                            (input, index) => {
+
+                                input.value =
+                                    values[index] ||
+                                    "";
+
+                            }
+                        );
+
+
+                    updatePreviews();
+
+
+                    showToast(
+                        `${Math.min(values.length, 20)} PO(s) imported.`,
+                        "success"
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+
+                    showToast(
+                        error.message ||
+                        "Excel import failed.",
+                        "error"
+                    );
+                }
 
             }
-
-        }
-    );
-
-
-    document.addEventListener(
-        "change",
-        event => {
-
-            if (
-                event.target.matches(
-                    "input, textarea, select"
-                )
-            ) {
-
-                updateAllPreviews();
-
-            }
-
-        }
-    );
+        );
 }
 
 
 /* =========================================================
-   RESET
+   QR CODE
 ========================================================= */
 
-function resetWorkspace(
-    workspace
+function generateQR(
+    elementId,
+    value
 ) {
 
-    if (!workspace) {
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!element) {
         return;
     }
 
 
-    /*
-     * Text fields
-     */
+    if (
+        typeof QRCode ===
+        "undefined"
+    ) {
 
-    $$(
-        'input[type="text"], textarea',
-        workspace
-    )
-    .forEach(input => {
+        console.warn(
+            "QRCode library not loaded."
+        );
 
-        input.value =
-            "";
-
-    });
+        return;
+    }
 
 
-    /*
-     * Number fields
-     */
+    element.innerHTML =
+        "";
 
-    $$(
-        'input[type="number"]',
-        workspace
-    )
-    .forEach(input => {
 
-        if (
-            input.id.toLowerCase()
-                .includes("end")
-        ) {
+    new QRCode(
+        element,
+        {
+            text:
+                value,
 
-            input.value =
-                "200";
+            width:
+                135,
 
-        } else {
+            height:
+                135,
 
-            input.value =
-                "1";
-
+            correctLevel:
+                QRCode.CorrectLevel.M
         }
-
-    });
-
-
-    /*
-     * Checkbox reset.
-     *
-     * IMPORTANT:
-     * We directly reset state here.
-     * Reset is not a feature toggle.
-     */
-
-    $$(
-        'input[type="checkbox"]',
-        workspace
-    )
-    .forEach(input => {
-
-        input.checked =
-            false;
-
-    });
-
-
-    updateAllPreviews();
-
-
-    showToast(
-        "success",
-        "Reset Complete",
-        "The selected tool has been reset."
     );
 }
 
 
-function setupResetButtons() {
+function setupQRCodes() {
 
-    $$("[data-reset]")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const workspace =
-                        button.closest(
-                            ".tool-workspace"
-                        );
+    generateQR(
+        "addressQR",
+        CONFIG.maps
+    );
 
 
-                    resetWorkspace(
-                        workspace
-                    );
-
-                }
-            );
-
-        });
+    generateQR(
+        "emailQR",
+        `mailto:${CONFIG.email}`
+    );
 }
 
 
 /* =========================================================
-   RELOAD → BOTTOM
+   RELOAD / SCROLL
 ========================================================= */
 
-function setupReloadPosition() {
+function setupScrollBehavior() {
+
+    /*
+     * Don't force the page to bottom on every load.
+     * Browser navigation remains normal.
+     */
 
     if (
         "scrollRestoration"
@@ -2895,57 +2136,7 @@ function setupReloadPosition() {
     ) {
 
         history.scrollRestoration =
-            "manual";
-    }
-
-
-    /*
-     * Remove old #tools hash.
-     */
-
-    if (
-        window.location.hash
-    ) {
-
-        history.replaceState(
-            null,
-            "",
-            window.location.pathname +
-            window.location.search
-        );
-    }
-
-
-    const navigation =
-        performance
-            .getEntriesByType(
-                "navigation"
-            )[0];
-
-
-    if (
-        navigation &&
-        navigation.type === "reload"
-    ) {
-
-        setTimeout(
-            () => {
-
-                window.scrollTo({
-                    top:
-                        document.documentElement
-                            .scrollHeight,
-
-                    left: 0,
-
-                    behavior:
-                        "instant"
-                });
-
-            },
-            300
-        );
-
+            "auto";
     }
 }
 
@@ -2956,47 +2147,63 @@ function setupReloadPosition() {
 
 function init() {
 
-    setupCheckboxStateTracking();
+    setupCheckboxes();
 
-    setupToolNavigation();
+    setupToolCards();
 
-    setupCocoTabs();
+    setupCloseButtons();
 
-    setupOtherTabs();
+    setupTabs();
 
-    setupExcelImport();
-
-    setupQRCodes();
-
-    setupGenerateButtons();
-
-    setupLivePreview();
+    setupLiveUpdates();
 
     setupResetButtons();
 
-    updateAllPreviews();
+    setupGenerateButtons();
 
-    setupReloadPosition();
+    setupExcel();
+
+    setupQRCodes();
+
+    setupScrollBehavior();
+
+    updatePreviews();
 
 
     console.log(
-        "BooksWagon Label Studio initialized."
+        "================================"
     );
 
     console.log(
-        "✓ 20 manual PO fields"
+        "BooksWagon Pages Label Studio"
     );
 
     console.log(
-        "✓ Comma-separated PO input"
+        "FINAL JS LOADED"
+    );
+
+    console.log(
+        "✓ Simple checkboxes"
+    );
+
+    console.log(
+        "✓ Enable / Disable toast"
+    );
+
+    console.log(
+        "✓ No confirmation dialog"
+    );
+
+    console.log(
+        "✓ 20 PO fields"
+    );
+
+    console.log(
+        "✓ Bulk PO input"
     );
 
     console.log(
         "✓ Unlimited box range"
-    );
-
-    console.log(
-        "✓ PO / Box / PO + Box"
     );
 
     console.log(
@@ -3013,6 +2220,10 @@ function init() {
 
     console.log(
         "✓ Page border"
+    );
+
+    console.log(
+        "✓ Cutting line"
     );
 
     console.log(
@@ -3036,9 +2247,8 @@ function init() {
     );
 
     console.log(
-        "✓ Confirmation handled by HTML"
+        "================================"
     );
-
 }
 
 
@@ -3062,5 +2272,4 @@ if (
 } else {
 
     init();
-
 }
