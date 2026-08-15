@@ -1,2400 +1,1076 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<meta
-    name="description"
-    content="BooksWagon Label Studio - PO and Box Label Generator"
->
-
-<title>BooksWagon Label Studio</title>
-
-<!-- =====================================================
-     LIBRARIES
-===================================================== -->
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-
-<!-- =====================================================
-     BASIC STYLES
-===================================================== -->
-
-<style>
-
-* {
-    box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    margin: 0;
-    font-family:
-        Inter,
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    background: #f6f8fb;
-    color: #101828;
-}
-
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-.header {
-    position: sticky;
-    top: 0;
-    z-index: 5000;
-
-    background: #ffffff;
-    border-bottom: 1px solid #e4e7ec;
-
-    padding: 14px 22px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.logo {
-    font-size: 18px;
-    font-weight: 900;
-    color: #1264f5;
-}
-
-.logo span {
-    color: #101828;
-}
-
-.header-right {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-
-/* =====================================================
-   MAIN
-===================================================== */
-
-.container {
-    width: min(1180px, calc(100% - 30px));
-    margin: 0 auto;
-}
-
-.hero {
-    padding: 42px 0 25px;
-}
-
-.hero h1 {
-    margin: 0 0 8px;
-    font-size: clamp(28px, 5vw, 48px);
-    font-weight: 950;
-}
-
-.hero p {
-    margin: 0;
-    color: #667085;
-    line-height: 1.6;
-}
-
-
-/* =====================================================
-   TOOL GRID
-===================================================== */
-
-.tool-grid {
-    display: grid;
-    grid-template-columns:
-        repeat(auto-fit, minmax(220px, 1fr));
-
-    gap: 15px;
-}
-
-.tool-card {
-    background: #ffffff;
-    border: 1px solid #e4e7ec;
-    border-radius: 16px;
-    padding: 20px;
-
-    cursor: pointer;
-
-    transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        border-color .18s ease;
-}
-
-.tool-card:hover {
-    transform: translateY(-2px);
-    border-color: #b2ddff;
-    box-shadow:
-        0 12px 30px rgba(16, 24, 40, .08);
-}
-
-.tool-card h3 {
-    margin: 0 0 6px;
-}
-
-.tool-card p {
-    margin: 0;
-    color: #667085;
-    font-size: 12px;
-}
-
-
-/* =====================================================
-   WORKSPACE
-===================================================== */
-
-.tool-workspace {
-    display: none;
-    margin: 30px 0;
-}
-
-.tool-workspace.active {
-    display: block;
-}
-
-.workspace-card {
-    background: #ffffff;
-    border: 1px solid #e4e7ec;
-    border-radius: 18px;
-    padding: 22px;
-    box-shadow:
-        0 10px 30px rgba(16, 24, 40, .05);
-}
-
-.workspace-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    align-items: flex-start;
-    margin-bottom: 22px;
-}
-
-.workspace-header h2 {
-    margin: 0 0 5px;
-}
-
-.workspace-header p {
-    margin: 0;
-    color: #667085;
-    font-size: 12px;
-}
-
-
-/* =====================================================
-   SECTIONS
-===================================================== */
-
-.section {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #eaecf0;
-}
-
-.section h3 {
-    margin: 0 0 12px;
-    font-size: 15px;
-}
-
-
-/* =====================================================
-   INPUT GRID
-===================================================== */
-
-.input-grid {
-    display: grid;
-    grid-template-columns:
-        repeat(auto-fit, minmax(180px, 1fr));
-
-    gap: 12px;
-}
-
-.field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.field label {
-    font-size: 11px;
-    font-weight: 800;
-    color: #344054;
-}
-
-input,
-textarea,
-select {
-    width: 100%;
-
-    min-height: 40px;
-
-    border:
-        1px solid #d0d5dd;
-
-    border-radius: 9px;
-
-    padding: 9px 11px;
-
-    background: #ffffff;
-
-    color: #101828;
-
-    outline: none;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-    border-color: #1264f5;
-
-    box-shadow:
-        0 0 0 3px rgba(18, 100, 245, .10);
-}
-
-
-/* =====================================================
-   BUTTONS
-===================================================== */
-
-button {
-    border: 0;
-    cursor: pointer;
-    font: inherit;
-}
-
-.btn {
-    min-height: 40px;
-    padding: 0 15px;
-
-    border-radius: 9px;
-
-    font-size: 11px;
-    font-weight: 850;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 6px;
-}
-
-.btn-primary {
-    background: #1264f5;
-    color: #ffffff;
-}
-
-.btn-primary:hover {
-    background: #0b55d4;
-}
-
-.btn-secondary {
-    background: #ffffff;
-    color: #344054;
-    border: 1px solid #d0d5dd;
-}
-
-.btn-danger {
-    background: #f04438;
-    color: #ffffff;
-}
-
-
-/* =====================================================
-   CHECKBOX SYSTEM
-===================================================== */
-
-.checkbox-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(220px, 1fr));
-
-    gap: 9px;
-}
-
-
-.check-row {
-    position: relative;
-
-    display: flex;
-    align-items: center;
-
-    gap: 10px;
-
-    min-height: 45px;
-
-    padding: 9px 11px;
-
-    border: 1px solid #e4e7ec;
-
-    border-radius: 10px;
-
-    background: #ffffff;
-
-    cursor: pointer;
-
-    user-select: none;
-}
-
-.check-row:hover {
-    border-color: #b2ddff;
-}
-
-.check-row input[type="checkbox"] {
-    appearance: none;
-
-    width: 18px;
-    height: 18px;
-
-    min-height: 18px;
-
-    flex: 0 0 18px;
-
-    padding: 0;
-
-    border:
-        2px solid #98a2b3;
-
-    border-radius: 5px;
-
-    background: #ffffff;
-
-    cursor: pointer;
-
-    position: relative;
-}
-
-.check-row input[type="checkbox"]:checked {
-    background: #1264f5;
-    border-color: #1264f5;
-}
-
-.check-row input[type="checkbox"]:checked::after {
-    content: "✓";
-
-    position: absolute;
-
-    inset: 0;
-
-    display: grid;
-    place-items: center;
-
-    color: #ffffff;
-
-    font-size: 12px;
-    font-weight: 950;
-}
-
-.check-row span {
-    font-size: 11px;
-    font-weight: 800;
-    color: #344054;
-}
-
-
-/* =====================================================
-   MANUAL PO GRID
-===================================================== */
-
-.po-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fill, minmax(160px, 1fr));
-
-    gap: 8px;
-
-    max-height: 420px;
-
-    overflow-y: auto;
-
-    padding-right: 4px;
-}
-
-.po-grid input {
-    font-size: 11px;
-}
-
-
-/* =====================================================
-   INPUT MODE TABS
-===================================================== */
-
-.input-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    margin-bottom: 13px;
-}
-
-.input-tab {
-    padding: 9px 13px;
-
-    border:
-        1px solid #d0d5dd;
-
-    background: #ffffff;
-
-    border-radius: 8px;
-
-    font-size: 11px;
-    font-weight: 850;
-
-    cursor: pointer;
-}
-
-.input-tab.active {
-    background: #1264f5;
-    color: #ffffff;
-    border-color: #1264f5;
-}
-
-
-/* =====================================================
-   HIDDEN
-===================================================== */
-
-.hidden {
-    display: none !important;
-}
-
-
-/* =====================================================
-   PREVIEW
-===================================================== */
-
-.preview-area {
-    display: grid;
-
-    grid-template-columns:
-        minmax(260px, 1fr)
-        minmax(260px, 1fr);
-
-    gap: 18px;
-}
-
-.preview-page {
-    min-height: 330px;
-
-    background: #ffffff;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 25px;
-
-    border: 1.5px solid #101828;
-
-    box-shadow:
-        0 10px 30px rgba(16,24,40,.08);
-}
-
-.dynamic-label-preview {
-    width: 88%;
-    min-height: 210px;
-
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-
-    gap: 15px;
-
-    padding: 20px;
-}
-
-.preview-item-border,
-.preview-box-number {
-    display: inline-flex;
-
-    min-width: 150px;
-
-    min-height: 42px;
-
-    padding: 9px 18px;
-
-    align-items: center;
-    justify-content: center;
-
-    border: 2px solid #111827;
-
-    border-radius: 2px;
-
-    font-weight: 900;
-}
-
-.preview-dotted-line {
-    width: 100%;
-
-    color: #111827;
-
-    letter-spacing: 2px;
-
-    font-weight: 800;
-
-    white-space: nowrap;
-}
-
-.has-outer-border {
-    border: 3px double #111827;
-}
-
-
-/* =====================================================
-   ADDRESS
-===================================================== */
-
-.address-section {
-    margin-top: 45px;
-
-    padding: 30px;
-
-    background: #ffffff;
-
-    border:
-        1px solid #e4e7ec;
-
-    border-radius: 18px;
-}
-
-.address-layout {
-    display: grid;
-
-    grid-template-columns:
-        1.5fr
-        1fr;
-
-    gap: 25px;
-}
-
-.address-link {
-    color: #1264f5;
-
-    font-weight: 800;
-
-    text-decoration: none;
-}
-
-.address-link:hover {
-    text-decoration: underline;
-}
-
-.contact-block {
-    margin-top: 18px;
-}
-
-.contact-block strong {
-    display: block;
-
-    margin-bottom: 5px;
-}
-
-.qr-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(140px, 1fr));
-
-    gap: 20px;
-}
-
-.qr-card {
-    text-align: center;
-
-    border:
-        1px solid #e4e7ec;
-
-    border-radius: 14px;
-
-    padding: 15px;
-
-    background: #ffffff;
-}
-
-.qr-card h4 {
-    margin: 0 0 12px;
-
-    font-size: 12px;
-}
-
-.qr-box {
-    width: 150px;
-    height: 150px;
-
-    margin: auto;
-
-    display: grid;
-    place-items: center;
-}
-
-.qr-label {
-    margin-top: 10px;
-
-    font-size: 10px;
-
-    color: #667085;
-
-    font-weight: 750;
-}
-
-
-/* =====================================================
-   FOOTER
-===================================================== */
-
-.footer {
-    margin-top: 45px;
-
-    padding: 30px 0 60px;
-
-    border-top:
-        1px solid #e4e7ec;
-
-    color: #667085;
-
-    font-size: 11px;
-}
-
-.footer-layout {
-    display: flex;
-
-    justify-content: space-between;
-
-    gap: 20px;
-
-    flex-wrap: wrap;
-}
-
-
-/* =====================================================
-   TOAST
-===================================================== */
-
-#toastContainer {
-    position: fixed;
-
-    top: 20px;
-    right: 20px;
-
-    z-index: 100000;
-
-    width:
-        min(370px, calc(100vw - 30px));
-
-    pointer-events: none;
-}
-
-
-/* =====================================================
-   CONFIRM MODAL
-===================================================== */
-
-#featureConfirmModal {
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 99999;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 20px;
-
-    background:
-        rgba(15, 23, 42, .48);
-
-    backdrop-filter:
-        blur(5px);
-}
-
-#featureConfirmModal.hidden {
-    display: none !important;
-}
-
-.confirm-box {
-    width:
-        min(420px, 100%);
-
-    background: #ffffff;
-
-    border-radius: 18px;
-
-    padding: 25px;
-
-    box-shadow:
-        0 25px 80px rgba(16,24,40,.22);
-}
-
-.confirm-box h3 {
-    margin: 0 0 7px;
-
-    font-size: 18px;
-}
-
-.confirm-box p {
-    margin: 0;
-
-    color: #667085;
-
-    font-size: 12px;
-
-    line-height: 1.6;
-}
-
-.confirm-actions {
-    display: flex;
-
-    justify-content: flex-end;
-
-    gap: 8px;
-
-    margin-top: 22px;
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media (max-width: 750px) {
-
-    .preview-area,
-    .address-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .qr-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .workspace-header {
-        flex-direction: column;
-    }
-
-    .header {
-        padding: 12px 15px;
-    }
-
-    .container {
-        width:
-            min(100% - 20px, 1180px);
-    }
-}
-
-</style>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="BooksWagon Label Studio - PO, Box and Address Label Generator"
+    >
+
+    <title>BooksWagon Label Studio</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- PDF -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        defer
+    ></script>
+
+    <!-- ZIP -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+        defer
+    ></script>
+
+    <!-- Excel -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
+        defer
+    ></script>
+
+    <!-- QR -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+        defer
+    ></script>
 </head>
 
 
 <body>
 
 
-<!-- =====================================================
+<!-- ======================================================
      HEADER
-===================================================== -->
+====================================================== -->
 
 <header class="header">
 
     <div class="logo">
-        BooksWagon <span>Label Studio</span>
+        BOOKSWAGON <span>LABEL STUDIO</span>
     </div>
 
     <div class="header-right">
 
-        <button
+        <a
+            href="#tools"
+            class="btn btn-primary"
+        >
+            Open Tools
+        </a>
+
+        <a
+            href="#contact"
             class="btn btn-secondary"
-            onclick="
-                document
-                .getElementById('addressSection')
-                .scrollIntoView({
-                    behavior:'smooth'
-                })
-            "
         >
             Contact
-        </button>
+        </a>
 
     </div>
 
 </header>
 
 
-<!-- =====================================================
-     MAIN
-===================================================== -->
 
-<main class="container">
+<!-- ======================================================
+     HERO
+====================================================== -->
 
-    <section class="hero">
+<main>
 
-        <h1>BooksWagon Label Studio</h1>
+<section class="hero">
 
-        <p>
-            Generate PO labels, Box labels,
-            address labels and downloadable PDF files.
-        </p>
+    <div class="container">
 
-    </section>
+        <div class="hero-content">
 
-
-    <!-- =================================================
-         TOOLS
-    ================================================== -->
-
-    <section id="tools">
-
-        <div class="tool-grid">
-
-            <div
-                class="tool-card"
-                data-open-tool="coco"
-            >
-
-                <h3>CocoBlue PO</h3>
-
-                <p>
-                    Generate CocoBlue PO and Box labels.
-                </p>
-
+            <div class="hero-badge">
+                BOOKSWAGON OPERATIONS TOOL
             </div>
 
+            <h1>
+                Print. Pack. Dispatch.
+            </h1>
 
-            <div
-                class="tool-card"
-                data-open-tool="other"
-            >
+            <p>
+                Generate PO, Box and Address labels quickly
+                with flexible ranges, multiple PO input,
+                PDF, ZIP and merged PDF downloads.
+            </p>
 
-                <h3>Other PO</h3>
+        </div>
 
-                <p>
-                    Generate labels for other PO formats.
-                </p>
+    </div>
 
+</section>
+
+
+
+<!-- ======================================================
+     TOOLS
+====================================================== -->
+
+<section
+    id="tools"
+    class="container"
+>
+
+    <div class="section-heading">
+
+        <div>
+            <span class="eyebrow">
+                LABEL TOOLS
+            </span>
+
+            <h2>
+                Choose your workflow.
+            </h2>
+
+            <p>
+                Select a tool and configure exactly what
+                you want printed.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="tool-grid">
+
+
+        <!-- COCOBLUE -->
+
+        <div
+            class="tool-card"
+            data-open-tool="coco"
+            role="button"
+            tabindex="0"
+        >
+
+            <div class="tool-icon">
+                CB
             </div>
 
+            <span class="tool-number">
+                TOOL 01
+            </span>
 
-            <div
-                class="tool-card"
-                data-open-tool="sbmo"
-            >
+            <h3>
+                CocoBlue
+            </h3>
 
-                <h3>SBMO</h3>
+            <p>
+                Create PO and Box labels with
+                unlimited ranges and flexible
+                printing options.
+            </p>
 
-                <p>
-                    Generate SBMO labels.
-                </p>
-
-            </div>
-
-
-            <div
-                class="tool-card"
-                data-open-tool="address"
-            >
-
-                <h3>Address Label</h3>
-
-                <p>
-                    Generate address labels and QR codes.
-                </p>
-
+            <div class="tool-tags">
+                <span>PO</span>
+                <span>BOX</span>
+                <span>PDF</span>
+                <span>ZIP</span>
             </div>
 
         </div>
 
-    </section>
 
 
-    <!-- =================================================
-         COCOBLUE
-    ================================================== -->
+        <!-- OTHER PO -->
 
-    <section
-        id="cocoWorkspace"
-        class="tool-workspace"
-    >
+        <div
+            class="tool-card"
+            data-open-tool="other"
+            role="button"
+            tabindex="0"
+        >
 
-        <div class="workspace-card">
-
-            <div class="workspace-header">
-
-                <div>
-
-                    <h2>CocoBlue PO</h2>
-
-                    <p>
-                        PO Number and Box Number label generator.
-                    </p>
-
-                </div>
-
-                <button
-                    class="btn btn-secondary"
-                    data-close-tool
-                >
-                    Close
-                </button>
-
+            <div class="tool-icon">
+                PO
             </div>
 
-
-            <!-- INPUT MODE -->
-
-            <div class="section">
-
-                <h3>PO Input Mode</h3>
-
-                <div class="input-tabs">
-
-                    <button
-                        type="button"
-                        class="input-tab active"
-                        data-coco-input="manual"
-                    >
-                        Separate PO Fields
-                    </button>
-
-                    <button
-                        type="button"
-                        class="input-tab"
-                        data-coco-input="comma"
-                    >
-                        Multiple PO in One Field
-                    </button>
-
-                    <button
-                        type="button"
-                        class="input-tab"
-                        data-coco-input="excel"
-                    >
-                        Excel Upload
-                    </button>
-
-                </div>
-
-
-                <div id="cocoManualArea">
-
-                    <div
-                        id="cocoPOGrid"
-                        class="po-grid"
-                    >
-
-                        <!-- 20 MANUAL PO FIELDS -->
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 1"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 2"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 3"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 4"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 5"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 6"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 7"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 8"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 9"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 10"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 11"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 12"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 13"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 14"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 15"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 16"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 17"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 18"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 19"
-                        >
-
-                        <input
-                            class="coco-po"
-                            type="text"
-                            placeholder="PO Number 20"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div
-                    id="cocoCommaArea"
-                    class="hidden"
-                >
-
-                    <textarea
-                        id="cocoCommaPO"
-                        rows="5"
-                        placeholder="Enter multiple PO numbers separated by commas.
-
-Example:
-PO1001, PO1002, PO1003, PO1004"
-                    ></textarea>
-
-                </div>
-
-
-                <div
-                    id="cocoExcelArea"
-                    class="hidden"
-                >
-
-                    <input
-                        id="cocoExcel"
-                        type="file"
-                        accept=".xlsx,.xls,.csv"
-                    >
-
-                    <small id="cocoExcelStatus">
-                        Select an Excel file.
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            <!-- BOX RANGE -->
-
-            <div class="section">
-
-                <h3>Box Range</h3>
-
-                <div class="input-grid">
-
-                    <div class="field">
-
-                        <label>
-                            Start Box Number
-                        </label>
-
-                        <input
-                            id="cocoStartBox"
-                            type="number"
-                            min="1"
-                            value="1"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label>
-                            End Box Number
-                        </label>
-
-                        <input
-                            id="cocoEndBox"
-                            type="number"
-                            min="1"
-                            value="200"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label>
-                            Copies Per Box
-                        </label>
-
-                        <input
-                            id="cocoCopiesPerBox"
-                            type="number"
-                            min="1"
-                            value="1"
-                        >
-
-                    </div>
-
-                </div>
-
-                <small>
-                    No artificial 1–200 limit.
-                    Any positive range is accepted.
-                </small>
-
-            </div>
-
-
-            <!-- PRINT OPTIONS -->
-
-            <div class="section">
-
-                <h3>Print Options</h3>
-
-                <div class="checkbox-grid">
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoPrintPO"
-                            data-feature="Print PO Number"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Print PO Number
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoPrintBox"
-                            data-feature="Print Box Number"
-                            data-default="false"
-                        >
-
-                        <span>
-                            Print Box Number
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoPrintPOBox"
-                            data-feature="Print PO + Box Number"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Print PO + Box Number
-                        </span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <!-- BORDER OPTIONS -->
-
-            <div class="section">
-
-                <h3>Border & Cutting Options</h3>
-
-                <div class="checkbox-grid">
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoPageBorder"
-                            data-feature="Page Border"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Page Border
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoPOBorder"
-                            data-feature="PO Number Border"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            PO Number Border
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoBoxBorder"
-                            data-feature="Box Number Border"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Box Number Border
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoPOBoxOuterBorder"
-                            data-feature="PO + Box Combined Border"
-                            data-default="false"
-                        >
-
-                        <span>
-                            PO + Box Combined Border
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoCutting"
-                            data-feature="Cutting Line"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Cutting Line
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoScissorLine"
-                            data-feature="Scissor Mark"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Scissor Mark
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoBoldText"
-                            data-feature="Bold Text"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Bold Text
-                        </span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <!-- DOWNLOAD -->
-
-            <div class="section">
-
-                <h3>Download Options</h3>
-
-                <div class="checkbox-grid">
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoSeparatePDF"
-                            data-feature="Separate PDF Files"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Separate PDF Files
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoZIP"
-                            data-feature="Download Multiple PDFs as ZIP"
-                            data-default="false"
-                        >
-
-                        <span>
-                            Multiple PDFs → ZIP
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="cocoMergedPDF"
-                            data-feature="Merge All PO PDFs"
-                            data-default="false"
-                        >
-
-                        <span>
-                            Merge All PO PDFs
-                        </span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <!-- PREVIEW -->
-
-            <div class="section">
-
-                <h3>Preview</h3>
-
-                <div class="preview-area">
-
-                    <div
-                        id="cocoPreviewPage"
-                        class="preview-page"
-                    >
-
-                        <div
-                            id="cocoPreviewLabel"
-                            class="dynamic-label-preview"
-                        >
-
-                            <strong class="preview-item-border">
-                                PO NUMBER
-                            </strong>
-
-                            <div class="preview-dotted-line">
-                                · · · · · ✂ · · · · ·
-                            </div>
-
-                            <div class="preview-box-number">
-                                BOX NO. 1
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div>
-
-                        <h4>
-                            Current Range
-                        </h4>
-
-                        <p id="cocoBoxSummary">
-                            1–200
-                        </p>
-
-                        <p id="cocoSummary">
-                            Ready
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- ACTIONS -->
-
-            <div class="section">
-
-                <div
-                    style="
-                        display:flex;
-                        gap:8px;
-                        flex-wrap:wrap;
-                    "
-                >
-
-                    <button
-                        id="cocoGenerate"
-                        class="btn btn-primary"
-                    >
-                        Generate PDF
-                    </button>
-
-
-                    <button
-                        id="cocoReset"
-                        class="btn btn-secondary"
-                    >
-                        Reset
-                    </button>
-
-                </div>
-
+            <span class="tool-number">
+                TOOL 02
+            </span>
+
+            <h3>
+                Other PO
+            </h3>
+
+            <p>
+                Generate labels for other PO
+                workflows with the same flexible
+                configuration.
+            </p>
+
+            <div class="tool-tags">
+                <span>PO</span>
+                <span>BOX</span>
+                <span>MULTIPLE</span>
+                <span>ZIP</span>
             </div>
 
         </div>
 
-    </section>
 
 
-    <!-- =================================================
-         OTHER PO
-    ================================================== -->
+        <!-- SBMO -->
 
-    <section
-        id="otherWorkspace"
-        class="tool-workspace"
-    >
+        <div
+            class="tool-card"
+            data-open-tool="sbmo"
+            role="button"
+            tabindex="0"
+        >
 
-        <div class="workspace-card">
-
-            <div class="workspace-header">
-
-                <div>
-
-                    <h2>Other PO</h2>
-
-                    <p>
-                        Other PO label generator.
-                    </p>
-
-                </div>
-
-                <button
-                    class="btn btn-secondary"
-                    data-close-tool
-                >
-                    Close
-                </button>
-
+            <div class="tool-icon">
+                SB
             </div>
 
-
-            <div class="section">
-
-                <h3>PO Input</h3>
-
-                <div class="input-tabs">
-
-                    <button
-                        type="button"
-                        class="input-tab active"
-                        data-other-input="manual"
-                    >
-                        Separate PO Fields
-                    </button>
-
-                    <button
-                        type="button"
-                        class="input-tab"
-                        data-other-input="comma"
-                    >
-                        Multiple PO in One Field
-                    </button>
-
-                    <button
-                        type="button"
-                        class="input-tab"
-                        data-other-input="excel"
-                    >
-                        Excel Upload
-                    </button>
-
-                </div>
-
-
-                <div id="otherManualArea">
-
-                    <div
-                        id="otherPOGrid"
-                        class="po-grid"
-                    >
-
-                        <!-- 20 fields -->
-
-                        <script>
-                            for (
-                                let i = 1;
-                                i <= 20;
-                                i++
-                            ) {
-                                document.write(`
-                                    <input
-                                        class="other-po"
-                                        type="text"
-                                        placeholder="PO Number ${i}"
-                                    >
-                                `);
-                            }
-                        </script>
-
-                    </div>
-
-                </div>
-
-
-                <div
-                    id="otherCommaArea"
-                    class="hidden"
-                >
-
-                    <textarea
-                        id="otherCommaPO"
-                        rows="5"
-                        placeholder="PO1001, PO1002, PO1003"
-                    ></textarea>
-
-                </div>
-
-
-                <div
-                    id="otherExcelArea"
-                    class="hidden"
-                >
-
-                    <input
-                        id="otherExcel"
-                        type="file"
-                        accept=".xlsx,.xls,.csv"
-                    >
-
-                    <small id="otherExcelStatus">
-                        Select an Excel file.
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            <div class="section">
-
-                <h3>Box Range</h3>
-
-                <div class="input-grid">
-
-                    <div class="field">
-
-                        <label>
-                            Start Box Number
-                        </label>
-
-                        <input
-                            id="otherStartBox"
-                            type="number"
-                            min="1"
-                            value="1"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label>
-                            End Box Number
-                        </label>
-
-                        <input
-                            id="otherEndBox"
-                            type="number"
-                            min="1"
-                            value="200"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="section">
-
-                <h3>Print Options</h3>
-
-                <div class="checkbox-grid">
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherPrintPO"
-                            data-feature="Other PO Number"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Print PO Number
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherPrintBox"
-                            data-feature="Other Box Number"
-                            data-default="false"
-                        >
-
-                        <span>
-                            Print Box Number
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherPrintPOBox"
-                            data-feature="Other PO + Box Number"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Print PO + Box Number
-                        </span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <div class="section">
-
-                <h3>Border Options</h3>
-
-                <div class="checkbox-grid">
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherPageBorder"
-                            data-feature="Other PO Page Border"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Page Border
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherPOBorder"
-                            data-feature="Other PO Number Border"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            PO Number Border
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherBoxBorder"
-                            data-feature="Other Box Number Border"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Box Number Border
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherPOBoxOuterBorder"
-                            data-feature="Other PO + Box Combined Border"
-                            data-default="false"
-                        >
-
-                        <span>
-                            PO + Box Combined Border
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherCutting"
-                            data-feature="Other PO Cutting Line"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Cutting Line
-                        </span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <div class="section">
-
-                <h3>Download Options</h3>
-
-                <div class="checkbox-grid">
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherSeparatePDF"
-                            data-feature="Other PO Separate PDFs"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Separate PDF
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherZIP"
-                            data-feature="Other PO ZIP Download"
-                            data-default="false"
-                        >
-
-                        <span>
-                            Multiple PDFs → ZIP
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="otherMergedPDF"
-                            data-feature="Merge Other PO PDFs"
-                            data-default="false"
-                        >
-
-                        <span>
-                            Merge All PDFs
-                        </span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <div class="section">
-
-                <div
-                    id="otherPreviewPage"
-                    class="preview-page"
-                >
-
-                    <div class="dynamic-label-preview">
-
-                        <strong class="preview-item-border">
-                            PO NUMBER
-                        </strong>
-
-                        <div class="preview-dotted-line">
-                            · · · · · ✂ · · · · ·
-                        </div>
-
-                        <div class="preview-box-number">
-                            BOX NO. 1
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="section">
-
-                <button
-                    id="otherGenerate"
-                    class="btn btn-primary"
-                >
-                    Generate PDF
-                </button>
-
-                <button
-                    id="otherReset"
-                    class="btn btn-secondary"
-                >
-                    Reset
-                </button>
-
+            <span class="tool-number">
+                TOOL 03
+            </span>
+
+            <h3>
+                SBMO
+            </h3>
+
+            <p>
+                Prepare SBMO labels using manual
+                or bulk PO input.
+            </p>
+
+            <div class="tool-tags">
+                <span>PO</span>
+                <span>BOX</span>
+                <span>PDF</span>
+                <span>ZIP</span>
             </div>
 
         </div>
 
-    </section>
+    </div>
 
+</section>
 
-    <!-- =================================================
-         SBMO
-    ================================================== -->
 
-    <section
-        id="sbmoWorkspace"
-        class="tool-workspace"
-    >
 
-        <div class="workspace-card">
+<!-- ======================================================
+     FEATURES
+====================================================== -->
 
-            <div class="workspace-header">
+<section
+    id="features"
+    class="container features-section"
+>
 
-                <div>
+    <div class="section-heading">
 
-                    <h2>SBMO</h2>
-
-                    <p>
-                        SBMO PO and Box label generator.
-                    </p>
-
-                </div>
-
-                <button
-                    class="btn btn-secondary"
-                    data-close-tool
-                >
-                    Close
-                </button>
-
-            </div>
-
-
-            <div class="section">
-
-                <h3>Manual PO Numbers</h3>
-
-                <div
-                    id="sbmoPOGrid"
-                    class="po-grid"
-                >
-
-                    <script>
-                        for (
-                            let i = 1;
-                            i <= 20;
-                            i++
-                        ) {
-                            document.write(`
-                                <input
-                                    class="sbmo-po"
-                                    type="text"
-                                    placeholder="PO Number ${i}"
-                                >
-                            `);
-                        }
-                    </script>
-
-                </div>
-
-                <textarea
-                    id="sbmoCommaPO"
-                    rows="4"
-                    style="margin-top:10px"
-                    placeholder="Or enter multiple PO numbers separated by commas"
-                ></textarea>
-
-            </div>
-
-
-            <div class="section">
-
-                <h3>Box Range</h3>
-
-                <div class="input-grid">
-
-                    <div class="field">
-
-                        <label>
-                            Start Box Number
-                        </label>
-
-                        <input
-                            id="sbmoStartBox"
-                            type="number"
-                            min="1"
-                            value="1"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label>
-                            End Box Number
-                        </label>
-
-                        <input
-                            id="sbmoEndBox"
-                            type="number"
-                            min="1"
-                            value="200"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="section">
-
-                <h3>Print Options</h3>
-
-                <div class="checkbox-grid">
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="sbmoPrintPO"
-                            data-feature="SBMO PO Number"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Print PO Number
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="sbmoPrintBox"
-                            data-feature="SBMO Box Number"
-                            data-default="false"
-                        >
-
-                        <span>
-                            Print Box Number
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="sbmoPrintPOBox"
-                            data-feature="SBMO PO + Box Number"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Print PO + Box Number
-                        </span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <div class="section">
-
-                <h3>Border & Cutting</h3>
-
-                <div class="checkbox-grid">
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="sbmoPOBorder"
-                            data-feature="SBMO PO Border"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            PO Border
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="sbmoBoxBorder"
-                            data-feature="SBMO Box Border"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Box Border
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="sbmoCutting"
-                            data-feature="SBMO Cutting Line"
-                            data-default="true"
-                            checked
-                        >
-
-                        <span>
-                            Cutting Line
-                        </span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <div class="section">
-
-                <h3>Download</h3>
-
-                <div class="checkbox-grid">
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="sbmoZIP"
-                            data-feature="SBMO ZIP Download"
-                            data-default="false"
-                        >
-
-                        <span>
-                            Multiple PDFs → ZIP
-                        </span>
-
-                    </label>
-
-
-                    <label class="check-row">
-
-                        <input
-                            type="checkbox"
-                            id="sbmoMergedPDF"
-                            data-feature="SBMO Merged PDF"
-                            data-default="false"
-                        >
-
-                        <span>
-                            Merge All PDFs
-                        </span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <div class="section">
-
-                <div
-                    class="dynamic-page-preview preview-page"
-                ></div>
-
-            </div>
-
-
-            <div class="section">
-
-                <button
-                    id="sbmoGenerate"
-                    class="btn btn-primary"
-                >
-                    Generate PDF
-                </button>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =================================================
-         ADDRESS SECTION
-    ================================================== -->
-
-    <section
-        id="addressSection"
-        class="address-section"
-    >
+        <span class="eyebrow">
+            NEW REQUIREMENTS
+        </span>
 
         <h2>
-            Contact Us
+            Built around your workflow.
         </h2>
+
+        <p>
+            Every optional feature is controlled independently
+            through a checkbox.
+        </p>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+
+        <div class="feature-card">
+            <strong>PO</strong>
+            <h3>PO Only</h3>
+            <p>
+                Print only the PO number when required.
+            </p>
+        </div>
+
+
+        <div class="feature-card">
+            <strong>BX</strong>
+            <h3>Box Only</h3>
+            <p>
+                Print only the Box Number when required.
+            </p>
+        </div>
+
+
+        <div class="feature-card">
+            <strong>PB</strong>
+            <h3>PO + Box</h3>
+            <p>
+                Print both PO and Box Number together.
+            </p>
+        </div>
+
+
+        <div class="feature-card">
+            <strong>ZIP</strong>
+            <h3>Multiple PDF ZIP</h3>
+            <p>
+                Multiple PDFs can be packaged into one ZIP.
+            </p>
+        </div>
+
+
+        <div class="feature-card">
+            <strong>20</strong>
+            <h3>20 Manual PO Fields</h3>
+            <p>
+                Enter up to 20 PO numbers individually.
+            </p>
+        </div>
+
+
+        <div class="feature-card">
+            <strong>,</strong>
+            <h3>Comma-Separated PO Input</h3>
+            <p>
+                Paste multiple PO numbers into one field,
+                separated by commas.
+            </p>
+        </div>
+
+
+        <div class="feature-card">
+            <strong>✓</strong>
+            <h3>Confirmation</h3>
+            <p>
+                Every optional checkbox requires
+                confirmation before enabling or disabling.
+            </p>
+        </div>
+
+
+        <div class="feature-card">
+            <strong>✂</strong>
+            <h3>Cutting Mark</h3>
+            <p>
+                Add a clear scissor cutting indicator
+                between PO and Box.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     COCOBLUE WORKSPACE
+====================================================== -->
+
+<section
+    id="cocoWorkspace"
+    class="tool-workspace"
+>
+
+<div class="container">
+
+<div class="workspace-card">
+
+    <div class="workspace-header">
+
+        <div>
+            <span class="eyebrow">
+                COCOBLUE
+            </span>
+
+            <h2>
+                PO &amp; Box Label Generator
+            </h2>
+
+            <p>
+                Configure every label option independently.
+            </p>
+        </div>
+
+        <button
+            type="button"
+            class="btn btn-secondary"
+            data-close-tool
+        >
+            ← Back
+        </button>
+
+    </div>
+
+
+
+    <!-- INPUT -->
+
+    <div class="section">
+
+        <h3>
+            01 — PO Number Input
+        </h3>
+
+        <p class="section-help">
+            Choose how you want to enter PO numbers.
+        </p>
+
+
+        <div class="input-tabs">
+
+            <button
+                type="button"
+                class="input-tab active"
+                data-coco-input="manual"
+            >
+                Individual PO
+            </button>
+
+            <button
+                type="button"
+                class="input-tab"
+                data-coco-input="comma"
+            >
+                Comma Separated
+            </button>
+
+            <button
+                type="button"
+                class="input-tab"
+                data-coco-input="excel"
+            >
+                Excel
+            </button>
+
+        </div>
+
+
+
+        <!-- MANUAL -->
+
+        <div
+            id="cocoManualArea"
+        >
+
+            <div class="po-grid">
+
+                <input class="coco-po" type="text" placeholder="PO 01">
+                <input class="coco-po" type="text" placeholder="PO 02">
+                <input class="coco-po" type="text" placeholder="PO 03">
+                <input class="coco-po" type="text" placeholder="PO 04">
+                <input class="coco-po" type="text" placeholder="PO 05">
+                <input class="coco-po" type="text" placeholder="PO 06">
+                <input class="coco-po" type="text" placeholder="PO 07">
+                <input class="coco-po" type="text" placeholder="PO 08">
+                <input class="coco-po" type="text" placeholder="PO 09">
+                <input class="coco-po" type="text" placeholder="PO 10">
+                <input class="coco-po" type="text" placeholder="PO 11">
+                <input class="coco-po" type="text" placeholder="PO 12">
+                <input class="coco-po" type="text" placeholder="PO 13">
+                <input class="coco-po" type="text" placeholder="PO 14">
+                <input class="coco-po" type="text" placeholder="PO 15">
+                <input class="coco-po" type="text" placeholder="PO 16">
+                <input class="coco-po" type="text" placeholder="PO 17">
+                <input class="coco-po" type="text" placeholder="PO 18">
+                <input class="coco-po" type="text" placeholder="PO 19">
+                <input class="coco-po" type="text" placeholder="PO 20">
+
+            </div>
+
+        </div>
+
+
+
+        <!-- COMMA -->
+
+        <div
+            id="cocoCommaArea"
+            class="hidden"
+        >
+
+            <textarea
+                id="cocoCommaPO"
+                placeholder="Enter multiple PO numbers separated by commas..."
+            ></textarea>
+
+        </div>
+
+
+
+        <!-- EXCEL -->
+
+        <div
+            id="cocoExcelArea"
+            class="hidden"
+        >
+
+            <input
+                id="cocoExcel"
+                type="file"
+                accept=".xlsx,.xls,.csv"
+            >
+
+            <small id="cocoExcelStatus">
+                No file selected.
+            </small>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- BOX RANGE -->
+
+    <div class="section">
+
+        <h3>
+            02 — Box Number Range
+        </h3>
+
+        <p class="section-help">
+            No artificial 1–200 restriction.
+        </p>
+
+        <div class="input-grid">
+
+            <div class="field">
+                <label>
+                    Start Box
+                </label>
+
+                <input
+                    id="cocoStartBox"
+                    type="number"
+                    min="1"
+                    value="1"
+                >
+            </div>
+
+
+            <div class="field">
+                <label>
+                    End Box
+                </label>
+
+                <input
+                    id="cocoEndBox"
+                    type="number"
+                    min="1"
+                    value="200"
+                >
+            </div>
+
+
+            <div class="field">
+                <label>
+                    Copies Per Box
+                </label>
+
+                <input
+                    id="cocoCopies"
+                    type="number"
+                    min="1"
+                    value="1"
+                >
+            </div>
+
+
+            <div class="field">
+                <label>
+                    Labels Per Page
+                </label>
+
+                <input
+                    id="cocoLabelsPerPage"
+                    type="number"
+                    min="1"
+                    value="1"
+                >
+            </div>
+
+        </div>
+
+        <small>
+            Example: 1–500, 500–5000 or any larger
+            valid numeric range.
+        </small>
+
+    </div>
+
+
+
+    <!-- PRINT CONTENT -->
+
+    <div class="section">
+
+        <h3>
+            03 — Print Content
+        </h3>
+
+        <p class="section-help">
+            Select exactly what should appear.
+        </p>
+
+        <div class="checkbox-grid">
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoPrintPO"
+                    data-confirm="true"
+                    data-feature="Print PO Number Only"
+                >
+                <span>
+                    Print PO Number Only
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoPrintBox"
+                    data-confirm="true"
+                    data-feature="Print Box Number Only"
+                >
+                <span>
+                    Print Box Number Only
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoPrintPOBox"
+                    data-confirm="true"
+                    data-feature="Print PO Number + Box Number"
+                >
+                <span>
+                    Print PO Number + Box Number
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoVertical"
+                    data-confirm="true"
+                    data-feature="Vertical PO / Box Layout"
+                >
+                <span>
+                    Vertical PO / Box Layout
+                </span>
+            </label>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- BORDERS -->
+
+    <div class="section">
+
+        <h3>
+            04 — Border Options
+        </h3>
+
+        <p class="section-help">
+            PO, Box, combined and page borders remain separate.
+        </p>
+
+        <div class="checkbox-grid">
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoPageBorder"
+                    data-confirm="true"
+                    data-feature="Page Border"
+                >
+                <span>
+                    Page Border
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoPOBorder"
+                    data-confirm="true"
+                    data-feature="PO Number Border"
+                >
+                <span>
+                    PO Number Border
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoBoxBorder"
+                    data-confirm="true"
+                    data-feature="Box Number Border"
+                >
+                <span>
+                    Box Number Border
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoPOBoxOuterBorder"
+                    data-confirm="true"
+                    data-feature="Combined PO + Box Outer Border"
+                >
+                <span>
+                    Combined PO + Box Outer Border
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoMasterBorder"
+                    data-confirm="true"
+                    data-feature="Master Label Border"
+                >
+                <span>
+                    Master Label Border
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoInnerBorder"
+                    data-confirm="true"
+                    data-feature="Inner Tax / Safety Border"
+                >
+                <span>
+                    Inner Tax / Safety Border
+                </span>
+            </label>
+
+        </div>
+
+
+        <div class="field" style="margin-top:15px">
+
+            <label>
+                Border Style
+            </label>
+
+            <select id="cocoBorderStyle">
+
+                <option value="solid">
+                    Solid
+                </option>
+
+                <option value="double">
+                    Double
+                </option>
+
+                <option value="dashed">
+                    Dashed
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- CUTTING -->
+
+    <div class="section">
+
+        <h3>
+            05 — Cutting Mark
+        </h3>
+
+        <div class="checkbox-grid">
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoCutting"
+                    data-confirm="true"
+                    data-feature="Enable Cutting Line"
+                >
+                <span>
+                    Enable Cutting Line
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoScissorLine"
+                    data-confirm="true"
+                    data-feature="Show Scissor Mark"
+                >
+                <span>
+                    Show Scissor Mark
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoBoldText"
+                    data-confirm="true"
+                    data-feature="Bold PO / Box Text"
+                >
+                <span>
+                    Bold PO / Box Text
+                </span>
+            </label>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- DOWNLOAD -->
+
+    <div class="section">
+
+        <h3>
+            06 — Download Options
+        </h3>
+
+        <div class="checkbox-grid">
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoSeparatePDF"
+                    data-confirm="true"
+                    data-feature="Separate PDF Files"
+                >
+                <span>
+                    Separate PDF Files
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoZIP"
+                    data-confirm="true"
+                    data-feature="Multiple PDFs to One ZIP File"
+                >
+                <span>
+                    Multiple PDFs → One ZIP File
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="cocoMergedPDF"
+                    data-confirm="true"
+                    data-feature="Merge All PO PDFs into One PDF"
+                >
+                <span>
+                    Merge All PO PDFs into One PDF
+                </span>
+            </label>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- TEXT -->
+
+    <div class="section">
+
+        <h3>
+            07 — Text Settings
+        </h3>
+
+        <div class="input-grid">
+
+            <div class="field">
+
+                <label>
+                    Font
+                </label>
+
+                <select id="cocoFont">
+
+                    <option value="helvetica">
+                        Helvetica
+                    </option>
+
+                    <option value="times">
+                        Times
+                    </option>
+
+                    <option value="courier">
+                        Courier
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Font Size
+                </label>
+
+                <input
+                    id="cocoFontSize"
+                    type="number"
+                    min="8"
+                    max="80"
+                    value="16"
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ACTIONS -->
+
+    <div class="workspace-actions">
+
+        <button
+            type="button"
+            class="btn btn-secondary"
+            data-reset="coco"
+        >
+            Reset
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-primary"
+            id="cocoGenerate"
+        >
+            Generate PDF
+        </button>
+
+    </div>
+
+
+
+    <!-- PREVIEW -->
+
+    <div class="preview-section">
+
+        <h3>
+            LIVE PREVIEW
+        </h3>
+
+        <div
+            id="cocoPreviewPage"
+            class="preview-page"
+        >
+
+            <div class="dynamic-label-preview">
+
+                <div class="preview-item-border">
+                    BWG 123
+                </div>
+
+                <div class="preview-dotted-line">
+                    · · · · · ✂ · · · · ·
+                </div>
+
+                <div class="preview-box-number">
+                    BOX NO. 1
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ADDRESS -->
+
+    <div class="section">
+
+        <h3>
+            Address Label
+        </h3>
+
+        <p class="section-help">
+            Generate office / dispatch address labels.
+        </p>
 
 
         <div class="address-layout">
 
             <div>
 
-                <h3>
+                <strong>
                     BooksWagon Office
-                </h3>
+                </strong>
 
+                <a
+                    class="address-link"
+                    href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Ground Floor, 2/14, Ansari Rd,
+                    Old Delhi, Daryaganj,
+                    Delhi, 110002
+                </a>
 
-                <div class="contact-block">
-
-                    <strong>
-                        Address
-                    </strong>
-
-
-                    <a
-                        class="address-link"
-                        href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Ground Floor, 2/14, Ansari Rd,
-                        Old Delhi, Daryaganj,
-                        Delhi, 110002
-                    </a>
-
-                </div>
-
-
-                <div class="contact-block">
-
-                    <strong>
-                        Official Email
-                    </strong>
-
-
+                <p>
+                    Email:
                     <a
                         class="address-link"
                         href="mailto:ashish.verma@bookswagon.in"
                     >
                         ashish.verma@bookswagon.in
                     </a>
-
-                </div>
-
-
-                <div
-                    style="margin-top:20px"
-                >
-
-                    <button
-                        id="cocoAddressGenerate"
-                        class="btn btn-primary"
-                    >
-                        Generate Address PDF
-                    </button>
-
-                </div>
+                </p>
 
             </div>
 
-
-            <!-- QR CODES -->
 
             <div class="qr-grid">
 
@@ -2409,9 +1085,9 @@ PO1001, PO1002, PO1003, PO1004"
                         class="qr-box"
                     ></div>
 
-                    <div class="qr-label">
+                    <span class="qr-label">
                         Scan to open Google Maps
-                    </div>
+                    </span>
 
                 </div>
 
@@ -2427,9 +1103,9 @@ PO1001, PO1002, PO1003, PO1004"
                         class="qr-box"
                     ></div>
 
-                    <div class="qr-label">
+                    <span class="qr-label">
                         Scan to email
-                    </div>
+                    </span>
 
                 </div>
 
@@ -2437,36 +1113,877 @@ PO1001, PO1002, PO1003, PO1004"
 
         </div>
 
-    </section>
+    </div>
+
+</div>
+
+</div>
+
+</section>
 
 
-</main>
+
+<!-- ======================================================
+     OTHER PO WORKSPACE
+====================================================== -->
+
+<section
+    id="otherWorkspace"
+    class="tool-workspace"
+>
+
+<div class="container">
+
+<div class="workspace-card">
+
+    <div class="workspace-header">
+
+        <div>
+
+            <span class="eyebrow">
+                OTHER PO
+            </span>
+
+            <h2>
+                Other PO Label Generator
+            </h2>
+
+            <p>
+                Same flexible PO and Box workflow.
+            </p>
+
+        </div>
+
+        <button
+            type="button"
+            class="btn btn-secondary"
+            data-close-tool
+        >
+            ← Back
+        </button>
+
+    </div>
 
 
-<!-- =====================================================
-     FOOTER
-===================================================== -->
 
-<footer class="footer">
+    <div class="section">
 
-    <div class="container">
+        <h3>
+            01 — PO Number Input
+        </h3>
 
-        <div class="footer-layout">
+        <div class="input-tabs">
 
-            <div>
+            <button
+                type="button"
+                class="input-tab active"
+                data-other-input="manual"
+            >
+                Individual PO
+            </button>
 
-                <strong>
-                    BooksWagon Label Studio
-                </strong>
+            <button
+                type="button"
+                class="input-tab"
+                data-other-input="comma"
+            >
+                Comma Separated
+            </button>
 
-                <div>
-                    PO & Box Label Generation System
-                </div>
+            <button
+                type="button"
+                class="input-tab"
+                data-other-input="excel"
+            >
+                Excel
+            </button>
+
+        </div>
+
+
+        <div id="otherManualArea">
+
+            <div class="po-grid">
+
+                <input class="other-po" type="text" placeholder="PO 01">
+                <input class="other-po" type="text" placeholder="PO 02">
+                <input class="other-po" type="text" placeholder="PO 03">
+                <input class="other-po" type="text" placeholder="PO 04">
+                <input class="other-po" type="text" placeholder="PO 05">
+                <input class="other-po" type="text" placeholder="PO 06">
+                <input class="other-po" type="text" placeholder="PO 07">
+                <input class="other-po" type="text" placeholder="PO 08">
+                <input class="other-po" type="text" placeholder="PO 09">
+                <input class="other-po" type="text" placeholder="PO 10">
+                <input class="other-po" type="text" placeholder="PO 11">
+                <input class="other-po" type="text" placeholder="PO 12">
+                <input class="other-po" type="text" placeholder="PO 13">
+                <input class="other-po" type="text" placeholder="PO 14">
+                <input class="other-po" type="text" placeholder="PO 15">
+                <input class="other-po" type="text" placeholder="PO 16">
+                <input class="other-po" type="text" placeholder="PO 17">
+                <input class="other-po" type="text" placeholder="PO 18">
+                <input class="other-po" type="text" placeholder="PO 19">
+                <input class="other-po" type="text" placeholder="PO 20">
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="otherCommaArea"
+            class="hidden"
+        >
+
+            <textarea
+                id="otherCommaPO"
+                placeholder="PO-001, PO-002, PO-003..."
+            ></textarea>
+
+        </div>
+
+
+        <div
+            id="otherExcelArea"
+            class="hidden"
+        >
+
+            <input
+                id="otherExcel"
+                type="file"
+                accept=".xlsx,.xls,.csv"
+            >
+
+        </div>
+
+    </div>
+
+
+
+    <div class="section">
+
+        <h3>
+            02 — Box Range
+        </h3>
+
+        <div class="input-grid">
+
+            <div class="field">
+
+                <label>
+                    Start Box
+                </label>
+
+                <input
+                    id="otherStartBox"
+                    type="number"
+                    min="1"
+                    value="1"
+                >
 
             </div>
 
 
-            <div>
+            <div class="field">
+
+                <label>
+                    End Box
+                </label>
+
+                <input
+                    id="otherEndBox"
+                    type="number"
+                    min="1"
+                    value="200"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Copies Per Box
+                </label>
+
+                <input
+                    id="otherCopies"
+                    type="number"
+                    min="1"
+                    value="1"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Labels Per Page
+                </label>
+
+                <input
+                    id="otherLabelsPerPage"
+                    type="number"
+                    min="1"
+                    value="1"
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="section">
+
+        <h3>
+            03 — Print Content
+        </h3>
+
+        <div class="checkbox-grid">
+
+            <label class="check-row">
+
+                <input
+                    type="checkbox"
+                    id="otherPrintPO"
+                    data-confirm="true"
+                    data-feature="PO Number Only"
+                >
+
+                <span>
+                    PO Number Only
+                </span>
+
+            </label>
+
+
+            <label class="check-row">
+
+                <input
+                    type="checkbox"
+                    id="otherPrintBox"
+                    data-confirm="true"
+                    data-feature="Box Number Only"
+                >
+
+                <span>
+                    Box Number Only
+                </span>
+
+            </label>
+
+
+            <label class="check-row">
+
+                <input
+                    type="checkbox"
+                    id="otherPrintPOBox"
+                    data-confirm="true"
+                    data-feature="PO + Box Number"
+                >
+
+                <span>
+                    PO + Box Number
+                </span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="section">
+
+        <h3>
+            04 — Border Options
+        </h3>
+
+        <div class="checkbox-grid">
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="otherPageBorder"
+                    data-confirm="true"
+                    data-feature="Page Border"
+                >
+                <span>Page Border</span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="otherPOBorder"
+                    data-confirm="true"
+                    data-feature="PO Number Border"
+                >
+                <span>PO Number Border</span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="otherBoxBorder"
+                    data-confirm="true"
+                    data-feature="Box Number Border"
+                >
+                <span>Box Number Border</span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="otherPOBoxOuterBorder"
+                    data-confirm="true"
+                    data-feature="Combined PO + Box Border"
+                >
+                <span>
+                    Combined PO + Box Border
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="otherMasterBorder"
+                    data-confirm="true"
+                    data-feature="Master Label Border"
+                >
+                <span>
+                    Master Label Border
+                </span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="otherInnerBorder"
+                    data-confirm="true"
+                    data-feature="Inner Tax / Safety Border"
+                >
+                <span>
+                    Inner Tax / Safety Border
+                </span>
+            </label>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="section">
+
+        <h3>
+            05 — Cutting
+        </h3>
+
+        <div class="checkbox-grid">
+
+            <label class="check-row">
+
+                <input
+                    type="checkbox"
+                    id="otherCutting"
+                    data-confirm="true"
+                    data-feature="Cutting Line + Scissor"
+                >
+
+                <span>
+                    Cutting Line + Scissor
+                </span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="section">
+
+        <h3>
+            06 — Download
+        </h3>
+
+        <div class="checkbox-grid">
+
+            <label class="check-row">
+
+                <input
+                    type="checkbox"
+                    id="otherSeparatePDF"
+                    data-confirm="true"
+                    data-feature="Separate PDFs"
+                >
+
+                <span>
+                    Separate PDFs
+                </span>
+
+            </label>
+
+
+            <label class="check-row">
+
+                <input
+                    type="checkbox"
+                    id="otherZIP"
+                    data-confirm="true"
+                    data-feature="Download as ZIP"
+                >
+
+                <span>
+                    Download as ZIP
+                </span>
+
+            </label>
+
+
+            <label class="check-row">
+
+                <input
+                    type="checkbox"
+                    id="otherMergedPDF"
+                    data-confirm="true"
+                    data-feature="Merge All PDFs"
+                >
+
+                <span>
+                    Merge All PDFs
+                </span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="workspace-actions">
+
+        <button
+            type="button"
+            class="btn btn-secondary"
+            data-reset="other"
+        >
+            Reset
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-primary"
+            id="otherGenerate"
+        >
+            Generate PDF
+        </button>
+
+    </div>
+
+
+
+    <div class="preview-section">
+
+        <h3>
+            LIVE PREVIEW
+        </h3>
+
+        <div
+            id="otherPreviewPage"
+            class="preview-page"
+        >
+
+            <div class="dynamic-label-preview">
+
+                <div class="preview-item-border">
+                    BWG 123
+                </div>
+
+                <div class="preview-box-number">
+                    BOX NO. 1
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ======================================================
+     SBMO WORKSPACE
+====================================================== -->
+
+<section
+    id="sbmoWorkspace"
+    class="tool-workspace"
+>
+
+<div class="container">
+
+<div class="workspace-card">
+
+    <div class="workspace-header">
+
+        <div>
+
+            <span class="eyebrow">
+                SBMO
+            </span>
+
+            <h2>
+                SBMO Label Generator
+            </h2>
+
+            <p>
+                Manual and bulk PO label workflow.
+            </p>
+
+        </div>
+
+        <button
+            type="button"
+            class="btn btn-secondary"
+            data-close-tool
+        >
+            ← Back
+        </button>
+
+    </div>
+
+
+
+    <div class="section">
+
+        <h3>
+            01 — PO Input
+        </h3>
+
+        <p class="section-help">
+            Up to 20 individual PO fields.
+        </p>
+
+
+        <div class="po-grid">
+
+            <input class="sbmo-po" type="text" placeholder="PO 01">
+            <input class="sbmo-po" type="text" placeholder="PO 02">
+            <input class="sbmo-po" type="text" placeholder="PO 03">
+            <input class="sbmo-po" type="text" placeholder="PO 04">
+            <input class="sbmo-po" type="text" placeholder="PO 05">
+            <input class="sbmo-po" type="text" placeholder="PO 06">
+            <input class="sbmo-po" type="text" placeholder="PO 07">
+            <input class="sbmo-po" type="text" placeholder="PO 08">
+            <input class="sbmo-po" type="text" placeholder="PO 09">
+            <input class="sbmo-po" type="text" placeholder="PO 10">
+            <input class="sbmo-po" type="text" placeholder="PO 11">
+            <input class="sbmo-po" type="text" placeholder="PO 12">
+            <input class="sbmo-po" type="text" placeholder="PO 13">
+            <input class="sbmo-po" type="text" placeholder="PO 14">
+            <input class="sbmo-po" type="text" placeholder="PO 15">
+            <input class="sbmo-po" type="text" placeholder="PO 16">
+            <input class="sbmo-po" type="text" placeholder="PO 17">
+            <input class="sbmo-po" type="text" placeholder="PO 18">
+            <input class="sbmo-po" type="text" placeholder="PO 19">
+            <input class="sbmo-po" type="text" placeholder="PO 20">
+
+        </div>
+
+
+        <textarea
+            id="sbmoCommaPO"
+            placeholder="Or paste multiple PO numbers separated by commas..."
+            style="margin-top:12px"
+        ></textarea>
+
+    </div>
+
+
+
+    <div class="section">
+
+        <h3>
+            02 — Box Range
+        </h3>
+
+        <div class="input-grid">
+
+            <div class="field">
+
+                <label>
+                    Start Box
+                </label>
+
+                <input
+                    id="sbmoStartBox"
+                    type="number"
+                    min="1"
+                    value="1"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    End Box
+                </label>
+
+                <input
+                    id="sbmoEndBox"
+                    type="number"
+                    min="1"
+                    value="200"
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="section">
+
+        <h3>
+            03 — Print Options
+        </h3>
+
+        <div class="checkbox-grid">
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="sbmoPrintPO"
+                    data-confirm="true"
+                    data-feature="PO Number"
+                >
+                <span>PO Number</span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="sbmoPrintBox"
+                    data-confirm="true"
+                    data-feature="Box Number"
+                >
+                <span>Box Number</span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="sbmoPrintPOBox"
+                    data-confirm="true"
+                    data-feature="PO + Box Number"
+                >
+                <span>PO + Box Number</span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="sbmoPOBorder"
+                    data-confirm="true"
+                    data-feature="PO Border"
+                >
+                <span>PO Border</span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="sbmoBoxBorder"
+                    data-confirm="true"
+                    data-feature="Box Border"
+                >
+                <span>Box Border</span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="sbmoCutting"
+                    data-confirm="true"
+                    data-feature="Cutting Mark"
+                >
+                <span>Cutting Mark</span>
+            </label>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="section">
+
+        <h3>
+            04 — Download Options
+        </h3>
+
+        <div class="checkbox-grid">
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="sbmoSeparatePDF"
+                    data-confirm="true"
+                    data-feature="Separate PDFs"
+                >
+                <span>Separate PDFs</span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="sbmoZIP"
+                    data-confirm="true"
+                    data-feature="ZIP File"
+                >
+                <span>ZIP File</span>
+            </label>
+
+
+            <label class="check-row">
+                <input
+                    type="checkbox"
+                    id="sbmoMergedPDF"
+                    data-confirm="true"
+                    data-feature="Merge PDFs"
+                >
+                <span>Merge PDFs</span>
+            </label>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="workspace-actions">
+
+        <button
+            type="button"
+            class="btn btn-secondary"
+            data-reset="sbmo"
+        >
+            Reset
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-primary"
+            id="sbmoGenerate"
+        >
+            Generate PDF
+        </button>
+
+    </div>
+
+
+
+    <div class="preview-section">
+
+        <h3>
+            SBMO PREVIEW
+        </h3>
+
+        <div
+            id="sbmoPreviewPage"
+            class="preview-page"
+        >
+
+            <div class="dynamic-label-preview">
+
+                <div class="preview-item-border">
+                    BWG 123
+                </div>
+
+                <div class="preview-dotted-line">
+                    · · · · · ✂ · · · · ·
+                </div>
+
+                <div class="preview-box-number">
+                    BOX NO. 1
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ======================================================
+     CONTACT
+====================================================== -->
+
+<section
+    id="contact"
+    class="container address-section"
+>
+
+    <div class="section-heading">
+
+        <span class="eyebrow">
+            CONTACT US
+        </span>
+
+        <h2>
+            BooksWagon Office
+        </h2>
+
+    </div>
+
+
+    <div class="address-layout">
+
+
+        <div>
+
+            <div class="contact-block">
+
+                <strong>
+                    OFFICE ADDRESS
+                </strong>
 
                 <a
                     class="address-link"
@@ -2479,52 +1996,203 @@ PO1001, PO1002, PO1003, PO1004"
                     Delhi, 110002
                 </a>
 
+                <p class="contact-note">
+                    Click the address to open the location
+                    in Google Maps.
+                </p>
+
+            </div>
+
+
+            <div class="contact-block">
+
+                <strong>
+                    OFFICIAL EMAIL
+                </strong>
+
+                <a
+                    class="address-link"
+                    href="mailto:ashish.verma@bookswagon.in"
+                >
+                    ashish.verma@bookswagon.in
+                </a>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="qr-grid">
+
+            <div class="qr-card">
+
+                <h4>
+                    Office Location
+                </h4>
+
+                <div
+                    id="footerAddressQR"
+                    class="qr-box"
+                ></div>
+
+                <span class="qr-label">
+                    Google Maps
+                </span>
+
+            </div>
+
+
+            <div class="qr-card">
+
+                <h4>
+                    Official Email
+                </h4>
+
+                <div
+                    id="footerEmailQR"
+                    class="qr-box"
+                ></div>
+
+                <span class="qr-label">
+                    Email
+                </span>
+
             </div>
 
         </div>
 
     </div>
 
+</section>
+
+</main>
+
+
+
+<!-- ======================================================
+     FOOTER
+====================================================== -->
+
+<footer class="footer">
+
+<div class="container footer-layout">
+
+    <div>
+
+        <strong>
+            BooksWagon Label Studio
+        </strong>
+
+        <span>
+            Internal label generation and dispatch workflow tool.
+        </span>
+
+    </div>
+
+
+    <div>
+
+        <strong>
+            Quick Links
+        </strong>
+
+        <div class="footer-links">
+
+            <a href="#tools">
+                Tools
+            </a>
+
+            <a href="#features">
+                Features
+            </a>
+
+            <a href="#contact">
+                Contact
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div>
+
+        <strong>
+            Office
+        </strong>
+
+        <span>
+            Ground Floor, 2/14, Ansari Rd,
+            Old Delhi, Daryaganj,
+            Delhi, 110002
+        </span>
+
+    </div>
+
+</div>
+
+
+<div class="container copyright">
+
+    © 2026 BooksWagon Label Studio
+    Internal Operations Tool
+
+</div>
+
 </footer>
 
 
-<!-- =====================================================
+
+<!-- ======================================================
      CONFIRMATION MODAL
-===================================================== -->
+====================================================== -->
 
 <div
     id="featureConfirmModal"
-    class="hidden"
+    class="confirm-modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="featureConfirmTitle"
 >
 
-    <div class="confirm-box">
+    <div
+        class="confirm-box"
+        role="document"
+    >
+
+        <div class="confirm-icon">
+            !
+        </div>
+
 
         <h3 id="featureConfirmTitle">
-            Confirm Change
+            Confirm Feature Change
         </h3>
 
+
         <p id="featureConfirmMessage">
-            Are you sure?
+            Are you sure you want to change this feature?
         </p>
 
 
         <div class="confirm-actions">
 
             <button
-                id="featureConfirmCancel"
                 type="button"
                 class="btn btn-secondary"
+                id="featureConfirmCancel"
             >
                 Cancel
             </button>
 
 
             <button
-                id="featureConfirmOK"
                 type="button"
                 class="btn btn-primary"
+                id="featureConfirmOK"
             >
-                Confirm
+                Yes, Continue
             </button>
 
         </div>
@@ -2534,332 +2202,287 @@ PO1001, PO1002, PO1003, PO1004"
 </div>
 
 
-<!-- =====================================================
-     JAVASCRIPT
-===================================================== -->
+
+<!-- ======================================================
+     TOAST
+====================================================== -->
+
+<div
+    id="toastContainer"
+    aria-live="polite"
+    aria-atomic="true"
+></div>
+
+
+
+<!-- ======================================================
+     FINAL CONFIRMATION SYSTEM
+     
+     IMPORTANT:
+     This is intentionally inside HTML so checkbox
+     confirmation does not depend on another JS handler.
+====================================================== -->
 
 <script>
 
-"use strict";
+(function () {
+
+    "use strict";
 
 
-/* =====================================================
-   HELPERS
-===================================================== */
-
-const $ = (selector, root = document) =>
-    root.querySelector(selector);
-
-const $$ = (selector, root = document) =>
-    Array.from(
-        root.querySelectorAll(selector)
-    );
-
-
-function escapeHTML(value) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        value ?? "";
-
-    return div.innerHTML;
-}
-
-
-/* =====================================================
-   TOAST
-===================================================== */
-
-function showToast(
-    type,
-    title,
-    message
-) {
-
-    let container =
-        $("#toastContainer");
-
-
-    if (!container) {
-
-        container =
-            document.createElement("div");
-
-        container.id =
-            "toastContainer";
-
-        document.body.appendChild(
-            container
-        );
-    }
-
-
-    const toast =
-        document.createElement("div");
-
-
-    const color =
-        type === "success"
-            ? "#12b76a"
-            : type === "error"
-                ? "#f04438"
-                : "#1264f5";
-
-
-    toast.style.cssText = `
-        pointer-events:auto;
-        margin-bottom:10px;
-        padding:14px 16px;
-        background:#fff;
-        border-left:4px solid ${color};
-        border-radius:12px;
-        box-shadow:0 15px 40px rgba(16,24,40,.14);
-        transition:.2s ease;
-    `;
-
-
-    toast.innerHTML = `
-
-        <div style="
-            color:${color};
-            font-size:12px;
-            font-weight:900;
-            margin-bottom:4px;
-        ">
-            ${escapeHTML(title)}
-        </div>
-
-        <div style="
-            color:#667085;
-            font-size:11px;
-            line-height:1.5;
-        ">
-            ${escapeHTML(message)}
-        </div>
-    `;
-
-
-    container.appendChild(
-        toast
-    );
-
-
-    setTimeout(() => {
-
-        toast.style.opacity =
-            "0";
-
-        toast.style.transform =
-            "translateX(20px)";
-
-        setTimeout(
-            () => toast.remove(),
-            220
-        );
-
-    }, 3200);
-}
-
-
-/* =====================================================
-   CHECKBOX CONFIRMATION
-===================================================== */
-
-let pendingCheckbox = null;
-let pendingState = false;
-
-
-function getFeatureName(
-    checkbox
-) {
-
-    const label =
-        checkbox.closest(
-            "label"
-        );
-
-
-    if (label) {
-
-        const clone =
-            label.cloneNode(true);
-
-
-        clone
-            .querySelectorAll(
-                "input"
-            )
-            .forEach(
-                element =>
-                    element.remove()
-            );
-
-
-        const value =
-            clone.textContent
-                .replace(/\s+/g, " ")
-                .trim();
-
-
-        if (value) {
-            return value;
-        }
-    }
-
-
-    return (
-        checkbox.dataset.feature ||
-        checkbox.id ||
-        "this feature"
-    );
-}
-
-
-function openFeatureConfirmation(
-    checkbox
-) {
-
-    pendingCheckbox =
-        checkbox;
-
-    pendingState =
-        !checkbox.checked;
+    let pendingCheckbox = null;
+    let pendingNewState = false;
 
 
     const modal =
-        $("#featureConfirmModal");
-
+        document.getElementById(
+            "featureConfirmModal"
+        );
 
     const title =
-        $("#featureConfirmTitle");
-
+        document.getElementById(
+            "featureConfirmTitle"
+        );
 
     const message =
-        $("#featureConfirmMessage");
+        document.getElementById(
+            "featureConfirmMessage"
+        );
 
+    const cancelButton =
+        document.getElementById(
+            "featureConfirmCancel"
+        );
 
-    const confirm =
-        $("#featureConfirmOK");
+    const confirmButton =
+        document.getElementById(
+            "featureConfirmOK"
+        );
 
-
-    const name =
-        getFeatureName(
-            checkbox
+    const toastContainer =
+        document.getElementById(
+            "toastContainer"
         );
 
 
-    title.textContent =
-        pendingState
-            ? "Enable Feature?"
-            : "Disable Feature?";
+    function getFeatureName(
+        checkbox
+    ) {
+
+        return (
+            checkbox.dataset.feature ||
+            checkbox.closest("label")
+                ?.innerText
+                ?.replace(/\s+/g, " ")
+                ?.trim() ||
+            "this feature"
+        );
+    }
 
 
-    message.textContent =
-        pendingState
-            ? `Are you sure you want to enable "${name}"?`
-            : `Are you sure you want to disable "${name}"?`;
+    function showToast(
+        type,
+        titleText,
+        messageText
+    ) {
+
+        const toast =
+            document.createElement(
+                "div"
+            );
 
 
-    confirm.textContent =
-        pendingState
-            ? "Yes, Enable"
-            : "Yes, Disable";
+        toast.className =
+            "confirmation-toast " +
+            (
+                type === "success"
+                    ? "toast-success"
+                    : "toast-danger"
+            );
 
 
-    confirm.style.background =
-        pendingState
-            ? "#1264f5"
-            : "#f04438";
+        toast.innerHTML = `
+            <div class="toast-title">
+                ${titleText}
+            </div>
+
+            <div class="toast-message">
+                ${messageText}
+            </div>
+        `;
 
 
-    modal.classList.remove(
-        "hidden"
-    );
-}
+        toastContainer.appendChild(
+            toast
+        );
 
 
-function closeFeatureConfirmation() {
+        requestAnimationFrame(
+            () => {
+                toast.classList.add(
+                    "show"
+                );
+            }
+        );
 
-    $("#featureConfirmModal")
-        ?.classList.add(
+
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+                setTimeout(
+                    () => toast.remove(),
+                    250
+                );
+
+            },
+            3000
+        );
+    }
+
+
+    function openConfirmation(
+        checkbox
+    ) {
+
+        pendingCheckbox =
+            checkbox;
+
+        pendingNewState =
+            !checkbox.checked;
+
+
+        const feature =
+            getFeatureName(
+                checkbox
+            );
+
+
+        title.textContent =
+            pendingNewState
+                ? "Enable Feature?"
+                : "Disable Feature?";
+
+
+        message.textContent =
+            pendingNewState
+                ? `Are you sure you want to enable "${feature}"?`
+                : `Are you sure you want to disable "${feature}"?`;
+
+
+        confirmButton.textContent =
+            pendingNewState
+                ? "Yes, Enable"
+                : "Yes, Disable";
+
+
+        confirmButton.classList.remove(
+            "confirm-enable",
+            "confirm-disable"
+        );
+
+
+        confirmButton.classList.add(
+            pendingNewState
+                ? "confirm-enable"
+                : "confirm-disable"
+        );
+
+
+        modal.classList.remove(
             "hidden"
         );
 
 
-    pendingCheckbox =
-        null;
-
-    pendingState =
-        false;
-}
-
-
-/*
- * CRITICAL FIX:
- *
- * Capture checkbox click before browser
- * changes checked state.
- */
-
-document.addEventListener(
-    "click",
-    event => {
-
-        const checkbox =
-            event.target.closest(
-                'input[type="checkbox"]'
-            );
-
-
-        if (!checkbox) {
-            return;
-        }
-
-
-        /*
-         * Some internal/reset checkbox can
-         * bypass confirmation if needed.
-         */
-
-        if (
-            checkbox.dataset.confirmSkip ===
-            "true"
-        ) {
-            return;
-        }
-
-
-        /*
-         * STOP NATIVE TOGGLE
-         */
-
-        event.preventDefault();
-
-        event.stopPropagation();
-
-
-        openFeatureConfirmation(
-            checkbox
+        document.body.classList.add(
+            "modal-open"
         );
 
-    },
-    true
-);
+
+        setTimeout(
+            () =>
+                confirmButton.focus(),
+            50
+        );
+    }
 
 
-/* =====================================================
-   CONFIRM BUTTON
-===================================================== */
+    function closeConfirmation() {
 
-$("#featureConfirmOK")
-    ?.addEventListener(
+        modal.classList.add(
+            "hidden"
+        );
+
+
+        document.body.classList.remove(
+            "modal-open"
+        );
+
+
+        pendingCheckbox =
+            null;
+
+        pendingNewState =
+            false;
+    }
+
+
+    /*
+     * =====================================================
+     * CRITICAL FIX
+     *
+     * We listen in CAPTURE phase.
+     * The browser's native checkbox toggle is stopped.
+     * Therefore checkbox does NOT change until user presses
+     * "Yes, Enable" / "Yes, Disable".
+     * =====================================================
+     */
+
+    document.addEventListener(
         "click",
-        () => {
+        function (event) {
+
+            const checkbox =
+                event.target.closest(
+                    'input[type="checkbox"][data-confirm="true"]'
+                );
+
+
+            if (!checkbox) {
+                return;
+            }
+
+
+            /*
+             * Stop browser from toggling it.
+             */
+
+            event.preventDefault();
+
+            event.stopImmediatePropagation();
+
+
+            openConfirmation(
+                checkbox
+            );
+
+        },
+        true
+    );
+
+
+    /*
+     * YES
+     */
+
+    confirmButton.addEventListener(
+        "click",
+        function () {
 
             if (!pendingCheckbox) {
-                closeFeatureConfirmation();
                 return;
             }
 
@@ -2867,873 +2490,514 @@ $("#featureConfirmOK")
             const checkbox =
                 pendingCheckbox;
 
+            const newState =
+                pendingNewState;
 
-            const state =
-                pendingState;
+            const feature =
+                getFeatureName(
+                    checkbox
+                );
 
 
             /*
-             * ACTUAL ENABLE / DISABLE
+             * ONLY HERE the checkbox changes.
              */
 
             checkbox.checked =
-                state;
+                newState;
 
 
             /*
-             * Tell other code that the
-             * checkbox has changed.
+             * Fire change event for the rest
+             * of the application.
              */
 
             checkbox.dispatchEvent(
                 new Event(
                     "change",
                     {
-                        bubbles:true
+                        bubbles: true
                     }
                 )
             );
 
 
-            const name =
-                getFeatureName(
-                    checkbox
-                );
+            closeConfirmation();
 
 
-            closeFeatureConfirmation();
-
-
-            if (state) {
+            if (newState) {
 
                 showToast(
                     "success",
                     "Feature Enabled",
-                    `"${name}" is now enabled.`
+                    `"${feature}" is now enabled.`
                 );
 
             } else {
 
                 showToast(
-                    "error",
+                    "danger",
                     "Feature Disabled",
-                    `"${name}" is now disabled.`
+                    `"${feature}" is now disabled.`
                 );
-
-
             }
 
         }
     );
 
 
-$("#featureConfirmCancel")
-    ?.addEventListener(
+    /*
+     * CANCEL
+     */
+
+    cancelButton.addEventListener(
         "click",
-        closeFeatureConfirmation
+        function () {
+
+            /*
+             * Checkbox remains unchanged.
+             */
+
+            closeConfirmation();
+
+        }
     );
 
 
-$("#featureConfirmModal")
-    ?.addEventListener(
+    /*
+     * BACKDROP CLICK
+     */
+
+    modal.addEventListener(
         "click",
-        event => {
+        function (event) {
 
             if (
-                event.target ===
-                $("#featureConfirmModal")
+                event.target === modal
             ) {
-                closeFeatureConfirmation();
+
+                closeConfirmation();
+
             }
 
         }
     );
 
 
-document.addEventListener(
-    "keydown",
-    event => {
+    /*
+     * ESCAPE
+     */
 
-        if (
-            event.key === "Escape"
-        ) {
+    document.addEventListener(
+        "keydown",
+        function (event) {
 
-            closeFeatureConfirmation();
+            if (
+                event.key === "Escape" &&
+                !modal.classList.contains(
+                    "hidden"
+                )
+            ) {
 
-        }
-
-    }
-);
-
-
-/* =====================================================
-   TOOL NAVIGATION
-===================================================== */
-
-$$("[data-open-tool]")
-    .forEach(card => {
-
-        card.addEventListener(
-            "click",
-            () => {
-
-                const id =
-                    card.dataset.openTool;
-
-
-                $$(".tool-workspace")
-                    .forEach(
-                        workspace =>
-                            workspace.classList.remove(
-                                "active"
-                            )
-                    );
-
-
-                const workspace =
-                    $(
-                        `#${id}Workspace`
-                    );
-
-
-                if (!workspace) {
-                    return;
-                }
-
-
-                workspace.classList.add(
-                    "active"
-                );
-
-
-                workspace.scrollIntoView({
-                    behavior:"smooth",
-                    block:"start"
-                });
+                closeConfirmation();
 
             }
-        );
 
-    });
-
-
-$$("[data-close-tool]")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                $$(".tool-workspace")
-                    .forEach(
-                        workspace =>
-                            workspace.classList.remove(
-                                "active"
-                            )
-                    );
-
-                $("#tools")
-                    ?.scrollIntoView({
-                        behavior:"smooth"
-                    });
-
-            }
-        );
-
-    });
-
-
-/* =====================================================
-   INPUT TABS
-===================================================== */
-
-$$("[data-coco-input]")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const mode =
-                    button.dataset.cocoInput;
-
-
-                $("#cocoManualArea")
-                    ?.classList.toggle(
-                        "hidden",
-                        mode !== "manual"
-                    );
-
-
-                $("#cocoCommaArea")
-                    ?.classList.toggle(
-                        "hidden",
-                        mode !== "comma"
-                    );
-
-
-                $("#cocoExcelArea")
-                    ?.classList.toggle(
-                        "hidden",
-                        mode !== "excel"
-                    );
-
-
-                $$("[data-coco-input]")
-                    .forEach(
-                        item =>
-                            item.classList.toggle(
-                                "active",
-                                item === button
-                            )
-                    );
-
-            }
-        );
-
-    });
-
-
-$$("[data-other-input]")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const mode =
-                    button.dataset.otherInput;
-
-
-                $("#otherManualArea")
-                    ?.classList.toggle(
-                        "hidden",
-                        mode !== "manual"
-                    );
-
-
-                $("#otherCommaArea")
-                    ?.classList.toggle(
-                        "hidden",
-                        mode !== "comma"
-                    );
-
-
-                $("#otherExcelArea")
-                    ?.classList.toggle(
-                        "hidden",
-                        mode !== "excel"
-                    );
-
-
-                $$("[data-other-input]")
-                    .forEach(
-                        item =>
-                            item.classList.toggle(
-                                "active",
-                                item === button
-                            )
-                    );
-
-            }
-        );
-
-    });
-
-
-/* =====================================================
-   RANGE FIX
-===================================================== */
-
-function removeRangeLimit() {
-
-    $$(
-        'input[type="number"]'
-    )
-    .forEach(input => {
-
-        const text =
-            (
-                input.id +
-                " " +
-                input.name +
-                " " +
-                input.placeholder
-            )
-            .toLowerCase();
-
-
-        if (
-            text.includes("box") ||
-            text.includes("range")
-        ) {
-
-            input.removeAttribute(
-                "max"
-            );
-
-            input.min = "1";
-        }
-
-    });
-
-}
-
-
-removeRangeLimit();
-
-
-/* =====================================================
-   QR CODES
-===================================================== */
-
-function generateQR(
-    elementId,
-    value
-) {
-
-    const element =
-        document.getElementById(
-            elementId
-        );
-
-
-    if (!element) {
-        return;
-    }
-
-
-    element.innerHTML = "";
-
-
-    if (
-        typeof QRCode ===
-        "undefined"
-    ) {
-
-        element.textContent =
-            "QR library unavailable.";
-
-        return;
-    }
-
-
-    new QRCode(
-        element,
-        {
-            text:value,
-            width:150,
-            height:150,
-            correctLevel:
-                QRCode.CorrectLevel.M
         }
     );
-}
 
 
-/*
- * Address QR
- */
+})();
 
-generateQR(
-    "addressQR",
-    "https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
-);
+</script>
 
 
-/*
- * Email QR
- */
 
-generateQR(
-    "emailQR",
-    "mailto:ashish.verma@bookswagon.in"
-);
+<!-- ======================================================
+     BASIC UI JS
+====================================================== -->
 
-
-/* =====================================================
-   LIVE PREVIEW
-===================================================== */
-
-function getFirstPO(
-    selector
-) {
-
-    const input =
-        $(selector);
-
-
-    return (
-        input?.value?.trim() ||
-        "PO NUMBER"
-    );
-}
-
-
-function getMode(
-    poId,
-    boxId,
-    bothId
-) {
-
-    const po =
-        $(poId)?.checked;
-
-    const box =
-        $(boxId)?.checked;
-
-    const both =
-        $(bothId)?.checked;
-
-
-    if (both) {
-        return "both";
-    }
-
-    if (po && box) {
-        return "both";
-    }
-
-    if (po) {
-        return "po";
-    }
-
-    if (box) {
-        return "box";
-    }
-
-    return "none";
-}
-
-
-function makePreview(
-    po,
-    box,
-    mode,
-    poBorder,
-    boxBorder,
-    combinedBorder,
-    cutting,
-    scissor
-) {
-
-    let html = "";
-
-
-    if (
-        mode === "po" ||
-        mode === "both"
-    ) {
-
-        html += `
-            <strong
-                class="${
-                    poBorder
-                        ? "preview-item-border"
-                        : ""
-                }"
-            >
-                ${escapeHTML(po)}
-            </strong>
-        `;
-    }
-
-
-    if (
-        mode === "both" &&
-        cutting
-    ) {
-
-        html += `
-            <div class="preview-dotted-line">
-                ${
-                    scissor
-                        ? "· · · · · ✂ · · · · ·"
-                        : "· · · · · · · · · ·"
-                }
-            </div>
-        `;
-    }
-
-
-    if (
-        mode === "box" ||
-        mode === "both"
-    ) {
-
-        html += `
-            <div
-                class="${
-                    boxBorder
-                        ? "preview-box-number"
-                        : ""
-                }"
-            >
-                BOX NO. ${escapeHTML(box)}
-            </div>
-        `;
-    }
-
-
-    if (!html) {
-
-        html = `
-            <span style="
-                color:#98a2b3;
-                font-size:11px;
-            ">
-                Select a print option
-            </span>
-        `;
-    }
-
-
-    return `
-        <div
-            class="
-                dynamic-label-preview
-                ${
-                    combinedBorder
-                        ? "has-outer-border"
-                        : ""
-                }
-            "
-        >
-            ${html}
-        </div>
-    `;
-}
-
-
-/* =====================================================
-   COCO PREVIEW
-===================================================== */
-
-function updateCocoPreview() {
-
-    const page =
-        $("#cocoPreviewPage");
-
-
-    if (!page) {
-        return;
-    }
-
-
-    const po =
-        getFirstPO(
-            ".coco-po"
-        );
-
-
-    const box =
-        $("#cocoStartBox")
-            ?.value ||
-        "1";
-
-
-    const mode =
-        getMode(
-            "#cocoPrintPO",
-            "#cocoPrintBox",
-            "#cocoPrintPOBox"
-        );
-
-
-    page.innerHTML =
-        makePreview(
-            po,
-            box,
-            mode,
-            $("#cocoPOBorder")
-                ?.checked,
-            $("#cocoBoxBorder")
-                ?.checked,
-            $("#cocoPOBoxOuterBorder")
-                ?.checked,
-            $("#cocoCutting")
-                ?.checked,
-            $("#cocoScissorLine")
-                ?.checked
-        );
-
-
-    $("#cocoBoxSummary")
-        && (
-            $("#cocoBoxSummary")
-                .textContent =
-                `${$("#cocoStartBox")?.value || 1}–${$("#cocoEndBox")?.value || 200}`
-        );
-}
-
-
-/* =====================================================
-   OTHER PREVIEW
-===================================================== */
-
-function updateOtherPreview() {
-
-    const page =
-        $("#otherPreviewPage");
-
-
-    if (!page) {
-        return;
-    }
-
-
-    const po =
-        getFirstPO(
-            ".other-po"
-        );
-
-
-    const box =
-        $("#otherStartBox")
-            ?.value ||
-        "1";
-
-
-    const mode =
-        getMode(
-            "#otherPrintPO",
-            "#otherPrintBox",
-            "#otherPrintPOBox"
-        );
-
-
-    page.innerHTML =
-        makePreview(
-            po,
-            box,
-            mode,
-            $("#otherPOBorder")
-                ?.checked,
-            $("#otherBoxBorder")
-                ?.checked,
-            $("#otherPOBoxOuterBorder")
-                ?.checked,
-            $("#otherCutting")
-                ?.checked,
-            true
-        );
-}
-
-
-/* =====================================================
-   SBMO PREVIEW
-===================================================== */
-
-function updateSBMOPreview() {
-
-    const page =
-        $("#sbmoWorkspace .dynamic-page-preview");
-
-
-    if (!page) {
-        return;
-    }
-
-
-    const po =
-        getFirstPO(
-            ".sbmo-po"
-        );
-
-
-    const box =
-        $("#sbmoStartBox")
-            ?.value ||
-        "1";
-
-
-    const mode =
-        getMode(
-            "#sbmoPrintPO",
-            "#sbmoPrintBox",
-            "#sbmoPrintPOBox"
-        );
-
-
-    page.innerHTML =
-        makePreview(
-            po,
-            box,
-            mode,
-            $("#sbmoPOBorder")
-                ?.checked,
-            $("#sbmoBoxBorder")
-                ?.checked,
-            false,
-            $("#sbmoCutting")
-                ?.checked,
-            true
-        );
-}
-
-
-function updateAllPreviews() {
-
-    updateCocoPreview();
-
-    updateOtherPreview();
-
-    updateSBMOPreview();
-}
-
-
-/* =====================================================
-   CHECKBOX CHANGE → PREVIEW
-===================================================== */
-
-document.addEventListener(
-    "change",
-    event => {
-
-        if (
-            event.target.matches(
-                'input[type="checkbox"]'
-            )
-        ) {
-
-            updateAllPreviews();
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   INPUT CHANGE → PREVIEW
-===================================================== */
-
-document.addEventListener(
-    "input",
-    event => {
-
-        if (
-            event.target.matches(
-                "input, textarea"
-            )
-        ) {
-
-            updateAllPreviews();
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   IMPORTANT:
-   RESTORE PAGE TO BOTTOM AFTER RELOAD
-===================================================== */
-
-window.addEventListener(
-    "load",
-    () => {
-
-        /*
-         * Browser's automatic scroll restoration
-         * is disabled so the page consistently
-         * opens from the bottom.
-         */
-
-        if (
-            "scrollRestoration"
-            in history
-        ) {
-            history.scrollRestoration =
-                "manual";
-        }
-
-
-        setTimeout(
-            () => {
-
-                window.scrollTo({
-                    top:
-                        document.documentElement
-                            .scrollHeight,
-
-                    behavior:"instant"
-                });
-
-            },
-            120
-        );
-
-
-        updateAllPreviews();
-    }
-);
-
-
-/* =====================================================
-   RELOAD → BOTTOM ALSO AFTER DOM READY
-===================================================== */
+<script>
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    function () {
+
+        /*
+         * Tool navigation
+         */
+
+        document
+            .querySelectorAll(
+                "[data-open-tool]"
+            )
+            .forEach(
+                card => {
+
+                    card.addEventListener(
+                        "click",
+                        function () {
+
+                            const tool =
+                                card.dataset.openTool;
+
+
+                            document
+                                .querySelectorAll(
+                                    ".tool-workspace"
+                                )
+                                .forEach(
+                                    section =>
+                                        section.classList.remove(
+                                            "active"
+                                        )
+                                );
+
+
+                            const target =
+                                document.getElementById(
+                                    tool +
+                                    "Workspace"
+                                );
+
+
+                            if (target) {
+
+                                target.classList.add(
+                                    "active"
+                                );
+
+
+                                target.scrollIntoView({
+                                    behavior:"smooth",
+                                    block:"start"
+                                });
+
+                            }
+
+                        }
+                    );
+
+
+                    card.addEventListener(
+                        "keydown",
+                        function (event) {
+
+                            if (
+                                event.key ===
+                                "Enter" ||
+                                event.key ===
+                                " "
+                            ) {
+
+                                event.preventDefault();
+
+                                card.click();
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /*
+         * Back buttons
+         */
+
+        document
+            .querySelectorAll(
+                "[data-close-tool]"
+            )
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            document
+                                .querySelectorAll(
+                                    ".tool-workspace"
+                                )
+                                .forEach(
+                                    section =>
+                                        section.classList.remove(
+                                            "active"
+                                        )
+                                );
+
+
+                            document
+                                .getElementById(
+                                    "tools"
+                                )
+                                ?.scrollIntoView({
+                                    behavior:"smooth"
+                                });
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /*
+         * Coco input tabs
+         */
+
+        document
+            .querySelectorAll(
+                "[data-coco-input]"
+            )
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            const mode =
+                                button.dataset.cocoInput;
+
+
+                            document
+                                .getElementById(
+                                    "cocoManualArea"
+                                )
+                                ?.classList.toggle(
+                                    "hidden",
+                                    mode !== "manual"
+                                );
+
+
+                            document
+                                .getElementById(
+                                    "cocoCommaArea"
+                                )
+                                ?.classList.toggle(
+                                    "hidden",
+                                    mode !== "comma"
+                                );
+
+
+                            document
+                                .getElementById(
+                                    "cocoExcelArea"
+                                )
+                                ?.classList.toggle(
+                                    "hidden",
+                                    mode !== "excel"
+                                );
+
+
+                            document
+                                .querySelectorAll(
+                                    "[data-coco-input]"
+                                )
+                                .forEach(
+                                    tab =>
+                                        tab.classList.toggle(
+                                            "active",
+                                            tab === button
+                                        )
+                                );
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /*
+         * Other PO tabs
+         */
+
+        document
+            .querySelectorAll(
+                "[data-other-input]"
+            )
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            const mode =
+                                button.dataset.otherInput;
+
+
+                            document
+                                .getElementById(
+                                    "otherManualArea"
+                                )
+                                ?.classList.toggle(
+                                    "hidden",
+                                    mode !== "manual"
+                                );
+
+
+                            document
+                                .getElementById(
+                                    "otherCommaArea"
+                                )
+                                ?.classList.toggle(
+                                    "hidden",
+                                    mode !== "comma"
+                                );
+
+
+                            document
+                                .getElementById(
+                                    "otherExcelArea"
+                                )
+                                ?.classList.toggle(
+                                    "hidden",
+                                    mode !== "excel"
+                                );
+
+
+                            document
+                                .querySelectorAll(
+                                    "[data-other-input]"
+                                )
+                                .forEach(
+                                    tab =>
+                                        tab.classList.toggle(
+                                            "active",
+                                            tab === button
+                                        )
+                                );
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /*
+         * QR codes
+         */
+
+        function createQR(
+            id,
+            value
+        ) {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+
+            if (
+                !element ||
+                typeof QRCode ===
+                "undefined"
+            ) {
+                return;
+            }
+
+
+            element.innerHTML =
+                "";
+
+
+            new QRCode(
+                element,
+                {
+                    text:value,
+                    width:140,
+                    height:140
+                }
+            );
+        }
+
+
+        const mapsURL =
+            "https://maps.app.goo.gl/7McYApm1u9x4QSj7A";
+
+
+        const email =
+            "mailto:ashish.verma@bookswagon.in";
+
+
+        createQR(
+            "addressQR",
+            mapsURL
+        );
+
+
+        createQR(
+            "emailQR",
+            email
+        );
+
+
+        createQR(
+            "footerAddressQR",
+            mapsURL
+        );
+
+
+        createQR(
+            "footerEmailQR",
+            email
+        );
+
+
+        /*
+         * Reload → bottom
+         */
 
         if (
             "scrollRestoration"
             in history
         ) {
+
             history.scrollRestoration =
                 "manual";
+
         }
 
 
-        updateAllPreviews();
+        if (
+            performance
+                .getEntriesByType(
+                    "navigation"
+                )[0]
+                ?.type ===
+            "reload"
+        ) {
 
+            setTimeout(
+                function () {
 
-        /*
-         * Give QR library and layout time
-         * to calculate the final document height.
-         */
+                    window.scrollTo({
+                        top:
+                            document.documentElement
+                                .scrollHeight,
+                        behavior:
+                            "instant"
+                    });
 
-        setTimeout(
-            () => {
+                },
+                100
+            );
 
-                window.scrollTo(
-                    0,
-                    document.documentElement
-                        .scrollHeight
-                );
-
-            },
-            300
-        );
+        }
 
     }
 );
 
-
-console.log(
-    "✓ BooksWagon Label Studio HTML initialized"
-);
-
-console.log(
-    "✓ Checkbox confirmation system ready"
-);
-
-console.log(
-    "✓ Address QR ready"
-);
-
-console.log(
-    "✓ Email QR ready"
-);
-
-console.log(
-    "✓ Unlimited box range enabled"
-);
-
 </script>
+
 
 </body>
 </html>
