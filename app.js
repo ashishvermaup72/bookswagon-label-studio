@@ -1,7 +1,6 @@
 /* =========================================================
-   BOOKSWAGON PAGES — FINAL SCRIPT.JS
-   Simple Checkbox System
-   No confirmation dialog
+   BOOKSWAGON LABEL STUDIO
+   FINAL SCRIPT.JS
 ========================================================= */
 
 "use strict";
@@ -14,19 +13,29 @@
 const CONFIG = {
     email: "ashish.verma@bookswagon.in",
 
+    address:
+        "Ground Floor, 2/14, Ansari Rd, Old Delhi, Daryaganj, Delhi, 110002",
+
     maps:
         "https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
 };
 
 
 /* =========================================================
+   STATE
+========================================================= */
+
+let currentTool = "Coco Blue";
+
+
+/* =========================================================
    SHORTCUTS
 ========================================================= */
 
-const $ = (selector) =>
+const $ = selector =>
     document.querySelector(selector);
 
-const $$ = (selector) =>
+const $$ = selector =>
     [...document.querySelectorAll(selector)];
 
 
@@ -36,17 +45,16 @@ const $$ = (selector) =>
 
 function showToast(message, type = "success") {
 
-    const container = $("#toast");
+    const container =
+        $("#toastContainer");
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
     const toast =
         document.createElement("div");
 
     toast.className =
-        `toast-message ${type}`;
+        `toast${type === "error" ? " error" : ""}`;
 
     toast.textContent =
         message;
@@ -60,43 +68,209 @@ function showToast(message, type = "success") {
 
 
 /* =========================================================
-   SIMPLE CHECKBOX
-   NO CONFIRMATION POPUP
+   CREATE 20 PO INPUTS
 ========================================================= */
 
-function setupCheckboxes() {
+function createPOFields() {
 
-    $$('.check input[type="checkbox"]')
-        .forEach(checkbox => {
+    const grid =
+        $("#poGrid");
 
-            checkbox.addEventListener(
-                "change",
-                function () {
+    if (!grid) return;
 
-                    const feature =
-                        this.dataset.feature ||
-                        "Feature";
+    grid.innerHTML = "";
 
-                    if (this.checked) {
+    for (let i = 1; i <= 20; i++) {
 
-                        showToast(
-                            `${feature} is now enabled.`,
-                            "success"
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "po-field";
+
+
+        const label =
+            document.createElement("span");
+
+        label.textContent =
+            `PO ${i}`;
+
+
+        const input =
+            document.createElement("input");
+
+        input.type =
+            "text";
+
+        input.className =
+            "po-input";
+
+        input.placeholder =
+            `PO Number ${i}`;
+
+        input.autocomplete =
+            "off";
+
+
+        wrapper.append(
+            label,
+            input
+        );
+
+
+        grid.appendChild(
+            wrapper
+        );
+    }
+}
+
+
+/* =========================================================
+   PARSE MULTIPLE PO
+========================================================= */
+
+function parsePOText(value) {
+
+    return String(value || "")
+        .split(/[\n,;|]+/)
+        .map(item => item.trim())
+        .filter(Boolean);
+}
+
+
+/* =========================================================
+   GET PO LIST
+========================================================= */
+
+function getPOList() {
+
+    const individual =
+        $$(".po-input")
+            .map(input =>
+                input.value.trim()
+            )
+            .filter(Boolean);
+
+
+    const bulk =
+        parsePOText(
+            $("#bulkPO")?.value
+        );
+
+
+    return [
+        ...new Set([
+            ...individual,
+            ...bulk
+        ])
+    ];
+}
+
+
+/* =========================================================
+   INPUT TABS
+========================================================= */
+
+function setupInputTabs() {
+
+    $$(".input-tab")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const target =
+                        button.dataset.input;
+
+
+                    $$(".input-tab")
+                        .forEach(item => {
+
+                            item.classList.toggle(
+                                "active",
+                                item === button
+                            );
+
+                        });
+
+
+                    $("#individualInput")
+                        ?.classList.toggle(
+                            "active",
+                            target === "individual"
                         );
 
-                    } else {
 
-                        showToast(
-                            `${feature} is now disabled.`,
-                            "error"
+                    $("#bulkInput")
+                        ?.classList.toggle(
+                            "active",
+                            target === "bulk"
                         );
-                    }
 
-                    updatePreviews();
                 }
             );
 
         });
+}
+
+
+/* =========================================================
+   TOOL SELECTION
+========================================================= */
+
+function openTool(tool) {
+
+    currentTool =
+        tool;
+
+
+    const title =
+        $("#workspaceTitle");
+
+    const description =
+        $("#workspaceDescription");
+
+
+    if (title) {
+
+        title.textContent =
+            `${tool} Label Generator`;
+
+    }
+
+
+    if (description) {
+
+        description.textContent =
+            `Create ${tool} PO and Box labels with complete customization.`;
+
+    }
+
+
+    $("#workspace")
+        ?.classList.add("active");
+
+
+    $$(".tool-select-btn")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.selectTool === tool
+            );
+
+        });
+
+
+    $("#workspace")
+        ?.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+
+    updatePreview();
 }
 
 
@@ -104,362 +278,107 @@ function setupCheckboxes() {
    TOOL CARDS
 ========================================================= */
 
-function setupToolCards() {
+function setupTools() {
 
     $$(".tool-card")
         .forEach(card => {
 
-            const openTool = () => {
-
-                const tool =
-                    card.dataset.tool;
-
-                if (!tool) {
-                    return;
-                }
-
-                $$(".workspace")
-                    .forEach(workspace => {
-
-                        workspace.classList.remove(
-                            "active"
-                        );
-
-                    });
-
-                const workspace =
-                    $(`#${tool}Workspace`);
-
-                if (!workspace) {
-                    return;
-                }
-
-                workspace.classList.add(
-                    "active"
-                );
-
-                workspace.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
-            };
-
-
             card.addEventListener(
                 "click",
-                openTool
-            );
+                () => {
 
+                    openTool(
+                        card.dataset.tool
+                    );
 
-            card.addEventListener(
-                "keydown",
-                event => {
-
-                    if (
-                        event.key === "Enter" ||
-                        event.key === " "
-                    ) {
-
-                        event.preventDefault();
-
-                        openTool();
-                    }
                 }
             );
 
         });
-}
 
 
-/* =========================================================
-   CLOSE WORKSPACE
-========================================================= */
-
-function setupCloseButtons() {
-
-    $$(".close-workspace")
+    $$(".tool-select-btn")
         .forEach(button => {
 
             button.addEventListener(
                 "click",
                 () => {
 
-                    $$(".workspace")
-                        .forEach(workspace => {
+                    openTool(
+                        button.dataset.selectTool
+                    );
 
-                            workspace.classList.remove(
-                                "active"
-                            );
-
-                        });
-
-                    $("#tools")
-                        ?.scrollIntoView({
-                            behavior: "smooth"
-                        });
                 }
             );
 
         });
+
+
+    $("#closeWorkspace")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                $("#workspace")
+                    ?.classList.remove(
+                        "active"
+                    );
+
+
+                $("#tools")
+                    ?.scrollIntoView({
+                        behavior: "smooth"
+                    });
+
+            }
+        );
+
 }
 
 
 /* =========================================================
-   TABS
+   SIMPLE CHECKBOX SYSTEM
+   NO CONFIRMATION POPUP
 ========================================================= */
 
-function setupTabs() {
+function setupCheckboxes() {
 
-    $$(".tab")
-        .forEach(tab => {
+    $$(".feature-checkbox input")
+        .forEach(checkbox => {
 
-            tab.addEventListener(
-                "click",
+            checkbox.addEventListener(
+                "change",
                 () => {
 
-                    const target =
-                        tab.dataset.tab;
+                    const feature =
+                        checkbox.dataset.feature ||
+                        "Feature";
 
-                    if (!target) {
-                        return;
+
+                    if (checkbox.checked) {
+
+                        showToast(
+                            `${feature} is enabled.`,
+                            "success"
+                        );
+
+                    } else {
+
+                        showToast(
+                            `${feature} is disabled.`,
+                            "error"
+                        );
+
                     }
 
 
-                    /*
-                     * Coco tabs
-                     */
-
-                    if (
-                        target.startsWith(
-                            "coco-"
-                        )
-                    ) {
-
-                        [
-                            "coco-manual",
-                            "coco-bulk",
-                            "coco-excel"
-                        ]
-                        .forEach(id => {
-
-                            const element =
-                                document.getElementById(
-                                    id
-                                );
-
-                            if (!element) {
-                                return;
-                            }
-
-                            element.style.display =
-                                id === target
-                                    ? "block"
-                                    : "none";
-
-                        });
-
-
-                        $$('.tab[data-tab^="coco-"]')
-                            .forEach(item => {
-
-                                item.classList.toggle(
-                                    "active",
-                                    item === tab
-                                );
-
-                            });
-                    }
+                    updatePreview();
 
                 }
             );
 
         });
-}
 
-
-/* =========================================================
-   PO PARSER
-========================================================= */
-
-function parsePOText(text) {
-
-    return [
-        ...new Set(
-
-            String(text || "")
-                .split(
-                    /[\n,;]+/
-                )
-                .map(
-                    value =>
-                        value.trim()
-                )
-                .filter(Boolean)
-
-        )
-    ];
-}
-
-
-/* =========================================================
-   COCO PO
-========================================================= */
-
-function getCocoPOs() {
-
-    const manual =
-        $$(".coco-po")
-            .map(
-                input =>
-                    input.value.trim()
-            )
-            .filter(Boolean);
-
-
-    const bulk =
-        parsePOText(
-            $("#cocoBulk")
-                ?.value
-        );
-
-
-    return [
-        ...new Set([
-            ...manual,
-            ...bulk
-        ])
-    ];
-}
-
-
-/* =========================================================
-   OTHER PO
-========================================================= */
-
-function getOtherPOs() {
-
-    const manual =
-        $$(".other-po")
-            .map(
-                input =>
-                    input.value.trim()
-            )
-            .filter(Boolean);
-
-
-    const bulk =
-        parsePOText(
-            $("#otherBulk")
-                ?.value
-        );
-
-
-    return [
-        ...new Set([
-            ...manual,
-            ...bulk
-        ])
-    ];
-}
-
-
-/* =========================================================
-   SBMO PO
-========================================================= */
-
-function getSBMOPOs() {
-
-    const manual =
-        $$(".sbmo-po")
-            .map(
-                input =>
-                    input.value.trim()
-            )
-            .filter(Boolean);
-
-
-    const bulk =
-        parsePOText(
-            $("#sbmoBulk")
-                ?.value
-        );
-
-
-    return [
-        ...new Set([
-            ...manual,
-            ...bulk
-        ])
-    ];
-}
-
-
-/* =========================================================
-   BOX RANGE
-   NO 200 LIMIT
-========================================================= */
-
-function getRange(startSelector, endSelector) {
-
-    const start =
-        Number(
-            $(startSelector)?.value
-        );
-
-    const end =
-        Number(
-            $(endSelector)?.value
-        );
-
-
-    if (
-        !Number.isFinite(start) ||
-        !Number.isFinite(end)
-    ) {
-
-        showToast(
-            "Please enter a valid box range.",
-            "error"
-        );
-
-        return null;
-    }
-
-
-    if (
-        start < 1 ||
-        end < 1
-    ) {
-
-        showToast(
-            "Box numbers must be 1 or greater.",
-            "error"
-        );
-
-        return null;
-    }
-
-
-    if (
-        end < start
-    ) {
-
-        showToast(
-            "End Box cannot be smaller than Start Box.",
-            "error"
-        );
-
-        return null;
-    }
-
-
-    return {
-        start:
-            Math.floor(start),
-
-        end:
-            Math.floor(end)
-    };
 }
 
 
@@ -467,20 +386,16 @@ function getRange(startSelector, endSelector) {
    PRINT MODE
 ========================================================= */
 
-function getPrintMode(
-    poSelector,
-    boxSelector,
-    bothSelector
-) {
+function getPrintMode() {
 
     const po =
-        $(poSelector)?.checked === true;
+        $("#printPO")?.checked === true;
 
     const box =
-        $(boxSelector)?.checked === true;
+        $("#printBox")?.checked === true;
 
     const both =
-        $(bothSelector)?.checked === true;
+        $("#printPOBox")?.checked === true;
 
 
     if (both) {
@@ -508,185 +423,330 @@ function getPrintMode(
 
 
 /* =========================================================
-   VALIDATE PRINT MODE
+   BORDER WIDTH
 ========================================================= */
 
-function validatePrintMode(
-    poSelector,
-    boxSelector,
-    bothSelector
-) {
+function getBorderWidth() {
 
-    const mode =
-        getPrintMode(
-            poSelector,
-            boxSelector,
-            bothSelector
-        );
+    const value =
+        $("#borderSize")?.value;
 
 
-    if (mode === "none") {
-
-        showToast(
-            "Select PO Number, Box Number or PO + Box.",
-            "error"
-        );
-
-        return false;
+    if (value === "thin") {
+        return 1;
     }
 
 
-    return true;
+    if (value === "thick") {
+        return 4;
+    }
+
+
+    return 2;
 }
 
 
 /* =========================================================
-   COCO PREVIEW
+   UPDATE PREVIEW
 ========================================================= */
 
-function updateCocoPreview() {
+function updatePreview() {
 
-    const preview =
-        $("#cocoPreview");
-
-    if (!preview) {
-        return;
-    }
+    const mode =
+        getPrintMode();
 
 
     const po =
-        getCocoPOs()[0] ||
+        getPOList()[0] ||
         "PO NUMBER";
 
 
     const box =
-        $("#cocoStart")
-            ?.value ||
+        $("#startBox")?.value ||
         "1";
 
 
-    const mode =
-        getPrintMode(
-            "#cocoPO",
-            "#cocoBox",
-            "#cocoPOBox"
-        );
-
-
-    const poElement =
+    const previewPO =
         $("#previewPO");
 
-    const boxElement =
+    const previewBox =
         $("#previewBox");
 
-    const cutElement =
+    const previewCut =
         $("#previewCut");
+
+    const previewPage =
+        $("#labelPreview");
+
+    const previewContent =
+        $("#previewContent");
 
 
     if (
-        !poElement ||
-        !boxElement ||
-        !cutElement
+        !previewPO ||
+        !previewBox ||
+        !previewCut ||
+        !previewPage ||
+        !previewContent
     ) {
-
         return;
     }
 
 
-    poElement.textContent =
+    /* Content */
+
+    previewPO.textContent =
         po;
 
-    boxElement.textContent =
+    previewBox.textContent =
         `BOX NO. ${box}`;
 
 
-    poElement.style.display =
-        (
+    previewPO.classList.toggle(
+        "hidden-preview",
+        !(
             mode === "po" ||
             mode === "both"
         )
-            ? "inline-flex"
-            : "none";
+    );
 
 
-    boxElement.style.display =
-        (
+    previewBox.classList.toggle(
+        "hidden-preview",
+        !(
             mode === "box" ||
             mode === "both"
         )
-            ? "inline-flex"
-            : "none";
+    );
 
 
-    cutElement.style.display =
-        (
+    previewCut.classList.toggle(
+        "hidden-preview",
+        !(
             mode === "both" &&
-            $("#cocoCut")?.checked
+            $("#cutLine")?.checked
         )
-            ? "block"
-            : "none";
-
-
-    poElement.classList.toggle(
-        "border",
-        $("#cocoPOBorder")
-            ?.checked === true
     );
 
 
-    boxElement.classList.toggle(
-        "border",
-        $("#cocoBoxBorder")
-            ?.checked === true
-    );
+    /* =====================================================
+       PAGE SIZE PREVIEW
+    ===================================================== */
+
+    const pageSizes = {
+
+        A4: {
+            width: 420,
+            height: 594
+        },
+
+        A5: {
+            width: 340,
+            height: 480
+        },
+
+        A6: {
+            width: 280,
+            height: 395
+        },
+
+        LETTER: {
+            width: 420,
+            height: 545
+        },
+
+        LEGAL: {
+            width: 420,
+            height: 650
+        },
+
+        CUSTOM: {
+            width:
+                Number(
+                    $("#customWidth")?.value
+                ) || 210,
+
+            height:
+                Number(
+                    $("#customHeight")?.value
+                ) || 297
+        }
+
+    };
 
 
-    preview.style.border =
-        $("#cocoPageBorder")
-            ?.checked === true
-            ? "1px solid #111827"
-            : "0";
+    const selectedSize =
+        $("#pageSize")?.value ||
+        "A4";
 
 
-    const label =
-        preview.querySelector(
-            ".preview-label"
+    const size =
+        pageSizes[selectedSize] ||
+        pageSizes.A4;
+
+
+    let width =
+        size.width;
+
+    let height =
+        size.height;
+
+
+    if (
+        $("#orientation")?.value ===
+        "landscape"
+    ) {
+
+        [
+            width,
+            height
+        ] = [
+            height,
+            width
+        ];
+
+    }
+
+
+    const maxWidth =
+        540;
+
+    const maxHeight =
+        520;
+
+
+    const scale =
+        Math.min(
+            maxWidth / width,
+            maxHeight / height
         );
 
 
-    if (label) {
-
-        label.style.border =
-            $("#cocoCombinedBorder")
-                ?.checked === true
-                ? "2px solid #111827"
-                : "0";
+    previewPage.style.width =
+        `${Math.max(
+            250,
+            width * scale
+        )}px`;
 
 
-        label.style.fontWeight =
-            $("#cocoBold")
-                ?.checked === true
-                ? "900"
-                : "400";
-    }
+    previewPage.style.minHeight =
+        `${Math.max(
+            280,
+            height * scale
+        )}px`;
+
+
+    /* =====================================================
+       PAGE BORDER
+    ===================================================== */
+
+    const borderColor =
+        $("#borderColor")?.value ||
+        "#111827";
+
+
+    const borderStyle =
+        $("#borderStyle")?.value ||
+        "solid";
+
+
+    const borderWidth =
+        getBorderWidth();
+
+
+    previewPage.style.border =
+        $("#pageBorder")?.checked
+            ? `${borderWidth}px ${borderStyle} ${borderColor}`
+            : "0";
+
+
+    /* =====================================================
+       PO BORDER
+    ===================================================== */
+
+    previewPO.style.border =
+        $("#poBorder")?.checked
+            ? `${borderWidth}px ${borderStyle} ${borderColor}`
+            : "0";
+
+
+    /* =====================================================
+       BOX BORDER
+    ===================================================== */
+
+    previewBox.style.border =
+        $("#boxBorder")?.checked
+            ? `${borderWidth}px ${borderStyle} ${borderColor}`
+            : "0";
+
+
+    /* =====================================================
+       COMBINED BORDER
+    ===================================================== */
+
+    previewContent.style.border =
+        $("#combinedBorder")?.checked
+            ? `${borderWidth}px ${borderStyle} ${borderColor}`
+            : "0";
+
+
+    /* =====================================================
+       FONT
+    ===================================================== */
+
+    const fonts = {
+
+        helvetica:
+            "Arial, Helvetica, sans-serif",
+
+        times:
+            "Times New Roman, Times, serif",
+
+        courier:
+            "Courier New, Courier, monospace",
+
+        georgia:
+            "Georgia, serif"
+
+    };
+
+
+    previewContent.style.fontFamily =
+        fonts[
+            $("#fontFamily")?.value
+        ] ||
+        fonts.helvetica;
+
+
+    previewContent.style.fontSize =
+        `${$("#fontSize")?.value || 18}px`;
+
+
+    previewContent.style.fontWeight =
+        $("#fontBold")?.checked
+            ? "900"
+            : "400";
+
+
+    previewContent.style.fontStyle =
+        $("#fontItalic")?.checked
+            ? "italic"
+            : "normal";
+
+
+    previewContent.style.textDecoration =
+        $("#fontUnderline")?.checked
+            ? "underline"
+            : "none";
+
 }
 
 
 /* =========================================================
-   ALL PREVIEWS
+   LIVE PREVIEW
 ========================================================= */
 
-function updatePreviews() {
-
-    updateCocoPreview();
-}
-
-
-/* =========================================================
-   LIVE INPUT
-========================================================= */
-
-function setupLiveUpdates() {
+function setupLivePreview() {
 
     document.addEventListener(
         "input",
@@ -698,8 +758,10 @@ function setupLiveUpdates() {
                 )
             ) {
 
-                updatePreviews();
+                updatePreview();
+
             }
+
         }
     );
 
@@ -714,193 +776,458 @@ function setupLiveUpdates() {
                 )
             ) {
 
-                updatePreviews();
+                updatePreview();
+
             }
+
         }
     );
+
 }
 
 
 /* =========================================================
-   PDF LIBRARY
+   PAGE FORMAT
 ========================================================= */
 
-function getPDFConstructor() {
+function getPageFormat() {
 
-    if (
-        !window.jspdf ||
-        !window.jspdf.jsPDF
-    ) {
+    const size =
+        $("#pageSize")?.value ||
+        "A4";
 
-        throw new Error(
-            "PDF library is not loaded. Please reload the page."
-        );
+
+    if (size === "A4") {
+        return "a4";
     }
 
 
-    return window.jspdf.jsPDF;
+    if (size === "A5") {
+        return "a5";
+    }
+
+
+    if (size === "A6") {
+        return "a6";
+    }
+
+
+    if (size === "LETTER") {
+        return "letter";
+    }
+
+
+    if (size === "LEGAL") {
+        return "legal";
+    }
+
+
+    return [
+        Number(
+            $("#customWidth")?.value
+        ) || 210,
+
+        Number(
+            $("#customHeight")?.value
+        ) || 297
+    ];
+
 }
 
 
 /* =========================================================
-   DRAW PDF LABEL
+   FONT STYLE
 ========================================================= */
 
-function drawPDFLabel(
-    doc,
-    po,
-    box,
-    options
-) {
+function getPDFFontStyle() {
 
-    const pageWidth =
-        doc.internal.pageSize
-            .getWidth();
+    const bold =
+        $("#fontBold")?.checked === true;
 
-    const pageHeight =
-        doc.internal.pageSize
-            .getHeight();
+    const italic =
+        $("#fontItalic")?.checked === true;
 
-    const centerX =
-        pageWidth / 2;
+
+    if (
+        bold &&
+        italic
+    ) {
+
+        return "bolditalic";
+
+    }
+
+
+    if (bold) {
+        return "bold";
+    }
+
+
+    if (italic) {
+        return "italic";
+    }
+
+
+    return "normal";
+}
+
+
+/* =========================================================
+   PDF FONT
+========================================================= */
+
+function getPDFFont() {
+
+    const value =
+        $("#fontFamily")?.value;
 
 
     /*
-     * PAGE BORDER
+     * jsPDF built-in fonts:
+     * helvetica
+     * times
+     * courier
      */
 
     if (
-        options.pageBorder
+        value === "times"
+    ) {
+
+        return "times";
+
+    }
+
+
+    if (
+        value === "courier"
+    ) {
+
+        return "courier";
+
+    }
+
+
+    /*
+     * Georgia falls back to Times
+     * because jsPDF doesn't have Georgia
+     * as a built-in font.
+     */
+
+    return "helvetica";
+}
+
+
+/* =========================================================
+   HEX → RGB
+========================================================= */
+
+function hexToRGB(hex) {
+
+    hex =
+        String(hex || "#111827")
+            .replace("#", "");
+
+
+    if (hex.length !== 6) {
+
+        return {
+            r: 17,
+            g: 24,
+            b: 39
+        };
+
+    }
+
+
+    return {
+
+        r:
+            parseInt(
+                hex.substring(0, 2),
+                16
+            ),
+
+        g:
+            parseInt(
+                hex.substring(2, 4),
+                16
+            ),
+
+        b:
+            parseInt(
+                hex.substring(4, 6),
+                16
+            )
+
+    };
+
+}
+
+
+/* =========================================================
+   PDF BORDER STYLE
+========================================================= */
+
+function applyPDFLineStyle(doc) {
+
+    const style =
+        $("#borderStyle")?.value ||
+        "solid";
+
+
+    if (
+        style === "dashed"
+    ) {
+
+        doc.setLineDashPattern(
+            [4, 3],
+            0
+        );
+
+    } else if (
+        style === "dotted"
+    ) {
+
+        doc.setLineDashPattern(
+            [1, 2],
+            0
+        );
+
+    } else {
+
+        doc.setLineDashPattern(
+            [],
+            0
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   DRAW BORDER
+========================================================= */
+
+function drawPDFBorder(
+    doc,
+    x,
+    y,
+    width,
+    height
+) {
+
+    const style =
+        $("#borderStyle")?.value ||
+        "solid";
+
+
+    applyPDFLineStyle(doc);
+
+
+    if (
+        style === "double"
+    ) {
+
+        doc.rect(
+            x,
+            y,
+            width,
+            height
+        );
+
+
+        doc.rect(
+            x + 2,
+            y + 2,
+            width - 4,
+            height - 4
+        );
+
+    } else {
+
+        doc.rect(
+            x,
+            y,
+            width,
+            height
+        );
+
+    }
+
+
+    doc.setLineDashPattern(
+        [],
+        0
+    );
+
+}
+
+
+/* =========================================================
+   DRAW ONE PDF LABEL
+========================================================= */
+
+function drawLabel(
+    doc,
+    po,
+    box
+) {
+
+    const pageWidth =
+        doc.internal.pageSize.getWidth();
+
+    const pageHeight =
+        doc.internal.pageSize.getHeight();
+
+
+    const center =
+        pageWidth / 2;
+
+
+    const rgb =
+        hexToRGB(
+            $("#borderColor")?.value
+        );
+
+
+    const lineWidth =
+        getBorderWidth();
+
+
+    /* =====================================================
+       PAGE BORDER
+    ===================================================== */
+
+    if (
+        $("#pageBorder")?.checked
     ) {
 
         doc.setDrawColor(
-            17,
-            24,
-            39
+            rgb.r,
+            rgb.g,
+            rgb.b
         );
 
         doc.setLineWidth(
-            0.7
+            lineWidth
         );
 
-        doc.rect(
+
+        drawPDFBorder(
+            doc,
             7,
             7,
             pageWidth - 14,
             pageHeight - 14
         );
+
     }
 
 
-    /*
-     * OUTER COMBINED BORDER
-     */
-
-    if (
-        options.combined
-    ) {
-
-        doc.setLineWidth(
-            1
-        );
-
-        doc.rect(
-            20,
-            20,
-            pageWidth - 40,
-            pageHeight - 40
-        );
-    }
-
-
-    let y =
-        pageHeight * 0.36;
-
+    /* =====================================================
+       FONT
+    ===================================================== */
 
     doc.setFont(
-        "helvetica",
-        options.bold
-            ? "bold"
-            : "normal"
+        getPDFFont(),
+        getPDFFontStyle()
     );
 
 
-    /*
-     * PO NUMBER
-     */
+    doc.setFontSize(
+        Number(
+            $("#fontSize")?.value
+        ) || 18
+    );
+
+
+    let y =
+        pageHeight / 2 - 35;
+
+
+    const mode =
+        getPrintMode();
+
+
+    /* =====================================================
+       PO
+    ===================================================== */
 
     if (
-        options.mode === "po" ||
-        options.mode === "both"
+        mode === "po" ||
+        mode === "both"
     ) {
 
         const poText =
             String(po);
 
 
-        doc.setFontSize(
-            18
-        );
-
-
-        const textWidth =
+        const poWidth =
             doc.getTextWidth(
                 poText
             );
 
 
         if (
-            options.poBorder
+            $("#poBorder")?.checked
         ) {
 
-            const boxWidth =
-                Math.max(
-                    80,
-                    textWidth + 30
-                );
-
+            doc.setDrawColor(
+                rgb.r,
+                rgb.g,
+                rgb.b
+            );
 
             doc.setLineWidth(
-                0.9
+                lineWidth
             );
 
 
-            doc.rect(
-                centerX -
-                    boxWidth / 2,
+            drawPDFBorder(
+                doc,
 
-                y - 15,
+                center -
+                    (poWidth + 30) / 2,
 
-                boxWidth,
+                y - 14,
 
-                30
+                poWidth + 30,
+
+                28
             );
+
         }
 
 
         doc.text(
             poText,
-            centerX,
+            center,
             y + 5,
             {
-                align:
-                    "center"
+                align: "center"
             }
         );
 
 
-        y += 50;
+        y += 48;
+
     }
 
 
-    /*
-     * CUTTING LINE
-     */
+    /* =====================================================
+       CUTTING LINE
+    ===================================================== */
 
     if (
-        options.mode === "both" &&
-        options.cutting
+        mode === "both" &&
+        $("#cutLine")?.checked
     ) {
+
+        const lineStyle =
+            $("#cutLineStyle")?.value ||
+            "dashed";
+
 
         doc.setDrawColor(
             70,
@@ -910,21 +1237,43 @@ function drawPDFLabel(
 
 
         doc.setLineWidth(
-            0.4
+            .5
         );
 
 
-        doc.setLineDashPattern(
-            [3, 3],
-            0
-        );
+        if (
+            lineStyle === "dashed"
+        ) {
+
+            doc.setLineDashPattern(
+                [4, 3],
+                0
+            );
+
+        } else if (
+            lineStyle === "dotted"
+        ) {
+
+            doc.setLineDashPattern(
+                [1, 3],
+                0
+            );
+
+        } else {
+
+            doc.setLineDashPattern(
+                [],
+                0
+            );
+
+        }
 
 
         doc.line(
             20,
-            y - 15,
+            y - 10,
             pageWidth - 20,
-            y - 15
+            y - 10
         );
 
 
@@ -935,8 +1284,13 @@ function drawPDFLabel(
 
 
         if (
-            options.scissor
+            $("#scissorMark")?.checked
         ) {
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
 
             doc.setFontSize(
                 10
@@ -945,112 +1299,315 @@ function drawPDFLabel(
 
             doc.text(
                 "✂",
-                centerX,
-                y - 11,
+                center,
+                y - 6,
                 {
-                    align:
-                        "center"
+                    align: "center"
                 }
             );
+
+
+            doc.setFont(
+                getPDFFont(),
+                getPDFFontStyle()
+            );
+
+
+            doc.setFontSize(
+                Number(
+                    $("#fontSize")?.value
+                ) || 18
+            );
+
         }
 
 
         y += 25;
+
     }
 
 
-    /*
-     * BOX NUMBER
-     */
+    /* =====================================================
+       BOX
+    ===================================================== */
 
     if (
-        options.mode === "box" ||
-        options.mode === "both"
+        mode === "box" ||
+        mode === "both"
     ) {
 
         const boxText =
             `BOX NO. ${box}`;
 
 
-        doc.setFontSize(
-            16
-        );
-
-
-        const textWidth =
+        const boxWidth =
             doc.getTextWidth(
                 boxText
             );
 
 
         if (
-            options.boxBorder
+            $("#boxBorder")?.checked
         ) {
 
-            const boxWidth =
-                Math.max(
-                    100,
-                    textWidth + 30
-                );
-
+            doc.setDrawColor(
+                rgb.r,
+                rgb.g,
+                rgb.b
+            );
 
             doc.setLineWidth(
-                0.9
+                lineWidth
             );
 
 
-            doc.rect(
-                centerX -
-                    boxWidth / 2,
+            drawPDFBorder(
+                doc,
 
-                y - 15,
+                center -
+                    (boxWidth + 30) / 2,
 
-                boxWidth,
+                y - 14,
 
-                30
+                boxWidth + 30,
+
+                28
             );
+
         }
 
 
         doc.text(
             boxText,
-            centerX,
+            center,
             y + 5,
             {
-                align:
-                    "center"
+                align: "center"
             }
         );
+
     }
+
+
+    /* =====================================================
+       COMBINED BORDER
+    ===================================================== */
+
+    if (
+        $("#combinedBorder")?.checked
+    ) {
+
+        doc.setDrawColor(
+            rgb.r,
+            rgb.g,
+            rgb.b
+        );
+
+        doc.setLineWidth(
+            lineWidth
+        );
+
+
+        drawPDFBorder(
+            doc,
+
+            18,
+            pageHeight / 2 - 82,
+
+            pageWidth - 36,
+            164
+        );
+
+    }
+
+
+    /* =====================================================
+       UNDERLINE
+    ===================================================== */
+
+    if (
+        $("#fontUnderline")?.checked
+    ) {
+
+        /*
+         * jsPDF doesn't have a native underline
+         * option for text, so a line is drawn
+         * below the main content.
+         */
+
+        doc.setDrawColor(
+            rgb.r,
+            rgb.g,
+            rgb.b
+        );
+
+        doc.setLineWidth(
+            .5
+        );
+
+
+        doc.line(
+            center - 45,
+            y + 10,
+            center + 45,
+            y + 10
+        );
+
+    }
+
 }
 
 
 /* =========================================================
-   CREATE PDF
+   VALIDATE SETTINGS
 ========================================================= */
 
-function createPDF(
-    po,
-    start,
-    end,
-    options
+function validateSettings() {
+
+    const mode =
+        getPrintMode();
+
+
+    if (
+        mode === "none"
+    ) {
+
+        showToast(
+            "Select PO Number Only, Box Number Only, or PO + Box.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    const poList =
+        getPOList();
+
+
+    if (
+        poList.length === 0
+    ) {
+
+        showToast(
+            "Please enter at least one PO number.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    const start =
+        Number(
+            $("#startBox")?.value
+        );
+
+
+    const end =
+        Number(
+            $("#endBox")?.value
+        );
+
+
+    if (
+        !Number.isInteger(start) ||
+        !Number.isInteger(end)
+    ) {
+
+        showToast(
+            "Start Box and End Box must be valid numbers.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    if (
+        start < 1 ||
+        end < start
+    ) {
+
+        showToast(
+            "Please enter a valid Box range.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   BUILD PDF FOR ONE PO
+========================================================= */
+
+function buildPDF(
+    po
 ) {
 
     const JsPDF =
-        getPDFConstructor();
+        window.jspdf?.jsPDF;
+
+
+    if (!JsPDF) {
+
+        throw new Error(
+            "jsPDF library is not available."
+        );
+
+    }
+
+
+    const orientation =
+        $("#orientation")?.value ||
+        "portrait";
+
+
+    const format =
+        getPageFormat();
 
 
     const doc =
         new JsPDF({
-            orientation:
-                "portrait",
 
-            unit:
-                "mm",
+            orientation,
 
-            format:
-                "a4"
+            unit: "mm",
+
+            format
+
         });
+
+
+    const start =
+        Number(
+            $("#startBox").value
+        );
+
+
+    const end =
+        Number(
+            $("#endBox").value
+        );
+
+
+    const copies =
+        Math.max(
+            1,
+            Number(
+                $("#copies").value
+            ) || 1
+        );
 
 
     let firstPage =
@@ -1063,70 +1620,16 @@ function createPDF(
         box++
     ) {
 
-        if (!firstPage) {
-            doc.addPage();
-        }
-
-
-        firstPage =
-            false;
-
-
-        drawPDFLabel(
-            doc,
-            po,
-            box,
-            options
-        );
-    }
-
-
-    return doc;
-}
-
-
-/* =========================================================
-   CREATE MERGED PDF
-========================================================= */
-
-function createMergedPDF(
-    poList,
-    start,
-    end,
-    options
-) {
-
-    const JsPDF =
-        getPDFConstructor();
-
-
-    const doc =
-        new JsPDF({
-            orientation:
-                "portrait",
-
-            unit:
-                "mm",
-
-            format:
-                "a4"
-        });
-
-
-    let firstPage =
-        true;
-
-
-    poList.forEach(po => {
-
         for (
-            let box = start;
-            box <= end;
-            box++
+            let copy = 0;
+            copy < copies;
+            copy++
         ) {
 
             if (!firstPage) {
+
                 doc.addPage();
+
             }
 
 
@@ -1134,275 +1637,288 @@ function createMergedPDF(
                 false;
 
 
-            drawPDFLabel(
+            drawLabel(
                 doc,
                 po,
-                box,
-                options
+                box
             );
+
         }
 
-    });
+    }
 
 
     return doc;
+
 }
 
 
 /* =========================================================
-   COCO OPTIONS
+   GENERATE SEPARATE PDFS
 ========================================================= */
 
-function getCocoOptions() {
+function generateSeparatePDFs(
+    poList
+) {
 
-    return {
+    poList.forEach(
+        po => {
 
-        mode:
-            getPrintMode(
-                "#cocoPO",
-                "#cocoBox",
-                "#cocoPOBox"
-            ),
+            const doc =
+                buildPDF(po);
 
-        pageBorder:
-            $("#cocoPageBorder")
-                ?.checked === true,
 
-        poBorder:
-            $("#cocoPOBorder")
-                ?.checked === true,
+            doc.save(
+                `${safeFilename(po)}_${safeFilename(currentTool)}.pdf`
+            );
 
-        boxBorder:
-            $("#cocoBoxBorder")
-                ?.checked === true,
+        }
+    );
 
-        combined:
-            $("#cocoCombinedBorder")
-                ?.checked === true,
-
-        cutting:
-            $("#cocoCut")
-                ?.checked === true,
-
-        scissor:
-            $("#cocoScissor")
-                ?.checked === true,
-
-        bold:
-            $("#cocoBold")
-                ?.checked === true
-    };
 }
 
 
 /* =========================================================
-   GENERATE COCO
+   GENERATE MERGED PDF
 ========================================================= */
 
-async function generateCoco() {
+function generateMergedPDF(
+    poList
+) {
 
-    try {
+    const JsPDF =
+        window.jspdf?.jsPDF;
 
-        const range =
-            getRange(
-                "#cocoStart",
-                "#cocoEnd"
-            );
 
+    const orientation =
+        $("#orientation")?.value ||
+        "portrait";
 
-        if (!range) {
-            return;
-        }
 
+    const format =
+        getPageFormat();
 
-        if (
-            !validatePrintMode(
-                "#cocoPO",
-                "#cocoBox",
-                "#cocoPOBox"
-            )
-        ) {
 
-            return;
-        }
+    const merged =
+        new JsPDF({
 
+            orientation,
 
-        const poList =
-            getCocoPOs();
+            unit: "mm",
 
-
-        if (!poList.length) {
-
-            showToast(
-                "Please enter at least one PO number.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        const options =
-            getCocoOptions();
-
-
-        const merge =
-            $("#cocoMerge")
-                ?.checked === true;
-
-
-        const zip =
-            $("#cocoZIP")
-                ?.checked === true;
-
-
-        /*
-         * MERGED PDF
-         */
-
-        if (merge) {
-
-            const doc =
-                createMergedPDF(
-                    poList,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                "BOOKSWAGON_MERGED_PO_LABELS.pdf"
-            );
-
-
-            showToast(
-                "Merged PDF downloaded successfully.",
-                "success"
-            );
-
-            return;
-        }
-
-
-        /*
-         * ZIP
-         */
-
-        if (
-            zip &&
-            typeof JSZip !==
-                "undefined"
-        ) {
-
-            const zipFile =
-                new JSZip();
-
-
-            poList.forEach(po => {
-
-                const doc =
-                    createPDF(
-                        po,
-                        range.start,
-                        range.end,
-                        options
-                    );
-
-
-                zipFile.file(
-                    `${safeFilename(po)}_BOX_${range.start}-${range.end}.pdf`,
-                    doc.output("blob")
-                );
-
-            });
-
-
-            const blob =
-                await zipFile.generateAsync({
-                    type: "blob"
-                });
-
-
-            const url =
-                URL.createObjectURL(
-                    blob
-                );
-
-
-            const anchor =
-                document.createElement(
-                    "a"
-                );
-
-
-            anchor.href =
-                url;
-
-            anchor.download =
-                "BOOKSWAGON_PO_LABELS.zip";
-
-
-            document.body.appendChild(
-                anchor
-            );
-
-
-            anchor.click();
-
-
-            anchor.remove();
-
-
-            setTimeout(
-                () =>
-                    URL.revokeObjectURL(
-                        url
-                    ),
-                1000
-            );
-
-
-            showToast(
-                "ZIP downloaded successfully.",
-                "success"
-            );
-
-            return;
-        }
-
-
-        /*
-         * SEPARATE PDF
-         */
-
-        poList.forEach(po => {
-
-            const doc =
-                createPDF(
-                    po,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `${safeFilename(po)}_BOX_${range.start}-${range.end}.pdf`
-            );
+            format
 
         });
 
 
-        showToast(
-            `${poList.length} PDF file(s) generated.`,
-            "success"
+    let firstPage =
+        true;
+
+
+    const start =
+        Number(
+            $("#startBox").value
         );
+
+
+    const end =
+        Number(
+            $("#endBox").value
+        );
+
+
+    const copies =
+        Math.max(
+            1,
+            Number(
+                $("#copies").value
+            ) || 1
+        );
+
+
+    for (
+        const po of poList
+    ) {
+
+        for (
+            let box = start;
+            box <= end;
+            box++
+        ) {
+
+            for (
+                let copy = 0;
+                copy < copies;
+                copy++
+            ) {
+
+                if (!firstPage) {
+
+                    merged.addPage();
+
+                }
+
+
+                firstPage =
+                    false;
+
+
+                drawLabel(
+                    merged,
+                    po,
+                    box
+                );
+
+            }
+
+        }
+
+    }
+
+
+    merged.save(
+        `${safeFilename(currentTool)}_MERGED.pdf`
+    );
+
+}
+
+
+/* =========================================================
+   GENERATE ZIP
+========================================================= */
+
+async function generateZIP(
+    poList
+) {
+
+    if (
+        typeof JSZip ===
+        "undefined"
+    ) {
+
+        throw new Error(
+            "JSZip library is not available."
+        );
+
+    }
+
+
+    const zip =
+        new JSZip();
+
+
+    poList.forEach(
+        po => {
+
+            const doc =
+                buildPDF(po);
+
+
+            zip.file(
+                `${safeFilename(po)}_${safeFilename(currentTool)}.pdf`,
+                doc.output("blob")
+            );
+
+        }
+    );
+
+
+    const blob =
+        await zip.generateAsync({
+            type: "blob"
+        });
+
+
+    downloadBlob(
+        blob,
+        `${safeFilename(currentTool)}_LABELS.zip`
+    );
+
+}
+
+
+/* =========================================================
+   MAIN GENERATOR
+========================================================= */
+
+async function generatePDF() {
+
+    try {
+
+        if (
+            !validateSettings()
+        ) {
+
+            return;
+
+        }
+
+
+        const poList =
+            getPOList();
+
+
+        const merge =
+            $("#mergePDF")?.checked === true;
+
+
+        const zip =
+            $("#zipPDF")?.checked === true;
+
+
+        /*
+         * If both are selected, ZIP takes priority.
+         * This prevents two conflicting download modes.
+         */
+
+        if (zip) {
+
+            await generateZIP(
+                poList
+            );
+
+
+            showToast(
+                "ZIP file downloaded successfully."
+            );
+
+
+            return;
+
+        }
+
+
+        if (merge) {
+
+            generateMergedPDF(
+                poList
+            );
+
+
+            showToast(
+                "Merged PDF downloaded successfully."
+            );
+
+
+            return;
+
+        }
+
+
+        generateSeparatePDFs(
+            poList
+        );
+
+
+        showToast(
+            `${poList.length} PDF file(s) generated successfully.`
+        );
+
 
     } catch (error) {
 
         console.error(
-            "CocoBlue:",
+            "PDF generation error:",
             error
         );
 
@@ -1412,332 +1928,9 @@ async function generateCoco() {
             "PDF generation failed.",
             "error"
         );
+
     }
-}
 
-
-/* =========================================================
-   OTHER OPTIONS
-========================================================= */
-
-function getOtherOptions() {
-
-    return {
-
-        mode:
-            getPrintMode(
-                "#otherPO",
-                "#otherBox",
-                "#otherPOBox"
-            ),
-
-        pageBorder:
-            $("#otherPageBorder")
-                ?.checked === true,
-
-        poBorder:
-            $("#otherPOBorder")
-                ?.checked === true,
-
-        boxBorder:
-            $("#otherBoxBorder")
-                ?.checked === true,
-
-        combined:
-            $("#otherCombined")
-                ?.checked === true,
-
-        cutting:
-            $("#otherCut")
-                ?.checked === true,
-
-        scissor:
-            true,
-
-        bold:
-            true
-    };
-}
-
-
-/* =========================================================
-   GENERATE OTHER PO
-========================================================= */
-
-async function generateOther() {
-
-    try {
-
-        const range =
-            getRange(
-                "#otherStart",
-                "#otherEnd"
-            );
-
-
-        if (!range) {
-            return;
-        }
-
-
-        if (
-            !validatePrintMode(
-                "#otherPO",
-                "#otherBox",
-                "#otherPOBox"
-            )
-        ) {
-
-            return;
-        }
-
-
-        const poList =
-            getOtherPOs();
-
-
-        if (!poList.length) {
-
-            showToast(
-                "Please enter at least one PO number.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        const options =
-            getOtherOptions();
-
-
-        if (
-            $("#otherMerge")
-                ?.checked === true
-        ) {
-
-            const doc =
-                createMergedPDF(
-                    poList,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                "BOOKSWAGON_OTHER_PO_MERGED.pdf"
-            );
-
-
-            showToast(
-                "Merged Other PO PDF downloaded.",
-                "success"
-            );
-
-            return;
-        }
-
-
-        poList.forEach(po => {
-
-            const doc =
-                createPDF(
-                    po,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `${safeFilename(po)}_OTHER_PO.pdf`
-            );
-
-        });
-
-
-        showToast(
-            "Other PO PDF(s) generated.",
-            "success"
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Other PO:",
-            error
-        );
-
-
-        showToast(
-            error.message ||
-            "Other PO generation failed.",
-            "error"
-        );
-    }
-}
-
-
-/* =========================================================
-   SBMO OPTIONS
-========================================================= */
-
-function getSBMOOptions() {
-
-    return {
-
-        mode:
-            getPrintMode(
-                "#sbmoPO",
-                "#sbmoBox",
-                "#sbmoPOBox"
-            ),
-
-        pageBorder:
-            $("#sbmoPageBorder")
-                ?.checked === true,
-
-        poBorder:
-            $("#sbmoPOBorder")
-                ?.checked === true,
-
-        boxBorder:
-            $("#sbmoBoxBorder")
-                ?.checked === true,
-
-        combined:
-            false,
-
-        cutting:
-            $("#sbmoCut")
-                ?.checked === true,
-
-        scissor:
-            true,
-
-        bold:
-            true
-    };
-}
-
-
-/* =========================================================
-   GENERATE SBMO
-========================================================= */
-
-async function generateSBMO() {
-
-    try {
-
-        const range =
-            getRange(
-                "#sbmoStart",
-                "#sbmoEnd"
-            );
-
-
-        if (!range) {
-            return;
-        }
-
-
-        if (
-            !validatePrintMode(
-                "#sbmoPO",
-                "#sbmoBox",
-                "#sbmoPOBox"
-            )
-        ) {
-
-            return;
-        }
-
-
-        const poList =
-            getSBMOPOs();
-
-
-        if (!poList.length) {
-
-            showToast(
-                "Please enter at least one PO number.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        const options =
-            getSBMOOptions();
-
-
-        if (
-            $("#sbmoMerge")
-                ?.checked === true
-        ) {
-
-            const doc =
-                createMergedPDF(
-                    poList,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                "BOOKSWAGON_SBMO_MERGED.pdf"
-            );
-
-
-            showToast(
-                "SBMO merged PDF downloaded.",
-                "success"
-            );
-
-            return;
-        }
-
-
-        poList.forEach(po => {
-
-            const doc =
-                createPDF(
-                    po,
-                    range.start,
-                    range.end,
-                    options
-                );
-
-
-            doc.save(
-                `${safeFilename(po)}_SBMO.pdf`
-            );
-
-        });
-
-
-        showToast(
-            "SBMO PDF(s) generated.",
-            "success"
-        );
-
-    } catch (error) {
-
-        console.error(
-            "SBMO:",
-            error
-        );
-
-
-        showToast(
-            error.message ||
-            "SBMO generation failed.",
-            "error"
-        );
-    }
 }
 
 
@@ -1745,21 +1938,76 @@ async function generateSBMO() {
    SAFE FILE NAME
 ========================================================= */
 
-function safeFilename(value) {
+function safeFilename(
+    value
+) {
 
-    return String(value || "PO")
+    return String(value || "LABEL")
         .replace(
-            /[<>:"/\\|?*\x00-\x1F]/g,
+            /[^a-z0-9_-]+/gi,
             "_"
         )
         .replace(
-            /\s+/g,
-            "_"
+            /^_+|_+$/g,
+            ""
         )
         .slice(
             0,
-            100
+            80
+        ) || "LABEL";
+
+}
+
+
+/* =========================================================
+   DOWNLOAD BLOB
+========================================================= */
+
+function downloadBlob(
+    blob,
+    filename
+) {
+
+    const url =
+        URL.createObjectURL(
+            blob
         );
+
+
+    const link =
+        document.createElement("a");
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        filename;
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    setTimeout(
+        () => {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        },
+        1000
+    );
+
 }
 
 
@@ -1767,292 +2015,130 @@ function safeFilename(value) {
    RESET
 ========================================================= */
 
-function resetWorkspace(
-    workspaceSelector
-) {
+function resetWorkspace() {
 
-    const workspace =
-        $(workspaceSelector);
+    $$(".po-input")
+        .forEach(
+            input => {
 
-
-    if (!workspace) {
-        return;
-    }
-
-
-    /*
-     * Text inputs
-     */
-
-    $$(
-        'input[type="text"]',
-        workspace
-    )
-    .forEach(input => {
-
-        input.value =
-            "";
-
-    });
-
-
-    /*
-     * Textareas
-     */
-
-    $$(
-        "textarea",
-        workspace
-    )
-    .forEach(textarea => {
-
-        textarea.value =
-            "";
-
-    });
-
-
-    /*
-     * Checkboxes
-     */
-
-    $$(
-        'input[type="checkbox"]',
-        workspace
-    )
-    .forEach(checkbox => {
-
-        checkbox.checked =
-            false;
-
-    });
-
-
-    /*
-     * Number inputs
-     */
-
-    $$(
-        'input[type="number"]',
-        workspace
-    )
-    .forEach(input => {
-
-        if (
-            input.id
-                .toLowerCase()
-                .includes("end")
-        ) {
-
-            input.value =
-                "200";
-
-        } else {
-
-            input.value =
-                "1";
-        }
-
-    });
-
-
-    updatePreviews();
-
-
-    showToast(
-        "Tool has been reset.",
-        "success"
-    );
-}
-
-
-/* =========================================================
-   RESET BUTTONS
-========================================================= */
-
-function setupResetButtons() {
-
-    $("#cocoReset")
-        ?.addEventListener(
-            "click",
-            () =>
-                resetWorkspace(
-                    "#cocoWorkspace"
-                )
-        );
-
-
-    $("#otherReset")
-        ?.addEventListener(
-            "click",
-            () =>
-                resetWorkspace(
-                    "#otherWorkspace"
-                )
-        );
-
-
-    $("#sbmoReset")
-        ?.addEventListener(
-            "click",
-            () =>
-                resetWorkspace(
-                    "#sbmoWorkspace"
-                )
-        );
-}
-
-
-/* =========================================================
-   GENERATE BUTTONS
-========================================================= */
-
-function setupGenerateButtons() {
-
-    $("#cocoGenerate")
-        ?.addEventListener(
-            "click",
-            generateCoco
-        );
-
-
-    $("#otherGenerate")
-        ?.addEventListener(
-            "click",
-            generateOther
-        );
-
-
-    $("#sbmoGenerate")
-        ?.addEventListener(
-            "click",
-            generateSBMO
-        );
-}
-
-
-/* =========================================================
-   EXCEL IMPORT
-========================================================= */
-
-function setupExcel() {
-
-    $("#cocoExcel")
-        ?.addEventListener(
-            "change",
-            async event => {
-
-                const file =
-                    event.target.files?.[0];
-
-
-                if (!file) {
-                    return;
-                }
-
-
-                try {
-
-                    if (
-                        typeof XLSX ===
-                        "undefined"
-                    ) {
-
-                        throw new Error(
-                            "Excel library is not loaded."
-                        );
-                    }
-
-
-                    const buffer =
-                        await file.arrayBuffer();
-
-
-                    const workbook =
-                        XLSX.read(
-                            buffer,
-                            {
-                                type:
-                                    "array"
-                            }
-                        );
-
-
-                    const sheet =
-                        workbook.Sheets[
-                            workbook.SheetNames[0]
-                        ];
-
-
-                    const rows =
-                        XLSX.utils.sheet_to_json(
-                            sheet,
-                            {
-                                header:
-                                    1,
-
-                                defval:
-                                    ""
-                            }
-                        );
-
-
-                    const values =
-                        rows
-                            .flat()
-                            .map(
-                                value =>
-                                    String(
-                                        value
-                                    ).trim()
-                            )
-                            .filter(Boolean);
-
-
-                    $$(".coco-po")
-                        .forEach(
-                            (input, index) => {
-
-                                input.value =
-                                    values[index] ||
-                                    "";
-
-                            }
-                        );
-
-
-                    updatePreviews();
-
-
-                    showToast(
-                        `${Math.min(values.length, 20)} PO(s) imported.`,
-                        "success"
-                    );
-
-                } catch (error) {
-
-                    console.error(
-                        error
-                    );
-
-
-                    showToast(
-                        error.message ||
-                        "Excel import failed.",
-                        "error"
-                    );
-                }
+                input.value = "";
 
             }
         );
+
+
+    if ($("#bulkPO")) {
+
+        $("#bulkPO").value =
+            "";
+
+    }
+
+
+    $("#startBox").value =
+        "1";
+
+
+    $("#endBox").value =
+        "200";
+
+
+    $("#copies").value =
+        "1";
+
+
+    $("#labelsPerPage").value =
+        "1";
+
+
+    $$(".feature-checkbox input")
+        .forEach(
+            checkbox => {
+
+                checkbox.checked =
+                    false;
+
+            }
+        );
+
+
+    $("#pageSize").value =
+        "A4";
+
+
+    $("#orientation").value =
+        "portrait";
+
+
+    $("#customWidth").value =
+        "210";
+
+
+    $("#customHeight").value =
+        "297";
+
+
+    $("#borderSize").value =
+        "medium";
+
+
+    $("#borderStyle").value =
+        "solid";
+
+
+    $("#borderColor").value =
+        "#111827";
+
+
+    $("#fontFamily").value =
+        "helvetica";
+
+
+    $("#fontSize").value =
+        "18";
+
+
+    $("#cutLineStyle").value =
+        "dashed";
+
+
+    updatePreview();
+
+
+    showToast(
+        "All settings have been reset."
+    );
+
 }
 
 
 /* =========================================================
-   QR CODE
+   RESET BUTTON
 ========================================================= */
 
-function generateQR(
+$("#resetButton")
+    ?.addEventListener(
+        "click",
+        resetWorkspace
+    );
+
+
+/* =========================================================
+   GENERATE BUTTON
+========================================================= */
+
+$("#generateButton")
+    ?.addEventListener(
+        "click",
+        generatePDF
+    );
+
+
+/* =========================================================
+   QR CODES
+========================================================= */
+
+function createQR(
     elementId,
     value
 ) {
@@ -2068,76 +2154,92 @@ function generateQR(
     }
 
 
+    element.innerHTML =
+        "";
+
+
     if (
         typeof QRCode ===
         "undefined"
     ) {
 
         console.warn(
-            "QRCode library not loaded."
+            "QRCode library is not loaded."
         );
 
         return;
+
     }
-
-
-    element.innerHTML =
-        "";
 
 
     new QRCode(
         element,
         {
-            text:
-                value,
 
-            width:
-                135,
+            text: value,
 
-            height:
-                135,
+            width: 130,
+
+            height: 130,
 
             correctLevel:
                 QRCode.CorrectLevel.M
+
         }
     );
+
 }
 
 
-function setupQRCodes() {
+function setupQR() {
 
-    generateQR(
+    createQR(
         "addressQR",
         CONFIG.maps
     );
 
 
-    generateQR(
+    createQR(
         "emailQR",
         `mailto:${CONFIG.email}`
     );
+
 }
 
 
 /* =========================================================
-   RELOAD / SCROLL
+   PAGE SIZE / ORIENTATION HELPERS
 ========================================================= */
 
-function setupScrollBehavior() {
+function setupPageSettings() {
 
-    /*
-     * Don't force the page to bottom on every load.
-     * Browser navigation remains normal.
-     */
+    $("#pageSize")
+        ?.addEventListener(
+            "change",
+            updatePreview
+        );
 
-    if (
-        "scrollRestoration"
-        in history
-    ) {
 
-        history.scrollRestoration =
-            "auto";
-    }
+    $("#orientation")
+        ?.addEventListener(
+            "change",
+            updatePreview
+        );
+
+
+    $("#customWidth")
+        ?.addEventListener(
+            "input",
+            updatePreview
+        );
+
+
+    $("#customHeight")
+        ?.addEventListener(
+            "input",
+            updatePreview
+        );
+
 }
 
 
@@ -2147,51 +2249,61 @@ function setupScrollBehavior() {
 
 function init() {
 
+    createPOFields();
+
+    setupInputTabs();
+
+    setupTools();
+
     setupCheckboxes();
 
-    setupToolCards();
+    setupLivePreview();
 
-    setupCloseButtons();
+    setupPageSettings();
 
-    setupTabs();
+    setupQR();
 
-    setupLiveUpdates();
+    updatePreview();
 
-    setupResetButtons();
 
-    setupGenerateButtons();
+    /*
+     * Default selected tool
+     */
 
-    setupExcel();
+    $$(".tool-select-btn")
+        .forEach(button => {
 
-    setupQRCodes();
+            button.classList.toggle(
+                "active",
+                button.dataset.selectTool ===
+                currentTool
+            );
 
-    setupScrollBehavior();
-
-    updatePreviews();
+        });
 
 
     console.log(
-        "================================"
+        "======================================"
     );
 
     console.log(
-        "BooksWagon Pages Label Studio"
+        "BOOKSWAGON LABEL STUDIO"
     );
 
     console.log(
-        "FINAL JS LOADED"
+        "FINAL SCRIPT LOADED"
     );
 
     console.log(
-        "✓ Simple checkboxes"
+        "✓ Coco Blue"
     );
 
     console.log(
-        "✓ Enable / Disable toast"
+        "✓ Other PO"
     );
 
     console.log(
-        "✓ No confirmation dialog"
+        "✓ ISB"
     );
 
     console.log(
@@ -2199,11 +2311,31 @@ function init() {
     );
 
     console.log(
-        "✓ Bulk PO input"
+        "✓ Bulk PO"
     );
 
     console.log(
         "✓ Unlimited box range"
+    );
+
+    console.log(
+        "✓ PO / Box / PO + Box"
+    );
+
+    console.log(
+        "✓ Page size"
+    );
+
+    console.log(
+        "✓ Orientation"
+    );
+
+    console.log(
+        "✓ Border size"
+    );
+
+    console.log(
+        "✓ Border style"
     );
 
     console.log(
@@ -2223,15 +2355,27 @@ function init() {
     );
 
     console.log(
+        "✓ Font family"
+    );
+
+    console.log(
+        "✓ Font size"
+    );
+
+    console.log(
+        "✓ Bold / Italic / Underline"
+    );
+
+    console.log(
         "✓ Cutting line"
     );
 
     console.log(
-        "✓ PDF"
+        "✓ Scissor mark"
     );
 
     console.log(
-        "✓ ZIP"
+        "✓ Separate PDF"
     );
 
     console.log(
@@ -2239,16 +2383,25 @@ function init() {
     );
 
     console.log(
-        "✓ Address QR"
+        "✓ ZIP"
     );
 
     console.log(
-        "✓ Email QR"
+        "✓ QR codes"
     );
 
     console.log(
-        "================================"
+        "✓ Simple checkbox ON/OFF"
     );
+
+    console.log(
+        "✓ No confirmation popup"
+    );
+
+    console.log(
+        "======================================"
+    );
+
 }
 
 
@@ -2272,4 +2425,5 @@ if (
 } else {
 
     init();
+
 }
