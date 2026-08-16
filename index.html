@@ -8,34 +8,16 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Books Label Studio</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
+    <meta
+        name="description"
+        content="Books Label Studio - PO, Barcode and Address Label Generator"
     >
 
-    <!-- Excel -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
-    ></script>
+    <title>Books Label Studio</title>
 
-    <!-- Barcode -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
-    ></script>
-
-    <!-- QR Code -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"
-    ></script>
-
-    <!-- PDF -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
-    ></script>
+    <!-- FINAL CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
@@ -75,6 +57,7 @@
             </label>
 
             <select id="languageSelect">
+
                 <option value="en">
                     English
                 </option>
@@ -82,6 +65,7 @@
                 <option value="hi">
                     हिंदी
                 </option>
+
             </select>
 
         </div>
@@ -100,7 +84,7 @@
             class="category-btn active"
             data-category="cocoBlue"
         >
-            🏷️ Coco Blue PO
+            Coco Blue PO
         </button>
 
 
@@ -109,7 +93,7 @@
             class="category-btn"
             data-category="otherPO"
         >
-            📦 Other PO
+            Other PO
         </button>
 
 
@@ -118,7 +102,7 @@
             class="category-btn"
             data-category="isbnBarcode"
         >
-            ▥ ISBN Barcode
+            ISBN Barcode
         </button>
 
 
@@ -127,14 +111,14 @@
             class="category-btn"
             data-category="addressSticker"
         >
-            ✉️ Address Sticker
+            Address Sticker
         </button>
 
     </nav>
 
 
     <!-- =====================================================
-         MAIN
+         MAIN CONTENT
     ====================================================== -->
 
     <main class="main-content">
@@ -152,7 +136,7 @@
             <div class="section-heading">
 
                 <span class="section-label">
-                    LABEL TOOL
+                    TOOL
                 </span>
 
                 <h2>
@@ -160,14 +144,13 @@
                 </h2>
 
                 <p>
-                    Create PO and Box labels with
-                    flexible repeat and page settings.
+                    Create professional PO and box labels.
                 </p>
 
             </div>
 
 
-            <!-- COCO SUB CATEGORY -->
+            <!-- SUB CATEGORY -->
 
             <div class="sub-navigation">
 
@@ -179,6 +162,7 @@
                     Individual
                 </button>
 
+
                 <button
                     type="button"
                     class="sub-category-btn"
@@ -187,6 +171,7 @@
                     Multiple
                 </button>
 
+
                 <button
                     type="button"
                     class="sub-category-btn"
@@ -194,6 +179,7 @@
                 >
                     Excel Upload
                 </button>
+
 
                 <button
                     type="button"
@@ -207,7 +193,7 @@
 
 
             <!-- =============================================
-                 INDIVIDUAL PO
+                 INDIVIDUAL
             ============================================== -->
 
             <div
@@ -249,7 +235,7 @@
 
 
             <!-- =============================================
-                 MULTIPLE PO
+                 MULTIPLE
             ============================================== -->
 
             <div
@@ -268,8 +254,7 @@
                             </h3>
 
                             <p>
-                                Separate PO numbers using comma
-                                or a new line.
+                                Separate PO numbers with comma or new line.
                             </p>
 
                         </div>
@@ -285,7 +270,7 @@
 
                         <textarea
                             id="cocoMultiplePO"
-                            placeholder="BW01, BW02, BW03, BW04"
+                            placeholder="PO1001, PO1002, PO1003"
                         ></textarea>
 
                     </div>
@@ -296,7 +281,7 @@
 
 
             <!-- =============================================
-                 EXCEL UPLOAD
+                 EXCEL
             ============================================== -->
 
             <div
@@ -315,7 +300,8 @@
                             </h3>
 
                             <p>
-                                Upload an Excel file with PO numbers.
+                                First row is treated as header and ignored.
+                                PO data starts from the second row.
                             </p>
 
                         </div>
@@ -330,7 +316,7 @@
                         </strong>
 
                         <p>
-                            First column will be used as PO numbers.
+                            First row = Header
                         </p>
 
                         <input
@@ -372,12 +358,11 @@
                         <div>
 
                             <h3>
-                                Coco Blue From / To Address
+                                From / To Address
                             </h3>
 
                             <p>
-                                Optional address printing inside
-                                the Coco Blue tool.
+                                Print From and To addresses inside Coco Blue.
                             </p>
 
                         </div>
@@ -389,15 +374,24 @@
 
                         <div class="address-editor">
 
-                            <div class="field">
+                            <div class="panel-title">
 
-                                <label for="cocoFromAddress">
-                                    From Address
-                                </label>
+                                <div>
+
+                                    <h3>
+                                        From Address
+                                    </h3>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="field">
 
                                 <textarea
                                     id="cocoFromAddress"
-                                    placeholder="Company Name&#10;Customer Name&#10;Full Address&#10;City, PIN"
+                                    placeholder="Company Name&#10;Customer Name&#10;Full Address"
                                 ></textarea>
 
                             </div>
@@ -407,15 +401,24 @@
 
                         <div class="address-editor">
 
-                            <div class="field">
+                            <div class="panel-title">
 
-                                <label for="cocoToAddress">
-                                    To Address
-                                </label>
+                                <div>
+
+                                    <h3>
+                                        To Address
+                                    </h3>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="field">
 
                                 <textarea
                                     id="cocoToAddress"
-                                    placeholder="Customer Name&#10;Full Address&#10;City, PIN"
+                                    placeholder="Customer Name&#10;Address&#10;City / State / PIN"
                                 ></textarea>
 
                             </div>
@@ -430,7 +433,7 @@
 
 
             <!-- =============================================
-                 BOX SETTINGS
+                 BOX REPEAT SETTINGS
             ============================================== -->
 
             <div class="panel-card">
@@ -444,7 +447,7 @@
                         </h3>
 
                         <p>
-                            Unlimited box range and repeat count.
+                            No artificial limit on repeat count.
                         </p>
 
                     </div>
@@ -506,6 +509,54 @@
 
                 <div class="two-column-fields">
 
+                    <div class="field">
+
+                        <label for="labelsPerPage">
+                            Labels Per Page
+                        </label>
+
+                        <select id="labelsPerPage">
+
+                            <option value="1">
+                                1 Label
+                            </option>
+
+                            <option
+                                value="2"
+                                selected
+                            >
+                                2 Labels
+                            </option>
+
+                            <option value="4">
+                                4 Labels
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="labelGap">
+                            Label Gap (mm)
+                        </label>
+
+                        <input
+                            id="labelGap"
+                            type="number"
+                            min="0"
+                            value="2"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="feature-checkbox-list">
+
                     <label class="feature-check">
 
                         <input
@@ -515,9 +566,7 @@
 
                         <span class="checkmark"></span>
 
-                        <span>
-                            Page Flow — Same PO
-                        </span>
+                        Same PO Page Flow
 
                     </label>
 
@@ -532,47 +581,9 @@
 
                         <span class="checkmark"></span>
 
-                        <span>
-                            Half Page Label Flow
-                        </span>
+                        Half Page Label Flow
 
                     </label>
-
-                </div>
-
-
-                <div class="two-column-fields">
-
-                    <div class="field">
-
-                        <label for="labelsPerPage">
-                            Labels Per Page
-                        </label>
-
-                        <input
-                            id="labelsPerPage"
-                            type="number"
-                            min="1"
-                            value="2"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="labelGap">
-                            Label Gap
-                        </label>
-
-                        <input
-                            id="labelGap"
-                            type="number"
-                            min="0"
-                            value="2"
-                        >
-
-                    </div>
 
                 </div>
 
@@ -594,8 +605,7 @@
                         </h3>
 
                         <p>
-                            All page sizes support Portrait
-                            and Landscape.
+                            Preview updates live with page settings.
                         </p>
 
                     </div>
@@ -727,8 +737,7 @@
                         </h3>
 
                         <p>
-                            Select exactly what should appear
-                            on the printed label.
+                            All options update the preview instantly.
                         </p>
 
                     </div>
@@ -748,9 +757,7 @@
 
                         <span class="checkmark"></span>
 
-                        <span>
-                            PO Number
-                        </span>
+                        PO Number
 
                     </label>
 
@@ -765,9 +772,7 @@
 
                         <span class="checkmark"></span>
 
-                        <span>
-                            Box Number
-                        </span>
+                        Box Number
 
                     </label>
 
@@ -781,9 +786,7 @@
 
                         <span class="checkmark"></span>
 
-                        <span>
-                            PO Number + Box Number
-                        </span>
+                        PO Number + Box Number
 
                     </label>
 
@@ -797,9 +800,7 @@
 
                         <span class="checkmark"></span>
 
-                        <span>
-                            Combined Border
-                        </span>
+                        Combined Border
 
                     </label>
 
@@ -813,9 +814,7 @@
 
                         <span class="checkmark"></span>
 
-                        <span>
-                            PO Border
-                        </span>
+                        PO Border
 
                     </label>
 
@@ -829,9 +828,7 @@
 
                         <span class="checkmark"></span>
 
-                        <span>
-                            Box Border
-                        </span>
+                        Box Border
 
                     </label>
 
@@ -845,9 +842,7 @@
 
                         <span class="checkmark"></span>
 
-                        <span>
-                            Cut Line / Scissor Mark
-                        </span>
+                        Cut Line / Scissor Mark
 
                     </label>
 
@@ -861,9 +856,7 @@
 
                         <span class="checkmark"></span>
 
-                        <span>
-                            Page Border
-                        </span>
+                        Page Border
 
                     </label>
 
@@ -873,274 +866,120 @@
 
 
             <!-- =============================================
-                 FONT SETTINGS
+                 PO FONT SETTINGS
             ============================================== -->
 
-            <div class="settings-grid">
+            <div class="panel-card">
 
-                <!-- PO FONT -->
+                <div class="panel-title">
 
-                <div class="panel-card">
+                    <div>
 
-                    <div class="panel-title">
-
-                        <div>
-
-                            <h3>
-                                PO Number Font
-                            </h3>
-
-                            <p>
-                                Separate PO text formatting.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="two-column-fields">
-
-                        <div class="field">
-
-                            <label for="poFontFamily">
-                                Font
-                            </label>
-
-                            <select id="poFontFamily">
-
-                                <option>Arial</option>
-                                <option>Calibri</option>
-                                <option>Cambria</option>
-                                <option>Georgia</option>
-                                <option>Verdana</option>
-                                <option>Tahoma</option>
-                                <option>Trebuchet MS</option>
-                                <option>Times New Roman</option>
-                                <option>Courier New</option>
-                                <option>Consolas</option>
-                                <option>Garamond</option>
-                                <option>Century Gothic</option>
-                                <option>Arial Black</option>
-                                <option>Impact</option>
-                                <option>Segoe UI</option>
-                                <option>Segoe UI Semibold</option>
-                                <option>Franklin Gothic Medium</option>
-                                <option>Book Antiqua</option>
-                                <option>Bookman Old Style</option>
-                                <option>Comic Sans MS</option>
-                                <option>Lucida Console</option>
-                                <option>Lucida Sans</option>
-                                <option>MS Sans Serif</option>
-                                <option>MS Serif</option>
-                                <option>Palatino Linotype</option>
-                                <option>Rockwell</option>
-                                <option>Gill Sans</option>
-                                <option>Helvetica</option>
-                            </select>
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="poFontSize">
-                                Font Size
-                            </label>
-
-                            <select id="poFontSize">
-
-                                <option value="10">10</option>
-                                <option value="12">12</option>
-                                <option value="14">14</option>
-                                <option value="16">16</option>
-                                <option value="18">18</option>
-                                <option value="20">20</option>
-                                <option value="22">22</option>
-                                <option value="24" selected>24</option>
-                                <option value="26">26</option>
-                                <option value="28">28</option>
-                                <option value="30">30</option>
-                                <option value="32">32</option>
-                                <option value="34">34</option>
-                                <option value="36">36</option>
-                                <option value="38">38</option>
-                                <option value="40">40</option>
-                                <option value="42">42</option>
-                                <option value="44">44</option>
-                                <option value="46">46</option>
-                                <option value="48">48</option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="text-style-controls">
-
-                        <label>
-                            <input
-                                id="poBoldCheck"
-                                type="checkbox"
-                            >
-                            Bold
-                        </label>
-
-
-                        <label>
-                            <input
-                                id="poItalicCheck"
-                                type="checkbox"
-                            >
-                            Italic
-                        </label>
-
-
-                        <label>
-                            <input
-                                id="poUnderlineCheck"
-                                type="checkbox"
-                            >
-                            Underline
-                        </label>
+                        <h3>
+                            PO Number Font Settings
+                        </h3>
 
                     </div>
 
                 </div>
 
 
-                <!-- BOX FONT -->
+                <div class="settings-grid">
 
-                <div class="panel-card">
+                    <div class="field">
 
-                    <div class="panel-title">
+                        <label for="poFontFamily">
+                            Font
+                        </label>
 
-                        <div>
+                        <select id="poFontFamily">
 
-                            <h3>
-                                Box Number Font
-                            </h3>
+                            <option>Arial</option>
+                            <option>Calibri</option>
+                            <option>Times New Roman</option>
+                            <option>Georgia</option>
+                            <option>Verdana</option>
+                            <option>Tahoma</option>
+                            <option>Trebuchet MS</option>
+                            <option>Courier New</option>
+                            <option>Consolas</option>
+                            <option>Cambria</option>
+                            <option>Garamond</option>
+                            <option>Palatino Linotype</option>
+                            <option>Century Gothic</option>
+                            <option>Segoe UI</option>
+                            <option>Segoe UI Semibold</option>
+                            <option>Franklin Gothic</option>
+                            <option>Impact</option>
+                            <option>Lucida Sans</option>
+                            <option>Book Antiqua</option>
+                            <option>Arial Narrow</option>
+                            <option>Arial Black</option>
+                            <option>Microsoft Sans Serif</option>
+                            <option>Rockwell</option>
+                            <option>Courier</option>
+                            <option>Helvetica</option>
 
-                            <p>
-                                Separate Box text formatting.
-                            </p>
-
-                        </div>
+                        </select>
 
                     </div>
 
 
-                    <div class="two-column-fields">
+                    <div class="field">
 
-                        <div class="field">
+                        <label for="poFontSize">
+                            Font Size
+                        </label>
 
-                            <label for="boxFontFamily">
-                                Font
-                            </label>
-
-                            <select id="boxFontFamily">
-
-                                <option>Arial</option>
-                                <option>Calibri</option>
-                                <option>Cambria</option>
-                                <option>Georgia</option>
-                                <option>Verdana</option>
-                                <option>Tahoma</option>
-                                <option>Trebuchet MS</option>
-                                <option>Times New Roman</option>
-                                <option>Courier New</option>
-                                <option>Consolas</option>
-                                <option>Garamond</option>
-                                <option>Century Gothic</option>
-                                <option>Arial Black</option>
-                                <option>Impact</option>
-                                <option>Segoe UI</option>
-                                <option>Segoe UI Semibold</option>
-                                <option>Franklin Gothic Medium</option>
-                                <option>Book Antiqua</option>
-                                <option>Bookman Old Style</option>
-                                <option>Comic Sans MS</option>
-                                <option>Lucida Console</option>
-                                <option>Lucida Sans</option>
-                                <option>MS Sans Serif</option>
-                                <option>MS Serif</option>
-                                <option>Palatino Linotype</option>
-                                <option>Rockwell</option>
-                                <option>Gill Sans</option>
-                                <option>Helvetica</option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="boxFontSize">
-                                Font Size
-                            </label>
-
-                            <select id="boxFontSize">
-
-                                <option value="10">10</option>
-                                <option value="12">12</option>
-                                <option value="14">14</option>
-                                <option value="16">16</option>
-                                <option value="18">18</option>
-                                <option value="20" selected>20</option>
-                                <option value="22">22</option>
-                                <option value="24">24</option>
-                                <option value="26">26</option>
-                                <option value="28">28</option>
-                                <option value="30">30</option>
-                                <option value="32">32</option>
-                                <option value="34">34</option>
-                                <option value="36">36</option>
-                                <option value="38">38</option>
-                                <option value="40">40</option>
-                                <option value="42">42</option>
-                                <option value="44">44</option>
-                                <option value="46">46</option>
-                                <option value="48">48</option>
-
-                            </select>
-
-                        </div>
+                        <input
+                            id="poFontSize"
+                            type="number"
+                            min="1"
+                            max="48"
+                            value="24"
+                        >
 
                     </div>
 
-
-                    <div class="text-style-controls">
-
-                        <label>
-                            <input
-                                id="boxBoldCheck"
-                                type="checkbox"
-                            >
-                            Bold
-                        </label>
+                </div>
 
 
-                        <label>
-                            <input
-                                id="boxItalicCheck"
-                                type="checkbox"
-                            >
-                            Italic
-                        </label>
+                <div class="text-style-controls">
+
+                    <label>
+
+                        <input
+                            id="poBoldCheck"
+                            type="checkbox"
+                        >
+
+                        Bold
+
+                    </label>
 
 
-                        <label>
-                            <input
-                                id="boxUnderlineCheck"
-                                type="checkbox"
-                            >
-                            Underline
-                        </label>
+                    <label>
 
-                    </div>
+                        <input
+                            id="poItalicCheck"
+                            type="checkbox"
+                        >
+
+                        Italic
+
+                    </label>
+
+
+                    <label>
+
+                        <input
+                            id="poUnderlineCheck"
+                            type="checkbox"
+                        >
+
+                        Underline
+
+                    </label>
 
                 </div>
 
@@ -1148,7 +987,128 @@
 
 
             <!-- =============================================
-                 PREVIEW
+                 BOX FONT SETTINGS
+            ============================================== -->
+
+            <div class="panel-card">
+
+                <div class="panel-title">
+
+                    <div>
+
+                        <h3>
+                            Box Number Font Settings
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-grid">
+
+                    <div class="field">
+
+                        <label for="boxFontFamily">
+                            Font
+                        </label>
+
+                        <select id="boxFontFamily">
+
+                            <option>Arial</option>
+                            <option>Calibri</option>
+                            <option>Times New Roman</option>
+                            <option>Georgia</option>
+                            <option>Verdana</option>
+                            <option>Tahoma</option>
+                            <option>Trebuchet MS</option>
+                            <option>Courier New</option>
+                            <option>Consolas</option>
+                            <option>Cambria</option>
+                            <option>Garamond</option>
+                            <option>Palatino Linotype</option>
+                            <option>Century Gothic</option>
+                            <option>Segoe UI</option>
+                            <option>Segoe UI Semibold</option>
+                            <option>Franklin Gothic</option>
+                            <option>Impact</option>
+                            <option>Lucida Sans</option>
+                            <option>Book Antiqua</option>
+                            <option>Arial Narrow</option>
+                            <option>Arial Black</option>
+                            <option>Microsoft Sans Serif</option>
+                            <option>Rockwell</option>
+                            <option>Courier</option>
+                            <option>Helvetica</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="boxFontSize">
+                            Font Size
+                        </label>
+
+                        <input
+                            id="boxFontSize"
+                            type="number"
+                            min="1"
+                            max="48"
+                            value="20"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-style-controls">
+
+                    <label>
+
+                        <input
+                            id="boxBoldCheck"
+                            type="checkbox"
+                        >
+
+                        Bold
+
+                    </label>
+
+
+                    <label>
+
+                        <input
+                            id="boxItalicCheck"
+                            type="checkbox"
+                        >
+
+                        Italic
+
+                    </label>
+
+
+                    <label>
+
+                        <input
+                            id="boxUnderlineCheck"
+                            type="checkbox"
+                        >
+
+                        Underline
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 LIVE PREVIEW
             ============================================== -->
 
             <div class="panel-card preview-card">
@@ -1162,13 +1122,15 @@
                         </h3>
 
                         <p>
-                            Preview changes automatically with
-                            page size and settings.
+                            Preview changes instantly.
                         </p>
 
                     </div>
 
-                    <span id="previewPageSize">
+                    <span
+                        id="previewPageSize"
+                        class="limit-badge"
+                    >
                         4 × 6 Inches
                     </span>
 
@@ -1211,9 +1173,7 @@
             </div>
 
 
-            <!-- =============================================
-                 ACTIONS
-            ============================================== -->
+            <!-- ACTIONS -->
 
             <div class="action-bar">
 
@@ -1239,7 +1199,6 @@
         </section>
 
 
-
         <!-- =================================================
              OTHER PO
         ================================================== -->
@@ -1252,7 +1211,7 @@
             <div class="section-heading">
 
                 <span class="section-label">
-                    LABEL TOOL
+                    TOOL
                 </span>
 
                 <h2>
@@ -1260,7 +1219,7 @@
                 </h2>
 
                 <p>
-                    Create labels for other purchase orders.
+                    Generate labels for other purchase orders.
                 </p>
 
             </div>
@@ -1310,7 +1269,7 @@
 
             <div
                 id="otherIndividualPanel"
-                class="other-po-panel active"
+                class="mode-panel active"
             >
 
                 <div class="panel-card">
@@ -1320,14 +1279,18 @@
                         <div>
 
                             <h3>
-                                Individual PO Numbers
+                                Individual Other PO
                             </h3>
 
                             <p>
-                                Up to 40 manual PO numbers.
+                                Enter up to 40 PO numbers.
                             </p>
 
                         </div>
+
+                        <span class="limit-badge">
+                            MAX 40
+                        </span>
 
                     </div>
 
@@ -1346,7 +1309,7 @@
 
             <div
                 id="otherMultiplePanel"
-                class="other-po-panel"
+                class="mode-panel"
             >
 
                 <div class="panel-card">
@@ -1359,7 +1322,7 @@
 
                         <textarea
                             id="otherMultiplePO"
-                            placeholder="PO01, PO02, PO03..."
+                            placeholder="PO1001, PO1002, PO1003"
                         ></textarea>
 
                     </div>
@@ -1373,7 +1336,7 @@
 
             <div
                 id="otherExcelPanel"
-                class="other-po-panel"
+                class="mode-panel"
             >
 
                 <div class="panel-card">
@@ -1381,8 +1344,12 @@
                     <div class="upload-area">
 
                         <strong>
-                            Upload Other PO Excel
+                            Upload Excel File
                         </strong>
+
+                        <p>
+                            First row = Header and will be ignored.
+                        </p>
 
                         <input
                             id="otherExcelFile"
@@ -1411,7 +1378,7 @@
 
             <div
                 id="otherAddressPanel"
-                class="other-po-panel"
+                class="mode-panel"
             >
 
                 <div class="panel-card">
@@ -1420,36 +1387,28 @@
 
                         <div class="address-editor">
 
-                            <div class="field">
+                            <h3>
+                                From Address
+                            </h3>
 
-                                <label for="otherFromAddress">
-                                    From Address
-                                </label>
-
-                                <textarea
-                                    id="otherFromAddress"
-                                    placeholder="From Company / Name / Address"
-                                ></textarea>
-
-                            </div>
+                            <textarea
+                                id="otherFromAddress"
+                                placeholder="From Address"
+                            ></textarea>
 
                         </div>
 
 
                         <div class="address-editor">
 
-                            <div class="field">
+                            <h3>
+                                To Address
+                            </h3>
 
-                                <label for="otherToAddress">
-                                    To Address
-                                </label>
-
-                                <textarea
-                                    id="otherToAddress"
-                                    placeholder="Customer / Address"
-                                ></textarea>
-
-                            </div>
+                            <textarea
+                                id="otherToAddress"
+                                placeholder="To Address"
+                            ></textarea>
 
                         </div>
 
@@ -1460,15 +1419,19 @@
             </div>
 
 
-            <!-- OTHER PAGE -->
+            <!-- PAGE SETTINGS -->
 
             <div class="panel-card">
 
                 <div class="panel-title">
 
-                    <h3>
-                        Page Settings
-                    </h3>
+                    <div>
+
+                        <h3>
+                            Page Settings
+                        </h3>
+
+                    </div>
 
                 </div>
 
@@ -1496,7 +1459,7 @@
                             </option>
 
                             <option value="custom">
-                                Custom
+                                Custom Size
                             </option>
 
                         </select>
@@ -1570,7 +1533,47 @@
             </div>
 
 
-            <!-- OTHER ACTIONS -->
+            <div class="panel-card preview-card">
+
+                <div class="panel-title">
+
+                    <h3>
+                        Live Preview
+                    </h3>
+
+                </div>
+
+
+                <div class="preview-container">
+
+                    <div
+                        class="preview-page"
+                    >
+
+                        <div
+                            class="preview-label"
+                        >
+
+                            <div
+                                class="preview-po"
+                            >
+                                PO NUMBER
+                            </div>
+
+                            <div
+                                class="preview-box"
+                            >
+                                BOX NO. 1
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
 
             <div class="action-bar">
 
@@ -1596,7 +1599,6 @@
         </section>
 
 
-
         <!-- =================================================
              ISBN BARCODE
         ================================================== -->
@@ -1609,7 +1611,7 @@
             <div class="section-heading">
 
                 <span class="section-label">
-                    BARCODE TOOL
+                    TOOL
                 </span>
 
                 <h2>
@@ -1617,7 +1619,7 @@
                 </h2>
 
                 <p>
-                    Generate clean printable book barcode labels.
+                    Generate printable ISBN barcode labels.
                 </p>
 
             </div>
@@ -1625,27 +1627,18 @@
 
             <div class="panel-card">
 
-                <div class="panel-title">
-
-                    <h3>
-                        ISBN Information
-                    </h3>
-
-                </div>
-
-
                 <div class="two-column-fields">
 
                     <div class="field">
 
                         <label for="isbnValue">
-                            ISBN / Barcode Value
+                            ISBN
                         </label>
 
                         <input
                             id="isbnValue"
                             type="text"
-                            placeholder="978XXXXXXXXXX"
+                            placeholder="Enter ISBN"
                         >
 
                     </div>
@@ -1671,7 +1664,7 @@
                 <div class="field">
 
                     <label for="isbnEdition">
-                        Edition / Additional Text
+                        Edition
                     </label>
 
                     <input
@@ -1682,19 +1675,8 @@
 
                 </div>
 
-
-                <div class="isbn-note">
-
-                    Barcode preview updates automatically.
-                    Keep sufficient gap between barcode,
-                    code text and title.
-
-                </div>
-
             </div>
 
-
-            <!-- ISBN PAGE -->
 
             <div class="panel-card">
 
@@ -1730,7 +1712,7 @@
                             </option>
 
                             <option value="custom">
-                                Custom
+                                Custom Size
                             </option>
 
                         </select>
@@ -1804,8 +1786,6 @@
             </div>
 
 
-            <!-- ISBN PREVIEW -->
-
             <div class="panel-card">
 
                 <div class="panel-title">
@@ -1822,6 +1802,7 @@
                     <svg
                         id="isbnBarcodeSvg"
                     ></svg>
+
 
                     <div
                         id="isbnBarcodeText"
@@ -1858,7 +1839,6 @@
         </section>
 
 
-
         <!-- =================================================
              ADDRESS STICKER
         ================================================== -->
@@ -1871,7 +1851,7 @@
             <div class="section-heading">
 
                 <span class="section-label">
-                    ADDRESS TOOL
+                    TOOL
                 </span>
 
                 <h2>
@@ -1879,7 +1859,7 @@
                 </h2>
 
                 <p>
-                    Create separate From and To address labels.
+                    Generate From and To address stickers.
                 </p>
 
             </div>
@@ -1907,7 +1887,7 @@
             </div>
 
 
-            <!-- ADDRESS MANUAL -->
+            <!-- MANUAL -->
 
             <div
                 id="addressManualPanel"
@@ -1917,9 +1897,6 @@
                 <div class="panel-card">
 
                     <div class="address-two-column">
-
-
-                        <!-- FROM -->
 
                         <div class="address-editor">
 
@@ -1945,136 +1922,15 @@
 
                             <div class="field">
 
-                                <label for="addressFrom">
-                                    From
-                                </label>
-
                                 <textarea
                                     id="addressFrom"
-                                    placeholder="Example:
-Company Name
-Customer Name
-Full Address
-City, State - PIN"
+                                    placeholder="Company Name&#10;Customer Name&#10;Full Address"
                                 ></textarea>
-
-                            </div>
-
-
-                            <div class="address-settings">
-
-                                <div class="field">
-
-                                    <label for="fromFontFamily">
-                                        Font
-                                    </label>
-
-                                    <select id="fromFontFamily">
-
-                                        <option>Arial</option>
-                                        <option>Calibri</option>
-                                        <option>Cambria</option>
-                                        <option>Georgia</option>
-                                        <option>Verdana</option>
-                                        <option>Tahoma</option>
-                                        <option>Times New Roman</option>
-                                        <option>Courier New</option>
-                                        <option>Segoe UI</option>
-                                        <option>Garamond</option>
-
-                                    </select>
-
-                                </div>
-
-
-                                <div class="field">
-
-                                    <label for="fromFontSize">
-                                        Font Size
-                                    </label>
-
-                                    <select id="fromFontSize">
-
-                                        <option value="10">10</option>
-                                        <option value="12">12</option>
-                                        <option value="14" selected>14</option>
-                                        <option value="16">16</option>
-                                        <option value="18">18</option>
-                                        <option value="20">20</option>
-                                        <option value="22">22</option>
-                                        <option value="24">24</option>
-                                        <option value="26">26</option>
-                                        <option value="28">28</option>
-                                        <option value="30">30</option>
-                                        <option value="32">32</option>
-                                        <option value="36">36</option>
-                                        <option value="40">40</option>
-                                        <option value="44">44</option>
-                                        <option value="48">48</option>
-
-                                    </select>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="text-style-controls">
-
-                                <label>
-
-                                    <input
-                                        id="fromBold"
-                                        type="checkbox"
-                                    >
-
-                                    Bold
-
-                                </label>
-
-
-                                <label>
-
-                                    <input
-                                        id="fromItalic"
-                                        type="checkbox"
-                                    >
-
-                                    Italic
-
-                                </label>
-
-
-                                <label>
-
-                                    <input
-                                        id="fromUnderline"
-                                        type="checkbox"
-                                    >
-
-                                    Underline
-
-                                </label>
-
-
-                                <label>
-
-                                    <input
-                                        id="fromBorder"
-                                        type="checkbox"
-                                    >
-
-                                    Border
-
-                                </label>
 
                             </div>
 
                         </div>
 
-
-
-                        <!-- TO -->
 
                         <div class="address-editor">
 
@@ -2087,7 +1943,10 @@ City, State - PIN"
                                     </h3>
 
                                     <p>
-                                        Customer / Receiver Address
+                                        Example:
+                                        Customer Name,
+                                        Address,
+                                        City / State / PIN
                                     </p>
 
                                 </div>
@@ -2097,149 +1956,14 @@ City, State - PIN"
 
                             <div class="field">
 
-                                <label for="addressTo">
-                                    To
-                                </label>
-
                                 <textarea
                                     id="addressTo"
-                                    placeholder="Example:
-Customer Name
-Full Address
-City, State - PIN
-Country"
+                                    placeholder="Customer Name&#10;Address&#10;City / State / PIN"
                                 ></textarea>
 
                             </div>
 
-
-                            <div class="address-settings">
-
-                                <div class="field">
-
-                                    <label for="toFontFamily">
-                                        Font
-                                    </label>
-
-                                    <select id="toFontFamily">
-
-                                        <option>Arial</option>
-                                        <option>Calibri</option>
-                                        <option>Cambria</option>
-                                        <option>Georgia</option>
-                                        <option>Verdana</option>
-                                        <option>Tahoma</option>
-                                        <option>Times New Roman</option>
-                                        <option>Courier New</option>
-                                        <option>Segoe UI</option>
-                                        <option>Garamond</option>
-
-                                    </select>
-
-                                </div>
-
-
-                                <div class="field">
-
-                                    <label for="toFontSize">
-                                        Font Size
-                                    </label>
-
-                                    <select id="toFontSize">
-
-                                        <option value="10">10</option>
-                                        <option value="12">12</option>
-                                        <option value="14" selected>14</option>
-                                        <option value="16">16</option>
-                                        <option value="18">18</option>
-                                        <option value="20">20</option>
-                                        <option value="22">22</option>
-                                        <option value="24">24</option>
-                                        <option value="26">26</option>
-                                        <option value="28">28</option>
-                                        <option value="30">30</option>
-                                        <option value="32">32</option>
-                                        <option value="36">36</option>
-                                        <option value="40">40</option>
-                                        <option value="44">44</option>
-                                        <option value="48">48</option>
-
-                                    </select>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="text-style-controls">
-
-                                <label>
-
-                                    <input
-                                        id="toBold"
-                                        type="checkbox"
-                                    >
-
-                                    Bold
-
-                                </label>
-
-
-                                <label>
-
-                                    <input
-                                        id="toItalic"
-                                        type="checkbox"
-                                    >
-
-                                    Italic
-
-                                </label>
-
-
-                                <label>
-
-                                    <input
-                                        id="toUnderline"
-                                        type="checkbox"
-                                    >
-
-                                    Underline
-
-                                </label>
-
-
-                                <label>
-
-                                    <input
-                                        id="toBorder"
-                                        type="checkbox"
-                                    >
-
-                                    Border
-
-                                </label>
-
-                            </div>
-
                         </div>
-
-                    </div>
-
-
-                    <div class="map-link-box">
-
-                        <span>
-                            Map:
-                        </span>
-
-                        <a
-                            href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
-                            target="_blank"
-                            rel="noopener"
-                        >
-                            Open Location
-                        </a>
 
                     </div>
 
@@ -2248,7 +1972,7 @@ Country"
             </div>
 
 
-            <!-- ADDRESS EXCEL -->
+            <!-- EXCEL -->
 
             <div
                 id="addressExcelPanel"
@@ -2257,15 +1981,6 @@ Country"
 
                 <div class="panel-card">
 
-                    <div class="panel-title">
-
-                        <h3>
-                            Address Excel Upload
-                        </h3>
-
-                    </div>
-
-
                     <div class="upload-area">
 
                         <strong>
@@ -2273,7 +1988,8 @@ Country"
                         </strong>
 
                         <p>
-                            Use From and To columns.
+                            First row = Header.
+                            Data starts from second row.
                         </p>
 
                         <input
@@ -2282,8 +1998,8 @@ Country"
                             accept=".xlsx,.xls,.csv"
                         >
 
-                        <span id="addressExcelFileName">
-                            No file selected
+                        <span>
+                            Upload From / To address data
                         </span>
 
                     </div>
@@ -2299,15 +2015,277 @@ Country"
             </div>
 
 
+            <!-- ADDRESS FONT SETTINGS -->
+
+            <div class="panel-card">
+
+                <div class="panel-title">
+
+                    <div>
+
+                        <h3>
+                            From / To Font Settings
+                        </h3>
+
+                        <p>
+                            From and To settings are completely separate.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="address-two-column">
+
+
+                    <!-- FROM -->
+
+                    <div class="address-editor">
+
+                        <h3>
+                            From Settings
+                        </h3>
+
+
+                        <div class="field">
+
+                            <label for="fromFontFamily">
+                                Font
+                            </label>
+
+                            <select id="fromFontFamily">
+
+                                <option>Arial</option>
+                                <option>Calibri</option>
+                                <option>Times New Roman</option>
+                                <option>Georgia</option>
+                                <option>Verdana</option>
+                                <option>Tahoma</option>
+                                <option>Trebuchet MS</option>
+                                <option>Courier New</option>
+                                <option>Consolas</option>
+                                <option>Cambria</option>
+                                <option>Garamond</option>
+                                <option>Palatino Linotype</option>
+                                <option>Century Gothic</option>
+                                <option>Segoe UI</option>
+                                <option>Franklin Gothic</option>
+                                <option>Impact</option>
+                                <option>Lucida Sans</option>
+                                <option>Book Antiqua</option>
+                                <option>Arial Narrow</option>
+                                <option>Arial Black</option>
+                                <option>Rockwell</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="fromFontSize">
+                                Font Size
+                            </label>
+
+                            <input
+                                id="fromFontSize"
+                                type="number"
+                                min="1"
+                                max="48"
+                                value="14"
+                            >
+
+                        </div>
+
+
+                        <div class="text-style-controls">
+
+                            <label>
+
+                                <input
+                                    id="fromBold"
+                                    type="checkbox"
+                                >
+
+                                Bold
+
+                            </label>
+
+
+                            <label>
+
+                                <input
+                                    id="fromItalic"
+                                    type="checkbox"
+                                >
+
+                                Italic
+
+                            </label>
+
+
+                            <label>
+
+                                <input
+                                    id="fromUnderline"
+                                    type="checkbox"
+                                >
+
+                                Underline
+
+                            </label>
+
+
+                            <label>
+
+                                <input
+                                    id="fromBorder"
+                                    type="checkbox"
+                                >
+
+                                Border
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TO -->
+
+                    <div class="address-editor">
+
+                        <h3>
+                            To Settings
+                        </h3>
+
+
+                        <div class="field">
+
+                            <label for="toFontFamily">
+                                Font
+                            </label>
+
+                            <select id="toFontFamily">
+
+                                <option>Arial</option>
+                                <option>Calibri</option>
+                                <option>Times New Roman</option>
+                                <option>Georgia</option>
+                                <option>Verdana</option>
+                                <option>Tahoma</option>
+                                <option>Trebuchet MS</option>
+                                <option>Courier New</option>
+                                <option>Consolas</option>
+                                <option>Cambria</option>
+                                <option>Garamond</option>
+                                <option>Palatino Linotype</option>
+                                <option>Century Gothic</option>
+                                <option>Segoe UI</option>
+                                <option>Franklin Gothic</option>
+                                <option>Impact</option>
+                                <option>Lucida Sans</option>
+                                <option>Book Antiqua</option>
+                                <option>Arial Narrow</option>
+                                <option>Arial Black</option>
+                                <option>Rockwell</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="toFontSize">
+                                Font Size
+                            </label>
+
+                            <input
+                                id="toFontSize"
+                                type="number"
+                                min="1"
+                                max="48"
+                                value="14"
+                            >
+
+                        </div>
+
+
+                        <div class="text-style-controls">
+
+                            <label>
+
+                                <input
+                                    id="toBold"
+                                    type="checkbox"
+                                >
+
+                                Bold
+
+                            </label>
+
+
+                            <label>
+
+                                <input
+                                    id="toItalic"
+                                    type="checkbox"
+                                >
+
+                                Italic
+
+                            </label>
+
+
+                            <label>
+
+                                <input
+                                    id="toUnderline"
+                                    type="checkbox"
+                                >
+
+                                Underline
+
+                            </label>
+
+
+                            <label>
+
+                                <input
+                                    id="toBorder"
+                                    type="checkbox"
+                                >
+
+                                Border
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
             <!-- ADDRESS PAGE -->
 
             <div class="panel-card">
 
                 <div class="panel-title">
 
-                    <h3>
-                        Page Settings
-                    </h3>
+                    <div>
+
+                        <h3>
+                            Page Settings
+                        </h3>
+
+                    </div>
 
                 </div>
 
@@ -2335,7 +2313,7 @@ Country"
                             </option>
 
                             <option value="custom">
-                                Custom
+                                Custom Size
                             </option>
 
                         </select>
@@ -2409,7 +2387,9 @@ Country"
             </div>
 
 
-            <!-- ADDRESS QR -->
+            <!-- =================================================
+                 QR CODES
+            ================================================== -->
 
             <div class="panel-card">
 
@@ -2418,11 +2398,11 @@ Country"
                     <div>
 
                         <h3>
-                            Location QR
+                            QR Codes
                         </h3>
 
                         <p>
-                            Scan to open the saved map location.
+                            Location and email QR codes.
                         </p>
 
                     </div>
@@ -2430,13 +2410,76 @@ Country"
                 </div>
 
 
-                <div
-                    id="addressQRPreview"
-                    class="qr-preview"
-                ></div>
+                <div class="address-two-column">
+
+
+                    <!-- MAP QR -->
+
+                    <div class="address-editor">
+
+                        <h3>
+                            Address / Location QR
+                        </h3>
+
+                        <div
+                            id="addressQRPreview"
+                            class="qr-preview"
+                        ></div>
+
+                        <div class="map-link-box">
+
+                            <span>
+                                Map Location
+                            </span>
+
+                            <a
+                                href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
+                                target="_blank"
+                                rel="noopener"
+                            >
+                                Open Map
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- EMAIL QR -->
+
+                    <div class="address-editor">
+
+                        <h3>
+                            Email QR
+                        </h3>
+
+                        <div
+                            id="emailQRPreview"
+                            class="qr-preview"
+                        ></div>
+
+                        <div class="map-link-box">
+
+                            <span>
+                                Email
+                            </span>
+
+                            <a
+                                href="mailto:ashish.verma@bookswagon.in"
+                            >
+                                ashish.verma@bookswagon.in
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
+
+            <!-- ADDRESS ACTIONS -->
 
             <div class="action-bar">
 
@@ -2464,7 +2507,6 @@ Country"
     </main>
 
 
-
     <!-- =====================================================
          FOOTER
     ====================================================== -->
@@ -2478,7 +2520,16 @@ Country"
             </strong>
 
             <span>
-                Professional browser-based label generator
+                Created &amp; Developed by Ashish Verma
+            </span>
+
+            <span>
+                © 2026 Ashish Verma. All Rights Reserved.
+            </span>
+
+            <span>
+                All rights reserved. Unauthorized copying,
+                modification or redistribution is prohibited.
             </span>
 
         </div>
@@ -2486,9 +2537,9 @@ Country"
 
         <div class="contact-area">
 
-            <span>
-                Contact:
-            </span>
+            <strong>
+                Contact
+            </strong>
 
             <a
                 href="mailto:ashish.verma@bookswagon.in"
@@ -2503,10 +2554,9 @@ Country"
 </div>
 
 
-
 <!-- =========================================================
-     TOAST
-========================================================== -->
+     ENABLE / DISABLE TOAST
+========================================================= -->
 
 <div
     id="toast"
@@ -2526,12 +2576,11 @@ Country"
 </div>
 
 
-
 <!-- =========================================================
      CONFIRMATION MODAL
-     Kept in HTML for compatibility.
-     Feature enable/disable itself does NOT use confirmation.
-========================================================== -->
+     Kept for compatibility.
+     Feature changes do NOT use confirmation.
+========================================================= -->
 
 <div
     id="confirmationModal"
@@ -2545,7 +2594,6 @@ Country"
             id="modalCloseButton"
             type="button"
             class="modal-close"
-            aria-label="Close"
         >
             ×
         </button>
@@ -2587,96 +2635,36 @@ Country"
 </div>
 
 
-
 <!-- =========================================================
-     JAVASCRIPT
-========================================================== -->
+     LIBRARIES
+========================================================= -->
 
-<script>
-
-    window.BOOKS_LABEL_STUDIO_CONFIG = {
-
-        mapUrl:
-            "https://maps.app.goo.gl/7McYApm1u9x4QSj7A",
-
-        email:
-            "ashish.verma@bookswagon.in",
-
-        maxManualPO:
-            40,
-
-        maxFontSize:
-            48
-
-    };
-
-</script>
-
-
+<!-- Excel -->
 <script
-    src="app.js"
+    src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
 ></script>
 
 
-<!-- =========================================================
-     QR INITIALIZER
-========================================================== -->
-
-<script>
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-
-        const qrContainer =
-            document.getElementById(
-                "addressQRPreview"
-            );
-
-        const mapUrl =
-            "https://maps.app.goo.gl/7McYApm1u9x4QSj7A";
+<!-- PDF -->
+<script
+    src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
+></script>
 
 
-        if (
-            qrContainer &&
-            typeof QRCode !== "undefined"
-        ) {
-
-            QRCode.toCanvas(
-                mapUrl,
-                {
-                    width: 150,
-                    margin: 2
-                },
-                function (error, canvas) {
-
-                    if (error) {
-
-                        console.error(
-                            error
-                        );
-
-                        return;
-
-                    }
+<!-- Barcode -->
+<script
+    src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
+></script>
 
 
-                    qrContainer.innerHTML =
-                        "";
+<!-- QR -->
+<script
+    src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"
+></script>
 
-                    qrContainer.appendChild(
-                        canvas
-                    );
 
-                }
-            );
-
-        }
-
-    }
-);
-
-</script>
+<!-- FINAL JAVASCRIPT -->
+<script src="app.js"></script>
 
 </body>
 </html>
