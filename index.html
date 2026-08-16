@@ -2,37 +2,36 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ashish Verma — Label Studio</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<!-- External Libraries -->
+<title>Ashish Verma Label Studio</title>
+
+<!-- Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 
 <style>
 :root{
   --blue:#2563eb;
   --blue2:#1d4ed8;
-  --blue-soft:#eff6ff;
+  --bg:#f5f7fb;
+  --card:#fff;
+  --border:#dce2ea;
+  --text:#20242b;
+  --muted:#6b7280;
   --green:#16a34a;
   --red:#dc2626;
   --orange:#f59e0b;
-  --bg:#f5f7fb;
-  --card:#fff;
-  --border:#dbe1ea;
-  --text:#20242b;
-  --muted:#6b7280;
-  --shadow:0 4px 18px rgba(15,23,42,.07);
-  --radius:10px;
+  --shadow:0 4px 16px rgba(15,23,42,.07);
 }
 
 *{box-sizing:border-box}
 
 html,body{
   margin:0;
-  padding:0;
+  min-height:100%;
   background:var(--bg);
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
@@ -42,28 +41,31 @@ button,input,select,textarea{
   font:inherit;
 }
 
-button{cursor:pointer}
+button{
+  cursor:pointer;
+}
 
 button:disabled,
 input:disabled,
 select:disabled{
   cursor:not-allowed;
-  opacity:.48;
+  opacity:.45;
 }
 
 /* HEADER */
+
 .header{
-  position:sticky;
-  top:0;
-  z-index:1000;
-  min-height:68px;
+  height:64px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:15px;
-  padding:10px 20px;
+  padding:9px 18px;
   background:#fff;
   border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:1000;
 }
 
 .brand{
@@ -73,108 +75,108 @@ select:disabled{
 }
 
 .logo{
-  width:42px;
-  height:42px;
+  width:40px;
+  height:40px;
   display:flex;
   align-items:center;
   justify-content:center;
   border-radius:9px;
   background:var(--blue);
   color:#fff;
-  font-size:20px;
   font-weight:800;
 }
 
 .brand h1{
   margin:0;
-  font-size:18px;
+  font-size:17px;
 }
 
 .brand small{
   color:var(--muted);
-  font-size:10px;
-}
-
-.header-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
+  font-size:9px;
 }
 
 /* APP */
+
 .app{
+  width:100%;
   max-width:1550px;
   margin:auto;
-  padding:16px;
+  padding:14px;
 }
 
-/* MAIN NAV */
-.main-nav{
+/* NAV */
+
+.nav{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  margin-bottom:15px;
+  gap:9px;
+  margin-bottom:12px;
 }
 
-.nav-card{
+.nav-btn{
   border:1px solid var(--border);
   background:#fff;
-  border-radius:11px;
-  padding:15px;
+  border-radius:9px;
+  padding:11px;
   text-align:left;
-  transition:.18s ease;
   box-shadow:var(--shadow);
+  transition:.18s;
 }
 
-.nav-card:hover{
-  transform:translateY(-2px);
-  border-color:#b8c4d4;
+.nav-btn:hover{
+  transform:translateY(-1px);
 }
 
-.nav-card.active{
+.nav-btn.active{
   background:var(--blue);
   border-color:var(--blue);
   color:#fff;
-  transform:translateY(-2px);
-  box-shadow:0 8px 25px rgba(37,99,235,.22);
 }
 
 .nav-icon{
-  font-size:22px;
-  margin-bottom:8px;
+  font-size:19px;
+  margin-bottom:5px;
 }
 
 .nav-title{
-  font-size:13px;
+  font-size:12px;
   font-weight:800;
 }
 
 .nav-sub{
-  margin-top:4px;
-  font-size:10px;
-  opacity:.72;
+  font-size:9px;
+  opacity:.7;
+  margin-top:3px;
 }
 
 /* WORKSPACE */
+
 .workspace{
   display:grid;
-  grid-template-columns:450px minmax(0,1fr);
-  gap:15px;
+  grid-template-columns:minmax(430px,500px) minmax(0,1fr);
+  gap:12px;
   align-items:start;
 }
 
-.preview-side{
+.controls{
+  min-width:0;
+}
+
+.preview-area{
+  min-width:0;
   position:sticky;
-  top:84px;
+  top:76px;
 }
 
 /* CARD */
+
 .card{
   background:var(--card);
   border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:14px;
-  margin-bottom:12px;
+  border-radius:9px;
+  padding:12px;
+  margin-bottom:10px;
   box-shadow:var(--shadow);
 }
 
@@ -182,37 +184,49 @@ select:disabled{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:10px;
-  margin-bottom:12px;
-  font-size:13px;
+  gap:8px;
+  margin-bottom:10px;
+  font-size:12px;
   font-weight:800;
 }
 
 .card-title small{
+  font-size:8px;
   color:var(--muted);
-  font-size:9px;
   font-weight:400;
 }
 
-/* MODE */
+/* SECTIONS */
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+  animation:fadeIn .15s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(3px)}
+  to{opacity:1;transform:none}
+}
+
+/* MODES */
+
 .mode-tabs{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:6px;
+  gap:5px;
 }
 
 .mode-btn{
+  min-height:34px;
   border:1px solid var(--border);
   background:#fff;
-  border-radius:7px;
-  padding:9px 5px;
-  font-size:11px;
+  border-radius:6px;
+  font-size:10px;
   font-weight:700;
-  transition:.15s;
-}
-
-.mode-btn:hover{
-  background:#f8fafc;
 }
 
 .mode-btn.active{
@@ -223,43 +237,45 @@ select:disabled{
 
 .mode-panel{
   display:none;
-  margin-top:12px;
+  margin-top:10px;
 }
 
 .mode-panel.active{
   display:block;
 }
 
-/* FORM */
+/* FORMS */
+
 .field{
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
 
 .field label{
   display:block;
-  margin-bottom:5px;
-  color:#4b5563;
-  font-size:10px;
+  font-size:9px;
   font-weight:800;
+  color:#4b5563;
+  margin-bottom:4px;
 }
 
 input[type=text],
 input[type=number],
 input[type=email],
-input[type=url],
+input[type=file],
 select,
 textarea{
   width:100%;
-  min-height:35px;
-  padding:7px 9px;
+  min-height:33px;
   border:1px solid var(--border);
-  border-radius:7px;
+  border-radius:6px;
+  padding:6px 8px;
   background:#fff;
+  color:var(--text);
   outline:none;
 }
 
 textarea{
-  min-height:85px;
+  min-height:70px;
   resize:vertical;
 }
 
@@ -270,76 +286,38 @@ textarea:focus{
   box-shadow:0 0 0 3px rgba(37,99,235,.08);
 }
 
-input[type=color]{
-  width:100%;
-  height:35px;
-  padding:2px;
-}
-
 .grid2{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:9px;
+  gap:8px;
 }
 
 .grid3{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:9px;
+  gap:8px;
 }
 
-/* CHECKS */
-.check-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-}
+/* BUTTON */
 
-.check{
-  display:flex;
-  align-items:center;
-  gap:5px;
-  padding:7px 8px;
-  background:#fafafa;
-  border:1px solid var(--border);
-  border-radius:7px;
-  font-size:10px;
-}
-
-.check input{
-  accent-color:var(--blue);
-}
-
-/* BUTTONS */
 .btn{
-  min-height:34px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  padding:7px 11px;
+  min-height:33px;
   border:1px solid var(--border);
-  border-radius:7px;
   background:#fff;
-  color:#333;
-  font-size:11px;
+  border-radius:6px;
+  padding:6px 10px;
+  font-size:10px;
   font-weight:700;
-  transition:.15s;
 }
 
 .btn:hover{
   background:#f8fafc;
-  border-color:#bcc7d5;
 }
 
 .btn.primary{
   background:var(--blue);
   border-color:var(--blue);
   color:#fff;
-}
-
-.btn.primary:hover{
-  background:var(--blue2);
 }
 
 .btn.green{
@@ -354,112 +332,139 @@ input[type=color]{
   color:#fff;
 }
 
-.btn.orange{
-  background:var(--orange);
-  border-color:var(--orange);
-  color:#fff;
-}
-
 .action-row{
   display:flex;
   flex-wrap:wrap;
-  gap:7px;
+  gap:6px;
 }
 
-/* BORDER SELECT */
-.border-select-wrap{
-  position:relative;
+/* CHECK */
+
+.check-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
 }
 
-.border-select-wrap select{
-  font-weight:600;
+.check{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  border:1px solid var(--border);
+  background:#fafafa;
+  padding:6px 8px;
+  border-radius:6px;
+  font-size:9px;
+}
+
+.check input{
+  accent-color:var(--blue);
+}
+
+/* MANUAL PO */
+
+.manual-po-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:6px;
+  max-height:290px;
+  overflow:auto;
+  padding-right:3px;
+}
+
+.manual-po-grid .field{
+  margin:0;
 }
 
 /* EXCEL */
+
 .upload{
   border:2px dashed #cbd5e1;
-  border-radius:9px;
-  padding:18px;
+  border-radius:8px;
+  padding:14px;
   text-align:center;
   background:#fafcff;
 }
 
 .upload strong{
   display:block;
-  margin-bottom:5px;
+  font-size:11px;
+  margin-bottom:4px;
 }
 
 .upload small{
   color:var(--muted);
-  font-size:9px;
+  font-size:8px;
 }
 
 .excel-preview{
-  max-height:220px;
+  max-height:160px;
   overflow:auto;
-  margin-top:10px;
+  margin-top:8px;
   border:1px solid var(--border);
-  border-radius:7px;
+  border-radius:6px;
 }
 
 .excel-preview table{
   width:100%;
   border-collapse:collapse;
-  font-size:9px;
+  font-size:8px;
 }
 
 .excel-preview th,
 .excel-preview td{
-  padding:6px;
+  padding:5px;
   border:1px solid var(--border);
-  white-space:nowrap;
+  text-align:left;
 }
 
 .excel-preview th{
+  background:#eef4ff;
   position:sticky;
   top:0;
-  background:#eef4ff;
 }
 
-/* FROZEN */
-.freeze-box{
+/* FREEZE */
+
+.freeze{
+  opacity:.42;
+  pointer-events:none;
   position:relative;
-  opacity:.48;
 }
 
-.freeze-box::after{
+.freeze::after{
   content:"🔒 FROZEN";
   position:absolute;
-  right:7px;
-  top:7px;
-  padding:3px 6px;
-  border-radius:5px;
+  top:5px;
+  right:5px;
   background:#fff1f2;
   color:var(--red);
   border:1px solid #fecaca;
-  font-size:8px;
+  padding:3px 5px;
+  border-radius:4px;
+  font-size:7px;
   font-weight:800;
 }
 
 /* PREVIEW */
-.preview-toolbar{
+
+.preview-header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
 
 .live{
   display:inline-flex;
   align-items:center;
-  gap:5px;
-  padding:5px 9px;
-  border-radius:20px;
-  background:#ecfdf5;
+  gap:4px;
   color:var(--green);
+  background:#ecfdf5;
   border:1px solid #bbf7d0;
-  font-size:9px;
+  padding:4px 8px;
+  border-radius:20px;
+  font-size:8px;
   font-weight:800;
 }
 
@@ -470,168 +475,156 @@ input[type=color]{
   background:var(--green);
 }
 
-.preview-canvas{
-  min-height:700px;
+.preview-box{
+  min-height:560px;
+  max-height:650px;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:28px;
+  padding:18px;
   overflow:auto;
   border:1px solid var(--border);
-  border-radius:9px;
-
-  background-color:#eef1f5;
-  background-image:
-    linear-gradient(45deg,#e2e6ec 25%,transparent 25%),
-    linear-gradient(-45deg,#e2e6ec 25%,transparent 25%),
-    linear-gradient(45deg,transparent 75%,#e2e6ec 75%),
-    linear-gradient(-45deg,transparent 75%,#e2e6ec 75%);
-  background-size:20px 20px;
-  background-position:
-    0 0,
-    0 10px,
-    10px -10px,
-    -10px 0;
+  border-radius:8px;
+  background:#e9edf3;
 }
 
+/* SMALLER PAPER */
+
 .paper{
-  position:relative;
-  width:381px;
-  height:540px;
-  padding:10px;
+  width:340px;
+  height:480px;
+  flex:0 0 auto;
   background:#fff;
+  padding:8px;
   border:1px solid #aaa;
-  box-shadow:0 10px 30px rgba(15,23,42,.18);
-  transition:.2s ease;
+  box-shadow:0 8px 24px rgba(0,0,0,.15);
 }
 
 .paper-grid{
   width:100%;
   height:100%;
   display:grid;
-  gap:6px;
+  gap:5px;
 }
 
-.label-preview{
-  width:100%;
-  min-height:150px;
+.label{
+  min-width:0;
+  min-height:0;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:8px;
-  padding:14px;
-  background:#fff;
+  gap:6px;
+  padding:8px;
   overflow:hidden;
+  text-align:center;
+  background:#fff;
 }
 
-.po-preview{
+.po-preview,
+.box-preview,
+.combined-preview{
   max-width:100%;
-  text-align:center;
   word-break:break-word;
-  line-height:1.15;
-}
-
-.box-preview{
-  max-width:100%;
-  text-align:center;
-  word-break:break-word;
-  line-height:1.15;
+  overflow-wrap:anywhere;
+  line-height:1.1;
 }
 
 .combined-preview{
-  max-width:100%;
   display:none;
-  text-align:center;
-  word-break:break-word;
-  line-height:1.15;
 }
 
-.combined-preview.show{
-  display:block;
-}
+/* OTHER */
 
-.address-preview,
+.other-preview,
 .isbn-preview,
-.other-preview{
+.address-preview{
   width:100%;
   height:100%;
   display:none;
-  padding:18px;
   background:#fff;
   overflow:hidden;
 }
 
-/* ADDRESS */
-.address-preview h4{
-  margin:0 0 5px;
-  font-size:10px;
-}
-
-.address-block{
-  margin-bottom:14px;
-  white-space:pre-wrap;
+.other-preview{
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:15px;
   word-break:break-word;
 }
 
-/* ISBN */
 .isbn-preview{
   flex-direction:column;
   align-items:center;
   justify-content:center;
+  gap:8px;
   text-align:center;
+  padding:15px;
 }
 
-.isbn-preview.show{
-  display:flex;
+.address-preview{
+  padding:15px;
+  text-align:left;
+  word-break:break-word;
 }
 
-#isbnBarcode{
-  max-width:90%;
+.address-preview h4{
+  font-size:9px;
+  margin:0 0 4px;
+}
+
+.address-block{
+  white-space:pre-wrap;
+  line-height:1.3;
+  margin-bottom:10px;
 }
 
 /* QR */
+
 .qr-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:9px;
+  gap:8px;
 }
 
 .qr-card{
-  min-height:155px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
   border:1px solid var(--border);
-  border-radius:8px;
+  border-radius:7px;
   background:#fafafa;
+  padding:8px;
+  text-align:center;
+}
+
+.qr-card strong{
+  display:block;
+  font-size:9px;
+  margin-bottom:5px;
 }
 
 .qr-card canvas{
-  max-width:125px;
-  max-height:125px;
+  width:100px!important;
+  height:100px!important;
 }
 
 /* TOAST */
+
 .toast{
   position:fixed;
-  top:82px;
-  right:18px;
+  top:75px;
+  right:15px;
   z-index:99999;
-  min-width:250px;
-  max-width:390px;
-  padding:11px 14px;
-  border-radius:8px;
+  min-width:230px;
+  max-width:360px;
+  padding:10px 13px;
+  border-radius:7px;
   color:#fff;
-  font-size:11px;
+  font-size:10px;
   font-weight:800;
-  box-shadow:0 10px 30px rgba(0,0,0,.2);
+  box-shadow:0 8px 25px rgba(0,0,0,.2);
   transform:translateX(120%);
   opacity:0;
   transition:.25s;
-  pointer-events:none;
 }
 
 .toast.show{
@@ -643,39 +636,29 @@ input[type=color]{
 .toast.red{background:var(--red)}
 .toast.orange{background:var(--orange)}
 
-/* FOOTER */
 .footer{
   text-align:center;
-  padding:20px 10px 8px;
+  padding:14px 5px 4px;
   color:var(--muted);
-  font-size:10px;
-  line-height:1.8;
+  font-size:9px;
 }
 
-.footer strong{
-  color:#374151;
-}
+@media(max-width:1050px){
 
-/* RESPONSIVE */
-@media(max-width:1150px){
   .workspace{
     grid-template-columns:1fr;
   }
 
-  .preview-side{
+  .preview-area{
     position:relative;
     top:0;
   }
+
 }
 
-@media(max-width:750px){
-  .header{
-    position:relative;
-    flex-direction:column;
-    align-items:flex-start;
-  }
+@media(max-width:700px){
 
-  .main-nav{
+  .nav{
     grid-template-columns:repeat(2,1fr);
   }
 
@@ -684,53 +667,27 @@ input[type=color]{
     grid-template-columns:1fr;
   }
 
-  .preview-canvas{
-    min-height:550px;
-    padding:12px;
-  }
-}
-
-@media(max-width:450px){
-  .main-nav{
+  .workspace{
     grid-template-columns:1fr;
   }
 
-  .mode-tabs{
+}
+
+@media(max-width:480px){
+
+  .nav{
+    grid-template-columns:1fr;
+  }
+
+  .manual-po-grid{
     grid-template-columns:1fr;
   }
 
   .paper{
-    transform:scale(.82);
+    transform:scale(.8);
     transform-origin:center;
   }
-}
 
-@media print{
-  .header,
-  .main-nav,
-  .controls,
-  .preview-toolbar,
-  .footer{
-    display:none!important;
-  }
-
-  body{
-    background:#fff;
-  }
-
-  .app{
-    padding:0;
-  }
-
-  .preview-canvas{
-    padding:0;
-    border:0;
-    background:#fff;
-  }
-
-  .paper{
-    box-shadow:none;
-  }
 }
 </style>
 </head>
@@ -740,51 +697,55 @@ input[type=color]{
 <header class="header">
 
   <div class="brand">
+
     <div class="logo">AV</div>
+
     <div>
       <h1>Label Studio</h1>
-      <small>Professional PO • ISBN • Address Label Generator</small>
+      <small>Created & Developed by Ashish Verma</small>
     </div>
+
   </div>
 
-  <div class="header-actions">
+  <div class="action-row">
+
     <button class="btn" id="undoBtn">↶ Undo</button>
     <button class="btn" id="redoBtn">↷ Redo</button>
     <button class="btn" id="defaultBtn">↺ Default</button>
-    <button class="btn" id="saveDefaultBtn">💾 Save</button>
+
   </div>
 
 </header>
 
 
-<main class="app">
+<div class="app">
 
-  <!-- MAIN OPTIONS -->
+  <!-- MAIN CATEGORY -->
 
-  <div class="main-nav">
+  <div class="nav">
 
-    <button class="nav-card active" data-section="coco">
-      <div class="nav-icon">📘</div>
+    <button class="nav-btn active" data-section="coco">
+      <div class="nav-icon">📦</div>
       <div class="nav-title">Coco Blue PO</div>
-      <div class="nav-sub">PO & Box Label</div>
+      <div class="nav-sub">PO + Box Labels</div>
     </button>
 
-    <button class="nav-card" data-section="other">
+    <button class="nav-btn" data-section="other">
       <div class="nav-icon">📄</div>
       <div class="nav-title">Other PO</div>
-      <div class="nav-sub">Other Purchase Orders</div>
+      <div class="nav-sub">PO Labels</div>
     </button>
 
-    <button class="nav-card" data-section="isbn">
-      <div class="nav-icon">🔖</div>
+    <button class="nav-btn" data-section="isbn">
+      <div class="nav-icon">📚</div>
       <div class="nav-title">ISBN</div>
-      <div class="nav-sub">ISBN Barcode Labels</div>
+      <div class="nav-sub">ISBN Barcode</div>
     </button>
 
-    <button class="nav-card" data-section="address">
+    <button class="nav-btn" data-section="address">
       <div class="nav-icon">📍</div>
       <div class="nav-title">Address</div>
-      <div class="nav-sub">Address & Email QR</div>
+      <div class="nav-sub">Address + QR</div>
     </button>
 
   </div>
@@ -792,142 +753,33 @@ input[type=color]{
 
   <div class="workspace">
 
-    <!-- LEFT -->
+    <!-- CONTROLS -->
 
-    <div class="controls">
-
-      <!-- PAGE SETTINGS -->
-
-      <div class="card">
-
-        <div class="card-title">
-          <span>⚙ Page Settings</span>
-          <small>Live Preview</small>
-        </div>
-
-        <div class="grid2">
-
-          <div class="field">
-            <label>Page Size</label>
-
-            <select id="pageSize">
-
-              <option value="4x6">4 × 6 Inches</option>
-
-              <option value="70x35">
-                70 × 35 mm
-              </option>
-
-              <option value="a4">
-                A4
-              </option>
-
-              <option value="custom">
-                Custom
-              </option>
-
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Orientation</label>
-
-            <select id="orientation">
-
-              <option value="portrait">
-                Portrait
-              </option>
-
-              <option value="landscape">
-                Landscape
-              </option>
-
-            </select>
-          </div>
-
-        </div>
+    <main class="controls">
 
 
-        <div id="customSizeBox"
-             style="display:none">
+      <!-- ================= COCO ================= -->
 
-          <div class="grid2">
-
-            <div class="field">
-              <label>Custom Width (mm)</label>
-              <input id="customWidth"
-                     type="number"
-                     value="101.6"
-                     min="1">
-            </div>
-
-            <div class="field">
-              <label>Custom Height (mm)</label>
-              <input id="customHeight"
-                     type="number"
-                     value="152.4"
-                     min="1">
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="grid2">
-
-          <div class="field">
-            <label>Labels Per Page</label>
-
-            <select id="labelsPerPage">
-              <option value="1">1 Label</option>
-              <option value="2">2 Labels</option>
-              <option value="4">4 Labels</option>
-              <option value="6">6 Labels</option>
-              <option value="9">9 Labels</option>
-              <option value="12">12 Labels</option>
-            </select>
-
-          </div>
-
-          <div class="field">
-            <label>Label Gap (mm)</label>
-            <input id="labelGap"
-                   type="number"
-                   value="3"
-                   min="0">
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- COCO BLUE -->
-
-      <section class="section active"
-               id="section-coco">
+      <section class="section active" id="section-coco">
 
         <div class="card">
 
           <div class="card-title">
-            <span>📘 Coco Blue PO</span>
+            <span>📦 Coco Blue PO</span>
+            <small>Input Method</small>
           </div>
 
           <div class="mode-tabs">
 
-            <button class="mode-btn active"
-                    data-mode="manual">
+            <button class="mode-btn active" data-mode="manual">
               ✍ Manual
             </button>
 
-            <button class="mode-btn"
-                    data-mode="multiple">
+            <button class="mode-btn" data-mode="multiple">
               🔢 Multiple
             </button>
 
-            <button class="mode-btn"
-                    data-mode="excel">
+            <button class="mode-btn" data-mode="excel">
               📊 Excel
             </button>
 
@@ -936,22 +788,28 @@ input[type=color]{
 
           <!-- MANUAL -->
 
-          <div class="mode-panel active"
-               id="mode-manual">
+          <div class="mode-panel active" id="mode-manual">
 
             <div class="field">
-              <label>PO Number</label>
-              <input id="poInput"
-                     type="text"
-                     placeholder="ABC123">
+              <label>PO Numbers — up to 20 manual entries</label>
             </div>
 
-            <div class="field">
-              <label>Box Number</label>
-              <input id="boxInput"
-                     type="number"
-                     value="1"
-                     min="1">
+            <div class="manual-po-grid">
+
+              <script>
+                for(let i=1;i<=20;i++){
+                  document.write(`
+                    <div class="field">
+                      <input
+                        type="text"
+                        class="manualPO"
+                        id="manualPO${i}"
+                        placeholder="PO ${i}">
+                    </div>
+                  `);
+                }
+              </script>
+
             </div>
 
           </div>
@@ -959,24 +817,31 @@ input[type=color]{
 
           <!-- MULTIPLE -->
 
-          <div class="mode-panel"
-               id="mode-multiple">
+          <div class="mode-panel" id="mode-multiple">
 
             <div class="field">
+
               <label>
-                PO Numbers — Comma Separated — No Limit
+                Multiple PO — comma separated, no limit
               </label>
 
-              <textarea id="multiplePO"
-                        placeholder="ABC123, ABC124, ABC125, ABC126..."></textarea>
+              <textarea
+                id="multiplePO"
+                placeholder="ABC001, ABC002, ABC003, ABC004..."
+              ></textarea>
+
             </div>
 
-            <div class="field">
-              <label>Starting Box Number</label>
-              <input id="multipleBox"
-                     type="number"
-                     value="1"
-                     min="1">
+            <div class="action-row">
+
+              <button class="btn primary" id="useMultipleBtn">
+                ✓ Use Multiple PO
+              </button>
+
+              <button class="btn" id="clearMultipleBtn">
+                Clear
+              </button>
+
             </div>
 
           </div>
@@ -984,27 +849,30 @@ input[type=color]{
 
           <!-- EXCEL -->
 
-          <div class="mode-panel"
-               id="mode-excel">
+          <div class="mode-panel" id="mode-excel">
 
             <div class="upload">
 
               <strong>📊 Upload Excel File</strong>
 
               <small>
-                First row is treated as Header and ignored as PO data.
+                First row/header will automatically be ignored.
+                First column is used as PO number.
               </small>
 
               <br><br>
 
-              <input id="excelInput"
-                     type="file"
-                     accept=".xlsx,.xls,.csv">
+              <input
+                type="file"
+                id="excelInput"
+                accept=".xlsx,.xls,.csv"
+              >
 
             </div>
 
-            <div class="excel-preview"
-                 id="excelPreview">
+            <div
+              class="excel-preview"
+              id="excelPreview">
             </div>
 
           </div>
@@ -1012,45 +880,190 @@ input[type=color]{
         </div>
 
 
-        <!-- PO / BOX DISPLAY -->
+        <!-- PAGE -->
 
         <div class="card">
 
           <div class="card-title">
-            <span>👁 PO / Box Display</span>
+            <span>📐 Page & Quantity</span>
+          </div>
+
+          <div class="grid2">
+
+            <div class="field">
+              <label>Page Size</label>
+
+              <select id="pageSize">
+
+                <option value="4x6">
+                  4 × 6 inches
+                </option>
+
+                <option value="70x35">
+                  70 × 35 mm
+                </option>
+
+                <option value="a4">
+                  A4
+                </option>
+
+                <option value="custom">
+                  Custom
+                </option>
+
+              </select>
+            </div>
+
+
+            <div class="field">
+              <label>Labels Per Page</label>
+
+              <select id="labelsPerPage">
+
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+                <option value="9">9</option>
+                <option value="12">12</option>
+
+              </select>
+            </div>
+
+          </div>
+
+
+          <div
+            id="customSizeBox"
+            style="display:none"
+            class="grid2">
+
+            <div class="field">
+              <label>Custom Width (mm)</label>
+              <input
+                type="number"
+                id="customWidth"
+                value="101.6"
+                min="1">
+            </div>
+
+            <div class="field">
+              <label>Custom Height (mm)</label>
+              <input
+                type="number"
+                id="customHeight"
+                value="152.4"
+                min="1">
+            </div>
+
+          </div>
+
+
+          <div class="grid2">
+
+            <div class="field">
+              <label>Orientation</label>
+
+              <select id="orientation">
+
+                <option value="portrait">
+                  Portrait
+                </option>
+
+                <option value="landscape">
+                  Landscape
+                </option>
+
+              </select>
+
+            </div>
+
+            <div class="field">
+              <label>Label Gap</label>
+
+              <input
+                type="number"
+                id="labelGap"
+                value="5"
+                min="0">
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- PO / BOX -->
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>🔧 PO & Box Controls</span>
           </div>
 
           <div class="check-row">
 
             <label class="check">
-              <input id="showPO"
-                     type="checkbox"
-                     checked>
-              Show PO Number
+              <input type="checkbox" id="showPO" checked>
+              PO Number
             </label>
 
             <label class="check">
-              <input id="showBox"
-                     type="checkbox"
-                     checked>
-              Show Box Number
+              <input type="checkbox" id="showBox" checked>
+              Box Number
             </label>
 
             <label class="check">
-              <input id="mergePOBox"
-                     type="checkbox">
+              <input type="checkbox" id="mergePOBox">
               Combine PO + Box
             </label>
+
+          </div>
+
+
+          <div class="field" style="margin-top:8px">
+            <label>Starting Box Number</label>
+
+            <input
+              type="number"
+              id="boxInput"
+              value="1"
+              min="1">
+          </div>
+
+
+          <div class="field">
+
+            <label>Combined Format</label>
+
+            <select id="combinedFormat">
+
+              <option value="po-box">
+                PO — BOX
+              </option>
+
+              <option value="box-po">
+                BOX — PO
+              </option>
+
+              <option value="po-slash-box">
+                PO / BOX
+              </option>
+
+              <option value="po-newline-box">
+                PO + BOX on separate lines
+              </option>
+
+            </select>
 
           </div>
 
         </div>
 
 
-        <!-- PO FONT -->
+        <!-- FONTS -->
 
-        <div class="card"
-             id="poFontCard">
+        <div class="card" id="poFontCard">
 
           <div class="card-title">
             <span>🔤 PO Number Font</span>
@@ -1065,7 +1078,6 @@ input[type=color]{
 
                 <option>Arial</option>
                 <option>Calibri</option>
-                <option>Cambria</option>
                 <option>Times New Roman</option>
                 <option>Georgia</option>
                 <option>Verdana</option>
@@ -1074,87 +1086,44 @@ input[type=color]{
                 <option>Courier New</option>
                 <option>Lucida Console</option>
                 <option>Impact</option>
-                <option>Comic Sans MS</option>
                 <option>Garamond</option>
-                <option>Palatino Linotype</option>
+                <option>Palatino</option>
                 <option>Book Antiqua</option>
                 <option>Century Gothic</option>
-                <option>Arial Black</option>
-                <option>Franklin Gothic Medium</option>
                 <option>Segoe UI</option>
-                <option>Segoe Print</option>
-                <option>Segoe Script</option>
-                <option>Consolas</option>
-                <option>Gill Sans</option>
-                <option>Helvetica</option>
-                <option>Monaco</option>
-                <option>Optima</option>
-                <option>Futura</option>
-                <option>Rockwell</option>
-                <option>Bookman</option>
-                <option>Didot</option>
-                <option>Baskerville</option>
-                <option>American Typewriter</option>
-                <option>Lucida Sans</option>
-                <option>Arial Narrow</option>
-                <option>Roboto</option>
-                <option>Open Sans</option>
-                <option>Montserrat</option>
-                <option>Lato</option>
-                <option>Poppins</option>
-                <option>Nunito</option>
-                <option>Ubuntu</option>
 
               </select>
             </div>
 
             <div class="field">
-              <label>Font Size</label>
+              <label>Size</label>
 
-              <select id="poFontSize">
-                <option>8</option>
-                <option>9</option>
-                <option>10</option>
-                <option>11</option>
-                <option>12</option>
-                <option>14</option>
-                <option>16</option>
-                <option>18</option>
-                <option>20</option>
-                <option selected>24</option>
-                <option>26</option>
-                <option>28</option>
-                <option>32</option>
-                <option>36</option>
-                <option>40</option>
-                <option>48</option>
-                <option>56</option>
-                <option>64</option>
-                <option>72</option>
-              </select>
+              <input
+                type="number"
+                id="poFontSize"
+                value="24"
+                min="5"
+                max="200">
 
             </div>
 
           </div>
 
+
           <div class="check-row">
 
             <label class="check">
-              <input id="poBold"
-                     type="checkbox"
-                     checked>
+              <input type="checkbox" id="poBold">
               Bold
             </label>
 
             <label class="check">
-              <input id="poItalic"
-                     type="checkbox">
+              <input type="checkbox" id="poItalic">
               Italic
             </label>
 
             <label class="check">
-              <input id="poUnderline"
-                     type="checkbox">
+              <input type="checkbox" id="poUnderline">
               Underline
             </label>
 
@@ -1163,13 +1132,10 @@ input[type=color]{
         </div>
 
 
-        <!-- BOX FONT -->
-
-        <div class="card"
-             id="boxFontCard">
+        <div class="card" id="boxFontCard">
 
           <div class="card-title">
-            <span>🔢 Box Number Font</span>
+            <span>🔤 Box Number Font</span>
           </div>
 
           <div class="grid2">
@@ -1182,7 +1148,6 @@ input[type=color]{
 
                 <option>Arial</option>
                 <option>Calibri</option>
-                <option>Cambria</option>
                 <option>Times New Roman</option>
                 <option>Georgia</option>
                 <option>Verdana</option>
@@ -1192,19 +1157,10 @@ input[type=color]{
                 <option>Lucida Console</option>
                 <option>Impact</option>
                 <option>Garamond</option>
-                <option>Palatino Linotype</option>
+                <option>Palatino</option>
                 <option>Book Antiqua</option>
                 <option>Century Gothic</option>
-                <option>Arial Black</option>
                 <option>Segoe UI</option>
-                <option>Consolas</option>
-                <option>Gill Sans</option>
-                <option>Helvetica</option>
-                <option>Roboto</option>
-                <option>Open Sans</option>
-                <option>Montserrat</option>
-                <option>Lato</option>
-                <option>Poppins</option>
 
               </select>
 
@@ -1212,24 +1168,14 @@ input[type=color]{
 
             <div class="field">
 
-              <label>Font Size</label>
+              <label>Size</label>
 
-              <select id="boxFontSize">
-                <option>8</option>
-                <option>10</option>
-                <option>12</option>
-                <option>14</option>
-                <option>16</option>
-                <option>18</option>
-                <option selected>20</option>
-                <option>22</option>
-                <option>24</option>
-                <option>28</option>
-                <option>32</option>
-                <option>36</option>
-                <option>40</option>
-                <option>48</option>
-              </select>
+              <input
+                type="number"
+                id="boxFontSize"
+                value="20"
+                min="5"
+                max="200">
 
             </div>
 
@@ -1238,15 +1184,12 @@ input[type=color]{
           <div class="check-row">
 
             <label class="check">
-              <input id="boxBold"
-                     type="checkbox"
-                     checked>
+              <input type="checkbox" id="boxBold">
               Bold
             </label>
 
             <label class="check">
-              <input id="boxItalic"
-                     type="checkbox">
+              <input type="checkbox" id="boxItalic">
               Italic
             </label>
 
@@ -1255,219 +1198,148 @@ input[type=color]{
         </div>
 
 
-        <!-- PO BORDER -->
+        <!-- BORDERS -->
 
-        <div class="card"
-             id="poBorderCard">
+        <div class="card" id="poBorderCard">
 
           <div class="card-title">
-            <span>▣ PO Number Border</span>
+            <span>▣ PO Border</span>
           </div>
 
-          <div class="field">
-
-            <label>Border Style</label>
-
-            <select id="poBorder">
-
-              <option value="none">None</option>
-              <option value="solid">Solid</option>
-              <option value="double">Double</option>
-              <option value="dashed">Dashed</option>
-              <option value="dotted">Dotted</option>
-              <option value="groove">Groove</option>
-              <option value="ridge">Ridge</option>
-              <option value="inset">Inset</option>
-              <option value="outset">Outset</option>
-              <option value="thin">Thin</option>
-              <option value="medium">Medium</option>
-              <option value="thick">Thick</option>
-              <option value="double-thin">Double Thin</option>
-              <option value="double-medium">Double Medium</option>
-              <option value="double-thick">Double Thick</option>
-              <option value="dash-dot">Dash Dot</option>
-              <option value="dash-dot-dot">Dash Dot Dot</option>
-              <option value="long-dash">Long Dash</option>
-              <option value="short-dash">Short Dash</option>
-              <option value="short-dot">Short Dot</option>
-              <option value="dot-dash">Dot Dash</option>
-              <option value="dot-dot-dash">Dot Dot Dash</option>
-              <option value="triple">Triple</option>
-              <option value="triple-thin">Triple Thin</option>
-              <option value="triple-thick">Triple Thick</option>
-              <option value="wave">Wave</option>
-              <option value="double-wave">Double Wave</option>
-              <option value="zigzag">Zigzag</option>
-              <option value="shadow">Shadow</option>
-              <option value="soft-shadow">Soft Shadow</option>
-              <option value="rounded">Rounded</option>
-              <option value="double-rounded">Double Rounded</option>
-              <option value="blue">Blue</option>
-              <option value="red">Red</option>
-              <option value="green">Green</option>
-              <option value="gray">Gray</option>
-              <option value="black">Black</option>
-              <option value="navy">Navy</option>
-              <option value="purple">Purple</option>
-              <option value="orange">Orange</option>
-              <option value="teal">Teal</option>
-              <option value="gold">Gold</option>
-              <option value="silver">Silver</option>
-              <option value="double-color">Double Color</option>
-
-            </select>
-
-          </div>
+          <select id="poBorder">
+            <option value="none">None</option>
+            <option value="thin">Thin</option>
+            <option value="medium">Medium</option>
+            <option value="thick">Thick</option>
+            <option value="solid">Solid</option>
+            <option value="double">Double</option>
+            <option value="double-thin">Double Thin</option>
+            <option value="double-medium">Double Medium</option>
+            <option value="double-thick">Double Thick</option>
+            <option value="dashed">Dashed</option>
+            <option value="dotted">Dotted</option>
+            <option value="short-dash">Short Dash</option>
+            <option value="long-dash">Long Dash</option>
+            <option value="short-dot">Short Dot</option>
+            <option value="dash-dot">Dash Dot</option>
+            <option value="dash-dot-dot">Dash Dot Dot</option>
+            <option value="dot-dash">Dot Dash</option>
+            <option value="dot-dot-dash">Dot Dot Dash</option>
+            <option value="groove">Groove</option>
+            <option value="ridge">Ridge</option>
+            <option value="inset">Inset</option>
+            <option value="outset">Outset</option>
+            <option value="rounded">Rounded</option>
+            <option value="double-rounded">Double Rounded</option>
+            <option value="shadow">Shadow</option>
+            <option value="soft-shadow">Soft Shadow</option>
+            <option value="blue">Blue</option>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="navy">Navy</option>
+            <option value="purple">Purple</option>
+            <option value="orange">Orange</option>
+            <option value="teal">Teal</option>
+            <option value="gold">Gold</option>
+            <option value="silver">Silver</option>
+            <option value="black">Black</option>
+            <option value="double-color">Double Blue</option>
+            <option value="triple">Triple</option>
+            <option value="triple-thin">Triple Thin</option>
+            <option value="triple-thick">Triple Thick</option>
+            <option value="double-wave">Double Wave</option>
+            <option value="zigzag">Zigzag</option>
+          </select>
 
         </div>
 
 
-        <!-- BOX BORDER -->
-
-        <div class="card"
-             id="boxBorderCard">
+        <div class="card" id="boxBorderCard">
 
           <div class="card-title">
-            <span>▣ Box Number Border</span>
+            <span>▣ Box Border</span>
           </div>
 
-          <div class="field">
-
-            <label>Border Style</label>
-
-            <select id="boxBorder">
-
-              <option value="none">None</option>
-              <option value="solid">Solid</option>
-              <option value="double">Double</option>
-              <option value="dashed">Dashed</option>
-              <option value="dotted">Dotted</option>
-              <option value="groove">Groove</option>
-              <option value="ridge">Ridge</option>
-              <option value="inset">Inset</option>
-              <option value="outset">Outset</option>
-              <option value="thin">Thin</option>
-              <option value="medium">Medium</option>
-              <option value="thick">Thick</option>
-              <option value="double-thin">Double Thin</option>
-              <option value="double-medium">Double Medium</option>
-              <option value="double-thick">Double Thick</option>
-              <option value="dash-dot">Dash Dot</option>
-              <option value="dash-dot-dot">Dash Dot Dot</option>
-              <option value="long-dash">Long Dash</option>
-              <option value="short-dash">Short Dash</option>
-              <option value="short-dot">Short Dot</option>
-              <option value="dot-dash">Dot Dash</option>
-              <option value="dot-dot-dash">Dot Dot Dash</option>
-              <option value="triple">Triple</option>
-              <option value="triple-thin">Triple Thin</option>
-              <option value="triple-thick">Triple Thick</option>
-              <option value="wave">Wave</option>
-              <option value="double-wave">Double Wave</option>
-              <option value="zigzag">Zigzag</option>
-              <option value="shadow">Shadow</option>
-              <option value="soft-shadow">Soft Shadow</option>
-              <option value="rounded">Rounded</option>
-              <option value="double-rounded">Double Rounded</option>
-              <option value="blue">Blue</option>
-              <option value="red">Red</option>
-              <option value="green">Green</option>
-              <option value="gray">Gray</option>
-              <option value="black">Black</option>
-              <option value="navy">Navy</option>
-              <option value="purple">Purple</option>
-              <option value="orange">Orange</option>
-              <option value="teal">Teal</option>
-              <option value="gold">Gold</option>
-              <option value="silver">Silver</option>
-              <option value="double-color">Double Color</option>
-
-            </select>
-
-          </div>
+          <select id="boxBorder">
+            <option value="none">None</option>
+            <option value="thin">Thin</option>
+            <option value="medium">Medium</option>
+            <option value="thick">Thick</option>
+            <option value="solid">Solid</option>
+            <option value="double">Double</option>
+            <option value="double-thin">Double Thin</option>
+            <option value="double-medium">Double Medium</option>
+            <option value="double-thick">Double Thick</option>
+            <option value="dashed">Dashed</option>
+            <option value="dotted">Dotted</option>
+            <option value="short-dash">Short Dash</option>
+            <option value="long-dash">Long Dash</option>
+            <option value="short-dot">Short Dot</option>
+            <option value="dash-dot">Dash Dot</option>
+            <option value="dash-dot-dot">Dash Dot Dot</option>
+            <option value="dot-dash">Dot Dash</option>
+            <option value="dot-dot-dash">Dot Dot Dash</option>
+            <option value="groove">Groove</option>
+            <option value="ridge">Ridge</option>
+            <option value="inset">Inset</option>
+            <option value="outset">Outset</option>
+            <option value="rounded">Rounded</option>
+            <option value="double-rounded">Double Rounded</option>
+            <option value="shadow">Shadow</option>
+            <option value="soft-shadow">Soft Shadow</option>
+            <option value="blue">Blue</option>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="navy">Navy</option>
+            <option value="purple">Purple</option>
+            <option value="orange">Orange</option>
+            <option value="teal">Teal</option>
+            <option value="gold">Gold</option>
+            <option value="silver">Silver</option>
+            <option value="black">Black</option>
+            <option value="double-color">Double Blue</option>
+            <option value="triple">Triple</option>
+            <option value="triple-thin">Triple Thin</option>
+            <option value="triple-thick">Triple Thick</option>
+            <option value="double-wave">Double Wave</option>
+            <option value="zigzag">Zigzag</option>
+          </select>
 
         </div>
 
 
-        <!-- COMBINED -->
-
-        <div class="card"
-             id="combinedCard">
+        <div class="card" id="combinedCard">
 
           <div class="card-title">
-            <span>🔗 Combined PO + Box</span>
-            <small>Freezes individual controls</small>
+            <span>▣ Combined PO + Box Border</span>
           </div>
 
-          <div class="field">
+          <select id="combinedBorder">
 
-            <label>Combined Format</label>
+            <option value="solid">Solid</option>
+            <option value="double">Double</option>
+            <option value="double-thick">Double Thick</option>
+            <option value="dashed">Dashed</option>
+            <option value="dotted">Dotted</option>
+            <option value="rounded">Rounded</option>
+            <option value="shadow">Shadow</option>
+            <option value="blue">Blue</option>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="navy">Navy</option>
 
-            <select id="combinedFormat">
-
-              <option value="po-box">
-                PO — BOX NO. 1
-              </option>
-
-              <option value="box-po">
-                BOX NO. 1 — PO
-              </option>
-
-              <option value="po-slash-box">
-                PO / BOX NO. 1
-              </option>
-
-              <option value="po-newline-box">
-                PO on Top + Box Below
-              </option>
-
-            </select>
-
-          </div>
-
-          <div class="field">
-
-            <label>Combined Border</label>
-
-            <select id="combinedBorder">
-
-              <option value="solid">Solid</option>
-              <option value="double">Double</option>
-              <option value="dashed">Dashed</option>
-              <option value="dotted">Dotted</option>
-              <option value="groove">Groove</option>
-              <option value="ridge">Ridge</option>
-              <option value="inset">Inset</option>
-              <option value="outset">Outset</option>
-              <option value="thick">Thick</option>
-              <option value="double-thick">Double Thick</option>
-              <option value="shadow">Shadow</option>
-              <option value="rounded">Rounded</option>
-              <option value="double-rounded">Double Rounded</option>
-              <option value="blue">Blue</option>
-              <option value="red">Red</option>
-              <option value="green">Green</option>
-              <option value="gray">Gray</option>
-
-            </select>
-
-          </div>
+          </select>
 
         </div>
 
-
-        <!-- PDF -->
 
         <div class="card">
 
-          <div class="card-title">
-            <span>📄 PDF</span>
-          </div>
-
-          <button class="btn primary"
-                  id="generatePDF"
-                  style="width:100%">
-            ⬇ Generate PDF
+          <button
+            class="btn primary"
+            style="width:100%"
+            id="generatePDF">
+            📄 Generate PDF
           </button>
 
         </div>
@@ -1475,10 +1347,9 @@ input[type=color]{
       </section>
 
 
-      <!-- OTHER PO -->
+      <!-- ================= OTHER PO ================= -->
 
-      <section class="section"
-               id="section-other">
+      <section class="section" id="section-other">
 
         <div class="card">
 
@@ -1488,54 +1359,95 @@ input[type=color]{
 
           <div class="mode-tabs">
 
-            <button class="mode-btn active"
-                    data-other-mode="manual">
+            <button
+              class="mode-btn active"
+              data-other-mode="manual">
               ✍ Manual
             </button>
 
-            <button class="mode-btn"
-                    data-other-mode="multiple">
+            <button
+              class="mode-btn"
+              data-other-mode="multiple">
               🔢 Multiple
             </button>
 
-            <button class="mode-btn"
-                    data-other-mode="excel">
+            <button
+              class="mode-btn"
+              data-other-mode="excel">
               📊 Excel
             </button>
 
           </div>
 
-          <div id="otherManual">
 
-            <div class="field">
-              <label>PO Number</label>
-              <input id="otherPO"
-                     type="text"
-                     placeholder="ABC123">
+          <div
+            class="mode-panel active"
+            id="otherManual">
+
+            <div class="manual-po-grid">
+
+              <script>
+                for(let i=1;i<=20;i++){
+                  document.write(`
+                    <div class="field">
+                      <input
+                        type="text"
+                        class="otherManualPO"
+                        id="otherPO${i}"
+                        placeholder="PO ${i}">
+                    </div>
+                  `);
+                }
+              </script>
+
             </div>
 
           </div>
 
-          <div id="otherMultiple"
-               style="display:none">
+
+          <div
+            class="mode-panel"
+            id="otherMultiple">
 
             <div class="field">
-              <label>PO Numbers — No Limit</label>
-              <textarea id="otherMultiplePO"
-                        placeholder="ABC123, ABC124, ABC125..."></textarea>
+
+              <label>Multiple PO — No Limit</label>
+
+              <textarea
+                id="otherMultiplePO"
+                placeholder="PO001, PO002, PO003...">
+              </textarea>
+
             </div>
 
           </div>
 
-          <div id="otherExcel"
-               style="display:none">
 
-            <input id="otherExcelInput"
-                   type="file"
-                   accept=".xlsx,.xls,.csv">
+          <div
+            class="mode-panel"
+            id="otherExcel">
 
-            <div class="excel-preview"
-                 id="otherExcelPreview"></div>
+            <div class="upload">
+
+              <strong>📊 Upload Excel</strong>
+
+              <small>
+                Header row ignored.
+              </small>
+
+              <br><br>
+
+              <input
+                type="file"
+                id="otherExcelInput"
+                accept=".xlsx,.xls,.csv">
+
+            </div>
+
+            <div
+              class="excel-preview"
+              id="otherExcelPreview">
+            </div>
 
           </div>
 
@@ -1544,55 +1456,45 @@ input[type=color]{
 
         <div class="card">
 
-          <div class="card-title">
-            <span>🔤 Other PO Font</span>
-          </div>
-
           <div class="grid2">
 
             <div class="field">
-              <label>Font</label>
 
-              <select id="otherFont">
+              <label>Page Size</label>
 
-                <option>Arial</option>
-                <option>Calibri</option>
-                <option>Cambria</option>
-                <option>Times New Roman</option>
-                <option>Georgia</option>
-                <option>Verdana</option>
-                <option>Tahoma</option>
-                <option>Trebuchet MS</option>
-                <option>Courier New</option>
-                <option>Garamond</option>
-                <option>Segoe UI</option>
-                <option>Roboto</option>
-                <option>Open Sans</option>
-                <option>Montserrat</option>
-                <option>Poppins</option>
+              <select id="otherPageSize">
+
+                <option value="4x6">
+                  4 × 6 inches
+                </option>
+
+                <option value="70x35">
+                  70 × 35 mm
+                </option>
+
+                <option value="a4">
+                  A4
+                </option>
+
+                <option value="custom">
+                  Custom
+                </option>
 
               </select>
+
             </div>
 
+
             <div class="field">
+
               <label>Font Size</label>
 
-              <select id="otherFontSize">
-
-                <option>8</option>
-                <option>10</option>
-                <option>12</option>
-                <option>14</option>
-                <option>16</option>
-                <option selected>20</option>
-                <option>24</option>
-                <option>28</option>
-                <option>32</option>
-                <option>36</option>
-                <option>40</option>
-                <option>48</option>
-
-              </select>
+              <input
+                type="number"
+                id="otherFontSize"
+                value="20"
+                min="5"
+                max="200">
 
             </div>
 
@@ -1600,56 +1502,94 @@ input[type=color]{
 
           <div class="field">
 
-            <label>Border Style</label>
+            <label>Font</label>
 
-            <select id="otherBorder">
+            <select id="otherFont">
 
-              <option value="none">None</option>
-              <option value="solid">Solid</option>
-              <option value="double">Double</option>
-              <option value="dashed">Dashed</option>
-              <option value="dotted">Dotted</option>
-              <option value="groove">Groove</option>
-              <option value="ridge">Ridge</option>
-              <option value="inset">Inset</option>
-              <option value="outset">Outset</option>
-              <option value="thin">Thin</option>
-              <option value="medium">Medium</option>
-              <option value="thick">Thick</option>
-              <option value="shadow">Shadow</option>
-              <option value="soft-shadow">Soft Shadow</option>
-              <option value="rounded">Rounded</option>
-              <option value="double-rounded">Double Rounded</option>
-              <option value="blue">Blue</option>
-              <option value="red">Red</option>
-              <option value="green">Green</option>
-              <option value="gray">Gray</option>
-              <option value="navy">Navy</option>
-              <option value="purple">Purple</option>
-              <option value="orange">Orange</option>
-              <option value="teal">Teal</option>
-              <option value="gold">Gold</option>
-              <option value="silver">Silver</option>
+              <option>Arial</option>
+              <option>Calibri</option>
+              <option>Times New Roman</option>
+              <option>Georgia</option>
+              <option>Verdana</option>
+              <option>Tahoma</option>
+              <option>Trebuchet MS</option>
+              <option>Courier New</option>
+              <option>Garamond</option>
+              <option>Palatino</option>
 
             </select>
 
           </div>
 
           <label class="check">
-            <input id="otherBold"
-                   type="checkbox"
-                   checked>
+
+            <input
+              type="checkbox"
+              id="otherBold">
+
             Bold
+
           </label>
 
         </div>
 
+
         <div class="card">
 
-          <button class="btn primary"
-                  id="generateOtherPDF"
-                  style="width:100%">
-            ⬇ Generate Other PO PDF
+          <div class="card-title">
+            <span>▣ Border</span>
+          </div>
+
+          <select id="otherBorder">
+
+            <option value="none">None</option>
+            <option value="thin">Thin</option>
+            <option value="medium">Medium</option>
+            <option value="thick">Thick</option>
+            <option value="solid">Solid</option>
+            <option value="double">Double</option>
+            <option value="double-thin">Double Thin</option>
+            <option value="double-medium">Double Medium</option>
+            <option value="double-thick">Double Thick</option>
+            <option value="dashed">Dashed</option>
+            <option value="dotted">Dotted</option>
+            <option value="short-dash">Short Dash</option>
+            <option value="long-dash">Long Dash</option>
+            <option value="dash-dot">Dash Dot</option>
+            <option value="dash-dot-dot">Dash Dot Dot</option>
+            <option value="groove">Groove</option>
+            <option value="ridge">Ridge</option>
+            <option value="rounded">Rounded</option>
+            <option value="double-rounded">Double Rounded</option>
+            <option value="shadow">Shadow</option>
+            <option value="soft-shadow">Soft Shadow</option>
+            <option value="blue">Blue</option>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="navy">Navy</option>
+            <option value="purple">Purple</option>
+            <option value="orange">Orange</option>
+            <option value="teal">Teal</option>
+            <option value="gold">Gold</option>
+            <option value="silver">Silver</option>
+            <option value="black">Black</option>
+            <option value="triple">Triple</option>
+            <option value="triple-thick">Triple Thick</option>
+            <option value="double-wave">Double Wave</option>
+            <option value="zigzag">Zigzag</option>
+
+          </select>
+
+        </div>
+
+
+        <div class="card">
+
+          <button
+            class="btn primary"
+            style="width:100%"
+            id="generateOtherPDF">
+            📄 Generate PDF
           </button>
 
         </div>
@@ -1657,167 +1597,92 @@ input[type=color]{
       </section>
 
 
-      <!-- ISBN -->
+      <!-- ================= ISBN ================= -->
 
-      <section class="section"
-               id="section-isbn">
-
-        <div class="card">
-
-          <div class="card-title">
-            <span>🔖 ISBN Barcode Generator</span>
-          </div>
-
-          <div class="mode-tabs">
-
-            <button class="mode-btn active"
-                    data-isbn-mode="manual">
-              ✍ Manual
-            </button>
-
-            <button class="mode-btn"
-                    data-isbn-mode="multiple">
-              🔢 Multiple
-            </button>
-
-            <button class="mode-btn"
-                    data-isbn-mode="excel">
-              📊 Excel
-            </button>
-
-          </div>
-
-
-          <div id="isbnManual">
-
-            <div class="field">
-              <label>Book Title</label>
-              <input id="bookTitle"
-                     type="text"
-                     placeholder="Book Title">
-            </div>
-
-            <div class="field">
-              <label>ISBN Number</label>
-              <input id="isbn"
-                     type="text"
-                     placeholder="9781234567890">
-            </div>
-
-          </div>
-
-
-          <div id="isbnMultiple"
-               style="display:none">
-
-            <div class="field">
-
-              <label>
-                ISBN Numbers — No Limit
-              </label>
-
-              <textarea id="multipleISBN"
-                        placeholder="978..., 978..., 978..."></textarea>
-
-            </div>
-
-          </div>
-
-
-          <div id="isbnExcel"
-               style="display:none">
-
-            <input id="isbnExcelInput"
-                   type="file"
-                   accept=".xlsx,.xls,.csv">
-
-            <div class="excel-preview"
-                 id="isbnExcelPreview"></div>
-
-          </div>
-
-        </div>
-
+      <section class="section" id="section-isbn">
 
         <div class="card">
 
           <div class="card-title">
-            <span>🔤 ISBN Font & Border</span>
+            <span>📚 ISBN Barcode</span>
+          </div>
+
+          <div class="field">
+
+            <label>ISBN</label>
+
+            <input
+              type="text"
+              id="isbn"
+              value="9781234567890"
+              placeholder="Enter ISBN">
+
+          </div>
+
+          <div class="field">
+
+            <label>Book Title</label>
+
+            <input
+              type="text"
+              id="bookTitle"
+              value="Book Title">
+
           </div>
 
           <div class="grid2">
 
             <div class="field">
+
               <label>Font</label>
 
               <select id="isbnFont">
 
                 <option>Arial</option>
                 <option>Calibri</option>
-                <option>Cambria</option>
                 <option>Times New Roman</option>
                 <option>Georgia</option>
                 <option>Verdana</option>
                 <option>Tahoma</option>
-                <option>Garamond</option>
-                <option>Segoe UI</option>
-                <option>Roboto</option>
-                <option>Open Sans</option>
-                <option>Montserrat</option>
-                <option>Poppins</option>
 
               </select>
 
             </div>
 
             <div class="field">
-              <label>Font Size</label>
 
-              <select id="isbnFontSize">
+              <label>Size</label>
 
-                <option>8</option>
-                <option>10</option>
-                <option>12</option>
-                <option selected>14</option>
-                <option>16</option>
-                <option>18</option>
-                <option>20</option>
-                <option>24</option>
-                <option>28</option>
-                <option>32</option>
-
-              </select>
+              <input
+                type="number"
+                id="isbnFontSize"
+                value="14"
+                min="5"
+                max="200">
 
             </div>
 
           </div>
 
-
           <div class="field">
 
-            <label>Border Style</label>
+            <label>Border</label>
 
             <select id="isbnBorder">
 
               <option value="none">None</option>
               <option value="solid">Solid</option>
               <option value="double">Double</option>
+              <option value="thick">Thick</option>
               <option value="dashed">Dashed</option>
               <option value="dotted">Dotted</option>
-              <option value="groove">Groove</option>
-              <option value="ridge">Ridge</option>
-              <option value="inset">Inset</option>
-              <option value="outset">Outset</option>
-              <option value="thin">Thin</option>
-              <option value="medium">Medium</option>
-              <option value="thick">Thick</option>
-              <option value="shadow">Shadow</option>
               <option value="rounded">Rounded</option>
-              <option value="double-rounded">Double Rounded</option>
+              <option value="shadow">Shadow</option>
               <option value="blue">Blue</option>
               <option value="red">Red</option>
               <option value="green">Green</option>
-              <option value="gray">Gray</option>
+              <option value="navy">Navy</option>
+              <option value="purple">Purple</option>
 
             </select>
 
@@ -1828,10 +1693,11 @@ input[type=color]{
 
         <div class="card">
 
-          <button class="btn primary"
-                  id="generateISBNPDF"
-                  style="width:100%">
-            ⬇ Generate ISBN PDF
+          <button
+            class="btn primary"
+            style="width:100%"
+            id="generateISBNPDF">
+            📄 Generate PDF
           </button>
 
         </div>
@@ -1839,101 +1705,47 @@ input[type=color]{
       </section>
 
 
-      <!-- ADDRESS -->
+      <!-- ================= ADDRESS ================= -->
 
-      <section class="section"
-               id="section-address">
-
-        <div class="card">
-
-          <div class="card-title">
-            <span>📍 Address Labels</span>
-          </div>
-
-          <div class="mode-tabs">
-
-            <button class="mode-btn active"
-                    data-address-mode="manual">
-              ✍ Manual
-            </button>
-
-            <button class="mode-btn"
-                    data-address-mode="multiple">
-              🔢 Multiple
-            </button>
-
-            <button class="mode-btn"
-                    data-address-mode="excel">
-              📊 Excel
-            </button>
-
-          </div>
-
-
-          <div id="addressManual">
-
-            <div class="field">
-              <label>From Address</label>
-
-              <textarea id="fromAddress"
-                        placeholder="From address"></textarea>
-            </div>
-
-            <div class="field">
-              <label>To Address</label>
-
-              <textarea id="toAddress"
-                        placeholder="To address"></textarea>
-            </div>
-
-            <div class="field">
-              <label>Email</label>
-
-              <input id="email"
-                     type="email"
-                     placeholder="email@example.com">
-
-            </div>
-
-          </div>
-
-
-          <div id="addressMultiple"
-               style="display:none">
-
-            <div class="field">
-
-              <label>
-                Addresses — No Limit
-              </label>
-
-              <textarea id="multipleAddress"
-                        placeholder="Address 1&#10;Address 2&#10;Address 3"></textarea>
-
-            </div>
-
-          </div>
-
-
-          <div id="addressExcel"
-               style="display:none">
-
-            <input id="addressExcelInput"
-                   type="file"
-                   accept=".xlsx,.xls,.csv">
-
-            <div class="excel-preview"
-                 id="addressExcelPreview"></div>
-
-          </div>
-
-        </div>
-
+      <section class="section" id="section-address">
 
         <div class="card">
 
           <div class="card-title">
-            <span>🔤 Address Font & Border</span>
+            <span>📍 Address</span>
+          </div>
+
+          <div class="field">
+
+            <label>From Address</label>
+
+            <textarea
+              id="fromAddress"
+              placeholder="From address">
+            </textarea>
+
+          </div>
+
+          <div class="field">
+
+            <label>To Address</label>
+
+            <textarea
+              id="toAddress"
+              placeholder="To address">
+            </textarea>
+
+          </div>
+
+          <div class="field">
+
+            <label>Email</label>
+
+            <input
+              type="email"
+              id="email"
+              placeholder="name@example.com">
+
           </div>
 
           <div class="grid2">
@@ -1946,19 +1758,10 @@ input[type=color]{
 
                 <option>Arial</option>
                 <option>Calibri</option>
-                <option>Cambria</option>
                 <option>Times New Roman</option>
                 <option>Georgia</option>
                 <option>Verdana</option>
                 <option>Tahoma</option>
-                <option>Trebuchet MS</option>
-                <option>Courier New</option>
-                <option>Garamond</option>
-                <option>Segoe UI</option>
-                <option>Roboto</option>
-                <option>Open Sans</option>
-                <option>Montserrat</option>
-                <option>Poppins</option>
 
               </select>
 
@@ -1968,54 +1771,37 @@ input[type=color]{
 
               <label>Font Size</label>
 
-              <select id="addressFontSize">
-
-                <option>8</option>
-                <option>9</option>
-                <option>10</option>
-                <option>11</option>
-                <option selected>12</option>
-                <option>14</option>
-                <option>16</option>
-                <option>18</option>
-                <option>20</option>
-                <option>24</option>
-                <option>28</option>
-                <option>32</option>
-
-              </select>
+              <input
+                type="number"
+                id="addressFontSize"
+                value="12"
+                min="5"
+                max="200">
 
             </div>
 
           </div>
 
-
           <div class="field">
 
-            <label>Border Style</label>
+            <label>Address Border</label>
 
             <select id="addressBorder">
 
               <option value="none">None</option>
               <option value="solid">Solid</option>
-              <option value="double">Double</option>
-              <option value="dashed">Dashed</option>
-              <option value="dotted">Dotted</option>
-              <option value="groove">Groove</option>
-              <option value="ridge">Ridge</option>
-              <option value="inset">Inset</option>
-              <option value="outset">Outset</option>
               <option value="thin">Thin</option>
               <option value="medium">Medium</option>
               <option value="thick">Thick</option>
-              <option value="shadow">Shadow</option>
-              <option value="soft-shadow">Soft Shadow</option>
+              <option value="double">Double</option>
+              <option value="dashed">Dashed</option>
+              <option value="dotted">Dotted</option>
               <option value="rounded">Rounded</option>
               <option value="double-rounded">Double Rounded</option>
+              <option value="shadow">Shadow</option>
               <option value="blue">Blue</option>
               <option value="red">Red</option>
               <option value="green">Green</option>
-              <option value="gray">Gray</option>
               <option value="navy">Navy</option>
               <option value="purple">Purple</option>
               <option value="orange">Orange</option>
@@ -2040,26 +1826,28 @@ input[type=color]{
 
             <div class="qr-card">
 
-              <strong>📍 Address QR</strong>
+              <strong>Address QR</strong>
 
               <div id="addressQR"></div>
 
-              <button class="btn"
-                      id="addressQRBtn">
-                Generate QR
+              <button
+                class="btn"
+                id="addressQRBtn">
+                Generate
               </button>
 
             </div>
 
             <div class="qr-card">
 
-              <strong>✉ Email QR</strong>
+              <strong>Email QR</strong>
 
               <div id="emailQR"></div>
 
-              <button class="btn"
-                      id="emailQRBtn">
-                Generate QR
+              <button
+                class="btn"
+                id="emailQRBtn">
+                Generate
               </button>
 
             </div>
@@ -2071,30 +1859,29 @@ input[type=color]{
 
         <div class="card">
 
-          <button class="btn primary"
-                  id="generateAddressPDF"
-                  style="width:100%">
-            ⬇ Generate Address PDF
+          <button
+            class="btn primary"
+            style="width:100%"
+            id="generateAddressPDF">
+            📄 Generate PDF
           </button>
 
         </div>
 
       </section>
 
-    </div>
+    </main>
 
 
-    <!-- RIGHT PREVIEW -->
+    <!-- PREVIEW -->
 
-    <div class="preview-side">
+    <aside class="preview-area">
 
       <div class="card">
 
-        <div class="preview-toolbar">
+        <div class="preview-header">
 
-          <div>
-            <strong>Live Page Preview</strong>
-          </div>
+          <strong>Live Page Preview</strong>
 
           <span class="live">
             <span class="live-dot"></span>
@@ -2104,83 +1891,64 @@ input[type=color]{
         </div>
 
 
-        <div class="preview-canvas">
+        <div class="preview-box">
 
-          <div class="paper"
-               id="paper">
+          <div class="paper" id="paper">
 
-            <div class="paper-grid"
-                 id="paperGrid">
+            <div
+              class="paper-grid"
+              id="paperGrid">
 
-              <!-- COCO -->
+            </div>
 
-              <div class="label-preview"
-                   id="labelPreview">
 
-                <div class="po-preview"
-                     id="previewPO">
-                  ABC123
-                </div>
+            <div
+              class="other-preview"
+              id="otherPreview">
+              ABC123
+            </div>
 
-                <div class="box-preview"
-                     id="previewBox">
-                  BOX NO. 1
-                </div>
 
-                <div class="combined-preview"
-                     id="combinedPreview">
-                </div>
+            <div
+              class="isbn-preview"
+              id="isbnPreview">
 
+              <div id="isbnTitlePreview">
+                Book Title
               </div>
 
+              <svg id="isbnBarcode"></svg>
 
-              <!-- OTHER -->
-
-              <div class="other-preview"
-                   id="otherPreview">
-                ABC123
+              <div id="isbnNumberPreview">
+                9781234567890
               </div>
 
+            </div>
 
-              <!-- ISBN -->
 
-              <div class="isbn-preview"
-                   id="isbnPreview">
+            <div
+              class="address-preview"
+              id="addressPreview">
 
-                <strong id="isbnTitlePreview">
-                  Book Title
-                </strong>
+              <h4>FROM</h4>
 
-                <svg id="isbnBarcode"></svg>
-
-                <small id="isbnNumberPreview">
-                  ISBN
-                </small>
-
+              <div
+                class="address-block"
+                id="fromPreview">
+                FROM ADDRESS
               </div>
 
+              <h4>TO</h4>
 
-              <!-- ADDRESS -->
+              <div
+                class="address-block"
+                id="toPreview">
+                TO ADDRESS
+              </div>
 
-              <div class="address-preview"
-                   id="addressPreview">
-
-                <h4>FROM</h4>
-
-                <div class="address-block"
-                     id="fromPreview">
-                  FROM ADDRESS
-                </div>
-
-                <h4>TO</h4>
-
-                <div class="address-block"
-                     id="toPreview">
-                  TO ADDRESS
-                </div>
-
-                <div id="emailPreview"></div>
-
+              <div
+                class="address-block"
+                id="emailPreview">
               </div>
 
             </div>
@@ -2191,36 +1959,27 @@ input[type=color]{
 
       </div>
 
-    </div>
+    </aside>
 
   </div>
 
 
   <footer class="footer">
 
-    <div>
-      Created & Developed by
-      <strong>Ashish Verma</strong>
-    </div>
-
-    <div>
-      © 2026 Ashish Verma. All Rights Reserved.
-    </div>
-
-    <div>
-      This application and its original design/code are
-      protected and remain the property of Ashish Verma.
-    </div>
+    <strong>Created & Developed by Ashish Verma © 2026</strong>
+    <br>
+    All rights reserved. Copyright belongs to Ashish Verma.
 
   </footer>
 
-</main>
+</div>
 
 
 <!-- TOAST -->
 
-<div class="toast"
-     id="toast">
+<div
+  class="toast green"
+  id="toast">
 
   <span id="toastText"></span>
 
@@ -2228,47 +1987,80 @@ input[type=color]{
 
 
 <script>
-"use strict";
 
 /* =========================================================
-   BASIC HELPERS
+   STATE
 ========================================================= */
 
-const $ = id => document.getElementById(id);
-
-const $$ = selector =>
-  Array.from(document.querySelectorAll(selector));
-
-
 let activeSection = "coco";
-let activeMode = "manual";
-
+let cocoMode = "manual";
 let otherMode = "manual";
-let isbnMode = "manual";
-let addressMode = "manual";
 
 let history = [];
 let historyIndex = -1;
 
+const MAX_HISTORY = 50;
+
 
 /* =========================================================
-   TOAST
+   HELPERS
 ========================================================= */
 
-function toast(message,type="green"){
+const $ = id =>
+  document.getElementById(id);
 
-  const box=$("toast");
-  const text=$("toastText");
+const $$ = selector =>
+  Array.from(
+    document.querySelectorAll(selector)
+  );
 
-  text.textContent=message;
 
-  box.className="toast "+type+" show";
+function toast(
+  message,
+  type = "green"
+){
 
-  clearTimeout(window.toastTimer);
+  const box =
+    $("toast");
 
-  window.toastTimer=setTimeout(()=>{
-    box.classList.remove("show");
-  },2400);
+  if(!box)return;
+
+  $("toastText").textContent =
+    message;
+
+  box.className =
+    `toast ${type} show`;
+
+  clearTimeout(
+    window.toastTimer
+  );
+
+  window.toastTimer =
+    setTimeout(
+      ()=>{
+        box.classList.remove("show");
+      },
+      2200
+    );
+
+}
+
+
+function toggle(
+  id,
+  show
+){
+
+  const el =
+    $(id);
+
+  if(!el)return;
+
+  el.classList.toggle(
+    "active",
+    show
+  );
+
 }
 
 
@@ -2276,1085 +2068,226 @@ function toast(message,type="green"){
    NAVIGATION
 ========================================================= */
 
-$$(".nav-card").forEach(button=>{
+$$(".nav-btn")
+.forEach(btn=>{
 
-  button.addEventListener("click",()=>{
+  btn.addEventListener(
+    "click",
+    ()=>{
 
-    const next=button.dataset.section;
+      activeSection =
+        btn.dataset.section;
 
-    $$(".nav-card").forEach(b=>{
-      b.classList.remove("active");
-    });
+      $$(".nav-btn")
+      .forEach(b=>{
+        b.classList.toggle(
+          "active",
+          b===btn
+        );
+      });
 
-    button.classList.add("active");
-
-    if(next!==activeSection){
+      $$(".section")
+      .forEach(section=>{
+        section.classList.toggle(
+          "active",
+          section.id ===
+          `section-${activeSection}`
+        );
+      });
 
       toast(
-        `${button.querySelector(".nav-title").textContent} Enabled`,
+        `${btn.querySelector(".nav-title").textContent} Enabled`,
         "green"
       );
+
+      updatePreview();
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   COCO MODES
+========================================================= */
+
+$$("[data-mode]")
+.forEach(btn=>{
+
+  btn.addEventListener(
+    "click",
+    ()=>{
+
+      cocoMode =
+        btn.dataset.mode;
+
+      $$("[data-mode]")
+      .forEach(b=>{
+        b.classList.toggle(
+          "active",
+          b===btn
+        );
+      });
+
+      $$(".mode-panel")
+      .forEach(panel=>{
+        panel.classList.remove(
+          "active"
+        );
+      });
+
+      const panel =
+        $(`mode-${cocoMode}`);
+
+      if(panel){
+        panel.classList.add(
+          "active"
+        );
+      }
+
+      toast(
+        `${cocoMode.toUpperCase()} mode enabled`,
+        "green"
+      );
+
+      updatePreview();
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   OTHER MODES
+========================================================= */
+
+$$("[data-other-mode]")
+.forEach(btn=>{
+
+  btn.addEventListener(
+    "click",
+    ()=>{
+
+      otherMode =
+        btn.dataset.otherMode;
+
+      $$("[data-other-mode]")
+      .forEach(b=>{
+        b.classList.toggle(
+          "active",
+          b===btn
+        );
+      });
+
+      ["otherManual",
+       "otherMultiple",
+       "otherExcel"]
+      .forEach(id=>{
+        $(id)?.classList.remove(
+          "active"
+        );
+      });
+
+      const target =
+        otherMode === "manual"
+          ? "otherManual"
+          : otherMode === "multiple"
+            ? "otherMultiple"
+            : "otherExcel";
+
+      $(target)?.classList.add(
+        "active"
+      );
+
+      toast(
+        `${otherMode.toUpperCase()} mode enabled`,
+        "green"
+      );
+
+      updatePreview();
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   MANUAL PO — 20 INPUTS
+========================================================= */
+
+function getManualPOs(){
+
+  return $$(".manualPO")
+    .map(input =>
+      input.value.trim()
+    )
+    .filter(Boolean);
+
+}
+
+
+/* =========================================================
+   MULTIPLE PO
+========================================================= */
+
+function getMultiplePOs(){
+
+  return String(
+    $("multiplePO")?.value || ""
+  )
+  .split(",")
+  .map(x=>x.trim())
+  .filter(Boolean);
+
+}
+
+
+$("useMultipleBtn")
+?.addEventListener(
+  "click",
+  ()=>{
+
+    const values =
+      getMultiplePOs();
+
+    if(!values.length){
+
+      toast(
+        "Enter comma-separated PO numbers first",
+        "red"
+      );
+
+      return;
+
     }
 
-    activeSection=next;
-
-    $$(".section").forEach(section=>{
-      section.classList.toggle(
-        "active",
-        section.id==="section-"+activeSection
-      );
-    });
+    toast(
+      `${values.length} PO number(s) loaded`,
+      "green"
+    );
 
     updatePreview();
-  });
-
-});
-
-
-/* =========================================================
-   GENERIC MODE SWITCHER
-========================================================= */
-
-function setupModeButtons(){
-
-  $$(".mode-btn").forEach(button=>{
-
-    button.addEventListener("click",()=>{
-
-      if(button.dataset.mode){
-
-        activeMode=button.dataset.mode;
-
-        $$(".mode-btn").forEach(b=>{
-          if(b.dataset.mode){
-            b.classList.toggle(
-              "active",
-              b===button
-            );
-          }
-        });
-
-        $$(".mode-panel").forEach(p=>{
-          p.classList.remove("active");
-        });
-
-        const panel=$("mode-"+activeMode);
-
-        if(panel){
-          panel.classList.add("active");
-        }
-
-        toast(
-          activeMode.toUpperCase()+" mode enabled",
-          "green"
-        );
-
-        updatePreview();
-      }
-
-    });
-
-  });
-
-
-  /* OTHER */
-
-  $$(".mode-btn").forEach(button=>{
-
-    button.addEventListener("click",()=>{
-
-      if(button.dataset.otherMode){
-
-        otherMode=
-          button.dataset.otherMode;
-
-        const parent=
-          button.closest(".card");
-
-        parent
-          .querySelectorAll("[data-other-mode]")
-          .forEach(b=>{
-            b.classList.toggle(
-              "active",
-              b===button
-            );
-          });
-
-        $("otherManual").style.display=
-          otherMode==="manual"
-            ?"block":"none";
-
-        $("otherMultiple").style.display=
-          otherMode==="multiple"
-            ?"block":"none";
-
-        $("otherExcel").style.display=
-          otherMode==="excel"
-            ?"block":"none";
-
-        toast(
-          otherMode.toUpperCase()+" mode enabled",
-          "green"
-        );
-
-        updatePreview();
-      }
-
-
-      if(button.dataset.isbnMode){
-
-        isbnMode=
-          button.dataset.isbnMode;
-
-        const parent=
-          button.closest(".card");
-
-        parent
-          .querySelectorAll("[data-isbn-mode]")
-          .forEach(b=>{
-            b.classList.toggle(
-              "active",
-              b===button
-            );
-          });
-
-        $("isbnManual").style.display=
-          isbnMode==="manual"
-            ?"block":"none";
-
-        $("isbnMultiple").style.display=
-          isbnMode==="multiple"
-            ?"block":"none";
-
-        $("isbnExcel").style.display=
-          isbnMode==="excel"
-            ?"block":"none";
-
-        toast(
-          isbnMode.toUpperCase()+" mode enabled",
-          "green"
-        );
-
-        updatePreview();
-      }
-
-
-      if(button.dataset.addressMode){
-
-        addressMode=
-          button.dataset.addressMode;
-
-        const parent=
-          button.closest(".card");
-
-        parent
-          .querySelectorAll("[data-address-mode]")
-          .forEach(b=>{
-            b.classList.toggle(
-              "active",
-              b===button
-            );
-          });
-
-        $("addressManual").style.display=
-          addressMode==="manual"
-            ?"block":"none";
-
-        $("addressMultiple").style.display=
-          addressMode==="multiple"
-            ?"block":"none";
-
-        $("addressExcel").style.display=
-          addressMode==="excel"
-            ?"block":"none";
-
-        toast(
-          addressMode.toUpperCase()+" mode enabled",
-          "green"
-        );
-
-        updatePreview();
-      }
-
-    });
-
-  });
-
-}
-
-
-/* =========================================================
-   CUSTOM PAGE SIZE
-========================================================= */
-
-$("pageSize").addEventListener("change",()=>{
-
-  const custom=
-    $("pageSize").value==="custom";
-
-  $("customSizeBox").style.display=
-    custom ? "block":"none";
-
-  if(custom){
-
-    toast(
-      "Custom page size enabled",
-      "green"
-    );
-
-  }else{
-
-    toast(
-      "Custom page size disabled",
-      "red"
-    );
-  }
-
-  updatePreview();
-});
-
-
-/* =========================================================
-   PAGE PREVIEW
-========================================================= */
-
-function getPageSize(){
-
-  const value=$("pageSize").value;
-
-  if(value==="4x6"){
-    return [101.6,152.4];
-  }
-
-  if(value==="70x35"){
-    return [70,35];
-  }
-
-  if(value==="a4"){
-    return [210,297];
-  }
-
-  return [
-    Number($("customWidth").value)||101.6,
-    Number($("customHeight").value)||152.4
-  ];
-}
-
-
-function updatePaper(){
-
-  let [w,h]=getPageSize();
-
-  if($("orientation").value==="landscape"){
-    [w,h]=[h,w];
-  }
-
-  const maxW=650;
-  const maxH=700;
-
-  const scale=
-    Math.min(
-      maxW/w,
-      maxH/h
-    );
-
-  const paper=$("paper");
-
-  paper.style.width=
-    Math.max(220,w*scale)+"px";
-
-  paper.style.height=
-    Math.max(220,h*scale)+"px";
-
-
-  const labels=
-    Number($("labelsPerPage").value)||1;
-
-  const grid=$("paperGrid");
-
-  let columns=1;
-
-  if(labels===2) columns=2;
-  else if(labels<=4) columns=2;
-  else if(labels<=6) columns=2;
-  else columns=3;
-
-  grid.style.gridTemplateColumns=
-    `repeat(${columns},1fr)`;
-
-  grid.style.gap=
-    `${Number($("labelGap").value)||3}px`;
-
-}
-
-
-[
-  "orientation",
-  "customWidth",
-  "customHeight",
-  "labelsPerPage",
-  "labelGap"
-].forEach(id=>{
-
-  $(id).addEventListener(
-    "input",
-    updatePaper
-  );
-
-  $(id).addEventListener(
-    "change",
-    updatePaper
-  );
-
-});
-
-
-/* =========================================================
-   FONT LIVE PREVIEW
-========================================================= */
-
-function applyTextStyles(){
-
-  const po=$("previewPO");
-  const box=$("previewBox");
-
-  po.style.fontFamily=$("poFont").value;
-  po.style.fontSize=$("poFontSize").value+"px";
-  po.style.fontWeight=
-    $("poBold").checked
-      ?"700":"400";
-  po.style.fontStyle=
-    $("poItalic").checked
-      ?"italic":"normal";
-  po.style.textDecoration=
-    $("poUnderline").checked
-      ?"underline":"none";
-
-
-  box.style.fontFamily=$("boxFont").value;
-  box.style.fontSize=$("boxFontSize").value+"px";
-  box.style.fontWeight=
-    $("boxBold").checked
-      ?"700":"400";
-  box.style.fontStyle=
-    $("boxItalic").checked
-      ?"italic":"normal";
-
-
-  $("otherPreview").style.fontFamily=
-    $("otherFont").value;
-
-  $("otherPreview").style.fontSize=
-    $("otherFontSize").value+"px";
-
-
-  $("isbnPreview").style.fontFamily=
-    $("isbnFont").value;
-
-  $("isbnPreview").style.fontSize=
-    $("isbnFontSize").value+"px";
-
-
-  $("addressPreview").style.fontFamily=
-    $("addressFont").value;
-
-  $("addressPreview").style.fontSize=
-    $("addressFontSize").value+"px";
-}
-
-
-/* =========================================================
-   BORDER
-========================================================= */
-
-function borderCSS(style){
-
-  const colorMap={
-    blue:"#2563eb",
-    red:"#dc2626",
-    green:"#16a34a",
-    gray:"#64748b",
-    black:"#111827",
-    navy:"#1e3a8a",
-    purple:"#7c3aed",
-    orange:"#f97316",
-    teal:"#0f766e",
-    gold:"#ca8a04",
-    silver:"#64748b"
-  };
-
-  const color=
-    colorMap[style]||"#222";
-
-  if(style==="none"){
-    return "none";
-  }
-
-  if(style==="thin"){
-    return "1px solid #222";
-  }
-
-  if(style==="medium"){
-    return "3px solid #222";
-  }
-
-  if(style==="thick"){
-    return "5px solid #222";
-  }
-
-  if(style==="double-thin"){
-    return "2px double #222";
-  }
-
-  if(style==="double-medium"){
-    return "4px double #222";
-  }
-
-  if(style==="double-thick"){
-    return "7px double #222";
-  }
-
-  if(style==="dash-dot"){
-    return "2px dashed #222";
-  }
-
-  if(style==="dash-dot-dot"){
-    return "2px dashed #222";
-  }
-
-  if(style==="long-dash"){
-    return "2px dashed #222";
-  }
-
-  if(style==="short-dash"){
-    return "1px dashed #222";
-  }
-
-  if(style==="short-dot"){
-    return "2px dotted #222";
-  }
-
-  if(style==="dot-dash"){
-    return "2px dotted #222";
-  }
-
-  if(style==="dot-dot-dash"){
-    return "2px dotted #222";
-  }
-
-  if(style==="triple"){
-    return "6px double #222";
-  }
-
-  if(style==="triple-thin"){
-    return "3px double #222";
-  }
-
-  if(style==="triple-thick"){
-    return "8px double #222";
-  }
-
-  if(style==="wave"){
-    return "3px solid #222";
-  }
-
-  if(style==="double-wave"){
-    return "5px double #222";
-  }
-
-  if(style==="zigzag"){
-    return "3px solid #222";
-  }
-
-  if(style==="double-color"){
-    return "5px double "+color;
-  }
-
-  if(
-    [
-      "blue",
-      "red",
-      "green",
-      "gray",
-      "black",
-      "navy",
-      "purple",
-      "orange",
-      "teal",
-      "gold",
-      "silver"
-    ].includes(style)
-  ){
-    return "2px solid "+color;
-  }
-
-  if(style==="shadow"){
-    return "2px solid #222";
-  }
-
-  if(style==="soft-shadow"){
-    return "1px solid #555";
-  }
-
-  if(style==="rounded"){
-    return "2px solid #222";
-  }
-
-  if(style==="double-rounded"){
-    return "4px double #222";
-  }
-
-  return "2px "+style+" #222";
-}
-
-
-function applyBorder(element,style){
-
-  if(!element)return;
-
-  element.style.border=
-    borderCSS(style);
-
-  element.style.borderRadius=
-    [
-      "rounded",
-      "double-rounded"
-    ].includes(style)
-      ?"8px":"0";
-
-  if(style==="shadow"){
-    element.style.boxShadow=
-      "5px 5px 0 #aaa";
-  }
-  else if(style==="soft-shadow"){
-    element.style.boxShadow=
-      "0 4px 12px rgba(0,0,0,.25)";
-  }
-  else{
-    element.style.boxShadow="none";
-  }
-}
-
-
-/* =========================================================
-   MERGE / FREEZE
-========================================================= */
-
-function applyMergeState(){
-
-  const merged=
-    $("mergePOBox").checked;
-
-  const poCard=
-    $("poFontCard");
-
-  const boxCard=
-    $("boxFontCard");
-
-  const poBorder=
-    $("poBorderCard");
-
-  const boxBorder=
-    $("boxBorderCard");
-
-  [
-    poCard,
-    boxCard,
-    poBorder,
-    boxBorder
-  ].forEach(card=>{
-
-    card.classList.toggle(
-      "freeze-box",
-      merged
-    );
-
-    card.querySelectorAll(
-      "input,select"
-    ).forEach(el=>{
-      el.disabled=merged;
-    });
-
-  });
-
-
-  if(merged){
-
-    $("combinedCard").style.display=
-      "block";
-
-    $("previewPO").style.display=
-      "none";
-
-    $("previewBox").style.display=
-      "none";
-
-    $("combinedPreview").classList.add(
-      "show"
-    );
-
-    toast(
-      "PO + Box Combined — individual controls frozen",
-      "green"
-    );
-
-  }else{
-
-    $("combinedCard").style.display=
-      "block";
-
-    $("combinedPreview").classList.remove(
-      "show"
-    );
-
-    $("previewPO").style.display=
-      $("showPO").checked
-        ?"block":"none";
-
-    $("previewBox").style.display=
-      $("showBox").checked
-        ?"block":"none";
-
-    toast(
-      "PO + Box controls unfrozen",
-      "red"
-    );
-  }
-
-  updatePreview();
-}
-
-
-$("mergePOBox").addEventListener(
-  "change",
-  applyMergeState
-);
-
-
-/* =========================================================
-   PREVIEW
-========================================================= */
-
-function updateCocoPreview(){
-
-  const po=
-    $("poInput").value.trim()||
-    "ABC123";
-
-  const box=
-    $("boxInput").value||
-    "1";
-
-  $("previewPO").textContent=
-    po;
-
-  $("previewBox").textContent=
-    "BOX NO. "+box;
-
-
-  const merged=
-    $("mergePOBox").checked;
-
-
-  if(merged){
-
-    const format=
-      $("combinedFormat").value;
-
-    let text="";
-
-    if(format==="po-box"){
-      text=
-        `${po} — BOX NO. ${box}`;
-    }
-
-    if(format==="box-po"){
-      text=
-        `BOX NO. ${box} — ${po}`;
-    }
-
-    if(format==="po-slash-box"){
-      text=
-        `${po} / BOX NO. ${box}`;
-    }
-
-    if(format==="po-newline-box"){
-      text=
-        `${po}\nBOX NO. ${box}`;
-    }
-
-    $("combinedPreview").textContent=
-      text;
-
-    $("combinedPreview").style.whiteSpace=
-      format==="po-newline-box"
-        ?"pre-line":"normal";
-
-    $("combinedPreview").style.fontFamily=
-      $("poFont").value;
-
-    $("combinedPreview").style.fontSize=
-      $("poFontSize").value+"px";
-
-    $("combinedPreview").style.fontWeight=
-      $("poBold").checked
-        ?"700":"400";
-
-    applyBorder(
-      $("labelPreview"),
-      $("combinedBorder").value
-    );
-
-  }else{
-
-    applyBorder(
-      $("previewPO"),
-      $("poBorder").value
-    );
-
-    applyBorder(
-      $("previewBox"),
-      $("boxBorder").value
-    );
-
-  }
-}
-
-
-function updateOtherPreview(){
-
-  let value=
-    $("otherPO").value.trim()||
-    "ABC123";
-
-  if(otherMode==="multiple"){
-
-    value=
-      $("otherMultiplePO").value
-        .split(",")
-        .map(x=>x.trim())
-        .filter(Boolean)[0]
-      ||"ABC123";
-  }
-
-  $("otherPreview").textContent=
-    value;
-
-  applyBorder(
-    $("otherPreview"),
-    $("otherBorder").value
-  );
-}
-
-
-function updateISBNPreview(){
-
-  const title=
-    $("bookTitle").value||
-    "Book Title";
-
-  const isbn=
-    $("isbn").value||
-    "ISBN";
-
-  $("isbnTitlePreview").textContent=
-    title;
-
-  $("isbnNumberPreview").textContent=
-    isbn;
-
-  applyBorder(
-    $("isbnPreview"),
-    $("isbnBorder").value
-  );
-
-  generateISBNBarcode();
-}
-
-
-function generateISBNBarcode(){
-
-  const value=
-    $("isbn").value.trim();
-
-  if(!value){
-    $("isbnBarcode").innerHTML="";
-    return;
-  }
-
-  if(typeof JsBarcode==="undefined"){
-    return;
-  }
-
-  try{
-
-    JsBarcode(
-      "#isbnBarcode",
-      value,
-      {
-        format:"auto",
-        width:1.4,
-        height:50,
-        displayValue:true,
-        margin:4
-      }
-    );
-
-  }catch(e){
-    console.warn(e);
-  }
-}
-
-
-function updateAddressPreview(){
-
-  $("fromPreview").textContent=
-    $("fromAddress").value||
-    "FROM ADDRESS";
-
-  $("toPreview").textContent=
-    $("toAddress").value||
-    "TO ADDRESS";
-
-  const email=
-    $("email").value.trim();
-
-  $("emailPreview").textContent=
-    email
-      ?"Email: "+email
-      :"";
-
-  applyBorder(
-    $("addressPreview"),
-    $("addressBorder").value
-  );
-}
-
-
-function updatePreview(){
-
-  updatePaper();
-  applyTextStyles();
-
-  $("labelPreview").style.display="none";
-  $("otherPreview").style.display="none";
-  $("isbnPreview").style.display="none";
-  $("addressPreview").style.display="none";
-
-
-  if(activeSection==="coco"){
-
-    $("labelPreview").style.display=
-      "flex";
-
-    updateCocoPreview();
-
-  }
-
-  else if(activeSection==="other"){
-
-    $("otherPreview").style.display=
-      "flex";
-
-    updateOtherPreview();
-
-  }
-
-  else if(activeSection==="isbn"){
-
-    $("isbnPreview").style.display=
-      "flex";
-
-    updateISBNPreview();
-
-  }
-
-  else if(activeSection==="address"){
-
-    $("addressPreview").style.display=
-      "block";
-
-    updateAddressPreview();
-
-  }
-
-}
-
-
-/* =========================================================
-   LIVE INPUTS
-========================================================= */
-
-$$("input,select,textarea").forEach(element=>{
-
-  element.addEventListener(
-    "input",
-    ()=>{
-
-      updatePreview();
-      scheduleHistory();
-
-    }
-  );
-
-  element.addEventListener(
-    "change",
-    ()=>{
-
-      updatePreview();
-      scheduleHistory();
-
-    }
-  );
-
-});
-
-
-/* =========================================================
-   ENABLE / DISABLE TOASTS
-========================================================= */
-
-[
-  "showPO",
-  "showBox"
-].forEach(id=>{
-
-  $(id).addEventListener(
-    "change",
-    ()=>{
-
-      if($(id).checked){
-
-        toast(
-          id==="showPO"
-            ?"PO Number Enabled"
-            :"Box Number Enabled",
-          "green"
-        );
-
-      }else{
-
-        toast(
-          id==="showPO"
-            ?"PO Number Disabled"
-            :"Box Number Disabled",
-          "red"
-        );
-
-      }
-
-    }
-  );
-
-});
-
-
-/* =========================================================
-   QR
-========================================================= */
-
-$("addressQRBtn").addEventListener(
-  "click",
-  async()=>{
-
-    if(typeof QRCode==="undefined"){
-
-      toast(
-        "QR library is not loaded",
-        "red"
-      );
-
-      return;
-    }
-
-    const value=[
-      $("fromAddress").value,
-      $("toAddress").value
-    ]
-    .filter(Boolean)
-    .join("\n");
-
-    if(!value){
-
-      toast(
-        "Enter address first",
-        "red"
-      );
-
-      return;
-    }
-
-    $("addressQR").innerHTML="";
-
-    const canvas=
-      document.createElement("canvas");
-
-    $("addressQR").appendChild(canvas);
-
-    await QRCode.toCanvas(
-      canvas,
-      value,
-      {
-        width:120,
-        margin:2
-      }
-    );
-
-    toast(
-      "Address QR generated",
-      "green"
-    );
 
   }
 );
 
 
-$("emailQRBtn").addEventListener(
+$("clearMultipleBtn")
+?.addEventListener(
   "click",
-  async()=>{
+  ()=>{
 
-    if(typeof QRCode==="undefined"){
+    $("multiplePO").value =
+      "";
 
-      toast(
-        "QR library is not loaded",
-        "red"
-      );
-
-      return;
-    }
-
-    const email=
-      $("email").value.trim();
-
-    if(!email){
-
-      toast(
-        "Enter email first",
-        "red"
-      );
-
-      return;
-    }
-
-    $("emailQR").innerHTML="";
-
-    const canvas=
-      document.createElement("canvas");
-
-    $("emailQR").appendChild(canvas);
-
-    await QRCode.toCanvas(
-      canvas,
-      "mailto:"+email,
-      {
-        width:120,
-        margin:2
-      }
-    );
+    updatePreview();
 
     toast(
-      "Email QR generated",
-      "green"
+      "Multiple PO cleared",
+      "red"
     );
 
   }
@@ -3365,170 +2298,278 @@ $("emailQRBtn").addEventListener(
    EXCEL
 ========================================================= */
 
-async function readExcel(
-  input,
-  preview,
-  target
-){
+let excelPOs = [];
 
-  const file=
-    input.files[0];
 
-  if(!file)return;
+$("excelInput")
+?.addEventListener(
+  "change",
+  async event=>{
 
-  if(typeof XLSX==="undefined"){
+    const file =
+      event.target.files?.[0];
 
-    toast(
-      "Excel library is not loaded",
-      "red"
-    );
+    if(!file)return;
 
-    return;
-  }
 
-  try{
+    if(
+      typeof XLSX ===
+      "undefined"
+    ){
 
-    const buffer=
-      await file.arrayBuffer();
-
-    const workbook=
-      XLSX.read(
-        buffer,
-        {type:"array"}
-      );
-
-    const sheet=
-      workbook.Sheets[
-        workbook.SheetNames[0]
-      ];
-
-    const rows=
-      XLSX.utils.sheet_to_json(
-        sheet,
-        {
-          header:1,
-          defval:""
-        }
-      );
-
-    if(!rows.length){
       toast(
-        "Excel file is empty",
+        "Excel library is not loaded",
         "red"
       );
+
       return;
-    }
-
-
-    /* FIRST ROW = HEADER / IGNORED */
-
-    const header=rows[0];
-
-    const data=rows.slice(1);
-
-
-    let html="<table><thead><tr>";
-
-    header.forEach(h=>{
-      html+=
-        `<th>${escapeHTML(h)}</th>`;
-    });
-
-    html+="</tr></thead><tbody>";
-
-    data.slice(0,200).forEach(row=>{
-
-      html+="<tr>";
-
-      header.forEach((_,i)=>{
-
-        html+=
-          `<td>${escapeHTML(
-            row[i]??""
-          )}</td>`;
-
-      });
-
-      html+="</tr>";
-
-    });
-
-    html+="</tbody></table>";
-
-    preview.innerHTML=html;
-
-
-    if(target){
-
-      const values=
-        data
-          .map(row=>row[0])
-          .filter(v=>v!=="");
-
-      target.value=
-        values.join(", ");
 
     }
 
 
-    toast(
-      "Excel loaded — Header row ignored",
-      "green"
-    );
+    try{
 
-    updatePreview();
+      const buffer =
+        await file.arrayBuffer();
 
-  }catch(error){
+      const workbook =
+        XLSX.read(
+          buffer,
+          {
+            type:"array"
+          }
+        );
 
-    console.error(error);
+      const sheet =
+        workbook.Sheets[
+          workbook.SheetNames[0]
+        ];
 
-    toast(
-      "Excel file could not be read",
-      "red"
-    );
+      const rows =
+        XLSX.utils.sheet_to_json(
+          sheet,
+          {
+            header:1,
+            defval:"",
+            raw:false
+          }
+        );
+
+
+      /*
+        HEADER / FIRST ROW IGNORED
+      */
+
+      excelPOs =
+        rows
+          .slice(1)
+          .map(row =>
+            String(
+              Array.isArray(row)
+                ? row[0] ?? ""
+                : row
+            ).trim()
+          )
+          .filter(Boolean);
+
+
+      renderExcel(
+        "excelPreview",
+        rows
+      );
+
+
+      toast(
+        `${excelPOs.length} PO(s) loaded from Excel`,
+        "green"
+      );
+
+      updatePreview();
+
+    }
+    catch(error){
+
+      console.error(error);
+
+      toast(
+        "Excel file could not be read",
+        "red"
+      );
+
+    }
 
   }
+);
+
+
+/* =========================================================
+   OTHER EXCEL
+========================================================= */
+
+let otherExcelPOs = [];
+
+
+$("otherExcelInput")
+?.addEventListener(
+  "change",
+  async event=>{
+
+    const file =
+      event.target.files?.[0];
+
+    if(!file)return;
+
+
+    if(
+      typeof XLSX ===
+      "undefined"
+    ){
+
+      toast(
+        "Excel library is not loaded",
+        "red"
+      );
+
+      return;
+
+    }
+
+
+    try{
+
+      const buffer =
+        await file.arrayBuffer();
+
+      const workbook =
+        XLSX.read(
+          buffer,
+          {
+            type:"array"
+          }
+        );
+
+      const sheet =
+        workbook.Sheets[
+          workbook.SheetNames[0]
+        ];
+
+      const rows =
+        XLSX.utils.sheet_to_json(
+          sheet,
+          {
+            header:1,
+            defval:"",
+            raw:false
+          }
+        );
+
+
+      otherExcelPOs =
+        rows
+          .slice(1)
+          .map(row =>
+            String(
+              Array.isArray(row)
+                ? row[0] ?? ""
+                : row
+            ).trim()
+          )
+          .filter(Boolean);
+
+
+      renderExcel(
+        "otherExcelPreview",
+        rows
+      );
+
+
+      toast(
+        `${otherExcelPOs.length} PO(s) loaded`,
+        "green"
+      );
+
+    }
+    catch(error){
+
+      console.error(error);
+
+      toast(
+        "Excel file could not be read",
+        "red"
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   EXCEL TABLE
+========================================================= */
+
+function renderExcel(
+  targetId,
+  rows
+){
+
+  const target =
+    $(targetId);
+
+  if(!target)return;
+
+
+  if(!rows.length){
+
+    target.innerHTML =
+      "";
+
+    return;
+
+  }
+
+
+  let html =
+    "<table><thead><tr>";
+
+
+  rows[0].forEach(
+    value=>{
+      html +=
+        `<th>${escapeHTML(value)}</th>`;
+    }
+  );
+
+
+  html +=
+    "</tr></thead><tbody>";
+
+
+  rows
+    .slice(1,151)
+    .forEach(row=>{
+
+      html +=
+        "<tr>";
+
+      row.forEach(value=>{
+        html +=
+          `<td>${escapeHTML(value)}</td>`;
+      });
+
+      html +=
+        "</tr>";
+
+    });
+
+
+  html +=
+    "</tbody></table>";
+
+  target.innerHTML =
+    html;
+
 }
-
-
-$("excelInput").addEventListener(
-  "change",
-  ()=>readExcel(
-    $("excelInput"),
-    $("excelPreview"),
-    $("multiplePO")
-  )
-);
-
-
-$("otherExcelInput").addEventListener(
-  "change",
-  ()=>readExcel(
-    $("otherExcelInput"),
-    $("otherExcelPreview"),
-    $("otherMultiplePO")
-  )
-);
-
-
-$("isbnExcelInput").addEventListener(
-  "change",
-  ()=>readExcel(
-    $("isbnExcelInput"),
-    $("isbnExcelPreview"),
-    $("multipleISBN")
-  )
-);
-
-
-$("addressExcelInput").addEventListener(
-  "change",
-  ()=>readExcel(
-    $("addressExcelInput"),
-    $("addressExcelPreview"),
-    $("multipleAddress")
-  )
-);
 
 
 /* =========================================================
@@ -3537,103 +2578,1090 @@ $("addressExcelInput").addEventListener(
 
 function escapeHTML(value){
 
-  return String(value??"")
+  return String(value ?? "")
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
     .replace(/>/g,"&gt;")
     .replace(/"/g,"&quot;")
     .replace(/'/g,"&#039;");
+
 }
+
+
+/* =========================================================
+   BORDER
+========================================================= */
+
+function borderCSS(style){
+
+  const colors = {
+    blue:"#2563eb",
+    red:"#dc2626",
+    green:"#16a34a",
+    navy:"#1e3a8a",
+    purple:"#7c3aed",
+    orange:"#f97316",
+    teal:"#0f766e",
+    gold:"#ca8a04",
+    silver:"#94a3b8",
+    black:"#111827"
+  };
+
+
+  if(!style || style==="none"){
+    return {
+      border:"none",
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  if(colors[style]){
+    return {
+      border:`2px solid ${colors[style]}`,
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  if(style==="thin"){
+    return {
+      border:"1px solid #222",
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  if(style==="medium"){
+    return {
+      border:"3px solid #222",
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  if(style==="thick"){
+    return {
+      border:"5px solid #222",
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  if(
+    style.includes("double")
+  ){
+
+    return {
+      border:"4px double #222",
+      radius:
+        style.includes("rounded")
+          ? "8px"
+          : "0",
+      shadow:"none"
+    };
+
+  }
+
+
+  if(style==="shadow"){
+    return {
+      border:"2px solid #222",
+      radius:"0",
+      shadow:"5px 5px 0 rgba(0,0,0,.25)"
+    };
+  }
+
+
+  if(style==="soft-shadow"){
+    return {
+      border:"1px solid #555",
+      radius:"0",
+      shadow:"0 4px 12px rgba(0,0,0,.22)"
+    };
+  }
+
+
+  if(style==="rounded"){
+    return {
+      border:"2px solid #222",
+      radius:"8px",
+      shadow:"none"
+    };
+  }
+
+
+  if(
+    style==="dashed" ||
+    style==="short-dash" ||
+    style==="long-dash"
+  ){
+    return {
+      border:"2px dashed #222",
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  if(
+    style==="dotted" ||
+    style==="short-dot"
+  ){
+    return {
+      border:"2px dotted #222",
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  if(style==="groove"){
+    return {
+      border:"5px groove #777",
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  if(style==="ridge"){
+    return {
+      border:"5px ridge #777",
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  if(style==="inset"){
+    return {
+      border:"5px inset #777",
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  if(style==="outset"){
+    return {
+      border:"5px outset #777",
+      radius:"0",
+      shadow:"none"
+    };
+  }
+
+
+  return {
+    border:"2px solid #222",
+    radius:"0",
+    shadow:"none"
+  };
+
+}
+
+
+function applyBorder(
+  el,
+  style
+){
+
+  if(!el)return;
+
+  const css =
+    borderCSS(style);
+
+  el.style.border =
+    css.border;
+
+  el.style.borderRadius =
+    css.radius;
+
+  el.style.boxShadow =
+    css.shadow;
+
+}
+
+
+/* =========================================================
+   COMBINE / FREEZE
+========================================================= */
+
+$("mergePOBox")
+?.addEventListener(
+  "change",
+  ()=>{
+
+    const merged =
+      $("mergePOBox").checked;
+
+
+    [
+      "poFontCard",
+      "boxFontCard",
+      "poBorderCard",
+      "boxBorderCard"
+    ]
+    .forEach(id=>{
+
+      const card =
+        $(id);
+
+      if(!card)return;
+
+      card.classList.toggle(
+        "freeze",
+        merged
+      );
+
+
+      card
+        .querySelectorAll(
+          "input,select"
+        )
+        .forEach(control=>{
+
+          control.disabled =
+            merged;
+
+        });
+
+    });
+
+
+    toast(
+      merged
+        ? "PO + Box Combined — controls frozen"
+        : "PO + Box controls unfrozen",
+      merged
+        ? "green"
+        : "red"
+    );
+
+
+    updatePreview();
+
+  }
+);
+
+
+/* =========================================================
+   FONT APPLICATION
+========================================================= */
+
+function applyFonts(){
+
+  const poFont =
+    $("poFont").value;
+
+  const poSize =
+    Number(
+      $("poFontSize").value
+    ) || 24;
+
+
+  const boxFont =
+    $("boxFont").value;
+
+  const boxSize =
+    Number(
+      $("boxFontSize").value
+    ) || 20;
+
+
+  $$(".po-preview")
+  .forEach(el=>{
+
+    el.style.fontFamily =
+      poFont;
+
+    el.style.fontSize =
+      `${poSize}px`;
+
+    el.style.fontWeight =
+      $("poBold").checked
+        ? "700"
+        : "400";
+
+    el.style.fontStyle =
+      $("poItalic").checked
+        ? "italic"
+        : "normal";
+
+    el.style.textDecoration =
+      $("poUnderline").checked
+        ? "underline"
+        : "none";
+
+  });
+
+
+  $$(".box-preview")
+  .forEach(el=>{
+
+    el.style.fontFamily =
+      boxFont;
+
+    el.style.fontSize =
+      `${boxSize}px`;
+
+    el.style.fontWeight =
+      $("boxBold").checked
+        ? "700"
+        : "400";
+
+    el.style.fontStyle =
+      $("boxItalic").checked
+        ? "italic"
+        : "normal";
+
+  });
+
+
+  $("otherPreview").style.fontFamily =
+    $("otherFont").value;
+
+  $("otherPreview").style.fontSize =
+    `${Number($("otherFontSize").value)||20}px`;
+
+  $("otherPreview").style.fontWeight =
+    $("otherBold").checked
+      ? "700"
+      : "400";
+
+
+  $("isbnPreview").style.fontFamily =
+    $("isbnFont").value;
+
+  $("isbnPreview").style.fontSize =
+    `${Number($("isbnFontSize").value)||14}px`;
+
+
+  $("addressPreview").style.fontFamily =
+    $("addressFont").value;
+
+  $("addressPreview").style.fontSize =
+    `${Number($("addressFontSize").value)||12}px`;
+
+}
+
+
+/* =========================================================
+   COCO VALUES
+========================================================= */
+
+function getCocoValues(){
+
+  if(cocoMode==="manual"){
+
+    const values =
+      getManualPOs();
+
+    return values.length
+      ? values
+      : ["ABC123"];
+
+  }
+
+
+  if(cocoMode==="multiple"){
+
+    const values =
+      getMultiplePOs();
+
+    return values.length
+      ? values
+      : ["ABC123"];
+
+  }
+
+
+  if(cocoMode==="excel"){
+
+    return excelPOs.length
+      ? excelPOs
+      : ["ABC123"];
+
+  }
+
+
+  return ["ABC123"];
+
+}
+
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+function updatePreview(){
+
+  const paper =
+    $("paper");
+
+  const pageSize =
+    $("pageSize")?.value ||
+    "4x6";
+
+
+  const sizes = {
+    "4x6":[340,480],
+    "70x35":[330,165],
+    "a4":[340,480]
+  };
+
+
+  let [
+    width,
+    height
+  ] =
+    sizes[pageSize] ||
+    sizes["4x6"];
+
+
+  if(pageSize==="custom"){
+
+    const w =
+      Number(
+        $("customWidth").value
+      ) || 101.6;
+
+    const h =
+      Number(
+        $("customHeight").value
+      ) || 152.4;
+
+
+    const scale =
+      Math.min(
+        340/w,
+        480/h
+      );
+
+
+    width =
+      w * scale;
+
+    height =
+      h * scale;
+
+  }
+
+
+  if(
+    $("orientation")?.value ===
+    "landscape"
+  ){
+
+    [
+      width,
+      height
+    ] = [
+      height,
+      width
+    ];
+
+  }
+
+
+  paper.style.width =
+    `${Math.max(180,width)}px`;
+
+  paper.style.height =
+    `${Math.max(140,height)}px`;
+
+
+  const count =
+    Number(
+      $("labelsPerPage")?.value
+    ) || 1;
+
+
+  let cols = 1;
+
+
+  if(count===2)cols=2;
+  if(count===4)cols=2;
+  if(count===6)cols=2;
+  if(count===9)cols=3;
+  if(count===12)cols=3;
+
+
+  $("paperGrid").style.gridTemplateColumns =
+    `repeat(${cols},minmax(0,1fr))`;
+
+
+  $("paperGrid").innerHTML =
+    "";
+
+
+  for(let i=0;i<count;i++){
+
+    const label =
+      document.createElement("div");
+
+    label.className =
+      "label";
+
+
+    const po =
+      document.createElement("div");
+
+    po.className =
+      "po-preview";
+
+
+    const box =
+      document.createElement("div");
+
+    box.className =
+      "box-preview";
+
+
+    const combined =
+      document.createElement("div");
+
+    combined.className =
+      "combined-preview";
+
+
+    label.appendChild(po);
+    label.appendChild(box);
+    label.appendChild(combined);
+
+    $("paperGrid")
+      .appendChild(label);
+
+  }
+
+
+  const values =
+    getCocoValues();
+
+
+  const merged =
+    $("mergePOBox").checked;
+
+
+  $$(".label")
+  .forEach(
+    (label,index)=>{
+
+      const po =
+        values[
+          index % values.length
+        ];
+
+
+      const boxNo =
+        (
+          Number(
+            $("boxInput").value
+          ) || 1
+        ) + index;
+
+
+      const poEl =
+        label.querySelector(
+          ".po-preview"
+        );
+
+      const boxEl =
+        label.querySelector(
+          ".box-preview"
+        );
+
+      const combinedEl =
+        label.querySelector(
+          ".combined-preview"
+        );
+
+
+      poEl.textContent =
+        po;
+
+      boxEl.textContent =
+        `BOX NO. ${boxNo}`;
+
+
+      if(merged){
+
+        poEl.style.display =
+          "none";
+
+        boxEl.style.display =
+          "none";
+
+        combinedEl.style.display =
+          "block";
+
+        combinedEl.textContent =
+          getCombinedText(
+            po,
+            boxNo
+          );
+
+        applyBorder(
+          combinedEl,
+          $("combinedBorder").value
+        );
+
+        applyBorder(
+          label,
+          "none"
+        );
+
+      }
+      else{
+
+        combinedEl.style.display =
+          "none";
+
+        poEl.style.display =
+          $("showPO").checked
+            ? "block"
+            : "none";
+
+        boxEl.style.display =
+          $("showBox").checked
+            ? "block"
+            : "none";
+
+
+        applyBorder(
+          poEl,
+          $("poBorder").value
+        );
+
+        applyBorder(
+          boxEl,
+          $("boxBorder").value
+        );
+
+        applyBorder(
+          label,
+          "none"
+        );
+
+      }
+
+    }
+  );
+
+
+  /* OTHER */
+
+  if(activeSection==="other"){
+
+    $("otherPreview").style.display =
+      "flex";
+
+    $("paperGrid").style.display =
+      "none";
+
+    $("isbnPreview").style.display =
+      "none";
+
+    $("addressPreview").style.display =
+      "none";
+
+
+    let values = [];
+
+    if(otherMode==="manual"){
+
+      values =
+        $$(".otherManualPO")
+          .map(x=>x.value.trim())
+          .filter(Boolean);
+
+    }
+
+    if(otherMode==="multiple"){
+
+      values =
+        String(
+          $("otherMultiplePO").value
+        )
+        .split(",")
+        .map(x=>x.trim())
+        .filter(Boolean);
+
+    }
+
+    if(otherMode==="excel"){
+
+      values =
+        otherExcelPOs;
+
+    }
+
+
+    $("otherPreview").textContent =
+      values[0] ||
+      "ABC123";
+
+
+    applyBorder(
+      $("otherPreview"),
+      $("otherBorder").value
+    );
+
+  }
+  else{
+
+    $("otherPreview").style.display =
+      "none";
+
+  }
+
+
+  /* ISBN */
+
+  if(activeSection==="isbn"){
+
+    $("paperGrid").style.display =
+      "none";
+
+    $("isbnPreview").style.display =
+      "flex";
+
+    $("otherPreview").style.display =
+      "none";
+
+    $("addressPreview").style.display =
+      "none";
+
+
+    $("isbnTitlePreview").textContent =
+      $("bookTitle").value ||
+      "Book Title";
+
+
+    $("isbnNumberPreview").textContent =
+      $("isbn").value ||
+      "9781234567890";
+
+
+    applyBorder(
+      $("isbnPreview"),
+      $("isbnBorder").value
+    );
+
+
+    if(
+      typeof JsBarcode !==
+      "undefined"
+    ){
+
+      try{
+
+        JsBarcode(
+          "#isbnBarcode",
+          $("isbn").value ||
+          "9781234567890",
+          {
+            format:"auto",
+            width:1.4,
+            height:45,
+            displayValue:true,
+            margin:3,
+            fontSize:10
+          }
+        );
+
+      }
+      catch(error){
+
+        console.warn(
+          "Barcode error",
+          error
+        );
+
+      }
+
+    }
+
+  }
+
+
+  /* ADDRESS */
+
+  if(activeSection==="address"){
+
+    $("paperGrid").style.display =
+      "none";
+
+    $("otherPreview").style.display =
+      "none";
+
+    $("isbnPreview").style.display =
+      "none";
+
+    $("addressPreview").style.display =
+      "block";
+
+
+    $("fromPreview").textContent =
+      $("fromAddress").value ||
+      "FROM ADDRESS";
+
+
+    $("toPreview").textContent =
+      $("toAddress").value ||
+      "TO ADDRESS";
+
+
+    $("emailPreview").textContent =
+      $("email").value
+        ? `Email: ${$("email").value}`
+        : "";
+
+
+    applyBorder(
+      $("addressPreview"),
+      $("addressBorder").value
+    );
+
+  }
+
+
+  applyFonts();
+
+}
+
+
+/* =========================================================
+   COMBINED TEXT
+========================================================= */
+
+function getCombinedText(
+  po,
+  box
+){
+
+  const format =
+    $("combinedFormat").value;
+
+
+  const boxText =
+    `BOX NO. ${box}`;
+
+
+  if(format==="box-po"){
+    return `${boxText} — ${po}`;
+  }
+
+  if(format==="po-slash-box"){
+    return `${po} / ${boxText}`;
+  }
+
+  if(format==="po-newline-box"){
+    return `${po}\n${boxText}`;
+  }
+
+  return `${po} — ${boxText}`;
+
+}
+
+
+/* =========================================================
+   LIVE INPUT
+========================================================= */
+
+$$("input,select,textarea")
+.forEach(el=>{
+
+  el.addEventListener(
+    "input",
+    ()=>{
+      updatePreview();
+      scheduleHistory();
+    }
+  );
+
+  el.addEventListener(
+    "change",
+    ()=>{
+      updatePreview();
+      scheduleHistory();
+    }
+  );
+
+});
+
+
+/* =========================================================
+   CUSTOM SIZE
+========================================================= */
+
+$("pageSize")
+?.addEventListener(
+  "change",
+  ()=>{
+
+    const custom =
+      $("pageSize").value ===
+      "custom";
+
+
+    $("customSizeBox").style.display =
+      custom
+        ? "grid"
+        : "none";
+
+
+    if(custom){
+
+      toast(
+        "Custom page size enabled",
+        "green"
+      );
+
+    }
+    else{
+
+      toast(
+        "Custom page size disabled",
+        "red"
+      );
+
+    }
+
+    updatePreview();
+
+  }
+);
 
 
 /* =========================================================
    HISTORY
 ========================================================= */
 
-let historyTimer;
-
 function snapshot(){
 
-  const data={};
+  const data = {};
 
   $$("input,select,textarea")
-    .forEach(el=>{
+  .forEach(el=>{
 
-      if(
-        !el.id ||
-        el.type==="file"
-      )return;
+    if(!el.id)return;
 
-      data[el.id]=
-        el.type==="checkbox"
-          ?el.checked
-          :el.value;
+    if(el.type==="file")return;
 
-    });
-
-  return data;
-}
-
-
-function restore(data){
-
-  Object.keys(data).forEach(id=>{
-
-    const el=$(id);
-
-    if(!el)return;
-
-    if(el.type==="checkbox"){
-      el.checked=data[id];
-    }else{
-      el.value=data[id];
-    }
+    data[el.id] =
+      el.type==="checkbox"
+        ? el.checked
+        : el.value;
 
   });
 
-  updatePreview();
+  return JSON.stringify(data);
+
 }
 
 
 function saveHistory(){
 
-  const current=
-    JSON.stringify(snapshot());
+  const data =
+    snapshot();
+
 
   if(
-    history[history.length-1]===current
+    history[historyIndex] ===
+    data
   )return;
 
-  history=
+
+  history =
     history.slice(
       0,
       historyIndex+1
     );
 
-  history.push(current);
 
-  if(history.length>50){
+  history.push(data);
+
+
+  if(
+    history.length >
+    MAX_HISTORY
+  ){
+
     history.shift();
+
   }
 
-  historyIndex=
+
+  historyIndex =
     history.length-1;
+
 }
+
+
+let historyTimer;
 
 
 function scheduleHistory(){
 
-  clearTimeout(historyTimer);
+  clearTimeout(
+    historyTimer
+  );
 
-  historyTimer=
+  historyTimer =
     setTimeout(
       saveHistory,
-      500
+      400
     );
+
 }
 
 
-$("undoBtn").addEventListener(
+function restore(
+  data
+){
+
+  const obj =
+    JSON.parse(data);
+
+
+  Object.keys(obj)
+  .forEach(id=>{
+
+    const el =
+      $(id);
+
+    if(!el)return;
+
+
+    if(el.type==="checkbox"){
+
+      el.checked =
+        Boolean(obj[id]);
+
+    }
+    else{
+
+      el.value =
+        obj[id];
+
+    }
+
+  });
+
+
+  updatePreview();
+
+}
+
+
+$("undoBtn")
+?.addEventListener(
   "click",
   ()=>{
 
@@ -3645,14 +3673,13 @@ $("undoBtn").addEventListener(
       );
 
       return;
+
     }
 
     historyIndex--;
 
     restore(
-      JSON.parse(
-        history[historyIndex]
-      )
+      history[historyIndex]
     );
 
     toast(
@@ -3664,12 +3691,14 @@ $("undoBtn").addEventListener(
 );
 
 
-$("redoBtn").addEventListener(
+$("redoBtn")
+?.addEventListener(
   "click",
   ()=>{
 
     if(
-      historyIndex>=history.length-1
+      historyIndex>=
+      history.length-1
     ){
 
       toast(
@@ -3678,14 +3707,13 @@ $("redoBtn").addEventListener(
       );
 
       return;
+
     }
 
     historyIndex++;
 
     restore(
-      JSON.parse(
-        history[historyIndex]
-      )
+      history[historyIndex]
     );
 
     toast(
@@ -3701,13 +3729,10 @@ $("redoBtn").addEventListener(
    DEFAULT
 ========================================================= */
 
-$("defaultBtn").addEventListener(
+$("defaultBtn")
+?.addEventListener(
   "click",
   ()=>{
-
-    localStorage.removeItem(
-      "AshishVermaLabelStudio"
-    );
 
     location.reload();
 
@@ -3715,18 +3740,146 @@ $("defaultBtn").addEventListener(
 );
 
 
-$("saveDefaultBtn").addEventListener(
+/* =========================================================
+   QR
+========================================================= */
+
+$("addressQRBtn")
+?.addEventListener(
   "click",
   ()=>{
 
-    localStorage.setItem(
-      "AshishVermaLabelStudio",
-      JSON.stringify(snapshot())
+    if(
+      typeof QRCode ===
+      "undefined"
+    ){
+
+      toast(
+        "QR library is not loaded",
+        "red"
+      );
+
+      return;
+
+    }
+
+
+    const value =
+      [
+        $("fromAddress").value,
+        $("toAddress").value
+      ]
+      .filter(Boolean)
+      .join("\n");
+
+
+    $("addressQR").innerHTML =
+      "";
+
+
+    QRCode.toCanvas(
+      value ||
+      "Address",
+      {
+        width:100,
+        margin:2
+      },
+      (error,canvas)=>{
+
+        if(error){
+
+          toast(
+            "QR generation failed",
+            "red"
+          );
+
+          return;
+
+        }
+
+        $("addressQR")
+          .appendChild(canvas);
+
+        toast(
+          "Address QR generated",
+          "green"
+        );
+
+      }
     );
 
-    toast(
-      "Current settings saved",
-      "green"
+  }
+);
+
+
+$("emailQRBtn")
+?.addEventListener(
+  "click",
+  ()=>{
+
+    if(
+      typeof QRCode ===
+      "undefined"
+    ){
+
+      toast(
+        "QR library is not loaded",
+        "red"
+      );
+
+      return;
+
+    }
+
+
+    const email =
+      $("email").value.trim();
+
+
+    if(!email){
+
+      toast(
+        "Enter email first",
+        "red"
+      );
+
+      return;
+
+    }
+
+
+    $("emailQR").innerHTML =
+      "";
+
+
+    QRCode.toCanvas(
+      `mailto:${email}`,
+      {
+        width:100,
+        margin:2
+      },
+      (error,canvas)=>{
+
+        if(error){
+
+          toast(
+            "QR generation failed",
+            "red"
+          );
+
+          return;
+
+        }
+
+        $("emailQR")
+          .appendChild(canvas);
+
+        toast(
+          "Email QR generated",
+          "green"
+        );
+
+      }
     );
 
   }
@@ -3737,549 +3890,378 @@ $("saveDefaultBtn").addEventListener(
    PDF
 ========================================================= */
 
-function getPDFSize(){
+function getPDFEntries(){
 
-  const size=$("pageSize").value;
+  if(activeSection==="coco"){
 
-  if(size==="4x6"){
-    return [101.6,152.4];
+    return getCocoValues();
+
   }
 
-  if(size==="70x35"){
+
+  if(activeSection==="other"){
+
+    if(otherMode==="manual"){
+
+      return $$(".otherManualPO")
+        .map(x=>x.value.trim())
+        .filter(Boolean);
+
+    }
+
+    if(otherMode==="multiple"){
+
+      return String(
+        $("otherMultiplePO").value
+      )
+      .split(",")
+      .map(x=>x.trim())
+      .filter(Boolean);
+
+    }
+
+    return otherExcelPOs;
+
+  }
+
+
+  if(activeSection==="isbn"){
+
+    return [
+      $("isbn").value ||
+      "9781234567890"
+    ];
+
+  }
+
+
+  if(activeSection==="address"){
+
+    return [
+      $("toAddress").value ||
+      "TO ADDRESS"
+    ];
+
+  }
+
+
+  return ["ABC123"];
+
+}
+
+
+function getPDFSize(){
+
+  if(activeSection==="other"){
+    return getSizeFrom(
+      $("otherPageSize")?.value
+    );
+  }
+
+  return getSizeFrom(
+    $("pageSize")?.value
+  );
+
+}
+
+
+function getSizeFrom(
+  value
+){
+
+  if(value==="70x35"){
     return [70,35];
   }
 
-  if(size==="a4"){
-    return "a4";
+  if(value==="a4"){
+    return [210,297];
+  }
+
+  if(value==="custom"){
+
+    return [
+      Number(
+        $("customWidth").value
+      ) || 101.6,
+
+      Number(
+        $("customHeight").value
+      ) || 152.4
+    ];
+
   }
 
   return [
-    Number($("customWidth").value)||101.6,
-    Number($("customHeight").value)||152.4
+    101.6,
+    152.4
   ];
+
 }
 
 
-function getPDFBorderStyle(style){
+function drawPDFBorder(
+  doc,
+  x,
+  y,
+  w,
+  h,
+  style
+){
 
-  const map={
-    none:"none",
-    solid:"solid",
-    double:"double",
-    dashed:"dashed",
-    dotted:"dotted",
-    groove:"solid",
-    ridge:"solid",
-    inset:"solid",
-    outset:"solid",
-    thin:"solid",
-    medium:"solid",
-    thick:"solid",
-    "double-thin":"double",
-    "double-medium":"double",
-    "double-thick":"double",
-    shadow:"solid",
-    "soft-shadow":"solid",
-    rounded:"solid",
-    "double-rounded":"double",
-    blue:"solid",
-    red:"solid",
-    green:"solid",
-    gray:"solid",
-    navy:"solid",
-    purple:"solid",
-    orange:"solid",
-    teal:"solid",
-    gold:"solid",
-    silver:"solid"
-  };
-
-  return map[style]||"solid";
-}
+  if(!style || style==="none")
+    return;
 
 
-async function generatePDF(){
+  let width = .5;
+
+  if(style==="medium")
+    width=.8;
+
+  if(style==="thick")
+    width=1.2;
+
+
+  doc.setLineWidth(width);
+
 
   if(
-    !window.jspdf ||
-    !window.jspdf.jsPDF
+    style==="dashed" ||
+    style==="short-dash" ||
+    style==="long-dash"
   ){
 
-    toast(
-      "PDF library is not loaded. Check internet connection.",
-      "red"
+    doc.setLineDashPattern(
+      [3,2],
+      0
     );
 
-    return;
+  }
+  else if(
+    style==="dotted"
+  ){
+
+    doc.setLineDashPattern(
+      [1,2],
+      0
+    );
+
+  }
+  else{
+
+    doc.setLineDashPattern(
+      [],
+      0
+    );
+
   }
 
 
-  try{
+  const colors = {
+    blue:[37,99,235],
+    red:[220,38,38],
+    green:[22,163,74],
+    navy:[30,58,138],
+    purple:[124,58,237],
+    orange:[249,115,22],
+    teal:[15,118,110],
+    gold:[202,138,4],
+    silver:[148,163,184],
+    black:[17,24,39]
+  };
 
-    let format=
-      getPDFSize();
 
-    let orientation=
-      $("orientation").value;
+  const c =
+    colors[style] ||
+    [20,20,20];
 
-    if(
-      Array.isArray(format) &&
-      orientation==="landscape"
+
+  doc.setDrawColor(
+    c[0],
+    c[1],
+    c[2]
+  );
+
+
+  doc.rect(
+    x,y,w,h
+  );
+
+
+  if(
+    style.includes("double") ||
+    style==="triple"
+  ){
+
+    const inset=2;
+
+    doc.rect(
+      x+inset,
+      y+inset,
+      w-inset*2,
+      h-inset*2
+    );
+
+  }
+
+
+  doc.setLineDashPattern(
+    [],
+    0
+  );
+
+}
+
+
+function drawPDF(
+  doc,
+  entries,
+  width,
+  height
+){
+
+  const count =
+    Number(
+      $("labelsPerPage").value
+    ) || 1;
+
+
+  let cols=1;
+
+  if(count===2)cols=2;
+  if(count===4)cols=2;
+  if(count===6)cols=2;
+  if(count===9)cols=3;
+  if(count===12)cols=3;
+
+
+  const rows =
+    Math.ceil(
+      count/cols
+    );
+
+
+  const margin=6;
+
+  const gap=4;
+
+
+  const cellW =
+    (
+      width -
+      margin*2 -
+      gap*(cols-1)
+    ) / cols;
+
+
+  const cellH =
+    (
+      height -
+      margin*2 -
+      gap*(rows-1)
+    ) / rows;
+
+
+  const pages =
+    Math.ceil(
+      entries.length/count
+    );
+
+
+  for(
+    let page=0;
+    page<pages;
+    page++
+  ){
+
+    if(page>0){
+
+      doc.addPage(
+        [width,height]
+      );
+
+    }
+
+
+    for(
+      let slot=0;
+      slot<count;
+      slot++
     ){
 
-      format=[
-        format[1],
-        format[0]
-      ];
-
-    }
+      const index =
+        page*count+slot;
 
 
-    const doc=
-      new jspdf.jsPDF({
-        orientation,
-        unit:"mm",
-        format
-      });
+      if(
+        index>=entries.length
+      )break;
 
 
-    const pageW=
-      doc.internal.pageSize.getWidth();
-
-    const pageH=
-      doc.internal.pageSize.getHeight();
-
-
-    const count=
-      Number(
-        $("labelsPerPage").value
-      )||1;
-
-
-    let columns=1;
-
-    if(count>=2 && count<=6)
-      columns=2;
-
-    if(count>6)
-      columns=3;
-
-
-    const rows=
-      Math.ceil(
-        count/columns
-      );
-
-
-    const margin=6;
-
-    const gap=
-      Number(
-        $("labelGap").value
-      )||3;
-
-
-    const cellW=
-      (
-        pageW-
-        margin*2-
-        gap*(columns-1)
-      )/columns;
-
-
-    const cellH=
-      (
-        pageH-
-        margin*2-
-        gap*(rows-1)
-      )/rows;
-
-
-    let values=[];
-
-
-    if(activeSection==="coco"){
-
-      if(activeMode==="multiple"){
-
-        values=
-          $("multiplePO")
-            .value
-            .split(",")
-            .map(x=>x.trim())
-            .filter(Boolean);
-
-      }
-      else if(activeMode==="excel"){
-
-        values=
-          $("multiplePO")
-            .value
-            .split(",")
-            .map(x=>x.trim())
-            .filter(Boolean);
-
-      }
-      else{
-
-        values=[
-          $("poInput").value.trim()||
-          "ABC123"
-        ];
-
-      }
-
-    }
-
-
-    else if(activeSection==="other"){
-
-      if(otherMode==="multiple"||
-         otherMode==="excel"){
-
-        values=
-          $("otherMultiplePO")
-            .value
-            .split(",")
-            .map(x=>x.trim())
-            .filter(Boolean);
-
-      }else{
-
-        values=[
-          $("otherPO").value.trim()||
-          "ABC123"
-        ];
-
-      }
-
-    }
-
-
-    else if(activeSection==="isbn"){
-
-      if(isbnMode==="multiple"||
-         isbnMode==="excel"){
-
-        values=
-          $("multipleISBN")
-            .value
-            .split(",")
-            .map(x=>x.trim())
-            .filter(Boolean);
-
-      }else{
-
-        values=[
-          $("isbn").value.trim()||
-          "9781234567890"
-        ];
-
-      }
-
-    }
-
-
-    else if(activeSection==="address"){
-
-      values=[
-        $("toAddress").value||
-        "ADDRESS"
-      ];
-
-    }
-
-
-    if(!values.length){
-      values=["ABC123"];
-    }
-
-
-    const pages=
-      Math.ceil(
-        values.length/count
-      );
-
-
-    for(let page=0;page<pages;page++){
-
-      if(page>0){
-        doc.addPage(
-          format,
-          orientation
+      const row =
+        Math.floor(
+          slot/cols
         );
-      }
+
+      const col =
+        slot%cols;
 
 
-      for(
-        let slot=0;
-        slot<count;
-        slot++
+      const x =
+        margin+
+        col*(cellW+gap);
+
+      const y =
+        margin+
+        row*(cellH+gap);
+
+
+      const value =
+        entries[index];
+
+
+      if(
+        activeSection==="coco"
       ){
 
-        const index=
-          page*count+slot;
-
-        if(index>=values.length)
-          break;
-
-
-        const row=
-          Math.floor(slot/columns);
-
-        const col=
-          slot%columns;
-
-
-        const x=
-          margin+
-          col*(cellW+gap);
-
-        const y=
-          margin+
-          row*(cellH+gap);
-
-
-        /* BORDER */
-
-        let border="solid";
-
-        if(activeSection==="coco"){
-
-          border=
-            $("mergePOBox").checked
-              ?$("combinedBorder").value
-              :$("poBorder").value;
-
-        }
-
-        if(activeSection==="other")
-          border=$("otherBorder").value;
-
-        if(activeSection==="isbn")
-          border=$("isbnBorder").value;
-
-        if(activeSection==="address")
-          border=$("addressBorder").value;
-
-
-        if(border!=="none"){
-
-          doc.setDrawColor(
-            30,30,30
-          );
-
-          let width=0.5;
-
-          if(border==="thin")
-            width=.25;
-
-          if(border==="medium")
-            width=.75;
-
-          if(border==="thick")
-            width=1.2;
-
-          doc.setLineWidth(width);
-
-          if(
-            border==="dashed"||
-            border==="long-dash"
-          ){
-
-            doc.setLineDashPattern(
-              [3,2],
-              0
-            );
-
-          }
-          else if(
-            border==="dotted"||
-            border==="short-dot"
-          ){
-
-            doc.setLineDashPattern(
-              [1,2],
-              0
-            );
-
-          }
-          else{
-
-            doc.setLineDashPattern(
-              [],
-              0
-            );
-
-          }
-
-          doc.rect(
-            x,
-            y,
-            cellW,
-            cellH
-          );
-
-          doc.setLineDashPattern(
-            [],
-            0
-          );
-
-        }
-
-
-        /* COCO */
-
-        if(activeSection==="coco"){
-
-          const po=
-            values[
-              index%values.length
-            ];
-
-          const box=
-            Number(
-              $("boxInput").value
-            )||1;
-
-          doc.setTextColor(
-            20,20,20
-          );
-
-
-          if(
-            $("mergePOBox").checked
-          ){
-
-            doc.setFont(
-              "helvetica",
-              $("poBold").checked
-                ?"bold":"normal"
-            );
-
-            doc.setFontSize(
-              Number(
-                $("poFontSize").value
-              )*.72
-            );
-
-
-            let text="";
-
-            const fmt=
-              $("combinedFormat").value;
-
-            if(fmt==="po-box")
-              text=
-                `${po} — BOX NO. ${box+index}`;
-
-            if(fmt==="box-po")
-              text=
-                `BOX NO. ${box+index} — ${po}`;
-
-            if(fmt==="po-slash-box")
-              text=
-                `${po} / BOX NO. ${box+index}`;
-
-            if(fmt==="po-newline-box")
-              text=
-                `${po}\nBOX NO. ${box+index}`;
-
-
-            const lines=
-              doc.splitTextToSize(
-                text,
-                cellW-8
-              );
-
-
-            doc.text(
-              lines,
-              x+cellW/2,
-              y+cellH/2,
-              {
-                align:"center",
-                baseline:"middle"
-              }
-            );
-
-          }
-          else{
-
-            if($("showPO").checked){
-
-              doc.setFont(
-                "helvetica",
-                $("poBold").checked
-                  ?"bold":"normal"
-              );
-
-              doc.setFontSize(
-                Number(
-                  $("poFontSize").value
-                )*.72
-              );
-
-              doc.text(
-                po,
-                x+cellW/2,
-                y+cellH*.42,
-                {
-                  align:"center"
-                }
-              );
-
-            }
-
-
-            if($("showBox").checked){
-
-              doc.setFont(
-                "helvetica",
-                $("boxBold").checked
-                  ?"bold":"normal"
-              );
-
-              doc.setFontSize(
-                Number(
-                  $("boxFontSize").value
-                )*.72
-              );
-
-              doc.text(
-                `BOX NO. ${box+index}`,
-                x+cellW/2,
-                y+cellH*.62,
-                {
-                  align:"center"
-                }
-              );
-
-            }
-
-          }
-
-        }
-
-
-        /* OTHER */
-
-        if(activeSection==="other"){
-
-          doc.setFont(
-            "helvetica",
-            $("otherBold").checked
-              ?"bold":"normal"
-          );
-
-          doc.setFontSize(
-            Number(
-              $("otherFontSize").value
-            )*.72
-          );
+        drawPDFBorder(
+          doc,
+          x,y,
+          cellW,
+          cellH,
+          $("mergePOBox").checked
+            ? $("combinedBorder").value
+            : "none"
+        );
+
+
+        doc.setFont(
+          "helvetica",
+          $("poBold").checked
+            ? "bold"
+            : "normal"
+        );
+
+
+        doc.setFontSize(
+          Number(
+            $("poFontSize").value
+          ) || 24
+        );
+
+
+        if(
+          $("mergePOBox").checked
+        ){
 
           doc.text(
-            values[index],
+            getCombinedText(
+              value,
+              (
+                Number(
+                  $("boxInput").value
+                ) || 1
+              ) + index
+            ),
             x+cellW/2,
             y+cellH/2,
             {
@@ -4288,146 +4270,67 @@ async function generatePDF(){
           );
 
         }
+        else{
 
+          if(
+            $("showPO").checked
+          ){
 
-        /* ISBN */
-
-        if(activeSection==="isbn"){
-
-          const title=
-            $("bookTitle").value||
-            "Book Title";
-
-          const isbn=
-            values[index];
-
-          doc.setFont(
-            "helvetica",
-            "bold"
-          );
-
-          doc.setFontSize(10);
-
-          doc.text(
-            title,
-            x+cellW/2,
-            y+20,
-            {
-              align:"center",
-              maxWidth:cellW-8
-            }
-          );
-
-
-          doc.setFont(
-            "helvetica",
-            "normal"
-          );
-
-          doc.setFontSize(9);
-
-          doc.text(
-            isbn,
-            x+cellW/2,
-            y+cellH-15,
-            {
-              align:"center"
-            }
-          );
-
-        }
-
-
-        /* ADDRESS */
-
-        if(activeSection==="address"){
-
-          doc.setFont(
-            "helvetica",
-            "bold"
-          );
-
-          doc.setFontSize(9);
-
-          doc.text(
-            "FROM",
-            x+6,
-            y+14
-          );
-
-
-          doc.setFont(
-            "helvetica",
-            "normal"
-          );
-
-          const fromLines=
-            doc.splitTextToSize(
-              $("fromAddress").value||
-              "",
-              cellW-12
+            drawPDFBorder(
+              doc,
+              x+2,
+              y+2,
+              cellW-4,
+              cellH/2-4,
+              $("poBorder").value
             );
 
-
-          doc.text(
-            fromLines,
-            x+6,
-            y+20
-          );
-
-
-          const toY=
-            Math.min(
-              y+65,
-              y+28+
-              fromLines.length*4
-            );
-
-
-          doc.setFont(
-            "helvetica",
-            "bold"
-          );
-
-          doc.text(
-            "TO",
-            x+6,
-            toY
-          );
-
-
-          doc.setFont(
-            "helvetica",
-            "normal"
-          );
-
-
-          const toLines=
-            doc.splitTextToSize(
-              $("toAddress").value||
-              "",
-              cellW-12
-            );
-
-
-          doc.text(
-            toLines,
-            x+6,
-            toY+6
-          );
-
-
-          if($("email").value){
-
-            doc.setFontSize(7);
 
             doc.text(
-              "Email: "+
-              $("email").value,
-              x+6,
-              y+cellH-8,
+              value,
+              x+cellW/2,
+              y+cellH*.35,
               {
-                maxWidth:cellW-12
+                align:"center"
+              }
+            );
+
+          }
+
+
+          if(
+            $("showBox").checked
+          ){
+
+            drawPDFBorder(
+              doc,
+              x+2,
+              y+cellH/2+2,
+              cellW-4,
+              cellH/2-4,
+              $("boxBorder").value
+            );
+
+
+            doc.setFontSize(
+              Number(
+                $("boxFontSize").value
+              ) || 20
+            );
+
+
+            doc.text(
+              `BOX NO. ${
+                (
+                  Number(
+                    $("boxInput").value
+                  ) || 1
+                ) + index
+              }`,
+              x+cellW/2,
+              y+cellH*.7,
+              {
+                align:"center"
               }
             );
 
@@ -4437,27 +4340,284 @@ async function generatePDF(){
 
       }
 
+
+      else if(
+        activeSection==="other"
+      ){
+
+        drawPDFBorder(
+          doc,
+          x,y,
+          cellW,
+          cellH,
+          $("otherBorder").value
+        );
+
+
+        doc.setFont(
+          "helvetica",
+          $("otherBold").checked
+            ? "bold"
+            : "normal"
+        );
+
+
+        doc.setFontSize(
+          Number(
+            $("otherFontSize").value
+          ) || 20
+        );
+
+
+        doc.text(
+          String(value),
+          x+cellW/2,
+          y+cellH/2,
+          {
+            align:"center"
+          }
+        );
+
+      }
+
+
+      else if(
+        activeSection==="isbn"
+      ){
+
+        drawPDFBorder(
+          doc,
+          x,y,
+          cellW,
+          cellH,
+          $("isbnBorder").value
+        );
+
+
+        doc.setFont(
+          "helvetica",
+          "bold"
+        );
+
+        doc.setFontSize(11);
+
+        doc.text(
+          $("bookTitle").value ||
+          "Book Title",
+          x+cellW/2,
+          y+15,
+          {
+            align:"center"
+          }
+        );
+
+
+        doc.setFont(
+          "helvetica",
+          "normal"
+        );
+
+        doc.setFontSize(9);
+
+        doc.text(
+          String(value),
+          x+cellW/2,
+          y+cellH-10,
+          {
+            align:"center"
+          }
+        );
+
+      }
+
+
+      else if(
+        activeSection==="address"
+      ){
+
+        drawPDFBorder(
+          doc,
+          x,y,
+          cellW,
+          cellH,
+          $("addressBorder").value
+        );
+
+
+        doc.setFont(
+          "helvetica",
+          "normal"
+        );
+
+        doc.setFontSize(
+          Number(
+            $("addressFontSize").value
+          ) || 12
+        );
+
+
+        const lines =
+          doc.splitTextToSize(
+            String(value),
+            cellW-10
+          );
+
+
+        doc.text(
+          lines,
+          x+5,
+          y+15
+        );
+
+
+        if(
+          $("email").value
+        ){
+
+          doc.setFontSize(8);
+
+          doc.text(
+            `Email: ${$("email").value}`,
+            x+5,
+            y+cellH-6,
+            {
+              maxWidth:
+                cellW-10
+            }
+          );
+
+        }
+
+      }
+
+    }
+
+  }
+
+}
+
+
+async function generatePDF(){
+
+  if(
+    !window.jspdf ||
+    typeof window.jspdf.jsPDF !==
+    "function"
+  ){
+
+    toast(
+      "PDF library is not loaded. Check internet connection.",
+      "red"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    const {
+      jsPDF
+    } =
+      window.jspdf;
+
+
+    let [
+      width,
+      height
+    ] =
+      getPDFSize();
+
+
+    if(
+      activeSection==="other" &&
+      $("otherPageSize").value!=="custom"
+    ){
+
+      [
+        width,
+        height
+      ] =
+        getSizeFrom(
+          $("otherPageSize").value
+        );
+
     }
 
 
+    const orientation =
+      $("orientation")?.value ||
+      "portrait";
+
+
+    if(
+      orientation==="landscape"
+    ){
+
+      [
+        width,
+        height
+      ]=[
+        height,
+        width
+      ];
+
+    }
+
+
+    const doc =
+      new jsPDF({
+        orientation,
+        unit:"mm",
+        format:[width,height]
+      });
+
+
+    const entries =
+      getPDFEntries();
+
+
+    if(!entries.length){
+
+      toast(
+        "No data available for PDF",
+        "red"
+      );
+
+      return;
+
+    }
+
+
+    drawPDF(
+      doc,
+      entries,
+      width,
+      height
+    );
+
+
     doc.save(
-      "Ashish-Verma-Label-Studio.pdf"
+      `Ashish-Verma-${activeSection}-${Date.now()}.pdf`
     );
 
 
     toast(
-      "PDF generated successfully",
+      `PDF generated successfully — ${entries.length} item(s)`,
       "green"
     );
 
+  }
+  catch(error){
 
-  }catch(error){
-
-    console.error(error);
+    console.error(
+      "PDF ERROR:",
+      error
+    );
 
     toast(
-      "PDF generation failed: "+
-      error.message,
+      `PDF Error: ${error.message}`,
       "red"
     );
 
@@ -4466,25 +4626,25 @@ async function generatePDF(){
 }
 
 
-$("generatePDF").addEventListener(
-  "click",
-  generatePDF
-);
+/* =========================================================
+   PDF BUTTONS
+========================================================= */
 
-$("generateOtherPDF").addEventListener(
-  "click",
-  generatePDF
-);
+[
+  "generatePDF",
+  "generateOtherPDF",
+  "generateISBNPDF",
+  "generateAddressPDF"
+]
+.forEach(id=>{
 
-$("generateISBNPDF").addEventListener(
-  "click",
-  generatePDF
-);
+  $(id)
+  ?.addEventListener(
+    "click",
+    generatePDF
+  );
 
-$("generateAddressPDF").addEventListener(
-  "click",
-  generatePDF
-);
+});
 
 
 /* =========================================================
@@ -4523,66 +4683,16 @@ document.addEventListener(
 
 
 /* =========================================================
-   INITIAL STATE
+   INITIALIZE
 ========================================================= */
 
-const saved=
-  localStorage.getItem(
-    "AshishVermaLabelStudio"
-  );
-
-
-if(saved){
-
-  try{
-
-    const data=
-      JSON.parse(saved);
-
-    Object.keys(data).forEach(id=>{
-
-      const el=$(id);
-
-      if(!el)return;
-
-      if(el.type==="checkbox")
-        el.checked=data[id];
-      else
-        el.value=data[id];
-
-    });
-
-  }catch(e){
-    console.warn(e);
-  }
-
-}
-
-
-updatePaper();
-applyMergeState();
-updatePreview();
 saveHistory();
 
+updatePreview();
 
-/* =========================================================
-   LIBRARY CHECK
-========================================================= */
-
-setTimeout(()=>{
-
-  if(
-    !window.jspdf ||
-    !window.jspdf.jsPDF
-  ){
-
-    console.warn(
-      "jsPDF library was not loaded."
-    );
-
-  }
-
-},1200);
+console.log(
+  "Ashish Verma Label Studio loaded successfully."
+);
 
 </script>
 
