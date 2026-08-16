@@ -1,4700 +1,3206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>Ashish Verma Label Studio</title>
-
-<!-- Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-
-<style>
-:root{
-  --blue:#2563eb;
-  --blue2:#1d4ed8;
-  --bg:#f5f7fb;
-  --card:#fff;
-  --border:#dce2ea;
-  --text:#20242b;
-  --muted:#6b7280;
-  --green:#16a34a;
-  --red:#dc2626;
-  --orange:#f59e0b;
-  --shadow:0 4px 16px rgba(15,23,42,.07);
-}
-
-*{box-sizing:border-box}
-
-html,body{
-  margin:0;
-  min-height:100%;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-button,input,select,textarea{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-button:disabled,
-input:disabled,
-select:disabled{
-  cursor:not-allowed;
-  opacity:.45;
-}
-
-/* HEADER */
-
-.header{
-  height:64px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-  padding:9px 18px;
-  background:#fff;
-  border-bottom:1px solid var(--border);
-  position:sticky;
-  top:0;
-  z-index:1000;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.logo{
-  width:40px;
-  height:40px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:9px;
-  background:var(--blue);
-  color:#fff;
-  font-weight:800;
-}
-
-.brand h1{
-  margin:0;
-  font-size:17px;
-}
-
-.brand small{
-  color:var(--muted);
-  font-size:9px;
-}
-
-/* APP */
-
-.app{
-  width:100%;
-  max-width:1550px;
-  margin:auto;
-  padding:14px;
-}
-
-/* NAV */
-
-.nav{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:9px;
-  margin-bottom:12px;
-}
-
-.nav-btn{
-  border:1px solid var(--border);
-  background:#fff;
-  border-radius:9px;
-  padding:11px;
-  text-align:left;
-  box-shadow:var(--shadow);
-  transition:.18s;
-}
-
-.nav-btn:hover{
-  transform:translateY(-1px);
-}
-
-.nav-btn.active{
-  background:var(--blue);
-  border-color:var(--blue);
-  color:#fff;
-}
-
-.nav-icon{
-  font-size:19px;
-  margin-bottom:5px;
-}
-
-.nav-title{
-  font-size:12px;
-  font-weight:800;
-}
-
-.nav-sub{
-  font-size:9px;
-  opacity:.7;
-  margin-top:3px;
-}
-
-/* WORKSPACE */
-
-.workspace{
-  display:grid;
-  grid-template-columns:minmax(430px,500px) minmax(0,1fr);
-  gap:12px;
-  align-items:start;
-}
-
-.controls{
-  min-width:0;
-}
-
-.preview-area{
-  min-width:0;
-  position:sticky;
-  top:76px;
-}
-
-/* CARD */
-
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:9px;
-  padding:12px;
-  margin-bottom:10px;
-  box-shadow:var(--shadow);
-}
-
-.card-title{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-  margin-bottom:10px;
-  font-size:12px;
-  font-weight:800;
-}
-
-.card-title small{
-  font-size:8px;
-  color:var(--muted);
-  font-weight:400;
-}
-
-/* SECTIONS */
-
-.section{
-  display:none;
-}
-
-.section.active{
-  display:block;
-  animation:fadeIn .15s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(3px)}
-  to{opacity:1;transform:none}
-}
-
-/* MODES */
-
-.mode-tabs{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:5px;
-}
-
-.mode-btn{
-  min-height:34px;
-  border:1px solid var(--border);
-  background:#fff;
-  border-radius:6px;
-  font-size:10px;
-  font-weight:700;
-}
-
-.mode-btn.active{
-  background:var(--blue);
-  color:#fff;
-  border-color:var(--blue);
-}
-
-.mode-panel{
-  display:none;
-  margin-top:10px;
-}
-
-.mode-panel.active{
-  display:block;
-}
-
-/* FORMS */
-
-.field{
-  margin-bottom:8px;
-}
-
-.field label{
-  display:block;
-  font-size:9px;
-  font-weight:800;
-  color:#4b5563;
-  margin-bottom:4px;
-}
-
-input[type=text],
-input[type=number],
-input[type=email],
-input[type=file],
-select,
-textarea{
-  width:100%;
-  min-height:33px;
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:6px 8px;
-  background:#fff;
-  color:var(--text);
-  outline:none;
-}
-
-textarea{
-  min-height:70px;
-  resize:vertical;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-  border-color:var(--blue);
-  box-shadow:0 0 0 3px rgba(37,99,235,.08);
-}
-
-.grid2{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:8px;
-}
-
-.grid3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-}
-
-/* BUTTON */
-
-.btn{
-  min-height:33px;
-  border:1px solid var(--border);
-  background:#fff;
-  border-radius:6px;
-  padding:6px 10px;
-  font-size:10px;
-  font-weight:700;
-}
-
-.btn:hover{
-  background:#f8fafc;
-}
-
-.btn.primary{
-  background:var(--blue);
-  border-color:var(--blue);
-  color:#fff;
-}
-
-.btn.green{
-  background:var(--green);
-  border-color:var(--green);
-  color:#fff;
-}
-
-.btn.red{
-  background:var(--red);
-  border-color:var(--red);
-  color:#fff;
-}
-
-.action-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-}
-
-/* CHECK */
-
-.check-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-}
-
-.check{
-  display:flex;
-  align-items:center;
-  gap:4px;
-  border:1px solid var(--border);
-  background:#fafafa;
-  padding:6px 8px;
-  border-radius:6px;
-  font-size:9px;
-}
-
-.check input{
-  accent-color:var(--blue);
-}
-
-/* MANUAL PO */
-
-.manual-po-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:6px;
-  max-height:290px;
-  overflow:auto;
-  padding-right:3px;
-}
-
-.manual-po-grid .field{
-  margin:0;
-}
-
-/* EXCEL */
-
-.upload{
-  border:2px dashed #cbd5e1;
-  border-radius:8px;
-  padding:14px;
-  text-align:center;
-  background:#fafcff;
-}
-
-.upload strong{
-  display:block;
-  font-size:11px;
-  margin-bottom:4px;
-}
-
-.upload small{
-  color:var(--muted);
-  font-size:8px;
-}
-
-.excel-preview{
-  max-height:160px;
-  overflow:auto;
-  margin-top:8px;
-  border:1px solid var(--border);
-  border-radius:6px;
-}
-
-.excel-preview table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:8px;
-}
-
-.excel-preview th,
-.excel-preview td{
-  padding:5px;
-  border:1px solid var(--border);
-  text-align:left;
-}
-
-.excel-preview th{
-  background:#eef4ff;
-  position:sticky;
-  top:0;
-}
-
-/* FREEZE */
-
-.freeze{
-  opacity:.42;
-  pointer-events:none;
-  position:relative;
-}
-
-.freeze::after{
-  content:"🔒 FROZEN";
-  position:absolute;
-  top:5px;
-  right:5px;
-  background:#fff1f2;
-  color:var(--red);
-  border:1px solid #fecaca;
-  padding:3px 5px;
-  border-radius:4px;
-  font-size:7px;
-  font-weight:800;
-}
-
-/* PREVIEW */
-
-.preview-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:8px;
-}
-
-.live{
-  display:inline-flex;
-  align-items:center;
-  gap:4px;
-  color:var(--green);
-  background:#ecfdf5;
-  border:1px solid #bbf7d0;
-  padding:4px 8px;
-  border-radius:20px;
-  font-size:8px;
-  font-weight:800;
-}
-
-.live-dot{
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:var(--green);
-}
-
-.preview-box{
-  min-height:560px;
-  max-height:650px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:18px;
-  overflow:auto;
-  border:1px solid var(--border);
-  border-radius:8px;
-  background:#e9edf3;
-}
-
-/* SMALLER PAPER */
-
-.paper{
-  width:340px;
-  height:480px;
-  flex:0 0 auto;
-  background:#fff;
-  padding:8px;
-  border:1px solid #aaa;
-  box-shadow:0 8px 24px rgba(0,0,0,.15);
-}
-
-.paper-grid{
-  width:100%;
-  height:100%;
-  display:grid;
-  gap:5px;
-}
-
-.label{
-  min-width:0;
-  min-height:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  padding:8px;
-  overflow:hidden;
-  text-align:center;
-  background:#fff;
-}
-
-.po-preview,
-.box-preview,
-.combined-preview{
-  max-width:100%;
-  word-break:break-word;
-  overflow-wrap:anywhere;
-  line-height:1.1;
-}
-
-.combined-preview{
-  display:none;
-}
-
-/* OTHER */
-
-.other-preview,
-.isbn-preview,
-.address-preview{
-  width:100%;
-  height:100%;
-  display:none;
-  background:#fff;
-  overflow:hidden;
-}
-
-.other-preview{
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:15px;
-  word-break:break-word;
-}
-
-.isbn-preview{
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  text-align:center;
-  padding:15px;
-}
-
-.address-preview{
-  padding:15px;
-  text-align:left;
-  word-break:break-word;
-}
-
-.address-preview h4{
-  font-size:9px;
-  margin:0 0 4px;
-}
-
-.address-block{
-  white-space:pre-wrap;
-  line-height:1.3;
-  margin-bottom:10px;
-}
-
-/* QR */
-
-.qr-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:8px;
-}
-
-.qr-card{
-  border:1px solid var(--border);
-  border-radius:7px;
-  background:#fafafa;
-  padding:8px;
-  text-align:center;
-}
-
-.qr-card strong{
-  display:block;
-  font-size:9px;
-  margin-bottom:5px;
-}
-
-.qr-card canvas{
-  width:100px!important;
-  height:100px!important;
-}
-
-/* TOAST */
-
-.toast{
-  position:fixed;
-  top:75px;
-  right:15px;
-  z-index:99999;
-  min-width:230px;
-  max-width:360px;
-  padding:10px 13px;
-  border-radius:7px;
-  color:#fff;
-  font-size:10px;
-  font-weight:800;
-  box-shadow:0 8px 25px rgba(0,0,0,.2);
-  transform:translateX(120%);
-  opacity:0;
-  transition:.25s;
-}
-
-.toast.show{
-  transform:translateX(0);
-  opacity:1;
-}
-
-.toast.green{background:var(--green)}
-.toast.red{background:var(--red)}
-.toast.orange{background:var(--orange)}
-
-.footer{
-  text-align:center;
-  padding:14px 5px 4px;
-  color:var(--muted);
-  font-size:9px;
-}
-
-@media(max-width:1050px){
-
-  .workspace{
-    grid-template-columns:1fr;
-  }
-
-  .preview-area{
-    position:relative;
-    top:0;
-  }
-
-}
-
-@media(max-width:700px){
-
-  .nav{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .grid2,
-  .grid3{
-    grid-template-columns:1fr;
-  }
-
-  .workspace{
-    grid-template-columns:1fr;
-  }
-
-}
-
-@media(max-width:480px){
-
-  .nav{
-    grid-template-columns:1fr;
-  }
-
-  .manual-po-grid{
-    grid-template-columns:1fr;
-  }
-
-  .paper{
-    transform:scale(.8);
-    transform-origin:center;
-  }
-
-}
-</style>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Books Label Studio</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <!-- External libraries -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
+        defer
+    ></script>
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        defer
+    ></script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"
+        defer
+    ></script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
+        defer
+    ></script>
+
+    <script
+        src="app.js"
+        defer
+    ></script>
 </head>
 
 <body>
 
-<header class="header">
-
-  <div class="brand">
-
-    <div class="logo">AV</div>
-
-    <div>
-      <h1>Label Studio</h1>
-      <small>Created & Developed by Ashish Verma</small>
-    </div>
-
-  </div>
-
-  <div class="action-row">
-
-    <button class="btn" id="undoBtn">↶ Undo</button>
-    <button class="btn" id="redoBtn">↷ Redo</button>
-    <button class="btn" id="defaultBtn">↺ Default</button>
-
-  </div>
-
-</header>
-
-
 <div class="app">
 
-  <!-- MAIN CATEGORY -->
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
-  <div class="nav">
+    <header class="top-header">
 
-    <button class="nav-btn active" data-section="coco">
-      <div class="nav-icon">📦</div>
-      <div class="nav-title">Coco Blue PO</div>
-      <div class="nav-sub">PO + Box Labels</div>
-    </button>
+        <div class="brand">
 
-    <button class="nav-btn" data-section="other">
-      <div class="nav-icon">📄</div>
-      <div class="nav-title">Other PO</div>
-      <div class="nav-sub">PO Labels</div>
-    </button>
+            <div class="brand-icon">
+                BL
+            </div>
 
-    <button class="nav-btn" data-section="isbn">
-      <div class="nav-icon">📚</div>
-      <div class="nav-title">ISBN</div>
-      <div class="nav-sub">ISBN Barcode</div>
-    </button>
+            <div>
+                <h1>
+                    Books Label Studio
+                </h1>
 
-    <button class="nav-btn" data-section="address">
-      <div class="nav-icon">📍</div>
-      <div class="nav-title">Address</div>
-      <div class="nav-sub">Address + QR</div>
-    </button>
+                <p>
+                    Professional Label & Barcode Maker
+                </p>
+            </div>
 
-  </div>
+        </div>
+
+        <div class="header-status">
+
+            <span
+                id="appStatus"
+                class="status-dot"
+            ></span>
+
+            <span id="appStatusText">
+                Ready
+            </span>
+
+        </div>
+
+    </header>
 
 
-  <div class="workspace">
+    <!-- =====================================================
+         MAIN FEATURE OPTIONS
+    ====================================================== -->
 
-    <!-- CONTROLS -->
+    <main>
 
-    <main class="controls">
+        <section class="feature-grid">
 
+            <!-- COCO BLUE -->
 
-      <!-- ================= COCO ================= -->
+            <button
+                type="button"
+                class="feature-card active"
+                data-feature="coco-blue"
+                id="openCocoBlue"
+            >
 
-      <section class="section active" id="section-coco">
+                <span class="feature-icon">
+                    CB
+                </span>
 
-        <div class="card">
+                <span class="feature-card-text">
 
-          <div class="card-title">
-            <span>📦 Coco Blue PO</span>
-            <small>Input Method</small>
-          </div>
+                    <strong>
+                        Coco Blue
+                    </strong>
 
-          <div class="mode-tabs">
+                    <small>
+                        PO & Box Labels
+                    </small>
 
-            <button class="mode-btn active" data-mode="manual">
-              ✍ Manual
+                </span>
+
+                <span class="feature-arrow">
+                    →
+                </span>
+
             </button>
 
-            <button class="mode-btn" data-mode="multiple">
-              🔢 Multiple
+
+            <!-- ISBN -->
+
+            <button
+                type="button"
+                class="feature-card"
+                data-feature="isbn"
+                id="openISBN"
+            >
+
+                <span class="feature-icon">
+                    ISBN
+                </span>
+
+                <span class="feature-card-text">
+
+                    <strong>
+                        ISBN Barcode Maker
+                    </strong>
+
+                    <small>
+                        ISBN / Barcode Labels
+                    </small>
+
+                </span>
+
+                <span class="feature-arrow">
+                    →
+                </span>
+
             </button>
 
-            <button class="mode-btn" data-mode="excel">
-              📊 Excel
+
+            <!-- OTHER PO -->
+
+            <button
+                type="button"
+                class="feature-card"
+                data-feature="other-po"
+                id="openOtherPO"
+            >
+
+                <span class="feature-icon">
+                    PO
+                </span>
+
+                <span class="feature-card-text">
+
+                    <strong>
+                        Other PO
+                    </strong>
+
+                    <small>
+                        General PO Labels
+                    </small>
+
+                </span>
+
+                <span class="feature-arrow">
+                    →
+                </span>
+
             </button>
 
-          </div>
+
+            <!-- ADDRESS -->
+
+            <button
+                type="button"
+                class="feature-card"
+                data-feature="address"
+                id="openAddress"
+            >
+
+                <span class="feature-icon">
+                    ADR
+                </span>
+
+                <span class="feature-card-text">
+
+                    <strong>
+                        Address Label Maker
+                    </strong>
+
+                    <small>
+                        Address & QR Labels
+                    </small>
+
+                </span>
+
+                <span class="feature-arrow">
+                    →
+                </span>
+
+            </button>
+
+        </section>
 
 
-          <!-- MANUAL -->
+        <!-- =================================================
+             COCO BLUE WORKSPACE
+        ================================================== -->
 
-          <div class="mode-panel active" id="mode-manual">
+        <section
+            id="cocoBlueWorkspace"
+            class="workspace active-workspace"
+        >
 
-            <div class="field">
-              <label>PO Numbers — up to 20 manual entries</label>
-            </div>
+            <div class="workspace-header">
 
-            <div class="manual-po-grid">
+                <div>
+                    <span class="workspace-tag">
+                        COCO BLUE
+                    </span>
 
-              <script>
-                for(let i=1;i<=20;i++){
-                  document.write(`
-                    <div class="field">
-                      <input
-                        type="text"
-                        class="manualPO"
-                        id="manualPO${i}"
-                        placeholder="PO ${i}">
-                    </div>
-                  `);
-                }
-              </script>
+                    <h2>
+                        PO & Box Label Generator
+                    </h2>
 
-            </div>
+                    <p>
+                        Enter PO numbers manually, in bulk,
+                        or upload Excel.
+                    </p>
+                </div>
 
-          </div>
-
-
-          <!-- MULTIPLE -->
-
-          <div class="mode-panel" id="mode-multiple">
-
-            <div class="field">
-
-              <label>
-                Multiple PO — comma separated, no limit
-              </label>
-
-              <textarea
-                id="multiplePO"
-                placeholder="ABC001, ABC002, ABC003, ABC004..."
-              ></textarea>
-
-            </div>
-
-            <div class="action-row">
-
-              <button class="btn primary" id="useMultipleBtn">
-                ✓ Use Multiple PO
-              </button>
-
-              <button class="btn" id="clearMultipleBtn">
-                Clear
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <!-- EXCEL -->
-
-          <div class="mode-panel" id="mode-excel">
-
-            <div class="upload">
-
-              <strong>📊 Upload Excel File</strong>
-
-              <small>
-                First row/header will automatically be ignored.
-                First column is used as PO number.
-              </small>
-
-              <br><br>
-
-              <input
-                type="file"
-                id="excelInput"
-                accept=".xlsx,.xls,.csv"
-              >
+                <button
+                    type="button"
+                    class="close-workspace"
+                    id="closeCocoWorkspace"
+                >
+                    ×
+                </button>
 
             </div>
+
+
+            <!-- =============================================
+                 INPUT MODE
+            ============================================== -->
+
+            <div class="mode-tabs">
+
+                <button
+                    type="button"
+                    class="mode-tab active"
+                    data-coco-mode="manual"
+                    id="cocoManualTab"
+                >
+                    Manual
+                </button>
+
+                <button
+                    type="button"
+                    class="mode-tab"
+                    data-coco-mode="bulk"
+                    id="cocoBulkTab"
+                >
+                    Bulk
+                </button>
+
+                <button
+                    type="button"
+                    class="mode-tab"
+                    data-coco-mode="excel"
+                    id="cocoExcelTab"
+                >
+                    Excel
+                </button>
+
+            </div>
+
+
+            <!-- =============================================
+                 MANUAL INPUT
+            ============================================== -->
 
             <div
-              class="excel-preview"
-              id="excelPreview">
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- PAGE -->
-
-        <div class="card">
-
-          <div class="card-title">
-            <span>📐 Page & Quantity</span>
-          </div>
-
-          <div class="grid2">
-
-            <div class="field">
-              <label>Page Size</label>
-
-              <select id="pageSize">
-
-                <option value="4x6">
-                  4 × 6 inches
-                </option>
-
-                <option value="70x35">
-                  70 × 35 mm
-                </option>
-
-                <option value="a4">
-                  A4
-                </option>
-
-                <option value="custom">
-                  Custom
-                </option>
-
-              </select>
-            </div>
-
-
-            <div class="field">
-              <label>Labels Per Page</label>
-
-              <select id="labelsPerPage">
-
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="4">4</option>
-                <option value="6">6</option>
-                <option value="9">9</option>
-                <option value="12">12</option>
-
-              </select>
-            </div>
-
-          </div>
-
-
-          <div
-            id="customSizeBox"
-            style="display:none"
-            class="grid2">
-
-            <div class="field">
-              <label>Custom Width (mm)</label>
-              <input
-                type="number"
-                id="customWidth"
-                value="101.6"
-                min="1">
-            </div>
-
-            <div class="field">
-              <label>Custom Height (mm)</label>
-              <input
-                type="number"
-                id="customHeight"
-                value="152.4"
-                min="1">
-            </div>
-
-          </div>
-
-
-          <div class="grid2">
-
-            <div class="field">
-              <label>Orientation</label>
-
-              <select id="orientation">
-
-                <option value="portrait">
-                  Portrait
-                </option>
-
-                <option value="landscape">
-                  Landscape
-                </option>
-
-              </select>
-
-            </div>
-
-            <div class="field">
-              <label>Label Gap</label>
-
-              <input
-                type="number"
-                id="labelGap"
-                value="5"
-                min="0">
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- PO / BOX -->
-
-        <div class="card">
-
-          <div class="card-title">
-            <span>🔧 PO & Box Controls</span>
-          </div>
-
-          <div class="check-row">
-
-            <label class="check">
-              <input type="checkbox" id="showPO" checked>
-              PO Number
-            </label>
-
-            <label class="check">
-              <input type="checkbox" id="showBox" checked>
-              Box Number
-            </label>
-
-            <label class="check">
-              <input type="checkbox" id="mergePOBox">
-              Combine PO + Box
-            </label>
-
-          </div>
-
-
-          <div class="field" style="margin-top:8px">
-            <label>Starting Box Number</label>
-
-            <input
-              type="number"
-              id="boxInput"
-              value="1"
-              min="1">
-          </div>
-
-
-          <div class="field">
-
-            <label>Combined Format</label>
-
-            <select id="combinedFormat">
-
-              <option value="po-box">
-                PO — BOX
-              </option>
-
-              <option value="box-po">
-                BOX — PO
-              </option>
-
-              <option value="po-slash-box">
-                PO / BOX
-              </option>
-
-              <option value="po-newline-box">
-                PO + BOX on separate lines
-              </option>
-
-            </select>
-
-          </div>
-
-        </div>
-
-
-        <!-- FONTS -->
-
-        <div class="card" id="poFontCard">
-
-          <div class="card-title">
-            <span>🔤 PO Number Font</span>
-          </div>
-
-          <div class="grid2">
-
-            <div class="field">
-              <label>Font</label>
-
-              <select id="poFont">
-
-                <option>Arial</option>
-                <option>Calibri</option>
-                <option>Times New Roman</option>
-                <option>Georgia</option>
-                <option>Verdana</option>
-                <option>Tahoma</option>
-                <option>Trebuchet MS</option>
-                <option>Courier New</option>
-                <option>Lucida Console</option>
-                <option>Impact</option>
-                <option>Garamond</option>
-                <option>Palatino</option>
-                <option>Book Antiqua</option>
-                <option>Century Gothic</option>
-                <option>Segoe UI</option>
-
-              </select>
-            </div>
-
-            <div class="field">
-              <label>Size</label>
-
-              <input
-                type="number"
-                id="poFontSize"
-                value="24"
-                min="5"
-                max="200">
-
-            </div>
-
-          </div>
-
-
-          <div class="check-row">
-
-            <label class="check">
-              <input type="checkbox" id="poBold">
-              Bold
-            </label>
-
-            <label class="check">
-              <input type="checkbox" id="poItalic">
-              Italic
-            </label>
-
-            <label class="check">
-              <input type="checkbox" id="poUnderline">
-              Underline
-            </label>
-
-          </div>
-
-        </div>
-
-
-        <div class="card" id="boxFontCard">
-
-          <div class="card-title">
-            <span>🔤 Box Number Font</span>
-          </div>
-
-          <div class="grid2">
-
-            <div class="field">
-
-              <label>Font</label>
-
-              <select id="boxFont">
-
-                <option>Arial</option>
-                <option>Calibri</option>
-                <option>Times New Roman</option>
-                <option>Georgia</option>
-                <option>Verdana</option>
-                <option>Tahoma</option>
-                <option>Trebuchet MS</option>
-                <option>Courier New</option>
-                <option>Lucida Console</option>
-                <option>Impact</option>
-                <option>Garamond</option>
-                <option>Palatino</option>
-                <option>Book Antiqua</option>
-                <option>Century Gothic</option>
-                <option>Segoe UI</option>
-
-              </select>
-
-            </div>
-
-            <div class="field">
-
-              <label>Size</label>
-
-              <input
-                type="number"
-                id="boxFontSize"
-                value="20"
-                min="5"
-                max="200">
-
-            </div>
-
-          </div>
-
-          <div class="check-row">
-
-            <label class="check">
-              <input type="checkbox" id="boxBold">
-              Bold
-            </label>
-
-            <label class="check">
-              <input type="checkbox" id="boxItalic">
-              Italic
-            </label>
-
-          </div>
-
-        </div>
-
-
-        <!-- BORDERS -->
-
-        <div class="card" id="poBorderCard">
-
-          <div class="card-title">
-            <span>▣ PO Border</span>
-          </div>
-
-          <select id="poBorder">
-            <option value="none">None</option>
-            <option value="thin">Thin</option>
-            <option value="medium">Medium</option>
-            <option value="thick">Thick</option>
-            <option value="solid">Solid</option>
-            <option value="double">Double</option>
-            <option value="double-thin">Double Thin</option>
-            <option value="double-medium">Double Medium</option>
-            <option value="double-thick">Double Thick</option>
-            <option value="dashed">Dashed</option>
-            <option value="dotted">Dotted</option>
-            <option value="short-dash">Short Dash</option>
-            <option value="long-dash">Long Dash</option>
-            <option value="short-dot">Short Dot</option>
-            <option value="dash-dot">Dash Dot</option>
-            <option value="dash-dot-dot">Dash Dot Dot</option>
-            <option value="dot-dash">Dot Dash</option>
-            <option value="dot-dot-dash">Dot Dot Dash</option>
-            <option value="groove">Groove</option>
-            <option value="ridge">Ridge</option>
-            <option value="inset">Inset</option>
-            <option value="outset">Outset</option>
-            <option value="rounded">Rounded</option>
-            <option value="double-rounded">Double Rounded</option>
-            <option value="shadow">Shadow</option>
-            <option value="soft-shadow">Soft Shadow</option>
-            <option value="blue">Blue</option>
-            <option value="red">Red</option>
-            <option value="green">Green</option>
-            <option value="navy">Navy</option>
-            <option value="purple">Purple</option>
-            <option value="orange">Orange</option>
-            <option value="teal">Teal</option>
-            <option value="gold">Gold</option>
-            <option value="silver">Silver</option>
-            <option value="black">Black</option>
-            <option value="double-color">Double Blue</option>
-            <option value="triple">Triple</option>
-            <option value="triple-thin">Triple Thin</option>
-            <option value="triple-thick">Triple Thick</option>
-            <option value="double-wave">Double Wave</option>
-            <option value="zigzag">Zigzag</option>
-          </select>
-
-        </div>
-
-
-        <div class="card" id="boxBorderCard">
-
-          <div class="card-title">
-            <span>▣ Box Border</span>
-          </div>
-
-          <select id="boxBorder">
-            <option value="none">None</option>
-            <option value="thin">Thin</option>
-            <option value="medium">Medium</option>
-            <option value="thick">Thick</option>
-            <option value="solid">Solid</option>
-            <option value="double">Double</option>
-            <option value="double-thin">Double Thin</option>
-            <option value="double-medium">Double Medium</option>
-            <option value="double-thick">Double Thick</option>
-            <option value="dashed">Dashed</option>
-            <option value="dotted">Dotted</option>
-            <option value="short-dash">Short Dash</option>
-            <option value="long-dash">Long Dash</option>
-            <option value="short-dot">Short Dot</option>
-            <option value="dash-dot">Dash Dot</option>
-            <option value="dash-dot-dot">Dash Dot Dot</option>
-            <option value="dot-dash">Dot Dash</option>
-            <option value="dot-dot-dash">Dot Dot Dash</option>
-            <option value="groove">Groove</option>
-            <option value="ridge">Ridge</option>
-            <option value="inset">Inset</option>
-            <option value="outset">Outset</option>
-            <option value="rounded">Rounded</option>
-            <option value="double-rounded">Double Rounded</option>
-            <option value="shadow">Shadow</option>
-            <option value="soft-shadow">Soft Shadow</option>
-            <option value="blue">Blue</option>
-            <option value="red">Red</option>
-            <option value="green">Green</option>
-            <option value="navy">Navy</option>
-            <option value="purple">Purple</option>
-            <option value="orange">Orange</option>
-            <option value="teal">Teal</option>
-            <option value="gold">Gold</option>
-            <option value="silver">Silver</option>
-            <option value="black">Black</option>
-            <option value="double-color">Double Blue</option>
-            <option value="triple">Triple</option>
-            <option value="triple-thin">Triple Thin</option>
-            <option value="triple-thick">Triple Thick</option>
-            <option value="double-wave">Double Wave</option>
-            <option value="zigzag">Zigzag</option>
-          </select>
-
-        </div>
-
-
-        <div class="card" id="combinedCard">
-
-          <div class="card-title">
-            <span>▣ Combined PO + Box Border</span>
-          </div>
-
-          <select id="combinedBorder">
-
-            <option value="solid">Solid</option>
-            <option value="double">Double</option>
-            <option value="double-thick">Double Thick</option>
-            <option value="dashed">Dashed</option>
-            <option value="dotted">Dotted</option>
-            <option value="rounded">Rounded</option>
-            <option value="shadow">Shadow</option>
-            <option value="blue">Blue</option>
-            <option value="red">Red</option>
-            <option value="green">Green</option>
-            <option value="navy">Navy</option>
-
-          </select>
-
-        </div>
-
-
-        <div class="card">
-
-          <button
-            class="btn primary"
-            style="width:100%"
-            id="generatePDF">
-            📄 Generate PDF
-          </button>
-
-        </div>
-
-      </section>
-
-
-      <!-- ================= OTHER PO ================= -->
-
-      <section class="section" id="section-other">
-
-        <div class="card">
-
-          <div class="card-title">
-            <span>📄 Other PO</span>
-          </div>
-
-          <div class="mode-tabs">
-
-            <button
-              class="mode-btn active"
-              data-other-mode="manual">
-              ✍ Manual
-            </button>
-
-            <button
-              class="mode-btn"
-              data-other-mode="multiple">
-              🔢 Multiple
-            </button>
-
-            <button
-              class="mode-btn"
-              data-other-mode="excel">
-              📊 Excel
-            </button>
-
-          </div>
-
-
-          <div
-            class="mode-panel active"
-            id="otherManual">
-
-            <div class="manual-po-grid">
-
-              <script>
-                for(let i=1;i<=20;i++){
-                  document.write(`
-                    <div class="field">
-                      <input
-                        type="text"
-                        class="otherManualPO"
-                        id="otherPO${i}"
-                        placeholder="PO ${i}">
+                id="cocoManualPanel"
+                class="input-panel active-panel"
+            >
+
+                <div class="panel-heading">
+
+                    <div>
+                        <h3>
+                            Manual PO Entry
+                        </h3>
+
+                        <p>
+                            Enter PO numbers individually.
+                        </p>
                     </div>
-                  `);
-                }
-              </script>
+
+                    <span class="counter">
+                        <span id="manualPOCount">0</span>
+                        / 20
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="manualPOGrid"
+                    class="manual-po-grid"
+                >
+
+                    <!-- JS creates 20 inputs -->
+
+                </div>
 
             </div>
 
-          </div>
 
-
-          <div
-            class="mode-panel"
-            id="otherMultiple">
-
-            <div class="field">
-
-              <label>Multiple PO — No Limit</label>
-
-              <textarea
-                id="otherMultiplePO"
-                placeholder="PO001, PO002, PO003...">
-              </textarea>
-
-            </div>
-
-          </div>
-
-
-          <div
-            class="mode-panel"
-            id="otherExcel">
-
-            <div class="upload">
-
-              <strong>📊 Upload Excel</strong>
-
-              <small>
-                Header row ignored.
-              </small>
-
-              <br><br>
-
-              <input
-                type="file"
-                id="otherExcelInput"
-                accept=".xlsx,.xls,.csv">
-
-            </div>
+            <!-- =============================================
+                 BULK INPUT
+            ============================================== -->
 
             <div
-              class="excel-preview"
-              id="otherExcelPreview">
-            </div>
+                id="cocoBulkPanel"
+                class="input-panel"
+            >
 
-          </div>
+                <div class="panel-heading">
 
-        </div>
+                    <div>
+                        <h3>
+                            Bulk PO Entry
+                        </h3>
 
+                        <p>
+                            Paste unlimited PO numbers separated
+                            by commas.
+                        </p>
+                    </div>
 
-        <div class="card">
+                    <span class="counter">
+                        Unlimited
+                    </span>
 
-          <div class="grid2">
-
-            <div class="field">
-
-              <label>Page Size</label>
-
-              <select id="otherPageSize">
-
-                <option value="4x6">
-                  4 × 6 inches
-                </option>
-
-                <option value="70x35">
-                  70 × 35 mm
-                </option>
-
-                <option value="a4">
-                  A4
-                </option>
-
-                <option value="custom">
-                  Custom
-                </option>
-
-              </select>
-
-            </div>
+                </div>
 
 
-            <div class="field">
+                <textarea
+                    id="cocoBulkInput"
+                    class="bulk-textarea"
+                    placeholder="Paste PO numbers here&#10;&#10;Example: PO1001, PO1002, PO1003, PO1004"
+                ></textarea>
 
-              <label>Font Size</label>
 
-              <input
-                type="number"
-                id="otherFontSize"
-                value="20"
-                min="5"
-                max="200">
+                <div class="input-hint">
+
+                    <span>
+                        Comma, newline and semicolon are accepted.
+                    </span>
+
+                    <strong id="bulkPOCount">
+                        0 PO
+                    </strong>
+
+                </div>
 
             </div>
 
-          </div>
 
-          <div class="field">
+            <!-- =============================================
+                 EXCEL INPUT
+            ============================================== -->
 
-            <label>Font</label>
+            <div
+                id="cocoExcelPanel"
+                class="input-panel"
+            >
 
-            <select id="otherFont">
+                <div class="panel-heading">
 
-              <option>Arial</option>
-              <option>Calibri</option>
-              <option>Times New Roman</option>
-              <option>Georgia</option>
-              <option>Verdana</option>
-              <option>Tahoma</option>
-              <option>Trebuchet MS</option>
-              <option>Courier New</option>
-              <option>Garamond</option>
-              <option>Palatino</option>
+                    <div>
+                        <h3>
+                            Excel Upload
+                        </h3>
 
-            </select>
+                        <p>
+                            First row is treated as the header
+                            and ignored for PO data.
+                        </p>
+                    </div>
 
-          </div>
+                    <span class="counter">
+                        Unlimited
+                    </span>
 
-          <label class="check">
-
-            <input
-              type="checkbox"
-              id="otherBold">
-
-            Bold
-
-          </label>
-
-        </div>
+                </div>
 
 
-        <div class="card">
+                <label
+                    for="cocoExcelFile"
+                    class="upload-box"
+                >
 
-          <div class="card-title">
-            <span>▣ Border</span>
-          </div>
+                    <span class="upload-icon">
+                        ↑
+                    </span>
 
-          <select id="otherBorder">
+                    <strong>
+                        Click to upload Excel
+                    </strong>
 
-            <option value="none">None</option>
-            <option value="thin">Thin</option>
-            <option value="medium">Medium</option>
-            <option value="thick">Thick</option>
-            <option value="solid">Solid</option>
-            <option value="double">Double</option>
-            <option value="double-thin">Double Thin</option>
-            <option value="double-medium">Double Medium</option>
-            <option value="double-thick">Double Thick</option>
-            <option value="dashed">Dashed</option>
-            <option value="dotted">Dotted</option>
-            <option value="short-dash">Short Dash</option>
-            <option value="long-dash">Long Dash</option>
-            <option value="dash-dot">Dash Dot</option>
-            <option value="dash-dot-dot">Dash Dot Dot</option>
-            <option value="groove">Groove</option>
-            <option value="ridge">Ridge</option>
-            <option value="rounded">Rounded</option>
-            <option value="double-rounded">Double Rounded</option>
-            <option value="shadow">Shadow</option>
-            <option value="soft-shadow">Soft Shadow</option>
-            <option value="blue">Blue</option>
-            <option value="red">Red</option>
-            <option value="green">Green</option>
-            <option value="navy">Navy</option>
-            <option value="purple">Purple</option>
-            <option value="orange">Orange</option>
-            <option value="teal">Teal</option>
-            <option value="gold">Gold</option>
-            <option value="silver">Silver</option>
-            <option value="black">Black</option>
-            <option value="triple">Triple</option>
-            <option value="triple-thick">Triple Thick</option>
-            <option value="double-wave">Double Wave</option>
-            <option value="zigzag">Zigzag</option>
+                    <small>
+                        .xlsx / .xls
+                    </small>
 
-          </select>
+                    <input
+                        type="file"
+                        id="cocoExcelFile"
+                        accept=".xlsx,.xls"
+                        hidden
+                    >
 
-        </div>
+                </label>
 
 
-        <div class="card">
-
-          <button
-            class="btn primary"
-            style="width:100%"
-            id="generateOtherPDF">
-            📄 Generate PDF
-          </button>
-
-        </div>
-
-      </section>
+                <div
+                    id="cocoExcelFileName"
+                    class="selected-file"
+                >
+                    No file selected
+                </div>
 
 
-      <!-- ================= ISBN ================= -->
-
-      <section class="section" id="section-isbn">
-
-        <div class="card">
-
-          <div class="card-title">
-            <span>📚 ISBN Barcode</span>
-          </div>
-
-          <div class="field">
-
-            <label>ISBN</label>
-
-            <input
-              type="text"
-              id="isbn"
-              value="9781234567890"
-              placeholder="Enter ISBN">
-
-          </div>
-
-          <div class="field">
-
-            <label>Book Title</label>
-
-            <input
-              type="text"
-              id="bookTitle"
-              value="Book Title">
-
-          </div>
-
-          <div class="grid2">
-
-            <div class="field">
-
-              <label>Font</label>
-
-              <select id="isbnFont">
-
-                <option>Arial</option>
-                <option>Calibri</option>
-                <option>Times New Roman</option>
-                <option>Georgia</option>
-                <option>Verdana</option>
-                <option>Tahoma</option>
-
-              </select>
+                <div
+                    id="cocoExcelPreview"
+                    class="excel-preview"
+                ></div>
 
             </div>
 
-            <div class="field">
 
-              <label>Size</label>
+            <!-- =============================================
+                 QUICK SETTINGS
+            ============================================== -->
 
-              <input
-                type="number"
-                id="isbnFontSize"
-                value="14"
-                min="5"
-                max="200">
+            <div class="quick-settings">
 
-            </div>
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="pageSettingsPopup"
+                >
 
-          </div>
+                    <span>
+                        Page
+                    </span>
 
-          <div class="field">
+                    <strong id="pageSummary">
+                        4 × 6 in
+                    </strong>
 
-            <label>Border</label>
-
-            <select id="isbnBorder">
-
-              <option value="none">None</option>
-              <option value="solid">Solid</option>
-              <option value="double">Double</option>
-              <option value="thick">Thick</option>
-              <option value="dashed">Dashed</option>
-              <option value="dotted">Dotted</option>
-              <option value="rounded">Rounded</option>
-              <option value="shadow">Shadow</option>
-              <option value="blue">Blue</option>
-              <option value="red">Red</option>
-              <option value="green">Green</option>
-              <option value="navy">Navy</option>
-              <option value="purple">Purple</option>
-
-            </select>
-
-          </div>
-
-        </div>
+                </button>
 
 
-        <div class="card">
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="contentSettingsPopup"
+                >
 
-          <button
-            class="btn primary"
-            style="width:100%"
-            id="generateISBNPDF">
-            📄 Generate PDF
-          </button>
+                    <span>
+                        Content
+                    </span>
 
-        </div>
+                    <strong id="contentSummary">
+                        PO + Box
+                    </strong>
 
-      </section>
+                </button>
 
 
-      <!-- ================= ADDRESS ================= -->
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="borderSettingsPopup"
+                >
 
-      <section class="section" id="section-address">
+                    <span>
+                        Borders
+                    </span>
 
-        <div class="card">
+                    <strong id="borderSummary">
+                        Custom
+                    </strong>
 
-          <div class="card-title">
-            <span>📍 Address</span>
-          </div>
+                </button>
 
-          <div class="field">
 
-            <label>From Address</label>
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="fontSettingsPopup"
+                >
 
-            <textarea
-              id="fromAddress"
-              placeholder="From address">
-            </textarea>
+                    <span>
+                        Fonts
+                    </span>
 
-          </div>
+                    <strong>
+                        Customize
+                    </strong>
 
-          <div class="field">
+                </button>
 
-            <label>To Address</label>
 
-            <textarea
-              id="toAddress"
-              placeholder="To address">
-            </textarea>
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="flowSettingsPopup"
+                >
 
-          </div>
+                    <span>
+                        Layout
+                    </span>
 
-          <div class="field">
+                    <strong id="flowSummary">
+                        2 Labels
+                    </strong>
 
-            <label>Email</label>
-
-            <input
-              type="email"
-              id="email"
-              placeholder="name@example.com">
-
-          </div>
-
-          <div class="grid2">
-
-            <div class="field">
-
-              <label>Font</label>
-
-              <select id="addressFont">
-
-                <option>Arial</option>
-                <option>Calibri</option>
-                <option>Times New Roman</option>
-                <option>Georgia</option>
-                <option>Verdana</option>
-                <option>Tahoma</option>
-
-              </select>
+                </button>
 
             </div>
 
-            <div class="field">
 
-              <label>Font Size</label>
+            <!-- =============================================
+                 LIVE PREVIEW
+            ============================================== -->
 
-              <input
-                type="number"
-                id="addressFontSize"
-                value="12"
-                min="5"
-                max="200">
+            <section class="preview-section">
+
+                <div class="preview-header">
+
+                    <div>
+
+                        <h3>
+                            Live Print Preview
+                        </h3>
+
+                        <p>
+                            Changes appear here instantly.
+                        </p>
+
+                    </div>
+
+                    <div class="preview-meta">
+
+                        <span id="previewPageSize">
+                            4 × 6 in
+                        </span>
+
+                        <span>
+                            •
+                        </span>
+
+                        <span id="previewLabelsPerPage">
+                            2 Labels
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="livePreview"
+                    class="live-preview"
+                >
+
+                    <div
+                        id="previewPage"
+                        class="preview-page"
+                    >
+
+                        <div
+                            id="previewLabel1"
+                            class="preview-label"
+                        >
+
+                            <div
+                                id="previewPO1"
+                                class="preview-po"
+                            >
+                                PO NUMBER
+                            </div>
+
+                            <div
+                                id="previewBox1"
+                                class="preview-box"
+                            >
+                                BOX NUMBER
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="previewLabel2"
+                            class="preview-label"
+                        >
+
+                            <div
+                                id="previewPO2"
+                                class="preview-po"
+                            >
+                                PO NUMBER
+                            </div>
+
+                            <div
+                                id="previewBox2"
+                                class="preview-box"
+                            >
+                                BOX NUMBER
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 ACTIONS
+            ============================================== -->
+
+            <div class="workspace-actions">
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    id="cocoResetButton"
+                >
+                    Reset
+                </button>
+
+                <button
+                    type="button"
+                    class="btn primary"
+                    id="cocoGenerateButton"
+                >
+                    Generate PDF
+                </button>
 
             </div>
 
-          </div>
-
-          <div class="field">
-
-            <label>Address Border</label>
-
-            <select id="addressBorder">
-
-              <option value="none">None</option>
-              <option value="solid">Solid</option>
-              <option value="thin">Thin</option>
-              <option value="medium">Medium</option>
-              <option value="thick">Thick</option>
-              <option value="double">Double</option>
-              <option value="dashed">Dashed</option>
-              <option value="dotted">Dotted</option>
-              <option value="rounded">Rounded</option>
-              <option value="double-rounded">Double Rounded</option>
-              <option value="shadow">Shadow</option>
-              <option value="blue">Blue</option>
-              <option value="red">Red</option>
-              <option value="green">Green</option>
-              <option value="navy">Navy</option>
-              <option value="purple">Purple</option>
-              <option value="orange">Orange</option>
-              <option value="teal">Teal</option>
-              <option value="gold">Gold</option>
-              <option value="silver">Silver</option>
-
-            </select>
-
-          </div>
-
-        </div>
+        </section>
 
 
-        <div class="card">
+        <!-- =================================================
+             ISBN WORKSPACE
+        ================================================== -->
 
-          <div class="card-title">
-            <span>🔳 QR Codes</span>
-          </div>
+        <section
+            id="isbnWorkspace"
+            class="workspace"
+        >
 
-          <div class="qr-grid">
+            <div class="workspace-header">
 
-            <div class="qr-card">
+                <div>
 
-              <strong>Address QR</strong>
+                    <span class="workspace-tag">
+                        ISBN
+                    </span>
 
-              <div id="addressQR"></div>
+                    <h2>
+                        ISBN Barcode Maker
+                    </h2>
 
-              <button
-                class="btn"
-                id="addressQRBtn">
-                Generate
-              </button>
+                    <p>
+                        Create professional ISBN barcode labels.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="close-workspace"
+                    id="closeISBNWorkspace"
+                >
+                    ×
+                </button>
 
             </div>
 
-            <div class="qr-card">
 
-              <strong>Email QR</strong>
+            <div class="simple-form-grid">
 
-              <div id="emailQR"></div>
+                <div class="field">
 
-              <button
-                class="btn"
-                id="emailQRBtn">
-                Generate
-              </button>
+                    <label for="isbnNumber">
+                        ISBN Number
+                    </label>
+
+                    <input
+                        id="isbnNumber"
+                        type="text"
+                        placeholder="Enter ISBN"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="isbnTitle">
+                        Book Title
+                    </label>
+
+                    <input
+                        id="isbnTitle"
+                        type="text"
+                        placeholder="Book title"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="isbnPageSize">
+                        Page Size
+                    </label>
+
+                    <select id="isbnPageSize">
+
+                        <option value="4x6">
+                            4 × 6 Inches
+                        </option>
+
+                        <option value="70x35">
+                            70 × 35 mm
+                        </option>
+
+                        <option value="a4">
+                            A4
+                        </option>
+
+                        <option value="custom">
+                            Custom
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="isbnCustomSize"
+                    class="custom-size-fields hidden"
+                >
+
+                    <div class="field">
+
+                        <label for="isbnCustomWidth">
+                            Width
+                        </label>
+
+                        <input
+                            id="isbnCustomWidth"
+                            type="number"
+                            min="1"
+                        >
+
+                    </div>
+
+                    <div class="field">
+
+                        <label for="isbnCustomHeight">
+                            Height
+                        </label>
+
+                        <input
+                            id="isbnCustomHeight"
+                            type="number"
+                            min="1"
+                        >
+
+                    </div>
+
+                </div>
 
             </div>
 
-          </div>
 
-        </div>
+            <div class="isbn-preview-card">
+
+                <div
+                    id="isbnBarcodePreview"
+                    class="barcode-preview"
+                ></div>
+
+            </div>
 
 
-        <div class="card">
+            <div class="workspace-actions">
 
-          <button
-            class="btn primary"
-            style="width:100%"
-            id="generateAddressPDF">
-            📄 Generate PDF
-          </button>
+                <button
+                    type="button"
+                    class="btn secondary"
+                    id="isbnResetButton"
+                >
+                    Reset
+                </button>
 
-        </div>
+                <button
+                    type="button"
+                    class="btn primary"
+                    id="isbnGenerateButton"
+                >
+                    Generate PDF
+                </button>
 
-      </section>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             OTHER PO WORKSPACE
+        ================================================== -->
+
+        <section
+            id="otherPOWorkspace"
+            class="workspace"
+        >
+
+            <div class="workspace-header">
+
+                <div>
+
+                    <span class="workspace-tag">
+                        OTHER PO
+                    </span>
+
+                    <h2>
+                        Other PO Label Maker
+                    </h2>
+
+                    <p>
+                        Create standard PO labels.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="close-workspace"
+                    id="closeOtherPOWorkspace"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="mode-tabs">
+
+                <button
+                    type="button"
+                    class="mode-tab active"
+                    data-other-mode="manual"
+                >
+                    Manual
+                </button>
+
+                <button
+                    type="button"
+                    class="mode-tab"
+                    data-other-mode="bulk"
+                >
+                    Bulk
+                </button>
+
+                <button
+                    type="button"
+                    class="mode-tab"
+                    data-other-mode="excel"
+                >
+                    Excel
+                </button>
+
+            </div>
+
+
+            <div
+                id="otherManualPanel"
+                class="input-panel active-panel"
+            >
+
+                <div
+                    id="otherManualPOGrid"
+                    class="manual-po-grid"
+                ></div>
+
+            </div>
+
+
+            <div
+                id="otherBulkPanel"
+                class="input-panel"
+            >
+
+                <textarea
+                    id="otherBulkInput"
+                    class="bulk-textarea"
+                    placeholder="Paste unlimited PO numbers separated by commas..."
+                ></textarea>
+
+            </div>
+
+
+            <div
+                id="otherExcelPanel"
+                class="input-panel"
+            >
+
+                <label
+                    for="otherExcelFile"
+                    class="upload-box"
+                >
+
+                    <span class="upload-icon">
+                        ↑
+                    </span>
+
+                    <strong>
+                        Upload Excel
+                    </strong>
+
+                    <small>
+                        First row will be handled as header.
+                    </small>
+
+                    <input
+                        id="otherExcelFile"
+                        type="file"
+                        accept=".xlsx,.xls"
+                        hidden
+                    >
+
+                </label>
+
+                <div
+                    id="otherExcelPreview"
+                    class="excel-preview"
+                ></div>
+
+            </div>
+
+
+            <!-- Same shared controls -->
+
+            <div class="quick-settings">
+
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="otherPageSettingsPopup"
+                >
+
+                    <span>
+                        Page Size
+                    </span>
+
+                    <strong>
+                        Configure
+                    </strong>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="otherBorderSettingsPopup"
+                >
+
+                    <span>
+                        Borders
+                    </span>
+
+                    <strong>
+                        Configure
+                    </strong>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="otherFontSettingsPopup"
+                >
+
+                    <span>
+                        Fonts
+                    </span>
+
+                    <strong>
+                        Configure
+                    </strong>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="otherFlowSettingsPopup"
+                >
+
+                    <span>
+                        Layout
+                    </span>
+
+                    <strong>
+                        Configure
+                    </strong>
+
+                </button>
+
+            </div>
+
+
+            <div
+                id="otherLivePreview"
+                class="live-preview"
+            ></div>
+
+
+            <div class="workspace-actions">
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    id="otherResetButton"
+                >
+                    Reset
+                </button>
+
+                <button
+                    type="button"
+                    class="btn primary"
+                    id="otherGenerateButton"
+                >
+                    Generate PDF
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ADDRESS WORKSPACE
+        ================================================== -->
+
+        <section
+            id="addressWorkspace"
+            class="workspace"
+        >
+
+            <div class="workspace-header">
+
+                <div>
+
+                    <span class="workspace-tag">
+                        ADDRESS
+                    </span>
+
+                    <h2>
+                        Address Label Maker
+                    </h2>
+
+                    <p>
+                        Address labels, QR codes and print preview.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="close-workspace"
+                    id="closeAddressWorkspace"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="address-grid">
+
+                <div class="field">
+
+                    <label for="fromAddress">
+                        From Address
+                    </label>
+
+                    <textarea
+                        id="fromAddress"
+                        placeholder="Enter sender address..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="toAddress">
+                        To Address
+                    </label>
+
+                    <textarea
+                        id="toAddress"
+                        placeholder="Enter receiver address..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <div class="address-qr-grid">
+
+                <div class="qr-card">
+
+                    <h3>
+                        Address QR
+                    </h3>
+
+                    <div
+                        id="addressQR"
+                        class="qr-preview"
+                    ></div>
+
+                </div>
+
+
+                <div class="qr-card">
+
+                    <h3>
+                        Email QR
+                    </h3>
+
+                    <input
+                        id="addressEmail"
+                        type="email"
+                        placeholder="Email address"
+                    >
+
+                    <div
+                        id="emailQR"
+                        class="qr-preview"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="quick-settings">
+
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="addressPageSettingsPopup"
+                >
+
+                    <span>
+                        Page
+                    </span>
+
+                    <strong>
+                        Configure
+                    </strong>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="addressBorderSettingsPopup"
+                >
+
+                    <span>
+                        Borders
+                    </span>
+
+                    <strong>
+                        Configure
+                    </strong>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="setting-card"
+                    data-popup="addressFontSettingsPopup"
+                >
+
+                    <span>
+                        Fonts
+                    </span>
+
+                    <strong>
+                        Configure
+                    </strong>
+
+                </button>
+
+            </div>
+
+
+            <div
+                id="addressLivePreview"
+                class="live-preview"
+            ></div>
+
+
+            <div class="workspace-actions">
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    id="addressResetButton"
+                >
+                    Reset
+                </button>
+
+                <button
+                    type="button"
+                    class="btn primary"
+                    id="addressGenerateButton"
+                >
+                    Generate PDF
+                </button>
+
+            </div>
+
+        </section>
 
     </main>
 
 
-    <!-- PREVIEW -->
+    <!-- =====================================================
+         POPUP: PAGE SETTINGS
+    ====================================================== -->
 
-    <aside class="preview-area">
+    <div
+        id="pageSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
 
-      <div class="card">
+        <div class="popup-panel">
 
-        <div class="preview-header">
+            <div class="popup-header">
 
-          <strong>Live Page Preview</strong>
+                <div>
+                    <span class="popup-tag">
+                        PAGE SETTINGS
+                    </span>
 
-          <span class="live">
-            <span class="live-dot"></span>
-            LIVE
-          </span>
+                    <h3>
+                        Page Size & Orientation
+                    </h3>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="popup-body">
+
+                <div class="form-row">
+
+                    <div class="field">
+
+                        <label for="pageSize">
+                            Page Size
+                        </label>
+
+                        <select id="pageSize">
+
+                            <option value="4x6">
+                                4 × 6 Inches
+                            </option>
+
+                            <option value="70x35">
+                                70 × 35 mm
+                            </option>
+
+                            <option value="a4">
+                                A4
+                            </option>
+
+                            <option value="custom">
+                                Custom
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="orientation">
+                            Orientation
+                        </label>
+
+                        <select id="orientation">
+
+                            <option value="portrait">
+                                Portrait
+                            </option>
+
+                            <option value="landscape">
+                                Landscape
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="customPageSizeFields"
+                    class="custom-size-fields hidden"
+                >
+
+                    <div class="field">
+
+                        <label for="customWidth">
+                            Custom Width
+                        </label>
+
+                        <input
+                            id="customWidth"
+                            type="number"
+                            min="1"
+                            value="70"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="customHeight">
+                            Custom Height
+                        </label>
+
+                        <input
+                            id="customHeight"
+                            type="number"
+                            min="1"
+                            value="35"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
-
-        <div class="preview-box">
-
-          <div class="paper" id="paper">
-
-            <div
-              class="paper-grid"
-              id="paperGrid">
-
-            </div>
+    </div>
 
 
-            <div
-              class="other-preview"
-              id="otherPreview">
-              ABC123
-            </div>
+    <!-- =====================================================
+         POPUP: CONTENT SETTINGS
+    ====================================================== -->
 
+    <div
+        id="contentSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
 
-            <div
-              class="isbn-preview"
-              id="isbnPreview">
+        <div class="popup-panel">
 
-              <div id="isbnTitlePreview">
-                Book Title
-              </div>
+            <div class="popup-header">
 
-              <svg id="isbnBarcode"></svg>
+                <div>
+                    <span class="popup-tag">
+                        CONTENT
+                    </span>
 
-              <div id="isbnNumberPreview">
-                9781234567890
-              </div>
+                    <h3>
+                        PO & Box Content
+                    </h3>
 
-            </div>
+                </div>
 
-
-            <div
-              class="address-preview"
-              id="addressPreview">
-
-              <h4>FROM</h4>
-
-              <div
-                class="address-block"
-                id="fromPreview">
-                FROM ADDRESS
-              </div>
-
-              <h4>TO</h4>
-
-              <div
-                class="address-block"
-                id="toPreview">
-                TO ADDRESS
-              </div>
-
-              <div
-                class="address-block"
-                id="emailPreview">
-              </div>
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
 
             </div>
 
-          </div>
+
+            <div class="popup-body">
+
+                <div class="option-group">
+
+                    <h4>
+                        What should appear on the page?
+                    </h4>
+
+
+                    <label class="option-row">
+
+                        <input
+                            type="checkbox"
+                            id="showPO"
+                            checked
+                        >
+
+                        <span>
+                            PO Number
+                        </span>
+
+                    </label>
+
+
+                    <label class="option-row">
+
+                        <input
+                            type="checkbox"
+                            id="showBox"
+                            checked
+                        >
+
+                        <span>
+                            Box Number
+                        </span>
+
+                    </label>
+
+
+                    <label class="option-row combined-option">
+
+                        <input
+                            type="checkbox"
+                            id="combinePOBox"
+                        >
+
+                        <span>
+                            Combined PO + Box
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="option-group">
+
+                    <h4>
+                        PO / Box line arrangement
+                    </h4>
+
+
+                    <label class="radio-row">
+
+                        <input
+                            type="radio"
+                            name="poBoxLine"
+                            id="sameLine"
+                            value="same"
+                        >
+
+                        <span>
+                            Same Line
+                        </span>
+
+                    </label>
+
+
+                    <label class="radio-row">
+
+                        <input
+                            type="radio"
+                            name="poBoxLine"
+                            id="separateLine"
+                            value="separate"
+                            checked
+                        >
+
+                        <span>
+                            Separate Lines
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
 
         </div>
 
-      </div>
-
-    </aside>
-
-  </div>
+    </div>
 
 
-  <footer class="footer">
+    <!-- =====================================================
+         POPUP: BORDER SETTINGS
+    ====================================================== -->
 
-    <strong>Created & Developed by Ashish Verma © 2026</strong>
-    <br>
-    All rights reserved. Copyright belongs to Ashish Verma.
+    <div
+        id="borderSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
 
-  </footer>
+        <div class="popup-panel large-popup">
+
+            <div class="popup-header">
+
+                <div>
+
+                    <span class="popup-tag">
+                        BORDERS
+                    </span>
+
+                    <h3>
+                        Border Settings
+                    </h3>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="popup-body">
+
+                <div class="border-settings-grid">
+
+                    <!-- PAGE BORDER -->
+
+                    <div class="border-setting-card">
+
+                        <div class="border-setting-header">
+
+                            <div>
+
+                                <strong>
+                                    Page Border
+                                </strong>
+
+                                <small>
+                                    Border around complete page
+                                </small>
+
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    id="pageBorder"
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <select
+                            id="pageBorderStyle"
+                        >
+
+                            <option value="solid">
+                                Solid
+                            </option>
+
+                            <option value="dashed">
+                                Dashed
+                            </option>
+
+                            <option value="dotted">
+                                Dotted
+                            </option>
+
+                            <option value="double">
+                                Double
+                            </option>
+
+                            <option value="rounded">
+                                Rounded
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- PO BORDER -->
+
+                    <div class="border-setting-card">
+
+                        <div class="border-setting-header">
+
+                            <div>
+
+                                <strong>
+                                    PO Border
+                                </strong>
+
+                                <small>
+                                    Border around PO number
+                                </small>
+
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    id="poBorder"
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <select
+                            id="poBorderStyle"
+                        >
+
+                            <option value="solid">
+                                Solid
+                            </option>
+
+                            <option value="dashed">
+                                Dashed
+                            </option>
+
+                            <option value="dotted">
+                                Dotted
+                            </option>
+
+                            <option value="double">
+                                Double
+                            </option>
+
+                            <option value="rounded">
+                                Rounded
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- BOX BORDER -->
+
+                    <div class="border-setting-card">
+
+                        <div class="border-setting-header">
+
+                            <div>
+
+                                <strong>
+                                    Box Border
+                                </strong>
+
+                                <small>
+                                    Border around box number
+                                </small>
+
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    id="boxBorder"
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <select
+                            id="boxBorderStyle"
+                        >
+
+                            <option value="solid">
+                                Solid
+                            </option>
+
+                            <option value="dashed">
+                                Dashed
+                            </option>
+
+                            <option value="dotted">
+                                Dotted
+                            </option>
+
+                            <option value="double">
+                                Double
+                            </option>
+
+                            <option value="rounded">
+                                Rounded
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- COMBINED BORDER -->
+
+                <div class="combined-setting">
+
+                    <label class="option-row">
+
+                        <input
+                            type="checkbox"
+                            id="combinedBorder"
+                        >
+
+                        <span>
+
+                            <strong>
+                                Combined Border
+                            </strong>
+
+                            <small>
+                                Enable this to combine all three
+                                border settings. Individual
+                                Page / PO / Box borders will
+                                automatically freeze.
+                            </small>
+
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         POPUP: FONT SETTINGS
+    ====================================================== -->
+
+    <div
+        id="fontSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
+
+        <div class="popup-panel extra-large-popup">
+
+            <div class="popup-header">
+
+                <div>
+
+                    <span class="popup-tag">
+                        TYPOGRAPHY
+                    </span>
+
+                    <h3>
+                        PO & Box Font Settings
+                    </h3>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="popup-body">
+
+                <!-- PO FONT -->
+
+                <div class="font-setting-block">
+
+                    <h4>
+                        PO Number
+                    </h4>
+
+
+                    <div class="font-controls">
+
+                        <div class="field">
+
+                            <label>
+                                Font
+                            </label>
+
+                            <select
+                                id="poFontFamily"
+                            >
+
+                                <option>
+                                    Arial
+                                </option>
+
+                                <option>
+                                    Helvetica
+                                </option>
+
+                                <option>
+                                    Times New Roman
+                                </option>
+
+                                <option>
+                                    Georgia
+                                </option>
+
+                                <option>
+                                    Verdana
+                                </option>
+
+                                <option>
+                                    Tahoma
+                                </option>
+
+                                <option>
+                                    Trebuchet MS
+                                </option>
+
+                                <option>
+                                    Courier New
+                                </option>
+
+                                <option>
+                                    Impact
+                                </option>
+
+                                <option>
+                                    Comic Sans MS
+                                </option>
+
+                                <option>
+                                    Garamond
+                                </option>
+
+                                <option>
+                                    Palatino
+                                </option>
+
+                                <option>
+                                    Bookman
+                                </option>
+
+                                <option>
+                                    Century Gothic
+                                </option>
+
+                                <option>
+                                    Franklin Gothic
+                                </option>
+
+                                <option>
+                                    Calibri
+                                </option>
+
+                                <option>
+                                    Cambria
+                                </option>
+
+                                <option>
+                                    Candara
+                                </option>
+
+                                <option>
+                                    Consolas
+                                </option>
+
+                                <option>
+                                    Segoe UI
+                                </option>
+
+                                <option>
+                                    Lucida Sans
+                                </option>
+
+                                <option>
+                                    Lucida Console
+                                </option>
+
+                                <option>
+                                    Monaco
+                                </option>
+
+                                <option>
+                                    Baskerville
+                                </option>
+
+                                <option>
+                                    Didot
+                                </option>
+
+                                <option>
+                                    Futura
+                                </option>
+
+                                <option>
+                                    Optima
+                                </option>
+
+                                <option>
+                                    Rockwell
+                                </option>
+
+                                <option>
+                                    Copperplate
+                                </option>
+
+                                <option>
+                                    Papyrus
+                                </option>
+
+                                <option>
+                                    Brush Script MT
+                                </option>
+
+                                <option>
+                                    Arial Black
+                                </option>
+
+                                <option>
+                                    Calisto MT
+                                </option>
+
+                                <option>
+                                    Corbel
+                                </option>
+
+                                <option>
+                                    Constantia
+                                </option>
+
+                                <option>
+                                    Franklin Gothic Medium
+                                </option>
+
+                                <option>
+                                    Gill Sans
+                                </option>
+
+                                <option>
+                                    Century Schoolbook
+                                </option>
+
+                                <option>
+                                    Book Antiqua
+                                </option>
+
+                                <option>
+                                    Monaco
+                                </option>
+
+                                <option>
+                                    DejaVu Sans
+                                </option>
+
+                                <option>
+                                    DejaVu Serif
+                                </option>
+
+                                <option>
+                                    Liberation Sans
+                                </option>
+
+                                <option>
+                                    Liberation Serif
+                                </option>
+
+                                <option>
+                                    Noto Sans
+                                </option>
+
+                                <option>
+                                    Noto Serif
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>
+                                Font Size
+                            </label>
+
+                            <input
+                                id="poFontSize"
+                                type="number"
+                                min="6"
+                                max="120"
+                                value="24"
+                            >
+
+                        </div>
+
+
+                        <label class="format-check">
+
+                            <input
+                                type="checkbox"
+                                id="poBold"
+                            >
+
+                            <span>
+                                Bold
+                            </span>
+
+                        </label>
+
+
+                        <label class="format-check">
+
+                            <input
+                                type="checkbox"
+                                id="poItalic"
+                            >
+
+                            <span>
+                                Italic
+                            </span>
+
+                        </label>
+
+
+                        <label class="format-check">
+
+                            <input
+                                type="checkbox"
+                                id="poUnderline"
+                            >
+
+                            <span>
+                                Underline
+                            </span>
+
+                        </label>
+
+
+                        <div class="field">
+
+                            <label>
+                                Opacity
+                            </label>
+
+                            <input
+                                id="poOpacity"
+                                type="range"
+                                min="0"
+                                max="100"
+                                value="100"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOX FONT -->
+
+                <div class="font-setting-block">
+
+                    <h4>
+                        Box Number
+                    </h4>
+
+
+                    <div class="font-controls">
+
+                        <div class="field">
+
+                            <label>
+                                Font
+                            </label>
+
+                            <select
+                                id="boxFontFamily"
+                            >
+
+                                <option>
+                                    Arial
+                                </option>
+
+                                <option>
+                                    Helvetica
+                                </option>
+
+                                <option>
+                                    Times New Roman
+                                </option>
+
+                                <option>
+                                    Georgia
+                                </option>
+
+                                <option>
+                                    Verdana
+                                </option>
+
+                                <option>
+                                    Tahoma
+                                </option>
+
+                                <option>
+                                    Trebuchet MS
+                                </option>
+
+                                <option>
+                                    Courier New
+                                </option>
+
+                                <option>
+                                    Impact
+                                </option>
+
+                                <option>
+                                    Garamond
+                                </option>
+
+                                <option>
+                                    Palatino
+                                </option>
+
+                                <option>
+                                    Calibri
+                                </option>
+
+                                <option>
+                                    Cambria
+                                </option>
+
+                                <option>
+                                    Segoe UI
+                                </option>
+
+                                <option>
+                                    Consolas
+                                </option>
+
+                                <option>
+                                    DejaVu Sans
+                                </option>
+
+                                <option>
+                                    DejaVu Serif
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>
+                                Font Size
+                            </label>
+
+                            <input
+                                id="boxFontSize"
+                                type="number"
+                                min="6"
+                                max="120"
+                                value="20"
+                            >
+
+                        </div>
+
+
+                        <label class="format-check">
+
+                            <input
+                                type="checkbox"
+                                id="boxBold"
+                            >
+
+                            <span>
+                                Bold
+                            </span>
+
+                        </label>
+
+
+                        <label class="format-check">
+
+                            <input
+                                type="checkbox"
+                                id="boxItalic"
+                            >
+
+                            <span>
+                                Italic
+                            </span>
+
+                        </label>
+
+
+                        <label class="format-check">
+
+                            <input
+                                type="checkbox"
+                                id="boxUnderline"
+                            >
+
+                            <span>
+                                Underline
+                            </span>
+
+                        </label>
+
+
+                        <div class="field">
+
+                            <label>
+                                Opacity
+                            </label>
+
+                            <input
+                                id="boxOpacity"
+                                type="range"
+                                min="0"
+                                max="100"
+                                value="100"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         POPUP: FLOW / PAGE LABEL SETTINGS
+    ====================================================== -->
+
+    <div
+        id="flowSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
+
+        <div class="popup-panel">
+
+            <div class="popup-header">
+
+                <div>
+
+                    <span class="popup-tag">
+                        PRINT FLOW
+                    </span>
+
+                    <h3>
+                        Labels Per Page
+                    </h3>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="popup-body">
+
+                <div class="field">
+
+                    <label for="labelsPerPage">
+                        Labels Per Page
+                    </label>
+
+                    <select id="labelsPerPage">
+
+                        <option value="1">
+                            1 Label
+                        </option>
+
+                        <option
+                            value="2"
+                            selected
+                        >
+                            2 Labels
+                        </option>
+
+                        <option value="3">
+                            3 Labels
+                        </option>
+
+                        <option value="4">
+                            4 Labels
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="option-group">
+
+                    <h4>
+                        Same PO Flow
+                    </h4>
+
+
+                    <label class="radio-row">
+
+                        <input
+                            type="radio"
+                            name="poFlow"
+                            id="samePOFlow"
+                            value="same"
+                            checked
+                        >
+
+                        <span>
+                            Keep same PO together
+                        </span>
+
+                    </label>
+
+
+                    <label class="radio-row">
+
+                        <input
+                            type="radio"
+                            name="poFlow"
+                            id="alternatePOFlow"
+                            value="alternate"
+                        >
+
+                        <span>
+                            Alternate / sequential flow
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="labelGap">
+                        Label Gap
+                    </label>
+
+                    <input
+                        id="labelGap"
+                        type="number"
+                        min="0"
+                        value="2"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         GENERIC OTHER POPUPS
+    ====================================================== -->
+
+    <div
+        id="otherPageSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
+
+        <div class="popup-panel">
+
+            <div class="popup-header">
+
+                <h3>
+                    Other PO Page Settings
+                </h3>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div class="popup-body">
+
+                <div class="field">
+
+                    <label for="otherPageSize">
+                        Page Size
+                    </label>
+
+                    <select id="otherPageSize">
+
+                        <option value="4x6">
+                            4 × 6 Inches
+                        </option>
+
+                        <option value="70x35">
+                            70 × 35 mm
+                        </option>
+
+                        <option value="a4">
+                            A4
+                        </option>
+
+                        <option value="custom">
+                            Custom
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="otherCustomSize"
+                    class="custom-size-fields hidden"
+                >
+
+                    <input
+                        id="otherCustomWidth"
+                        type="number"
+                        placeholder="Width"
+                    >
+
+                    <input
+                        id="otherCustomHeight"
+                        type="number"
+                        placeholder="Height"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="otherBorderSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
+
+        <div class="popup-panel">
+
+            <div class="popup-header">
+
+                <h3>
+                    Other PO Borders
+                </h3>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div class="popup-body">
+
+                <label class="option-row">
+
+                    <input
+                        id="otherPageBorder"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        Page Border
+                    </span>
+
+                </label>
+
+
+                <label class="option-row">
+
+                    <input
+                        id="otherPOBorder"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        PO Border
+                    </span>
+
+                </label>
+
+
+                <select
+                    id="otherBorderStyle"
+                >
+
+                    <option value="solid">
+                        Solid
+                    </option>
+
+                    <option value="dashed">
+                        Dashed
+                    </option>
+
+                    <option value="dotted">
+                        Dotted
+                    </option>
+
+                    <option value="double">
+                        Double
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="otherFontSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
+
+        <div class="popup-panel">
+
+            <div class="popup-header">
+
+                <h3>
+                    Other PO Fonts
+                </h3>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div class="popup-body">
+
+                <div class="field">
+
+                    <label>
+                        Font
+                    </label>
+
+                    <select id="otherFontFamily">
+
+                        <option>
+                            Arial
+                        </option>
+
+                        <option>
+                            Helvetica
+                        </option>
+
+                        <option>
+                            Times New Roman
+                        </option>
+
+                        <option>
+                            Georgia
+                        </option>
+
+                        <option>
+                            Verdana
+                        </option>
+
+                        <option>
+                            Calibri
+                        </option>
+
+                        <option>
+                            Cambria
+                        </option>
+
+                        <option>
+                            Courier New
+                        </option>
+
+                        <option>
+                            Impact
+                        </option>
+
+                        <option>
+                            Garamond
+                        </option>
+
+                        <option>
+                            Segoe UI
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Font Size
+                    </label>
+
+                    <input
+                        id="otherFontSize"
+                        type="number"
+                        value="24"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="otherFlowSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
+
+        <div class="popup-panel">
+
+            <div class="popup-header">
+
+                <h3>
+                    Other PO Layout
+                </h3>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div class="popup-body">
+
+                <div class="field">
+
+                    <label>
+                        Labels Per Page
+                    </label>
+
+                    <select id="otherLabelsPerPage">
+
+                        <option value="1">
+                            1
+                        </option>
+
+                        <option value="2">
+                            2
+                        </option>
+
+                        <option value="3">
+                            3
+                        </option>
+
+                        <option value="4">
+                            4
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ADDRESS POPUPS
+    ====================================================== -->
+
+    <div
+        id="addressPageSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
+
+        <div class="popup-panel">
+
+            <div class="popup-header">
+
+                <h3>
+                    Address Page Settings
+                </h3>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div class="popup-body">
+
+                <div class="field">
+
+                    <label for="addressPageSize">
+                        Page Size
+                    </label>
+
+                    <select id="addressPageSize">
+
+                        <option value="4x6">
+                            4 × 6 Inches
+                        </option>
+
+                        <option value="70x35">
+                            70 × 35 mm
+                        </option>
+
+                        <option value="a4">
+                            A4
+                        </option>
+
+                        <option value="custom">
+                            Custom
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="addressCustomSize"
+                    class="custom-size-fields hidden"
+                >
+
+                    <input
+                        id="addressCustomWidth"
+                        type="number"
+                        placeholder="Width"
+                    >
+
+                    <input
+                        id="addressCustomHeight"
+                        type="number"
+                        placeholder="Height"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="addressBorderSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
+
+        <div class="popup-panel">
+
+            <div class="popup-header">
+
+                <h3>
+                    Address Borders
+                </h3>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div class="popup-body">
+
+                <label class="option-row">
+
+                    <input
+                        id="addressPageBorder"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        Page Border
+                    </span>
+
+                </label>
+
+
+                <label class="option-row">
+
+                    <input
+                        id="addressFromBorder"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        From Border
+                    </span>
+
+                </label>
+
+
+                <label class="option-row">
+
+                    <input
+                        id="addressToBorder"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        To Border
+                    </span>
+
+                </label>
+
+
+                <select
+                    id="addressBorderStyle"
+                >
+
+                    <option value="solid">
+                        Solid
+                    </option>
+
+                    <option value="dashed">
+                        Dashed
+                    </option>
+
+                    <option value="dotted">
+                        Dotted
+                    </option>
+
+                    <option value="double">
+                        Double
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="addressFontSettingsPopup"
+        class="popup-overlay"
+        aria-hidden="true"
+    >
+
+        <div class="popup-panel">
+
+            <div class="popup-header">
+
+                <h3>
+                    Address Font Settings
+                </h3>
+
+                <button
+                    type="button"
+                    class="popup-close"
+                    data-close-popup
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div class="popup-body">
+
+                <div class="field">
+
+                    <label>
+                        Address Font
+                    </label>
+
+                    <select id="addressFontFamily">
+
+                        <option>
+                            Arial
+                        </option>
+
+                        <option>
+                            Helvetica
+                        </option>
+
+                        <option>
+                            Times New Roman
+                        </option>
+
+                        <option>
+                            Georgia
+                        </option>
+
+                        <option>
+                            Verdana
+                        </option>
+
+                        <option>
+                            Calibri
+                        </option>
+
+                        <option>
+                            Cambria
+                        </option>
+
+                        <option>
+                            Segoe UI
+                        </option>
+
+                        <option>
+                            Garamond
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Font Size
+                    </label>
+
+                    <input
+                        id="addressFontSize"
+                        type="number"
+                        value="16"
+                    >
+
+                </div>
+
+
+                <div class="format-row">
+
+                    <label class="format-check">
+
+                        <input
+                            id="addressBold"
+                            type="checkbox"
+                        >
+
+                        <span>
+                            Bold
+                        </span>
+
+                    </label>
+
+
+                    <label class="format-check">
+
+                        <input
+                            id="addressItalic"
+                            type="checkbox"
+                        >
+
+                        <span>
+                            Italic
+                        </span>
+
+                    </label>
+
+
+                    <label class="format-check">
+
+                        <input
+                            id="addressUnderline"
+                            type="checkbox"
+                        >
+
+                        <span>
+                            Underline
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TOP RIGHT TOAST
+    ====================================================== -->
+
+    <div
+        id="toastContainer"
+        class="toast-container"
+        aria-live="polite"
+    >
+
+        <div
+            id="toast"
+            class="toast"
+        >
+
+            <span
+                id="toastIcon"
+                class="toast-icon"
+            >
+                ✓
+            </span>
+
+            <div>
+
+                <strong id="toastTitle">
+                    Feature Updated
+                </strong>
+
+                <p id="toastMessage">
+                    Feature has been enabled.
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                id="toastClose"
+                class="toast-close"
+            >
+                ×
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="site-footer">
+
+        <div>
+
+            <strong>
+                Created & Developed by Ashish Verma
+            </strong>
+
+            <span>
+                Books Label Studio
+            </span>
+
+        </div>
+
+        <div>
+
+            <span>
+                © 2026 Ashish Verma. All Rights Reserved.
+            </span>
+
+            <span>
+                Unauthorized copying, modification or
+                redistribution is prohibited.
+            </span>
+
+        </div>
+
+    </footer>
 
 </div>
-
-
-<!-- TOAST -->
-
-<div
-  class="toast green"
-  id="toast">
-
-  <span id="toastText"></span>
-
-</div>
-
-
-<script>
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let activeSection = "coco";
-let cocoMode = "manual";
-let otherMode = "manual";
-
-let history = [];
-let historyIndex = -1;
-
-const MAX_HISTORY = 50;
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-const $ = id =>
-  document.getElementById(id);
-
-const $$ = selector =>
-  Array.from(
-    document.querySelectorAll(selector)
-  );
-
-
-function toast(
-  message,
-  type = "green"
-){
-
-  const box =
-    $("toast");
-
-  if(!box)return;
-
-  $("toastText").textContent =
-    message;
-
-  box.className =
-    `toast ${type} show`;
-
-  clearTimeout(
-    window.toastTimer
-  );
-
-  window.toastTimer =
-    setTimeout(
-      ()=>{
-        box.classList.remove("show");
-      },
-      2200
-    );
-
-}
-
-
-function toggle(
-  id,
-  show
-){
-
-  const el =
-    $(id);
-
-  if(!el)return;
-
-  el.classList.toggle(
-    "active",
-    show
-  );
-
-}
-
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-$$(".nav-btn")
-.forEach(btn=>{
-
-  btn.addEventListener(
-    "click",
-    ()=>{
-
-      activeSection =
-        btn.dataset.section;
-
-      $$(".nav-btn")
-      .forEach(b=>{
-        b.classList.toggle(
-          "active",
-          b===btn
-        );
-      });
-
-      $$(".section")
-      .forEach(section=>{
-        section.classList.toggle(
-          "active",
-          section.id ===
-          `section-${activeSection}`
-        );
-      });
-
-      toast(
-        `${btn.querySelector(".nav-title").textContent} Enabled`,
-        "green"
-      );
-
-      updatePreview();
-
-    }
-  );
-
-});
-
-
-/* =========================================================
-   COCO MODES
-========================================================= */
-
-$$("[data-mode]")
-.forEach(btn=>{
-
-  btn.addEventListener(
-    "click",
-    ()=>{
-
-      cocoMode =
-        btn.dataset.mode;
-
-      $$("[data-mode]")
-      .forEach(b=>{
-        b.classList.toggle(
-          "active",
-          b===btn
-        );
-      });
-
-      $$(".mode-panel")
-      .forEach(panel=>{
-        panel.classList.remove(
-          "active"
-        );
-      });
-
-      const panel =
-        $(`mode-${cocoMode}`);
-
-      if(panel){
-        panel.classList.add(
-          "active"
-        );
-      }
-
-      toast(
-        `${cocoMode.toUpperCase()} mode enabled`,
-        "green"
-      );
-
-      updatePreview();
-
-    }
-  );
-
-});
-
-
-/* =========================================================
-   OTHER MODES
-========================================================= */
-
-$$("[data-other-mode]")
-.forEach(btn=>{
-
-  btn.addEventListener(
-    "click",
-    ()=>{
-
-      otherMode =
-        btn.dataset.otherMode;
-
-      $$("[data-other-mode]")
-      .forEach(b=>{
-        b.classList.toggle(
-          "active",
-          b===btn
-        );
-      });
-
-      ["otherManual",
-       "otherMultiple",
-       "otherExcel"]
-      .forEach(id=>{
-        $(id)?.classList.remove(
-          "active"
-        );
-      });
-
-      const target =
-        otherMode === "manual"
-          ? "otherManual"
-          : otherMode === "multiple"
-            ? "otherMultiple"
-            : "otherExcel";
-
-      $(target)?.classList.add(
-        "active"
-      );
-
-      toast(
-        `${otherMode.toUpperCase()} mode enabled`,
-        "green"
-      );
-
-      updatePreview();
-
-    }
-  );
-
-});
-
-
-/* =========================================================
-   MANUAL PO — 20 INPUTS
-========================================================= */
-
-function getManualPOs(){
-
-  return $$(".manualPO")
-    .map(input =>
-      input.value.trim()
-    )
-    .filter(Boolean);
-
-}
-
-
-/* =========================================================
-   MULTIPLE PO
-========================================================= */
-
-function getMultiplePOs(){
-
-  return String(
-    $("multiplePO")?.value || ""
-  )
-  .split(",")
-  .map(x=>x.trim())
-  .filter(Boolean);
-
-}
-
-
-$("useMultipleBtn")
-?.addEventListener(
-  "click",
-  ()=>{
-
-    const values =
-      getMultiplePOs();
-
-    if(!values.length){
-
-      toast(
-        "Enter comma-separated PO numbers first",
-        "red"
-      );
-
-      return;
-
-    }
-
-    toast(
-      `${values.length} PO number(s) loaded`,
-      "green"
-    );
-
-    updatePreview();
-
-  }
-);
-
-
-$("clearMultipleBtn")
-?.addEventListener(
-  "click",
-  ()=>{
-
-    $("multiplePO").value =
-      "";
-
-    updatePreview();
-
-    toast(
-      "Multiple PO cleared",
-      "red"
-    );
-
-  }
-);
-
-
-/* =========================================================
-   EXCEL
-========================================================= */
-
-let excelPOs = [];
-
-
-$("excelInput")
-?.addEventListener(
-  "change",
-  async event=>{
-
-    const file =
-      event.target.files?.[0];
-
-    if(!file)return;
-
-
-    if(
-      typeof XLSX ===
-      "undefined"
-    ){
-
-      toast(
-        "Excel library is not loaded",
-        "red"
-      );
-
-      return;
-
-    }
-
-
-    try{
-
-      const buffer =
-        await file.arrayBuffer();
-
-      const workbook =
-        XLSX.read(
-          buffer,
-          {
-            type:"array"
-          }
-        );
-
-      const sheet =
-        workbook.Sheets[
-          workbook.SheetNames[0]
-        ];
-
-      const rows =
-        XLSX.utils.sheet_to_json(
-          sheet,
-          {
-            header:1,
-            defval:"",
-            raw:false
-          }
-        );
-
-
-      /*
-        HEADER / FIRST ROW IGNORED
-      */
-
-      excelPOs =
-        rows
-          .slice(1)
-          .map(row =>
-            String(
-              Array.isArray(row)
-                ? row[0] ?? ""
-                : row
-            ).trim()
-          )
-          .filter(Boolean);
-
-
-      renderExcel(
-        "excelPreview",
-        rows
-      );
-
-
-      toast(
-        `${excelPOs.length} PO(s) loaded from Excel`,
-        "green"
-      );
-
-      updatePreview();
-
-    }
-    catch(error){
-
-      console.error(error);
-
-      toast(
-        "Excel file could not be read",
-        "red"
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   OTHER EXCEL
-========================================================= */
-
-let otherExcelPOs = [];
-
-
-$("otherExcelInput")
-?.addEventListener(
-  "change",
-  async event=>{
-
-    const file =
-      event.target.files?.[0];
-
-    if(!file)return;
-
-
-    if(
-      typeof XLSX ===
-      "undefined"
-    ){
-
-      toast(
-        "Excel library is not loaded",
-        "red"
-      );
-
-      return;
-
-    }
-
-
-    try{
-
-      const buffer =
-        await file.arrayBuffer();
-
-      const workbook =
-        XLSX.read(
-          buffer,
-          {
-            type:"array"
-          }
-        );
-
-      const sheet =
-        workbook.Sheets[
-          workbook.SheetNames[0]
-        ];
-
-      const rows =
-        XLSX.utils.sheet_to_json(
-          sheet,
-          {
-            header:1,
-            defval:"",
-            raw:false
-          }
-        );
-
-
-      otherExcelPOs =
-        rows
-          .slice(1)
-          .map(row =>
-            String(
-              Array.isArray(row)
-                ? row[0] ?? ""
-                : row
-            ).trim()
-          )
-          .filter(Boolean);
-
-
-      renderExcel(
-        "otherExcelPreview",
-        rows
-      );
-
-
-      toast(
-        `${otherExcelPOs.length} PO(s) loaded`,
-        "green"
-      );
-
-    }
-    catch(error){
-
-      console.error(error);
-
-      toast(
-        "Excel file could not be read",
-        "red"
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   EXCEL TABLE
-========================================================= */
-
-function renderExcel(
-  targetId,
-  rows
-){
-
-  const target =
-    $(targetId);
-
-  if(!target)return;
-
-
-  if(!rows.length){
-
-    target.innerHTML =
-      "";
-
-    return;
-
-  }
-
-
-  let html =
-    "<table><thead><tr>";
-
-
-  rows[0].forEach(
-    value=>{
-      html +=
-        `<th>${escapeHTML(value)}</th>`;
-    }
-  );
-
-
-  html +=
-    "</tr></thead><tbody>";
-
-
-  rows
-    .slice(1,151)
-    .forEach(row=>{
-
-      html +=
-        "<tr>";
-
-      row.forEach(value=>{
-        html +=
-          `<td>${escapeHTML(value)}</td>`;
-      });
-
-      html +=
-        "</tr>";
-
-    });
-
-
-  html +=
-    "</tbody></table>";
-
-  target.innerHTML =
-    html;
-
-}
-
-
-/* =========================================================
-   ESCAPE
-========================================================= */
-
-function escapeHTML(value){
-
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-/* =========================================================
-   BORDER
-========================================================= */
-
-function borderCSS(style){
-
-  const colors = {
-    blue:"#2563eb",
-    red:"#dc2626",
-    green:"#16a34a",
-    navy:"#1e3a8a",
-    purple:"#7c3aed",
-    orange:"#f97316",
-    teal:"#0f766e",
-    gold:"#ca8a04",
-    silver:"#94a3b8",
-    black:"#111827"
-  };
-
-
-  if(!style || style==="none"){
-    return {
-      border:"none",
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  if(colors[style]){
-    return {
-      border:`2px solid ${colors[style]}`,
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  if(style==="thin"){
-    return {
-      border:"1px solid #222",
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  if(style==="medium"){
-    return {
-      border:"3px solid #222",
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  if(style==="thick"){
-    return {
-      border:"5px solid #222",
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  if(
-    style.includes("double")
-  ){
-
-    return {
-      border:"4px double #222",
-      radius:
-        style.includes("rounded")
-          ? "8px"
-          : "0",
-      shadow:"none"
-    };
-
-  }
-
-
-  if(style==="shadow"){
-    return {
-      border:"2px solid #222",
-      radius:"0",
-      shadow:"5px 5px 0 rgba(0,0,0,.25)"
-    };
-  }
-
-
-  if(style==="soft-shadow"){
-    return {
-      border:"1px solid #555",
-      radius:"0",
-      shadow:"0 4px 12px rgba(0,0,0,.22)"
-    };
-  }
-
-
-  if(style==="rounded"){
-    return {
-      border:"2px solid #222",
-      radius:"8px",
-      shadow:"none"
-    };
-  }
-
-
-  if(
-    style==="dashed" ||
-    style==="short-dash" ||
-    style==="long-dash"
-  ){
-    return {
-      border:"2px dashed #222",
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  if(
-    style==="dotted" ||
-    style==="short-dot"
-  ){
-    return {
-      border:"2px dotted #222",
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  if(style==="groove"){
-    return {
-      border:"5px groove #777",
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  if(style==="ridge"){
-    return {
-      border:"5px ridge #777",
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  if(style==="inset"){
-    return {
-      border:"5px inset #777",
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  if(style==="outset"){
-    return {
-      border:"5px outset #777",
-      radius:"0",
-      shadow:"none"
-    };
-  }
-
-
-  return {
-    border:"2px solid #222",
-    radius:"0",
-    shadow:"none"
-  };
-
-}
-
-
-function applyBorder(
-  el,
-  style
-){
-
-  if(!el)return;
-
-  const css =
-    borderCSS(style);
-
-  el.style.border =
-    css.border;
-
-  el.style.borderRadius =
-    css.radius;
-
-  el.style.boxShadow =
-    css.shadow;
-
-}
-
-
-/* =========================================================
-   COMBINE / FREEZE
-========================================================= */
-
-$("mergePOBox")
-?.addEventListener(
-  "change",
-  ()=>{
-
-    const merged =
-      $("mergePOBox").checked;
-
-
-    [
-      "poFontCard",
-      "boxFontCard",
-      "poBorderCard",
-      "boxBorderCard"
-    ]
-    .forEach(id=>{
-
-      const card =
-        $(id);
-
-      if(!card)return;
-
-      card.classList.toggle(
-        "freeze",
-        merged
-      );
-
-
-      card
-        .querySelectorAll(
-          "input,select"
-        )
-        .forEach(control=>{
-
-          control.disabled =
-            merged;
-
-        });
-
-    });
-
-
-    toast(
-      merged
-        ? "PO + Box Combined — controls frozen"
-        : "PO + Box controls unfrozen",
-      merged
-        ? "green"
-        : "red"
-    );
-
-
-    updatePreview();
-
-  }
-);
-
-
-/* =========================================================
-   FONT APPLICATION
-========================================================= */
-
-function applyFonts(){
-
-  const poFont =
-    $("poFont").value;
-
-  const poSize =
-    Number(
-      $("poFontSize").value
-    ) || 24;
-
-
-  const boxFont =
-    $("boxFont").value;
-
-  const boxSize =
-    Number(
-      $("boxFontSize").value
-    ) || 20;
-
-
-  $$(".po-preview")
-  .forEach(el=>{
-
-    el.style.fontFamily =
-      poFont;
-
-    el.style.fontSize =
-      `${poSize}px`;
-
-    el.style.fontWeight =
-      $("poBold").checked
-        ? "700"
-        : "400";
-
-    el.style.fontStyle =
-      $("poItalic").checked
-        ? "italic"
-        : "normal";
-
-    el.style.textDecoration =
-      $("poUnderline").checked
-        ? "underline"
-        : "none";
-
-  });
-
-
-  $$(".box-preview")
-  .forEach(el=>{
-
-    el.style.fontFamily =
-      boxFont;
-
-    el.style.fontSize =
-      `${boxSize}px`;
-
-    el.style.fontWeight =
-      $("boxBold").checked
-        ? "700"
-        : "400";
-
-    el.style.fontStyle =
-      $("boxItalic").checked
-        ? "italic"
-        : "normal";
-
-  });
-
-
-  $("otherPreview").style.fontFamily =
-    $("otherFont").value;
-
-  $("otherPreview").style.fontSize =
-    `${Number($("otherFontSize").value)||20}px`;
-
-  $("otherPreview").style.fontWeight =
-    $("otherBold").checked
-      ? "700"
-      : "400";
-
-
-  $("isbnPreview").style.fontFamily =
-    $("isbnFont").value;
-
-  $("isbnPreview").style.fontSize =
-    `${Number($("isbnFontSize").value)||14}px`;
-
-
-  $("addressPreview").style.fontFamily =
-    $("addressFont").value;
-
-  $("addressPreview").style.fontSize =
-    `${Number($("addressFontSize").value)||12}px`;
-
-}
-
-
-/* =========================================================
-   COCO VALUES
-========================================================= */
-
-function getCocoValues(){
-
-  if(cocoMode==="manual"){
-
-    const values =
-      getManualPOs();
-
-    return values.length
-      ? values
-      : ["ABC123"];
-
-  }
-
-
-  if(cocoMode==="multiple"){
-
-    const values =
-      getMultiplePOs();
-
-    return values.length
-      ? values
-      : ["ABC123"];
-
-  }
-
-
-  if(cocoMode==="excel"){
-
-    return excelPOs.length
-      ? excelPOs
-      : ["ABC123"];
-
-  }
-
-
-  return ["ABC123"];
-
-}
-
-
-/* =========================================================
-   PREVIEW
-========================================================= */
-
-function updatePreview(){
-
-  const paper =
-    $("paper");
-
-  const pageSize =
-    $("pageSize")?.value ||
-    "4x6";
-
-
-  const sizes = {
-    "4x6":[340,480],
-    "70x35":[330,165],
-    "a4":[340,480]
-  };
-
-
-  let [
-    width,
-    height
-  ] =
-    sizes[pageSize] ||
-    sizes["4x6"];
-
-
-  if(pageSize==="custom"){
-
-    const w =
-      Number(
-        $("customWidth").value
-      ) || 101.6;
-
-    const h =
-      Number(
-        $("customHeight").value
-      ) || 152.4;
-
-
-    const scale =
-      Math.min(
-        340/w,
-        480/h
-      );
-
-
-    width =
-      w * scale;
-
-    height =
-      h * scale;
-
-  }
-
-
-  if(
-    $("orientation")?.value ===
-    "landscape"
-  ){
-
-    [
-      width,
-      height
-    ] = [
-      height,
-      width
-    ];
-
-  }
-
-
-  paper.style.width =
-    `${Math.max(180,width)}px`;
-
-  paper.style.height =
-    `${Math.max(140,height)}px`;
-
-
-  const count =
-    Number(
-      $("labelsPerPage")?.value
-    ) || 1;
-
-
-  let cols = 1;
-
-
-  if(count===2)cols=2;
-  if(count===4)cols=2;
-  if(count===6)cols=2;
-  if(count===9)cols=3;
-  if(count===12)cols=3;
-
-
-  $("paperGrid").style.gridTemplateColumns =
-    `repeat(${cols},minmax(0,1fr))`;
-
-
-  $("paperGrid").innerHTML =
-    "";
-
-
-  for(let i=0;i<count;i++){
-
-    const label =
-      document.createElement("div");
-
-    label.className =
-      "label";
-
-
-    const po =
-      document.createElement("div");
-
-    po.className =
-      "po-preview";
-
-
-    const box =
-      document.createElement("div");
-
-    box.className =
-      "box-preview";
-
-
-    const combined =
-      document.createElement("div");
-
-    combined.className =
-      "combined-preview";
-
-
-    label.appendChild(po);
-    label.appendChild(box);
-    label.appendChild(combined);
-
-    $("paperGrid")
-      .appendChild(label);
-
-  }
-
-
-  const values =
-    getCocoValues();
-
-
-  const merged =
-    $("mergePOBox").checked;
-
-
-  $$(".label")
-  .forEach(
-    (label,index)=>{
-
-      const po =
-        values[
-          index % values.length
-        ];
-
-
-      const boxNo =
-        (
-          Number(
-            $("boxInput").value
-          ) || 1
-        ) + index;
-
-
-      const poEl =
-        label.querySelector(
-          ".po-preview"
-        );
-
-      const boxEl =
-        label.querySelector(
-          ".box-preview"
-        );
-
-      const combinedEl =
-        label.querySelector(
-          ".combined-preview"
-        );
-
-
-      poEl.textContent =
-        po;
-
-      boxEl.textContent =
-        `BOX NO. ${boxNo}`;
-
-
-      if(merged){
-
-        poEl.style.display =
-          "none";
-
-        boxEl.style.display =
-          "none";
-
-        combinedEl.style.display =
-          "block";
-
-        combinedEl.textContent =
-          getCombinedText(
-            po,
-            boxNo
-          );
-
-        applyBorder(
-          combinedEl,
-          $("combinedBorder").value
-        );
-
-        applyBorder(
-          label,
-          "none"
-        );
-
-      }
-      else{
-
-        combinedEl.style.display =
-          "none";
-
-        poEl.style.display =
-          $("showPO").checked
-            ? "block"
-            : "none";
-
-        boxEl.style.display =
-          $("showBox").checked
-            ? "block"
-            : "none";
-
-
-        applyBorder(
-          poEl,
-          $("poBorder").value
-        );
-
-        applyBorder(
-          boxEl,
-          $("boxBorder").value
-        );
-
-        applyBorder(
-          label,
-          "none"
-        );
-
-      }
-
-    }
-  );
-
-
-  /* OTHER */
-
-  if(activeSection==="other"){
-
-    $("otherPreview").style.display =
-      "flex";
-
-    $("paperGrid").style.display =
-      "none";
-
-    $("isbnPreview").style.display =
-      "none";
-
-    $("addressPreview").style.display =
-      "none";
-
-
-    let values = [];
-
-    if(otherMode==="manual"){
-
-      values =
-        $$(".otherManualPO")
-          .map(x=>x.value.trim())
-          .filter(Boolean);
-
-    }
-
-    if(otherMode==="multiple"){
-
-      values =
-        String(
-          $("otherMultiplePO").value
-        )
-        .split(",")
-        .map(x=>x.trim())
-        .filter(Boolean);
-
-    }
-
-    if(otherMode==="excel"){
-
-      values =
-        otherExcelPOs;
-
-    }
-
-
-    $("otherPreview").textContent =
-      values[0] ||
-      "ABC123";
-
-
-    applyBorder(
-      $("otherPreview"),
-      $("otherBorder").value
-    );
-
-  }
-  else{
-
-    $("otherPreview").style.display =
-      "none";
-
-  }
-
-
-  /* ISBN */
-
-  if(activeSection==="isbn"){
-
-    $("paperGrid").style.display =
-      "none";
-
-    $("isbnPreview").style.display =
-      "flex";
-
-    $("otherPreview").style.display =
-      "none";
-
-    $("addressPreview").style.display =
-      "none";
-
-
-    $("isbnTitlePreview").textContent =
-      $("bookTitle").value ||
-      "Book Title";
-
-
-    $("isbnNumberPreview").textContent =
-      $("isbn").value ||
-      "9781234567890";
-
-
-    applyBorder(
-      $("isbnPreview"),
-      $("isbnBorder").value
-    );
-
-
-    if(
-      typeof JsBarcode !==
-      "undefined"
-    ){
-
-      try{
-
-        JsBarcode(
-          "#isbnBarcode",
-          $("isbn").value ||
-          "9781234567890",
-          {
-            format:"auto",
-            width:1.4,
-            height:45,
-            displayValue:true,
-            margin:3,
-            fontSize:10
-          }
-        );
-
-      }
-      catch(error){
-
-        console.warn(
-          "Barcode error",
-          error
-        );
-
-      }
-
-    }
-
-  }
-
-
-  /* ADDRESS */
-
-  if(activeSection==="address"){
-
-    $("paperGrid").style.display =
-      "none";
-
-    $("otherPreview").style.display =
-      "none";
-
-    $("isbnPreview").style.display =
-      "none";
-
-    $("addressPreview").style.display =
-      "block";
-
-
-    $("fromPreview").textContent =
-      $("fromAddress").value ||
-      "FROM ADDRESS";
-
-
-    $("toPreview").textContent =
-      $("toAddress").value ||
-      "TO ADDRESS";
-
-
-    $("emailPreview").textContent =
-      $("email").value
-        ? `Email: ${$("email").value}`
-        : "";
-
-
-    applyBorder(
-      $("addressPreview"),
-      $("addressBorder").value
-    );
-
-  }
-
-
-  applyFonts();
-
-}
-
-
-/* =========================================================
-   COMBINED TEXT
-========================================================= */
-
-function getCombinedText(
-  po,
-  box
-){
-
-  const format =
-    $("combinedFormat").value;
-
-
-  const boxText =
-    `BOX NO. ${box}`;
-
-
-  if(format==="box-po"){
-    return `${boxText} — ${po}`;
-  }
-
-  if(format==="po-slash-box"){
-    return `${po} / ${boxText}`;
-  }
-
-  if(format==="po-newline-box"){
-    return `${po}\n${boxText}`;
-  }
-
-  return `${po} — ${boxText}`;
-
-}
-
-
-/* =========================================================
-   LIVE INPUT
-========================================================= */
-
-$$("input,select,textarea")
-.forEach(el=>{
-
-  el.addEventListener(
-    "input",
-    ()=>{
-      updatePreview();
-      scheduleHistory();
-    }
-  );
-
-  el.addEventListener(
-    "change",
-    ()=>{
-      updatePreview();
-      scheduleHistory();
-    }
-  );
-
-});
-
-
-/* =========================================================
-   CUSTOM SIZE
-========================================================= */
-
-$("pageSize")
-?.addEventListener(
-  "change",
-  ()=>{
-
-    const custom =
-      $("pageSize").value ===
-      "custom";
-
-
-    $("customSizeBox").style.display =
-      custom
-        ? "grid"
-        : "none";
-
-
-    if(custom){
-
-      toast(
-        "Custom page size enabled",
-        "green"
-      );
-
-    }
-    else{
-
-      toast(
-        "Custom page size disabled",
-        "red"
-      );
-
-    }
-
-    updatePreview();
-
-  }
-);
-
-
-/* =========================================================
-   HISTORY
-========================================================= */
-
-function snapshot(){
-
-  const data = {};
-
-  $$("input,select,textarea")
-  .forEach(el=>{
-
-    if(!el.id)return;
-
-    if(el.type==="file")return;
-
-    data[el.id] =
-      el.type==="checkbox"
-        ? el.checked
-        : el.value;
-
-  });
-
-  return JSON.stringify(data);
-
-}
-
-
-function saveHistory(){
-
-  const data =
-    snapshot();
-
-
-  if(
-    history[historyIndex] ===
-    data
-  )return;
-
-
-  history =
-    history.slice(
-      0,
-      historyIndex+1
-    );
-
-
-  history.push(data);
-
-
-  if(
-    history.length >
-    MAX_HISTORY
-  ){
-
-    history.shift();
-
-  }
-
-
-  historyIndex =
-    history.length-1;
-
-}
-
-
-let historyTimer;
-
-
-function scheduleHistory(){
-
-  clearTimeout(
-    historyTimer
-  );
-
-  historyTimer =
-    setTimeout(
-      saveHistory,
-      400
-    );
-
-}
-
-
-function restore(
-  data
-){
-
-  const obj =
-    JSON.parse(data);
-
-
-  Object.keys(obj)
-  .forEach(id=>{
-
-    const el =
-      $(id);
-
-    if(!el)return;
-
-
-    if(el.type==="checkbox"){
-
-      el.checked =
-        Boolean(obj[id]);
-
-    }
-    else{
-
-      el.value =
-        obj[id];
-
-    }
-
-  });
-
-
-  updatePreview();
-
-}
-
-
-$("undoBtn")
-?.addEventListener(
-  "click",
-  ()=>{
-
-    if(historyIndex<=0){
-
-      toast(
-        "Nothing to undo",
-        "orange"
-      );
-
-      return;
-
-    }
-
-    historyIndex--;
-
-    restore(
-      history[historyIndex]
-    );
-
-    toast(
-      "Undo applied",
-      "green"
-    );
-
-  }
-);
-
-
-$("redoBtn")
-?.addEventListener(
-  "click",
-  ()=>{
-
-    if(
-      historyIndex>=
-      history.length-1
-    ){
-
-      toast(
-        "Nothing to redo",
-        "orange"
-      );
-
-      return;
-
-    }
-
-    historyIndex++;
-
-    restore(
-      history[historyIndex]
-    );
-
-    toast(
-      "Redo applied",
-      "green"
-    );
-
-  }
-);
-
-
-/* =========================================================
-   DEFAULT
-========================================================= */
-
-$("defaultBtn")
-?.addEventListener(
-  "click",
-  ()=>{
-
-    location.reload();
-
-  }
-);
-
-
-/* =========================================================
-   QR
-========================================================= */
-
-$("addressQRBtn")
-?.addEventListener(
-  "click",
-  ()=>{
-
-    if(
-      typeof QRCode ===
-      "undefined"
-    ){
-
-      toast(
-        "QR library is not loaded",
-        "red"
-      );
-
-      return;
-
-    }
-
-
-    const value =
-      [
-        $("fromAddress").value,
-        $("toAddress").value
-      ]
-      .filter(Boolean)
-      .join("\n");
-
-
-    $("addressQR").innerHTML =
-      "";
-
-
-    QRCode.toCanvas(
-      value ||
-      "Address",
-      {
-        width:100,
-        margin:2
-      },
-      (error,canvas)=>{
-
-        if(error){
-
-          toast(
-            "QR generation failed",
-            "red"
-          );
-
-          return;
-
-        }
-
-        $("addressQR")
-          .appendChild(canvas);
-
-        toast(
-          "Address QR generated",
-          "green"
-        );
-
-      }
-    );
-
-  }
-);
-
-
-$("emailQRBtn")
-?.addEventListener(
-  "click",
-  ()=>{
-
-    if(
-      typeof QRCode ===
-      "undefined"
-    ){
-
-      toast(
-        "QR library is not loaded",
-        "red"
-      );
-
-      return;
-
-    }
-
-
-    const email =
-      $("email").value.trim();
-
-
-    if(!email){
-
-      toast(
-        "Enter email first",
-        "red"
-      );
-
-      return;
-
-    }
-
-
-    $("emailQR").innerHTML =
-      "";
-
-
-    QRCode.toCanvas(
-      `mailto:${email}`,
-      {
-        width:100,
-        margin:2
-      },
-      (error,canvas)=>{
-
-        if(error){
-
-          toast(
-            "QR generation failed",
-            "red"
-          );
-
-          return;
-
-        }
-
-        $("emailQR")
-          .appendChild(canvas);
-
-        toast(
-          "Email QR generated",
-          "green"
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* =========================================================
-   PDF
-========================================================= */
-
-function getPDFEntries(){
-
-  if(activeSection==="coco"){
-
-    return getCocoValues();
-
-  }
-
-
-  if(activeSection==="other"){
-
-    if(otherMode==="manual"){
-
-      return $$(".otherManualPO")
-        .map(x=>x.value.trim())
-        .filter(Boolean);
-
-    }
-
-    if(otherMode==="multiple"){
-
-      return String(
-        $("otherMultiplePO").value
-      )
-      .split(",")
-      .map(x=>x.trim())
-      .filter(Boolean);
-
-    }
-
-    return otherExcelPOs;
-
-  }
-
-
-  if(activeSection==="isbn"){
-
-    return [
-      $("isbn").value ||
-      "9781234567890"
-    ];
-
-  }
-
-
-  if(activeSection==="address"){
-
-    return [
-      $("toAddress").value ||
-      "TO ADDRESS"
-    ];
-
-  }
-
-
-  return ["ABC123"];
-
-}
-
-
-function getPDFSize(){
-
-  if(activeSection==="other"){
-    return getSizeFrom(
-      $("otherPageSize")?.value
-    );
-  }
-
-  return getSizeFrom(
-    $("pageSize")?.value
-  );
-
-}
-
-
-function getSizeFrom(
-  value
-){
-
-  if(value==="70x35"){
-    return [70,35];
-  }
-
-  if(value==="a4"){
-    return [210,297];
-  }
-
-  if(value==="custom"){
-
-    return [
-      Number(
-        $("customWidth").value
-      ) || 101.6,
-
-      Number(
-        $("customHeight").value
-      ) || 152.4
-    ];
-
-  }
-
-  return [
-    101.6,
-    152.4
-  ];
-
-}
-
-
-function drawPDFBorder(
-  doc,
-  x,
-  y,
-  w,
-  h,
-  style
-){
-
-  if(!style || style==="none")
-    return;
-
-
-  let width = .5;
-
-  if(style==="medium")
-    width=.8;
-
-  if(style==="thick")
-    width=1.2;
-
-
-  doc.setLineWidth(width);
-
-
-  if(
-    style==="dashed" ||
-    style==="short-dash" ||
-    style==="long-dash"
-  ){
-
-    doc.setLineDashPattern(
-      [3,2],
-      0
-    );
-
-  }
-  else if(
-    style==="dotted"
-  ){
-
-    doc.setLineDashPattern(
-      [1,2],
-      0
-    );
-
-  }
-  else{
-
-    doc.setLineDashPattern(
-      [],
-      0
-    );
-
-  }
-
-
-  const colors = {
-    blue:[37,99,235],
-    red:[220,38,38],
-    green:[22,163,74],
-    navy:[30,58,138],
-    purple:[124,58,237],
-    orange:[249,115,22],
-    teal:[15,118,110],
-    gold:[202,138,4],
-    silver:[148,163,184],
-    black:[17,24,39]
-  };
-
-
-  const c =
-    colors[style] ||
-    [20,20,20];
-
-
-  doc.setDrawColor(
-    c[0],
-    c[1],
-    c[2]
-  );
-
-
-  doc.rect(
-    x,y,w,h
-  );
-
-
-  if(
-    style.includes("double") ||
-    style==="triple"
-  ){
-
-    const inset=2;
-
-    doc.rect(
-      x+inset,
-      y+inset,
-      w-inset*2,
-      h-inset*2
-    );
-
-  }
-
-
-  doc.setLineDashPattern(
-    [],
-    0
-  );
-
-}
-
-
-function drawPDF(
-  doc,
-  entries,
-  width,
-  height
-){
-
-  const count =
-    Number(
-      $("labelsPerPage").value
-    ) || 1;
-
-
-  let cols=1;
-
-  if(count===2)cols=2;
-  if(count===4)cols=2;
-  if(count===6)cols=2;
-  if(count===9)cols=3;
-  if(count===12)cols=3;
-
-
-  const rows =
-    Math.ceil(
-      count/cols
-    );
-
-
-  const margin=6;
-
-  const gap=4;
-
-
-  const cellW =
-    (
-      width -
-      margin*2 -
-      gap*(cols-1)
-    ) / cols;
-
-
-  const cellH =
-    (
-      height -
-      margin*2 -
-      gap*(rows-1)
-    ) / rows;
-
-
-  const pages =
-    Math.ceil(
-      entries.length/count
-    );
-
-
-  for(
-    let page=0;
-    page<pages;
-    page++
-  ){
-
-    if(page>0){
-
-      doc.addPage(
-        [width,height]
-      );
-
-    }
-
-
-    for(
-      let slot=0;
-      slot<count;
-      slot++
-    ){
-
-      const index =
-        page*count+slot;
-
-
-      if(
-        index>=entries.length
-      )break;
-
-
-      const row =
-        Math.floor(
-          slot/cols
-        );
-
-      const col =
-        slot%cols;
-
-
-      const x =
-        margin+
-        col*(cellW+gap);
-
-      const y =
-        margin+
-        row*(cellH+gap);
-
-
-      const value =
-        entries[index];
-
-
-      if(
-        activeSection==="coco"
-      ){
-
-        drawPDFBorder(
-          doc,
-          x,y,
-          cellW,
-          cellH,
-          $("mergePOBox").checked
-            ? $("combinedBorder").value
-            : "none"
-        );
-
-
-        doc.setFont(
-          "helvetica",
-          $("poBold").checked
-            ? "bold"
-            : "normal"
-        );
-
-
-        doc.setFontSize(
-          Number(
-            $("poFontSize").value
-          ) || 24
-        );
-
-
-        if(
-          $("mergePOBox").checked
-        ){
-
-          doc.text(
-            getCombinedText(
-              value,
-              (
-                Number(
-                  $("boxInput").value
-                ) || 1
-              ) + index
-            ),
-            x+cellW/2,
-            y+cellH/2,
-            {
-              align:"center"
-            }
-          );
-
-        }
-        else{
-
-          if(
-            $("showPO").checked
-          ){
-
-            drawPDFBorder(
-              doc,
-              x+2,
-              y+2,
-              cellW-4,
-              cellH/2-4,
-              $("poBorder").value
-            );
-
-
-            doc.text(
-              value,
-              x+cellW/2,
-              y+cellH*.35,
-              {
-                align:"center"
-              }
-            );
-
-          }
-
-
-          if(
-            $("showBox").checked
-          ){
-
-            drawPDFBorder(
-              doc,
-              x+2,
-              y+cellH/2+2,
-              cellW-4,
-              cellH/2-4,
-              $("boxBorder").value
-            );
-
-
-            doc.setFontSize(
-              Number(
-                $("boxFontSize").value
-              ) || 20
-            );
-
-
-            doc.text(
-              `BOX NO. ${
-                (
-                  Number(
-                    $("boxInput").value
-                  ) || 1
-                ) + index
-              }`,
-              x+cellW/2,
-              y+cellH*.7,
-              {
-                align:"center"
-              }
-            );
-
-          }
-
-        }
-
-      }
-
-
-      else if(
-        activeSection==="other"
-      ){
-
-        drawPDFBorder(
-          doc,
-          x,y,
-          cellW,
-          cellH,
-          $("otherBorder").value
-        );
-
-
-        doc.setFont(
-          "helvetica",
-          $("otherBold").checked
-            ? "bold"
-            : "normal"
-        );
-
-
-        doc.setFontSize(
-          Number(
-            $("otherFontSize").value
-          ) || 20
-        );
-
-
-        doc.text(
-          String(value),
-          x+cellW/2,
-          y+cellH/2,
-          {
-            align:"center"
-          }
-        );
-
-      }
-
-
-      else if(
-        activeSection==="isbn"
-      ){
-
-        drawPDFBorder(
-          doc,
-          x,y,
-          cellW,
-          cellH,
-          $("isbnBorder").value
-        );
-
-
-        doc.setFont(
-          "helvetica",
-          "bold"
-        );
-
-        doc.setFontSize(11);
-
-        doc.text(
-          $("bookTitle").value ||
-          "Book Title",
-          x+cellW/2,
-          y+15,
-          {
-            align:"center"
-          }
-        );
-
-
-        doc.setFont(
-          "helvetica",
-          "normal"
-        );
-
-        doc.setFontSize(9);
-
-        doc.text(
-          String(value),
-          x+cellW/2,
-          y+cellH-10,
-          {
-            align:"center"
-          }
-        );
-
-      }
-
-
-      else if(
-        activeSection==="address"
-      ){
-
-        drawPDFBorder(
-          doc,
-          x,y,
-          cellW,
-          cellH,
-          $("addressBorder").value
-        );
-
-
-        doc.setFont(
-          "helvetica",
-          "normal"
-        );
-
-        doc.setFontSize(
-          Number(
-            $("addressFontSize").value
-          ) || 12
-        );
-
-
-        const lines =
-          doc.splitTextToSize(
-            String(value),
-            cellW-10
-          );
-
-
-        doc.text(
-          lines,
-          x+5,
-          y+15
-        );
-
-
-        if(
-          $("email").value
-        ){
-
-          doc.setFontSize(8);
-
-          doc.text(
-            `Email: ${$("email").value}`,
-            x+5,
-            y+cellH-6,
-            {
-              maxWidth:
-                cellW-10
-            }
-          );
-
-        }
-
-      }
-
-    }
-
-  }
-
-}
-
-
-async function generatePDF(){
-
-  if(
-    !window.jspdf ||
-    typeof window.jspdf.jsPDF !==
-    "function"
-  ){
-
-    toast(
-      "PDF library is not loaded. Check internet connection.",
-      "red"
-    );
-
-    return;
-
-  }
-
-
-  try{
-
-    const {
-      jsPDF
-    } =
-      window.jspdf;
-
-
-    let [
-      width,
-      height
-    ] =
-      getPDFSize();
-
-
-    if(
-      activeSection==="other" &&
-      $("otherPageSize").value!=="custom"
-    ){
-
-      [
-        width,
-        height
-      ] =
-        getSizeFrom(
-          $("otherPageSize").value
-        );
-
-    }
-
-
-    const orientation =
-      $("orientation")?.value ||
-      "portrait";
-
-
-    if(
-      orientation==="landscape"
-    ){
-
-      [
-        width,
-        height
-      ]=[
-        height,
-        width
-      ];
-
-    }
-
-
-    const doc =
-      new jsPDF({
-        orientation,
-        unit:"mm",
-        format:[width,height]
-      });
-
-
-    const entries =
-      getPDFEntries();
-
-
-    if(!entries.length){
-
-      toast(
-        "No data available for PDF",
-        "red"
-      );
-
-      return;
-
-    }
-
-
-    drawPDF(
-      doc,
-      entries,
-      width,
-      height
-    );
-
-
-    doc.save(
-      `Ashish-Verma-${activeSection}-${Date.now()}.pdf`
-    );
-
-
-    toast(
-      `PDF generated successfully — ${entries.length} item(s)`,
-      "green"
-    );
-
-  }
-  catch(error){
-
-    console.error(
-      "PDF ERROR:",
-      error
-    );
-
-    toast(
-      `PDF Error: ${error.message}`,
-      "red"
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   PDF BUTTONS
-========================================================= */
-
-[
-  "generatePDF",
-  "generateOtherPDF",
-  "generateISBNPDF",
-  "generateAddressPDF"
-]
-.forEach(id=>{
-
-  $(id)
-  ?.addEventListener(
-    "click",
-    generatePDF
-  );
-
-});
-
-
-/* =========================================================
-   KEYBOARD
-========================================================= */
-
-document.addEventListener(
-  "keydown",
-  event=>{
-
-    if(
-      event.ctrlKey &&
-      event.key.toLowerCase()==="z"
-    ){
-
-      event.preventDefault();
-
-      $("undoBtn").click();
-
-    }
-
-
-    if(
-      event.ctrlKey &&
-      event.key.toLowerCase()==="y"
-    ){
-
-      event.preventDefault();
-
-      $("redoBtn").click();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-saveHistory();
-
-updatePreview();
-
-console.log(
-  "Ashish Verma Label Studio loaded successfully."
-);
-
-</script>
 
 </body>
 </html>
