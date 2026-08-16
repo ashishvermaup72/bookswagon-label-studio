@@ -1,4132 +1,1870 @@
 /* =========================================================
-   BOOKS LABEL STUDIO
-   FINAL APP.JS
-   Matches the supplied final HTML + CSS
+   BooksWagon Label Studio
+   JavaScript
 ========================================================= */
 
 "use strict";
 
-
 /* =========================================================
-   GLOBAL STATE
+   DATA
 ========================================================= */
 
-const state = {
-    currentFeature: "coco-blue",
-    cocoMode: "manual",
-    otherMode: "manual",
+const FONT_LIST = [
+  "Arial",
+  "Helvetica",
+  "Times New Roman",
+  "Georgia",
+  "Verdana",
+  "Tahoma",
+  "Trebuchet MS",
+  "Courier New",
+  "Lucida Console",
+  "Lucida Sans",
+  "Palatino Linotype",
+  "Book Antiqua",
+  "Garamond",
+  "Cambria",
+  "Calibri",
+  "Candara",
+  "Consolas",
+  "Constantia",
+  "Corbel",
+  "Segoe UI",
+  "Segoe UI Light",
+  "Segoe UI Semibold",
+  "Century Gothic",
+  "Franklin Gothic Medium",
+  "Gill Sans",
+  "Impact",
+  "Rockwell",
+  "Baskerville",
+  "Didot",
+  "Copperplate",
+  "Futura",
+  "Optima",
+  "Avenir",
+  "Monaco",
+  "Menlo",
+  "Courier",
+  "System UI",
+  "Sans Serif",
+  "Serif",
+  "Monospace"
+];
 
-    cocoExcelData: [],
-    otherExcelData: [],
-
-    toastTimer: null
-};
-
+const BORDER_LIST = [
+  ["none", "No Border"],
+  ["solid", "Solid"],
+  ["dashed", "Dashed"],
+  ["dotted", "Dotted"],
+  ["double", "Double"],
+  ["groove", "Groove"],
+  ["ridge", "Ridge"],
+  ["inset", "Inset"],
+  ["outset", "Outset"],
+  ["thin", "Thin Solid"],
+  ["medium", "Medium Solid"],
+  ["thick", "Thick Solid"],
+  ["thin-double", "Thin Double"],
+  ["thick-double", "Thick Double"],
+  ["short-dash", "Short Dash"],
+  ["long-dash", "Long Dash"],
+  ["dash-dot", "Dash Dot"],
+  ["dash-dot-dot", "Dash Dot Dot"],
+  ["triple", "Triple"],
+  ["quadruple", "Quadruple"],
+  ["soft", "Soft"],
+  ["bold", "Bold"],
+  ["extra", "Extra Bold"],
+  ["minimal", "Minimal"],
+  ["classic", "Classic"],
+  ["modern", "Modern"],
+  ["decorative", "Decorative"],
+  ["shadow", "Shadow"],
+  ["rounded", "Rounded"],
+  ["square", "Square"],
+  ["double-soft", "Double Soft"],
+  ["double-bold", "Double Bold"],
+  ["groove-thin", "Thin Groove"],
+  ["ridge-thin", "Thin Ridge"],
+  ["classic-double", "Classic Double"]
+];
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
-const $ = (id) => document.getElementById(id);
+const $ = (selector, parent = document) =>
+  parent.querySelector(selector);
 
-const $$ = (selector) =>
-    Array.from(document.querySelectorAll(selector));
+const $$ = (selector, parent = document) =>
+  [...parent.querySelectorAll(selector)];
 
+function showToast(type, title, message) {
+  const toast = $("#toast");
+  const icon = $("#toastIcon");
+  const toastTitle = $("#toastTitle");
+  const toastText = $("#toastText");
 
-function exists(id) {
-    return !!$(id);
+  if (!toast) return;
+
+  clearTimeout(window.__toastTimer);
+
+  toast.className = `toast ${type}`;
+
+  if (icon) {
+    icon.textContent = type === "green" ? "✓" : "!";
+  }
+
+  if (toastTitle) {
+    toastTitle.textContent = title;
+  }
+
+  if (toastText) {
+    toastText.textContent = message;
+  }
+
+  void toast.offsetWidth;
+
+  toast.classList.add("show");
+
+  window.__toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
 }
 
-
-function value(id, fallback = "") {
-    return exists(id) ? $(id).value : fallback;
+function getChecked(name, fallback = null) {
+  return $(`input[name="${name}"]:checked`)?.value ?? fallback;
 }
 
-
-function checked(id) {
-    return exists(id) ? $(id).checked : false;
+function safeNumber(value, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
 }
-
-
-function numberValue(id, fallback = 0) {
-    const n = Number(value(id, fallback));
-    return Number.isFinite(n) ? n : fallback;
-}
-
-
-function escapeHTML(text) {
-    return String(text ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
-
 
 /* =========================================================
-   TOAST
+   FONT DROPDOWNS
 ========================================================= */
 
-function showToast(message, type = "success", title = "Feature Updated") {
+function populateFontDropdowns() {
+  const selectors = [
+    "#poFont",
+    "#boxFont",
+    ".fontSelect"
+  ];
 
-    const toast = $("toast");
+  selectors.forEach(selector => {
+    $$(selector).forEach(select => {
+      if (select.options.length > 0) return;
 
-    if (!toast) return;
+      FONT_LIST.forEach(font => {
+        const option = document.createElement("option");
 
-    const icon = $("toastIcon");
-    const toastTitle = $("toastTitle");
-    const toastMessage = $("toastMessage");
+        option.value = font;
+        option.textContent = font;
 
-    clearTimeout(state.toastTimer);
-
-    toast.classList.remove(
-        "success",
-        "error",
-        "warning",
-        "show"
-    );
-
-    toast.classList.add(type);
-
-    if (icon) {
-        icon.textContent =
-            type === "success" ? "✓" :
-            type === "error" ? "!" : "•";
-    }
-
-    if (toastTitle) {
-        toastTitle.textContent = title;
-    }
-
-    if (toastMessage) {
-        toastMessage.textContent = message;
-    }
-
-    requestAnimationFrame(() => {
-        toast.classList.add("show");
+        select.appendChild(option);
+      });
     });
-
-    state.toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-    }, 2800);
+  });
 }
-
-
-function featureEnabled(name) {
-    showToast(
-        `This feature has been enabled.`,
-        "success",
-        name
-    );
-}
-
-
-function featureDisabled(name) {
-    showToast(
-        `This feature has been disabled.`,
-        "error",
-        name
-    );
-}
-
 
 /* =========================================================
-   MAIN FEATURE WORKSPACES
+   BORDER DROPDOWNS
 ========================================================= */
 
-const workspaceMap = {
-    "coco-blue": "cocoBlueWorkspace",
-    "isbn": "isbnWorkspace",
-    "other-po": "otherPOWorkspace",
-    "address": "addressWorkspace"
-};
+function populateBorderDropdowns() {
+  const selectors = [
+    "#pageBorderStyle",
+    "#poBorderStyle",
+    "#boxBorderStyle",
+    "#allBorderStyle",
+    ".borderSelect"
+  ];
 
+  selectors.forEach(selector => {
+    $$(selector).forEach(select => {
+      if (select.options.length > 0) return;
 
-function openFeature(feature) {
+      BORDER_LIST.forEach(([value, label]) => {
+        const option = document.createElement("option");
 
-    state.currentFeature = feature;
+        option.value = value;
+        option.textContent = label;
 
-    $$(".feature-card").forEach(card => {
-        card.classList.toggle(
-            "active",
-            card.dataset.feature === feature
-        );
+        select.appendChild(option);
+      });
     });
-
-    Object.entries(workspaceMap).forEach(
-        ([key, workspaceId]) => {
-
-            const workspace = $(workspaceId);
-
-            if (!workspace) return;
-
-            workspace.classList.toggle(
-                "active-workspace",
-                key === feature
-            );
-        }
-    );
-
-    updateLivePreview();
+  });
 }
-
-
-function closeAllWorkspaces() {
-
-    $$(".workspace").forEach(workspace => {
-        workspace.classList.remove(
-            "active-workspace"
-        );
-    });
-
-    $$(".feature-card").forEach(card => {
-        card.classList.remove("active");
-    });
-}
-
-
-function initFeatureCards() {
-
-    $$(".feature-card").forEach(card => {
-
-        card.addEventListener("click", () => {
-
-            openFeature(
-                card.dataset.feature
-            );
-
-        });
-
-    });
-
-
-    const closeMap = {
-        closeCocoWorkspace: "coco-blue",
-        closeISBNWorkspace: "isbn",
-        closeOtherPOWorkspace: "other-po",
-        closeAddressWorkspace: "address"
-    };
-
-
-    Object.entries(closeMap).forEach(
-        ([buttonId, feature]) => {
-
-            const button = $(buttonId);
-
-            if (!button) return;
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    /*
-                     * Closing the current workspace
-                     * returns to the simple feature cards.
-                     */
-
-                    closeAllWorkspaces();
-
-                }
-            );
-
-        }
-    );
-
-}
-
 
 /* =========================================================
-   POPUPS
+   MODULE SWITCHING
+   FOUR MODULES STAY COMPLETELY INDEPENDENT
 ========================================================= */
 
-function openPopup(id) {
+function initModules() {
+  $$(".module-btn").forEach(button => {
+    button.addEventListener("click", () => {
 
-    const popup = $(id);
+      const targetId = button.dataset.panel;
+      const target = document.getElementById(targetId);
 
-    if (!popup) return;
+      if (!target) return;
 
-    popup.classList.add("open");
+      $$(".module-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
 
-    popup.setAttribute(
-        "aria-hidden",
-        "false"
-    );
+      $$(".panel").forEach(panel => {
+        panel.classList.remove("active");
+      });
 
-    document.body.style.overflow = "hidden";
-}
+      button.classList.add("active");
+      target.classList.add("active");
 
+      showToast(
+        "green",
+        "Tool Enabled",
+        `${button.querySelector("strong")?.textContent || "Tool"} has been enabled.`
+      );
 
-function closePopup(popup) {
-
-    if (!popup) return;
-
-    popup.classList.remove("open");
-
-    popup.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-    if (!$(".popup-overlay.open")) {
-        document.body.style.overflow = "";
-    }
-}
-
-
-function closeAllPopups() {
-
-    $$(".popup-overlay").forEach(
-        popup => closePopup(popup)
-    );
-
-}
-
-
-function initPopups() {
-
-    $$("[data-popup]").forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                openPopup(
-                    button.dataset.popup
-                );
-
-            }
-        );
-
+      refreshActivePreview();
     });
+  });
 
+  $$(".close").forEach(button => {
+    button.addEventListener("click", () => {
 
-    $$("[data-close-popup]").forEach(button => {
+      $$(".panel").forEach(panel => {
+        panel.classList.remove("active");
+      });
 
-        button.addEventListener(
-            "click",
-            () => {
+      $$(".module-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
 
-                closePopup(
-                    button.closest(
-                        ".popup-overlay"
-                    )
-                );
-
-            }
-        );
-
+      showToast(
+        "red",
+        "Tool Disabled",
+        "The active tool has been disabled."
+      );
     });
-
-
-    $$(".popup-overlay").forEach(popup => {
-
-        popup.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target === popup
-                ) {
-
-                    closePopup(popup);
-
-                }
-
-            }
-        );
-
-    });
-
-
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (event.key === "Escape") {
-                closeAllPopups();
-            }
-
-        }
-    );
-
-
-    const toastClose = $("toastClose");
-
-    if (toastClose) {
-
-        toastClose.addEventListener(
-            "click",
-            () => {
-
-                $("toast")?.classList.remove(
-                    "show"
-                );
-
-            }
-        );
-
-    }
-
+  });
 }
-
 
 /* =========================================================
-   COCO MODES
+   COCOBLUE TABS
 ========================================================= */
 
-function switchCocoMode(mode) {
+function initCocoTabs() {
+  $$("#cocoPanel .tab").forEach(tab => {
 
-    state.cocoMode = mode;
+    tab.addEventListener("click", () => {
 
-    $$("[data-coco-mode]").forEach(button => {
+      const targetId = tab.dataset.tab;
 
-        button.classList.toggle(
-            "active",
-            button.dataset.cocoMode === mode
-        );
+      $$("#cocoPanel .tab").forEach(t => {
+        t.classList.remove("active");
+      });
 
+      $$("#cocoPanel .cocoTab").forEach(panel => {
+        panel.style.display =
+          panel.id === targetId ? "block" : "none";
+      });
+
+      tab.classList.add("active");
+
+      showToast(
+        "green",
+        "Input Mode Enabled",
+        `${tab.textContent.trim()} has been enabled.`
+      );
     });
 
-
-    const panels = {
-        manual: "cocoManualPanel",
-        bulk: "cocoBulkPanel",
-        excel: "cocoExcelPanel"
-    };
-
-
-    Object.entries(panels).forEach(
-        ([key, id]) => {
-
-            const panel = $(id);
-
-            if (!panel) return;
-
-            panel.classList.toggle(
-                "active-panel",
-                key === mode
-            );
-
-        }
-    );
-
-
-    updateLivePreview();
-
+  });
 }
-
-
-function initCocoModes() {
-
-    $$("[data-coco-mode]").forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                switchCocoMode(
-                    button.dataset.cocoMode
-                );
-
-            }
-        );
-
-    });
-
-}
-
 
 /* =========================================================
-   OTHER PO MODES
+   MANUAL PO — 20 FIELDS
 ========================================================= */
 
-function switchOtherMode(mode) {
+function createManualPOFields() {
+  const container = $("#manualList");
 
-    state.otherMode = mode;
+  if (!container || container.children.length > 0) {
+    return;
+  }
 
-    $$("[data-other-mode]").forEach(button => {
+  for (let i = 1; i <= 20; i++) {
 
-        button.classList.toggle(
-            "active",
-            button.dataset.otherMode === mode
-        );
+    const item = document.createElement("div");
 
-    });
+    item.className = "manual-item";
 
+    item.innerHTML = `
+      <small>PO ${i}</small>
+      <input
+        class="manualPO"
+        type="text"
+        placeholder="PO Number"
+      >
+    `;
 
-    const panels = {
-        manual: "otherManualPanel",
-        bulk: "otherBulkPanel",
-        excel: "otherExcelPanel"
-    };
+    container.appendChild(item);
+  }
 
-
-    Object.entries(panels).forEach(
-        ([key, id]) => {
-
-            const panel = $(id);
-
-            if (!panel) return;
-
-            panel.classList.toggle(
-                "active-panel",
-                key === mode
-            );
-
-        }
-    );
-
-
-    updateLivePreview();
-
+  $$(".manualPO").forEach(input => {
+    input.addEventListener("input", refreshActivePreview);
+  });
 }
-
-
-function initOtherModes() {
-
-    $$("[data-other-mode]").forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                switchOtherMode(
-                    button.dataset.otherMode
-                );
-
-            }
-        );
-
-    });
-
-}
-
 
 /* =========================================================
-   MANUAL PO INPUTS
+   BULK PO
+   UNLIMITED INPUT
 ========================================================= */
 
-function createManualInputs(
-    containerId,
-    prefix,
-    count = 20
-) {
+function initBulkInput() {
+  const input = $("#bulkInput");
+  const counter = $("#bulkCount");
 
-    const container = $(containerId);
+  if (!input) return;
 
-    if (!container) return;
+  function updateBulkCount() {
 
-    container.innerHTML = "";
+    const values = input.value
+      .split(/[,\n\r]+/)
+      .map(value => value.trim())
+      .filter(Boolean);
 
-    for (let i = 1; i <= count; i++) {
-
-        const wrapper =
-            document.createElement("div");
-
-        wrapper.className =
-            "po-input-wrapper";
-
-        const label =
-            document.createElement("label");
-
-        label.textContent =
-            `PO ${i}`;
-
-        const input =
-            document.createElement("input");
-
-        input.type = "text";
-
-        input.id =
-            `${prefix}${i}`;
-
-        input.placeholder =
-            `PO ${i}`;
-
-        input.autocomplete =
-            "off";
-
-        input.addEventListener(
-            "input",
-            () => {
-
-                updateManualCount();
-
-                updateLivePreview();
-
-            }
-        );
-
-        wrapper.appendChild(label);
-        wrapper.appendChild(input);
-
-        container.appendChild(wrapper);
+    if (counter) {
+      counter.textContent =
+        `${values.length} PO numbers`;
     }
+  }
 
+  input.addEventListener("input", updateBulkCount);
+
+  updateBulkCount();
 }
-
-
-function getManualPOs(prefix) {
-
-    const result = [];
-
-    for (let i = 1; i <= 20; i++) {
-
-        const input =
-            $(`${prefix}${i}`);
-
-        if (!input) continue;
-
-        const po =
-            input.value.trim();
-
-        if (po) {
-            result.push(po);
-        }
-
-    }
-
-    return result;
-}
-
-
-function updateManualCount() {
-
-    const count =
-        getManualPOs("cocoPO").length;
-
-    if ($("manualPOCount")) {
-        $("manualPOCount").textContent =
-            count;
-    }
-
-}
-
-
-/* =========================================================
-   BULK PARSER
-========================================================= */
-
-function parseBulk(text) {
-
-    if (!text) return [];
-
-    /*
-     * Unlimited input.
-     *
-     * Supports:
-     * comma
-     * newline
-     * semicolon
-     */
-
-    return String(text)
-        .split(/[,;\n\r]+/)
-        .map(item => item.trim())
-        .filter(Boolean);
-
-}
-
-
-/* =========================================================
-   COCO DATA
-========================================================= */
-
-function getCocoPOs() {
-
-    if (state.cocoMode === "manual") {
-
-        return getManualPOs("cocoPO");
-
-    }
-
-
-    if (state.cocoMode === "bulk") {
-
-        return parseBulk(
-            value("cocoBulkInput")
-        );
-
-    }
-
-
-    if (state.cocoMode === "excel") {
-
-        return state.cocoExcelData
-            .map(row => {
-
-                if (Array.isArray(row)) {
-                    return row[0];
-                }
-
-                return row;
-
-            })
-            .map(item =>
-                String(item ?? "").trim()
-            )
-            .filter(Boolean);
-
-    }
-
-
-    return [];
-
-}
-
-
-/* =========================================================
-   OTHER PO DATA
-========================================================= */
-
-function getOtherPOs() {
-
-    if (state.otherMode === "manual") {
-
-        return getManualPOs("otherPO");
-
-    }
-
-
-    if (state.otherMode === "bulk") {
-
-        return parseBulk(
-            value("otherBulkInput")
-        );
-
-    }
-
-
-    if (state.otherMode === "excel") {
-
-        return state.otherExcelData
-            .map(row => {
-
-                if (Array.isArray(row)) {
-                    return row[0];
-                }
-
-                return row;
-
-            })
-            .map(item =>
-                String(item ?? "").trim()
-            )
-            .filter(Boolean);
-
-    }
-
-
-    return [];
-
-}
-
 
 /* =========================================================
    EXCEL
 ========================================================= */
 
-function loadExcelFile(
-    file,
-    callback,
-    fileNameElement,
-    previewElement
-) {
-
-    if (!file) return;
-
-    if (typeof XLSX === "undefined") {
-
-        showToast(
-            "Excel library is not loaded.",
-            "error",
-            "Excel Upload"
-        );
-
-        return;
-    }
-
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload = event => {
-
-        try {
-
-            const data =
-                new Uint8Array(
-                    event.target.result
-                );
-
-
-            const workbook =
-                XLSX.read(
-                    data,
-                    {
-                        type: "array"
-                    }
-                );
-
-
-            const sheet =
-                workbook.Sheets[
-                    workbook.SheetNames[0]
-                ];
-
-
-            /*
-             * header: 1 keeps rows as arrays.
-             */
-
-            const allRows =
-                XLSX.utils.sheet_to_json(
-                    sheet,
-                    {
-                        header: 1,
-                        defval: ""
-                    }
-                );
-
-
-            if (!allRows.length) {
-
-                callback([]);
-
-                showToast(
-                    "The Excel file is empty.",
-                    "error",
-                    "Excel Upload"
-                );
-
-                return;
-
-            }
-
-
-            /*
-             * IMPORTANT:
-             * First row is always ignored.
-             */
-
-            const header =
-                allRows[0];
-
-            const dataRows =
-                allRows.slice(1);
-
-
-            callback(
-                dataRows,
-                header
-            );
-
-
-            if (fileNameElement) {
-
-                fileNameElement.textContent =
-                    file.name;
-
-            }
-
-
-            if (previewElement) {
-
-                renderExcelPreview(
-                    previewElement,
-                    header,
-                    dataRows
-                );
-
-            }
-
-
-            showToast(
-                `Excel loaded. Header row ignored. ${dataRows.length} data rows found.`,
-                "success",
-                "Excel Upload"
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Excel error:",
-                error
-            );
-
-            showToast(
-                "Could not read the Excel file.",
-                "error",
-                "Excel Upload"
-            );
-
-        }
-
-    };
-
-
-    reader.onerror = () => {
-
-        showToast(
-            "Could not open the Excel file.",
-            "error",
-            "Excel Upload"
-        );
-
-    };
-
-
-    reader.readAsArrayBuffer(file);
-
-}
-
-
-function renderExcelPreview(
-    container,
-    header,
-    rows
-) {
-
-    container.innerHTML = "";
-
-    const table =
-        document.createElement("table");
-
-    const thead =
-        document.createElement("thead");
-
-    const headerRow =
-        document.createElement("tr");
-
-
-    header.forEach(cell => {
-
-        const th =
-            document.createElement("th");
-
-        th.textContent =
-            String(cell ?? "");
-
-        headerRow.appendChild(th);
-
-    });
-
-
-    thead.appendChild(headerRow);
-
-
-    const tbody =
-        document.createElement("tbody");
-
-
-    rows.slice(0, 50).forEach(row => {
-
-        const tr =
-            document.createElement("tr");
-
-
-        const columns =
-            Array.isArray(row)
-                ? row
-                : [row];
-
-
-        columns.forEach(cell => {
-
-            const td =
-                document.createElement("td");
-
-            td.textContent =
-                String(cell ?? "");
-
-            tr.appendChild(td);
-
-        });
-
-
-        tbody.appendChild(tr);
-
-    });
-
-
-    table.appendChild(thead);
-    table.appendChild(tbody);
-
-    container.appendChild(table);
-
-}
-
-
-/* =========================================================
-   EXCEL EVENTS
-========================================================= */
-
 function initExcel() {
+  const input = $("#excelInput");
+  const status = $("#excelStatus");
 
-    const cocoFile =
-        $("cocoExcelFile");
+  if (!input) return;
 
-    if (cocoFile) {
+  input.addEventListener("change", () => {
 
-        cocoFile.addEventListener(
-            "change",
-            event => {
+    if (!input.files.length) {
+      if (status) {
+        status.textContent =
+          "No Excel file selected.";
+      }
 
-                const file =
-                    event.target.files[0];
-
-                loadExcelFile(
-                    file,
-
-                    rows => {
-
-                        state.cocoExcelData =
-                            rows;
-
-                        updateLivePreview();
-
-                    },
-
-                    $("cocoExcelFileName"),
-
-                    $("cocoExcelPreview")
-                );
-
-            }
-        );
-
+      return;
     }
 
+    const file = input.files[0];
 
-    const otherFile =
-        $("otherExcelFile");
-
-    if (otherFile) {
-
-        otherFile.addEventListener(
-            "change",
-            event => {
-
-                const file =
-                    event.target.files[0];
-
-                loadExcelFile(
-                    file,
-
-                    rows => {
-
-                        state.otherExcelData =
-                            rows;
-
-                        updateLivePreview();
-
-                    },
-
-                    null,
-
-                    $("otherExcelPreview")
-                );
-
-            }
-        );
-
+    if (status) {
+      status.textContent =
+        `${file.name} selected — first row will be treated as header.`;
     }
 
+    showToast(
+      "green",
+      "Excel Enabled",
+      "Excel input has been enabled."
+    );
+  });
 }
-
 
 /* =========================================================
-   PAGE SIZE
+   COMBINED PO + BOX
 ========================================================= */
 
-function getDimensions(
-    size,
-    customWidth,
-    customHeight
-) {
+function initContentMode() {
 
-    switch (size) {
+  const combinedFreeze =
+    $("#combinedFreeze");
 
-        case "4x6":
+  const contentInputs =
+    $$('input[name="content"]');
 
-            return {
-                width: 101.6,
-                height: 152.4,
-                label: "4 × 6 in"
-            };
+  if (!combinedFreeze) return;
 
+  combinedFreeze.addEventListener("change", () => {
 
-        case "70x35":
+    if (combinedFreeze.checked) {
 
-            return {
-                width: 70,
-                height: 35,
-                label: "70 × 35 mm"
-            };
+      const combined =
+        $("#combined");
 
+      if (combined) {
+        combined.checked = true;
+      }
 
-        case "a4":
+      contentInputs.forEach(input => {
+        input.disabled = true;
+      });
 
-            return {
-                width: 210,
-                height: 297,
-                label: "A4"
-            };
+      showToast(
+        "green",
+        "Combined Enabled",
+        "PO and Box content controls are now frozen."
+      );
 
+    } else {
 
-        case "custom":
+      contentInputs.forEach(input => {
+        input.disabled = false;
+      });
 
-            return {
-                width:
-                    Math.max(
-                        1,
-                        Number(customWidth) || 70
-                    ),
-
-                height:
-                    Math.max(
-                        1,
-                        Number(customHeight) || 35
-                    ),
-
-                label: "Custom"
-            };
-
-
-        default:
-
-            return {
-                width: 101.6,
-                height: 152.4,
-                label: "4 × 6 in"
-            };
-
+      showToast(
+        "red",
+        "Combined Disabled",
+        "PO Number and Box Number controls are available individually."
+      );
     }
 
+    refreshActivePreview();
+  });
+
+  contentInputs.forEach(input => {
+    input.addEventListener("change", refreshActivePreview);
+  });
 }
-
-
-function applyOrientation(
-    dimensions,
-    orientation
-) {
-
-    let width =
-        dimensions.width;
-
-    let height =
-        dimensions.height;
-
-
-    if (
-        orientation === "landscape" &&
-        height > width
-    ) {
-
-        [width, height] =
-            [height, width];
-
-    }
-
-
-    if (
-        orientation === "portrait" &&
-        width > height
-    ) {
-
-        [width, height] =
-            [height, width];
-
-    }
-
-
-    return {
-        width,
-        height
-    };
-
-}
-
 
 /* =========================================================
-   CUSTOM SIZE VISIBILITY
+   CUSTOM PAGE SIZE
 ========================================================= */
 
-function updateCustomSize(
-    selectId,
-    containerId,
-    widthId,
-    heightId
-) {
+function initCustomPage() {
 
-    const select =
-        $(selectId);
+  const pageSize = $("#pageSize");
+  const customPage = $("#customPage");
 
-    const container =
-        $(containerId);
+  if (!pageSize || !customPage) return;
 
-    if (!select || !container) return;
+  pageSize.addEventListener("change", () => {
 
     const isCustom =
-        select.value === "custom";
+      pageSize.value === "custom";
 
-    container.classList.toggle(
-        "hidden",
-        !isCustom
+    customPage.classList.toggle(
+      "open",
+      isCustom
     );
 
+    showToast(
+      isCustom ? "green" : "red",
+      isCustom
+        ? "Custom Page Enabled"
+        : "Custom Page Disabled",
+      isCustom
+        ? "Custom width and height fields are available."
+        : "Custom page fields have been hidden."
+    );
 
-    if (widthId) {
-
-        const input = $(widthId);
-
-        if (input) {
-            input.disabled = !isCustom;
-        }
-
-    }
-
-
-    if (heightId) {
-
-        const input = $(heightId);
-
-        if (input) {
-            input.disabled = !isCustom;
-        }
-
-    }
-
+    refreshActivePreview();
+  });
 }
 
-
 /* =========================================================
-   PAGE SETTINGS EVENTS
+   CUSTOM LABEL COUNT
 ========================================================= */
 
-function initPageSettings() {
+function initCustomLabelCount() {
 
-    const configs = [
+  const select = $("#labelsPerPage");
+  const customBox = $("#customLabels");
 
-        {
-            select: "pageSize",
-            container: "customPageSizeFields",
-            width: "customWidth",
-            height: "customHeight"
-        },
+  if (!select || !customBox) return;
 
-        {
-            select: "isbnPageSize",
-            container: "isbnCustomSize",
-            width: "isbnCustomWidth",
-            height: "isbnCustomHeight"
-        },
+  select.addEventListener("change", () => {
 
-        {
-            select: "otherPageSize",
-            container: "otherCustomSize",
-            width: "otherCustomWidth",
-            height: "otherCustomHeight"
-        },
+    const isCustom =
+      select.value === "custom";
 
-        {
-            select: "addressPageSize",
-            container: "addressCustomSize",
-            width: "addressCustomWidth",
-            height: "addressCustomHeight"
-        }
+    customBox.classList.toggle(
+      "open",
+      isCustom
+    );
 
-    ];
+    showToast(
+      isCustom ? "green" : "red",
+      isCustom
+        ? "Custom Label Count Enabled"
+        : "Custom Label Count Disabled",
+      isCustom
+        ? "Enter your required labels per page."
+        : "Predefined label count selected."
+    );
 
-
-    configs.forEach(config => {
-
-        const select =
-            $(config.select);
-
-        if (!select) return;
-
-        select.addEventListener(
-            "change",
-            () => {
-
-                updateCustomSize(
-                    config.select,
-                    config.container,
-                    config.width,
-                    config.height
-                );
-
-                updateLivePreview();
-
-            }
-        );
-
-
-        updateCustomSize(
-            config.select,
-            config.container,
-            config.width,
-            config.height
-        );
-
-    });
-
-
-    [
-        "orientation",
-        "customWidth",
-        "customHeight",
-        "isbnCustomWidth",
-        "isbnCustomHeight",
-        "otherCustomWidth",
-        "otherCustomHeight",
-        "addressCustomWidth",
-        "addressCustomHeight"
-    ].forEach(id => {
-
-        const element = $(id);
-
-        if (!element) return;
-
-        element.addEventListener(
-            "input",
-            updateLivePreview
-        );
-
-        element.addEventListener(
-            "change",
-            updateLivePreview
-        );
-
-    });
-
+    refreshActivePreview();
+  });
 }
 
-
 /* =========================================================
-   CONTENT SETTINGS
+   BOX RANGE VALIDATION
 ========================================================= */
 
-function updateContentState(
-    announce = false
+function validateBoxRange(
+  startSelector,
+  endSelector
 ) {
 
-    const po =
-        $("showPO");
+  const startInput =
+    $(startSelector);
 
-    const box =
-        $("showBox");
+  const endInput =
+    $(endSelector);
 
-    const combined =
-        $("combinePOBox");
+  if (!startInput || !endInput) {
+    return true;
+  }
 
+  const startRaw =
+    startInput.value.trim();
 
-    if (!po || !box || !combined) {
+  const endRaw =
+    endInput.value.trim();
+
+  if (!startRaw || !endRaw) {
+    startInput.setCustomValidity("");
+    endInput.setCustomValidity("");
+
+    return true;
+  }
+
+  const start =
+    safeNumber(startRaw);
+
+  const end =
+    safeNumber(endRaw);
+
+  if (start > end) {
+
+    const message =
+      "Start Box Number must be lower than or equal to End Box Number.";
+
+    startInput.setCustomValidity(message);
+    endInput.setCustomValidity(message);
+
+    showToast(
+      "red",
+      "Invalid Box Range",
+      "Start Box Number cannot be greater than End Box Number."
+    );
+
+    return false;
+  }
+
+  startInput.setCustomValidity("");
+  endInput.setCustomValidity("");
+
+  return true;
+}
+
+/* =========================================================
+   COCO BOX RANGE
+========================================================= */
+
+function initCocoRange() {
+
+  ["#startBox", "#endBox"].forEach(selector => {
+
+    const input = $(selector);
+
+    if (!input) return;
+
+    input.addEventListener("input", () => {
+
+      validateBoxRange(
+        "#startBox",
+        "#endBox"
+      );
+
+      updateCocoPreview();
+    });
+  });
+}
+
+/* =========================================================
+   OTHER PO BOX RANGE
+========================================================= */
+
+function initOtherRange() {
+
+  ["#otherStart", "#otherEnd"].forEach(selector => {
+
+    const input = $(selector);
+
+    if (!input) return;
+
+    input.addEventListener("input", () => {
+
+      validateBoxRange(
+        "#otherStart",
+        "#otherEnd"
+      );
+
+      updateOtherPreview();
+    });
+  });
+}
+
+/* =========================================================
+   ALL BORDER MODE
+========================================================= */
+
+function initAllBorder() {
+
+  const allBorder =
+    $("#allBorder");
+
+  if (!allBorder) return;
+
+  const individualIds = [
+    "pageBorder",
+    "poBorder",
+    "boxBorder"
+  ];
+
+  allBorder.addEventListener(
+    "change",
+    () => {
+
+      const checked =
+        allBorder.checked;
+
+      individualIds.forEach(id => {
+
+        const input =
+          document.getElementById(id);
+
+        if (!input) return;
+
+        input.checked = checked;
+        input.disabled = checked;
+
+        const card =
+          input.closest(".border-card");
+
+        if (card) {
+          card.classList.toggle(
+            "frozen",
+            checked
+          );
+        }
+      });
+
+      showToast(
+        checked ? "green" : "red",
+        checked
+          ? "All Border Enabled"
+          : "All Border Disabled",
+        checked
+          ? "Page, PO and Box borders are enabled and frozen."
+          : "Individual border controls are available."
+      );
+
+      updateCocoPreview();
+    }
+  );
+}
+
+/* =========================================================
+   ENABLE / DISABLE TOASTS
+========================================================= */
+
+function initToggleToasts() {
+
+  $$(`
+    #cocoPanel input[type="checkbox"],
+    #cocoPanel input[type="radio"]
+  `).forEach(input => {
+
+    input.addEventListener("change", () => {
+
+      /*
+        Do not duplicate the Combined/All Border
+        specialized messages.
+      */
+
+      if (
+        input.id === "combinedFreeze" ||
+        input.id === "allBorder"
+      ) {
         return;
-    }
+      }
 
-
-    if (combined.checked) {
-
-        /*
-         * Combined PO + Box:
-         * both individual controls freeze.
-         */
-
-        po.checked = true;
-        box.checked = true;
-
-        po.disabled = true;
-        box.disabled = true;
-
-        po.closest(".option-row")
-            ?.classList.add(
-                "frozen-control"
-            );
-
-        box.closest(".option-row")
-            ?.classList.add(
-                "frozen-control"
-            );
-
-
-        if (announce) {
-
-            featureEnabled(
-                "Combined PO + Box"
-            );
-
-        }
-
-    } else {
-
-        po.disabled = false;
-        box.disabled = false;
-
-        po.closest(".option-row")
-            ?.classList.remove(
-                "frozen-control"
-            );
-
-        box.closest(".option-row")
-            ?.classList.remove(
-                "frozen-control"
-            );
-
-    }
-
-
-    /*
-     * Prevent both from being turned off.
-     */
-
-    if (
-        !combined.checked &&
-        !po.checked &&
-        !box.checked
-    ) {
-
-        po.checked = true;
-
-        showToast(
-            "At least PO Number or Box Number must remain enabled.",
-            "error",
-            "Content"
+      const wrapper =
+        input.closest(
+          ".choice,.format,.border-card"
         );
 
-    }
-
-
-    updateLivePreview();
-
-}
-
-
-function initContentSettings() {
-
-    [
-        "showPO",
-        "showBox",
-        "combinePOBox"
-    ].forEach(id => {
-
-        const element = $(id);
-
-        if (!element) return;
-
-        element.addEventListener(
-            "change",
-            () => {
-
-                const name =
-                    id === "showPO"
-                        ? "PO Number"
-                        : id === "showBox"
-                            ? "Box Number"
-                            : "Combined PO + Box";
-
-
-                if (element.checked) {
-
-                    featureEnabled(name);
-
-                } else {
-
-                    featureDisabled(name);
-
-                }
-
-
-                updateContentState(
-                    id === "combinePOBox"
-                );
-
-            }
+      const label =
+        wrapper?.querySelector(
+          "label,strong"
         );
 
+      const feature =
+        label?.textContent.trim() ||
+        "Feature";
+
+      showToast(
+        input.checked
+          ? "green"
+          : "red",
+        input.checked
+          ? "Feature Enabled"
+          : "Feature Disabled",
+        `${feature} has been ${
+          input.checked
+            ? "enabled"
+            : "disabled"
+        }.`
+      );
+
+      refreshActivePreview();
     });
-
-
-    $$("input[name='poBoxLine']")
-        .forEach(radio => {
-
-            radio.addEventListener(
-                "change",
-                updateLivePreview
-            );
-
-        });
-
-
-    updateContentState(false);
-
+  });
 }
-
 
 /* =========================================================
-   BORDER SETTINGS
+   BORDER CSS
 ========================================================= */
 
-function setBorderFreeze(
-    id,
-    frozen
-) {
+function getBorderCSS(style) {
 
-    const element = $(id);
+  const map = {
 
-    if (!element) return;
+    none: "none",
 
-    element.disabled = frozen;
+    solid:
+      "1px solid #111",
 
-    const card =
-        element.closest(
-            ".border-setting-card"
-        );
+    dashed:
+      "2px dashed #111",
 
-    if (card) {
+    dotted:
+      "2px dotted #111",
 
-        card.classList.toggle(
-            "frozen-control",
-            frozen
-        );
+    double:
+      "3px double #111",
 
-    }
+    groove:
+      "3px groove #111",
 
+    ridge:
+      "3px ridge #111",
+
+    inset:
+      "3px inset #111",
+
+    outset:
+      "3px outset #111",
+
+    thin:
+      "1px solid #111",
+
+    medium:
+      "2px solid #111",
+
+    thick:
+      "4px solid #111",
+
+    "thin-double":
+      "2px double #111",
+
+    "thick-double":
+      "5px double #111",
+
+    "short-dash":
+      "2px dashed #111",
+
+    "long-dash":
+      "3px dashed #111",
+
+    "dash-dot":
+      "2px dashed #111",
+
+    "dash-dot-dot":
+      "2px dashed #111",
+
+    triple:
+      "5px double #111",
+
+    quadruple:
+      "6px double #111",
+
+    soft:
+      "1px solid #94a3b8",
+
+    bold:
+      "4px solid #111",
+
+    extra:
+      "6px solid #111",
+
+    minimal:
+      "1px solid #cbd5e1",
+
+    classic:
+      "2px solid #111",
+
+    modern:
+      "2px solid #2563eb",
+
+    decorative:
+      "3px double #111",
+
+    shadow:
+      "1px solid #111",
+
+    rounded:
+      "2px solid #111",
+
+    square:
+      "2px solid #111",
+
+    "double-soft":
+      "3px double #64748b",
+
+    "double-bold":
+      "5px double #111",
+
+    "groove-thin":
+      "2px groove #64748b",
+
+    "ridge-thin":
+      "2px ridge #64748b",
+
+    "classic-double":
+      "4px double #111"
+  };
+
+  return map[style] || "1px solid #111";
 }
-
-
-function updateBorderState(
-    announce = false
-) {
-
-    const page =
-        $("pageBorder");
-
-    const po =
-        $("poBorder");
-
-    const box =
-        $("boxBorder");
-
-    const combined =
-        $("combinedBorder");
-
-
-    if (!page || !po || !box || !combined) {
-        return;
-    }
-
-
-    if (combined.checked) {
-
-        /*
-         * Combined border ON:
-         * all three are automatically selected
-         * and frozen.
-         */
-
-        page.checked = true;
-        po.checked = true;
-        box.checked = true;
-
-        setBorderFreeze(
-            "pageBorder",
-            true
-        );
-
-        setBorderFreeze(
-            "poBorder",
-            true
-        );
-
-        setBorderFreeze(
-            "boxBorder",
-            true
-        );
-
-
-        if (announce) {
-
-            featureEnabled(
-                "Combined Border"
-            );
-
-        }
-
-    } else {
-
-        setBorderFreeze(
-            "pageBorder",
-            false
-        );
-
-        setBorderFreeze(
-            "poBorder",
-            false
-        );
-
-        setBorderFreeze(
-            "boxBorder",
-            false
-        );
-
-    }
-
-
-    updateLivePreview();
-
-}
-
-
-function initBorderSettings() {
-
-    [
-        "pageBorder",
-        "poBorder",
-        "boxBorder",
-        "combinedBorder"
-    ].forEach(id => {
-
-        const element = $(id);
-
-        if (!element) return;
-
-        element.addEventListener(
-            "change",
-            () => {
-
-                const name =
-                    id === "pageBorder"
-                        ? "Page Border"
-                        : id === "poBorder"
-                            ? "PO Border"
-                            : id === "boxBorder"
-                                ? "Box Border"
-                                : "Combined Border";
-
-
-                if (element.checked) {
-
-                    featureEnabled(name);
-
-                } else {
-
-                    featureDisabled(name);
-
-                }
-
-
-                updateBorderState(
-                    id === "combinedBorder"
-                );
-
-            }
-        );
-
-    });
-
-
-    [
-        "pageBorderStyle",
-        "poBorderStyle",
-        "boxBorderStyle"
-    ].forEach(id => {
-
-        const element = $(id);
-
-        if (!element) return;
-
-        element.addEventListener(
-            "change",
-            updateLivePreview
-        );
-
-    });
-
-
-    updateBorderState(false);
-
-}
-
 
 /* =========================================================
-   FONT SETTINGS
+   GET LABEL COUNT
 ========================================================= */
 
-function getFontSettings(prefix) {
+function getCocoLabelCount() {
 
-    return {
+  const select =
+    $("#labelsPerPage");
 
-        family:
-            value(
-                `${prefix}FontFamily`,
-                "Arial"
-            ),
+  if (!select) return 1;
 
-        size:
-            numberValue(
-                `${prefix}FontSize`,
-                20
-            ),
-
-        bold:
-            checked(
-                `${prefix}Bold`
-            ),
-
-        italic:
-            checked(
-                `${prefix}Italic`
-            ),
-
-        underline:
-            checked(
-                `${prefix}Underline`
-            ),
-
-        opacity:
-            numberValue(
-                `${prefix}Opacity`,
-                100
-            )
-
-    };
-
-}
-
-
-function applyPreviewFont(
-    element,
-    settings
-) {
-
-    if (!element) return;
-
-    element.style.fontFamily =
-        `"${settings.family}"`;
-
-    element.style.fontSize =
-        `${settings.size}px`;
-
-    element.style.fontWeight =
-        settings.bold
-            ? "700"
-            : "400";
-
-    element.style.fontStyle =
-        settings.italic
-            ? "italic"
-            : "normal";
-
-    element.style.textDecoration =
-        settings.underline
-            ? "underline"
-            : "none";
-
-    element.style.opacity =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                settings.opacity
-            )
-        ) / 100;
-
-}
-
-
-function initFontSettings() {
-
-    const ids = [
-
-        "poFontFamily",
-        "poFontSize",
-        "poBold",
-        "poItalic",
-        "poUnderline",
-        "poOpacity",
-
-        "boxFontFamily",
-        "boxFontSize",
-        "boxBold",
-        "boxItalic",
-        "boxUnderline",
-        "boxOpacity",
-
-        "otherFontFamily",
-        "otherFontSize",
-
-        "addressFontFamily",
-        "addressFontSize",
-        "addressBold",
-        "addressItalic",
-        "addressUnderline"
-
-    ];
-
-
-    ids.forEach(id => {
-
-        const element = $(id);
-
-        if (!element) return;
-
-        element.addEventListener(
-            "input",
-            updateLivePreview
-        );
-
-        element.addEventListener(
-            "change",
-            updateLivePreview
-        );
-
-    });
-
-}
-
-
-/* =========================================================
-   LABEL FLOW
-========================================================= */
-
-function getLabelsPerPage() {
+  if (select.value === "custom") {
 
     return Math.max(
-        1,
-        Math.min(
-            4,
-            numberValue(
-                "labelsPerPage",
-                2
-            )
-        )
+      1,
+      safeNumber(
+        $("#customLabelCount")?.value,
+        1
+      )
+    );
+  }
+
+  return Math.max(
+    1,
+    safeNumber(
+      select.value,
+      1
+    )
+  );
+}
+
+/* =========================================================
+   PAGE SIZE PREVIEW
+========================================================= */
+
+function applyCocoPageSize(preview) {
+
+  const size =
+    $("#pageSize")?.value;
+
+  if (!preview) return;
+
+  if (size === "4x6") {
+
+    preview.style.width = "500px";
+    preview.style.minHeight = "340px";
+  }
+
+  else if (size === "70x35") {
+
+    preview.style.width = "430px";
+    preview.style.minHeight = "220px";
+  }
+
+  else if (size === "a4") {
+
+    preview.style.width = "500px";
+    preview.style.minHeight = "680px";
+  }
+
+  else if (size === "custom") {
+
+    const width =
+      safeNumber(
+        $("#customWidth")?.value,
+        70
+      );
+
+    const height =
+      safeNumber(
+        $("#customHeight")?.value,
+        35
+      );
+
+    preview.style.width =
+      `${Math.min(
+        Math.max(width * 5, 250),
+        700
+      )}px`;
+
+    preview.style.minHeight =
+      `${Math.min(
+        Math.max(height * 5, 180),
+        850
+      )}px`;
+  }
+}
+
+/* =========================================================
+   COCO CONTENT
+========================================================= */
+
+function getCocoContentMode() {
+
+  if ($("#combinedFreeze")?.checked) {
+    return "combined";
+  }
+
+  return getChecked(
+    "content",
+    "po"
+  );
+}
+
+/* =========================================================
+   COCO PREVIEW
+========================================================= */
+
+function updateCocoPreview() {
+
+  const preview =
+    $("#cocoPreview");
+
+  if (!preview) return;
+
+  const count =
+    getCocoLabelCount();
+
+  const visualCount =
+    Math.min(count, 20);
+
+  let columns = 1;
+
+  if (visualCount >= 4) {
+    columns = 2;
+  }
+
+  if (visualCount >= 9) {
+    columns = 3;
+  }
+
+  preview.style.gridTemplateColumns =
+    `repeat(${columns}, 1fr)`;
+
+  applyCocoPageSize(preview);
+
+  preview.innerHTML = "";
+
+  const po =
+    $("#poNumber")?.value.trim() ||
+    "BWG123";
+
+  const poPrefix =
+    $("#poPrefix")?.value.trim() ||
+    "";
+
+  const boxPrefix =
+    $("#boxPrefix")?.value.trim() ||
+    "BOX NO.";
+
+  const start =
+    safeNumber(
+      $("#startBox")?.value,
+      121
     );
 
-}
-
-
-function initFlowSettings() {
-
-    const labels =
-        $("labelsPerPage");
-
-    if (labels) {
-
-        labels.addEventListener(
-            "change",
-            () => {
-
-                updateLivePreview();
-
-            }
-        );
-
-    }
-
-
-    const gap =
-        $("labelGap");
-
-    if (gap) {
-
-        gap.addEventListener(
-            "input",
-            updateLivePreview
-        );
-
-    }
-
-
-    $$("input[name='poFlow']")
-        .forEach(radio => {
-
-            radio.addEventListener(
-                "change",
-                updateLivePreview
-            );
-
-        });
-
-}
-
-
-/* =========================================================
-   LIVE PREVIEW PAGE SIZE
-========================================================= */
-
-function updatePreviewPage() {
-
-    const page =
-        $("previewPage");
-
-    if (!page) return;
-
-
-    const dimensions =
-        applyOrientation(
-            getDimensions(
-                value(
-                    "pageSize",
-                    "4x6"
-                ),
-
-                value(
-                    "customWidth",
-                    70
-                ),
-
-                value(
-                    "customHeight",
-                    35
-                )
-            ),
-
-            value(
-                "orientation",
-                "portrait"
-            )
-        );
-
-
-    /*
-     * Preview is scaled for screen,
-     * while preserving actual ratio.
-     */
-
-    const maxWidth = 500;
-    const maxHeight = 560;
-
-    const ratio =
-        dimensions.width /
-        dimensions.height;
-
-
-    let width;
-    let height;
-
-
-    if (ratio >= 1) {
-
-        width =
-            Math.min(
-                maxWidth,
-                dimensions.width * 2.7
-            );
-
-        height =
-            width / ratio;
-
-    } else {
-
-        height =
-            Math.min(
-                maxHeight,
-                dimensions.height * 2.7
-            );
-
-        width =
-            height * ratio;
-
-    }
-
-
-    page.style.width =
-        `${Math.max(150, width)}px`;
-
-    page.style.height =
-        `${Math.max(150, height)}px`;
-
-
-    if ($("previewPageSize")) {
-
-        $("previewPageSize").textContent =
-            getDimensions(
-                value("pageSize", "4x6"),
-                value("customWidth", 70),
-                value("customHeight", 35)
-            ).label;
-
-    }
-
-
-    if ($("pageSummary")) {
-
-        const d =
-            getDimensions(
-                value("pageSize", "4x6"),
-                value("customWidth", 70),
-                value("customHeight", 35)
-            );
-
-        $("pageSummary").textContent =
-            `${d.label} / ${value("orientation", "portrait")}`;
-
-    }
-
-}
-
-
-/* =========================================================
-   LIVE PREVIEW LABEL CONTENT
-========================================================= */
-
-function getFirstPO() {
-
-    const pos =
-        getCocoPOs();
-
-    return pos[0] ||
-        "PO NUMBER";
-
-}
-
-
-function getBoxNumber() {
-
-    return "BOX NUMBER";
-
-}
-
-
-function updatePreviewLabel(
-    labelId,
-    poId,
-    boxId,
-    poText,
-    boxText,
-    visiblePO,
-    visibleBox,
-    sameLine
-) {
+  const content =
+    getCocoContentMode();
+
+  const lineMode =
+    getChecked(
+      "lineMode",
+      "separate"
+    );
+
+  const pageBorderEnabled =
+    $("#pageBorder")?.checked ||
+    $("#allBorder")?.checked;
+
+  const poBorderEnabled =
+    $("#poBorder")?.checked ||
+    $("#allBorder")?.checked;
+
+  const boxBorderEnabled =
+    $("#boxBorder")?.checked ||
+    $("#allBorder")?.checked;
+
+  if (pageBorderEnabled) {
+
+    const style =
+      $("#allBorder")?.checked
+        ? $("#allBorderStyle")?.value
+        : $("#pageBorderStyle")?.value;
+
+    preview.style.border =
+      getBorderCSS(style);
+  }
+  else {
+    preview.style.border = "none";
+  }
+
+  for (let i = 0; i < visualCount; i++) {
 
     const label =
-        $(labelId);
+      document.createElement("div");
 
-    const po =
-        $(poId);
-
-    const box =
-        $(boxId);
-
-
-    if (!label || !po || !box) return;
-
-
-    po.textContent =
-        poText;
-
-    box.textContent =
-        boxText;
-
-
-    po.style.display =
-        visiblePO
-            ? "block"
-            : "none";
-
-
-    box.style.display =
-        visibleBox
-            ? "block"
-            : "none";
-
+    label.className = "label";
 
     label.style.flexDirection =
-        sameLine
-            ? "row"
-            : "column";
+      lineMode === "same"
+        ? "row"
+        : "column";
 
+    label.style.gap = "7px";
 
-    label.style.gap =
-        sameLine
-            ? "10px"
-            : "7px";
+    const poElement =
+      document.createElement("div");
 
+    poElement.className =
+      "po-preview";
 
-    if (sameLine) {
+    poElement.textContent =
+      `${poPrefix}${po}`;
 
-        label.style.justifyContent =
-            "center";
+    const boxElement =
+      document.createElement("div");
 
+    boxElement.className =
+      "box-preview";
+
+    boxElement.textContent =
+      `${boxPrefix}${start + i}`;
+
+    /* CONTENT MODE */
+
+    if (content === "po") {
+      boxElement.style.display = "none";
     }
 
-
-    /*
-     * Combined PO + Box text.
-     */
-
-    if (checked("combinePOBox")) {
-
-        po.textContent =
-            `${poText}  |  ${boxText}`;
-
-        box.style.display =
-            "none";
-
-        label.style.flexDirection =
-            "row";
-
+    if (content === "box") {
+      poElement.style.display = "none";
     }
 
+    /* PO FONT */
 
-    applyPreviewFont(
-        po,
-        getFontSettings("po")
-    );
+    poElement.style.fontFamily =
+      $("#poFont")?.value ||
+      "Arial";
 
+    poElement.style.fontSize =
+      `${safeNumber(
+        $("#poSize")?.value,
+        20
+      )}px`;
 
-    applyPreviewFont(
-        box,
-        getFontSettings("box")
-    );
+    poElement.style.opacity =
+      safeNumber(
+        $("#poOpacity")?.value,
+        100
+      ) / 100;
 
+    poElement.style.fontWeight =
+      $("#poBold")?.checked
+        ? "700"
+        : "400";
+
+    poElement.style.fontStyle =
+      $("#poItalic")?.checked
+        ? "italic"
+        : "normal";
+
+    poElement.style.textDecoration =
+      $("#poUnderline")?.checked
+        ? "underline"
+        : "none";
+
+    /* BOX FONT */
+
+    boxElement.style.fontFamily =
+      $("#boxFont")?.value ||
+      "Arial";
+
+    boxElement.style.fontSize =
+      `${safeNumber(
+        $("#boxSize")?.value,
+        17
+      )}px`;
+
+    boxElement.style.opacity =
+      safeNumber(
+        $("#boxOpacity")?.value,
+        100
+      ) / 100;
+
+    boxElement.style.fontWeight =
+      $("#boxBold")?.checked
+        ? "700"
+        : "400";
+
+    boxElement.style.fontStyle =
+      $("#boxItalic")?.checked
+        ? "italic"
+        : "normal";
+
+    boxElement.style.textDecoration =
+      $("#boxUnderline")?.checked
+        ? "underline"
+        : "none";
+
+    /* PO BORDER */
+
+    if (poBorderEnabled) {
+
+      const style =
+        $("#allBorder")?.checked
+          ? $("#allBorderStyle")?.value
+          : $("#poBorderStyle")?.value;
+
+      poElement.style.border =
+        getBorderCSS(style);
+
+      poElement.style.padding =
+        "3px 6px";
+    }
+
+    /* BOX BORDER */
+
+    if (boxBorderEnabled) {
+
+      const style =
+        $("#allBorder")?.checked
+          ? $("#allBorderStyle")?.value
+          : $("#boxBorderStyle")?.value;
+
+      boxElement.style.border =
+        getBorderCSS(style);
+
+      boxElement.style.padding =
+        "3px 6px";
+    }
+
+    label.appendChild(poElement);
+    label.appendChild(boxElement);
+
+    preview.appendChild(label);
+  }
 }
 
-
 /* =========================================================
-   LABEL BORDER PREVIEW
+   OTHER PO PREVIEW
 ========================================================= */
 
-function borderStyleToCSS(
-    style
-) {
+function updateOtherPreview() {
 
-    switch (style) {
+  const panel =
+    $("#otherPanel");
 
-        case "dashed":
-            return "2px dashed #111827";
+  if (!panel) return;
 
-        case "dotted":
-            return "2px dotted #111827";
+  const preview =
+    $(".preview-page", panel);
 
-        case "double":
-            return "4px double #111827";
+  if (!preview) return;
 
-        case "rounded":
-            return "2px solid #111827";
+  const po =
+    $("#otherPO")?.value.trim() ||
+    "BWG123";
 
-        default:
-            return "2px solid #111827";
+  const start =
+    safeNumber(
+      $("#otherStart")?.value,
+      121
+    );
 
-    }
+  const end =
+    safeNumber(
+      $("#otherEnd")?.value,
+      start
+    );
 
+  if (start > end) {
+    return;
+  }
+
+  const label =
+    $(".label", preview);
+
+  if (!label) return;
+
+  const poElement =
+    $(".po-preview", label);
+
+  const boxElement =
+    $(".box-preview", label);
+
+  if (poElement) {
+    poElement.textContent = po;
+  }
+
+  if (boxElement) {
+    boxElement.textContent =
+      `BOX NO.${start}`;
+  }
 }
-
-
-function updatePreviewBorders() {
-
-    const page =
-        $("previewPage");
-
-    if (!page) return;
-
-
-    const pageEnabled =
-        checked("pageBorder");
-
-    const poEnabled =
-        checked("poBorder");
-
-    const boxEnabled =
-        checked("boxBorder");
-
-    const combined =
-        checked("combinedBorder");
-
-
-    page.style.border =
-        pageEnabled || combined
-            ? borderStyleToCSS(
-                value(
-                    "pageBorderStyle",
-                    "solid"
-                )
-            )
-            : "1px solid #cbd5e1";
-
-
-    const poBorderStyle =
-        borderStyleToCSS(
-            value(
-                "poBorderStyle",
-                "solid"
-            )
-        );
-
-
-    const boxBorderStyle =
-        borderStyleToCSS(
-            value(
-                "boxBorderStyle",
-                "solid"
-            )
-        );
-
-
-    [1, 2].forEach(index => {
-
-        const po =
-            $(`previewPO${index}`);
-
-        const box =
-            $(`previewBox${index}`);
-
-        const label =
-            $(`previewLabel${index}`);
-
-
-        if (!po || !box || !label) {
-            return;
-        }
-
-
-        po.style.border =
-            poEnabled || combined
-                ? poBorderStyle
-                : "none";
-
-
-        box.style.border =
-            boxEnabled || combined
-                ? boxBorderStyle
-                : "none";
-
-
-        po.style.borderRadius =
-            value(
-                "poBorderStyle",
-                "solid"
-            ) === "rounded"
-                ? "7px"
-                : "3px";
-
-
-        box.style.borderRadius =
-            value(
-                "boxBorderStyle",
-                "solid"
-            ) === "rounded"
-                ? "7px"
-                : "3px";
-
-
-        label.classList.toggle(
-            "combined-border",
-            combined
-        );
-
-    });
-
-}
-
 
 /* =========================================================
-   LABELS PER PAGE PREVIEW
-========================================================= */
-
-function updateLabelsPreview() {
-
-    const count =
-        getLabelsPerPage();
-
-
-    const label2 =
-        $("previewLabel2");
-
-
-    if (!label2) return;
-
-
-    /*
-     * Existing HTML has two preview labels.
-     *
-     * 1 = show first only.
-     * 2 = show both.
-     *
-     * For 3/4, duplicate-style visual
-     * is created dynamically.
-     */
-
-    if (count === 1) {
-
-        label2.style.display =
-            "none";
-
-    } else {
-
-        label2.style.display =
-            "flex";
-
-    }
-
-
-    if ($("previewLabelsPerPage")) {
-
-        $("previewLabelsPerPage")
-            .textContent =
-            `${count} Label${count > 1 ? "s" : ""}`;
-
-    }
-
-
-    if ($("flowSummary")) {
-
-        $("flowSummary").textContent =
-            `${count} Label${count > 1 ? "s" : ""}`;
-
-    }
-
-}
-
-
-/* =========================================================
-   CONTENT SUMMARY
-========================================================= */
-
-function updateSummaries() {
-
-    const po =
-        checked("showPO");
-
-    const box =
-        checked("showBox");
-
-    const combined =
-        checked("combinePOBox");
-
-
-    if ($("contentSummary")) {
-
-        if (combined) {
-
-            $("contentSummary").textContent =
-                "Combined PO + Box";
-
-        } else if (po && box) {
-
-            $("contentSummary").textContent =
-                "PO + Box";
-
-        } else if (po) {
-
-            $("contentSummary").textContent =
-                "PO Only";
-
-        } else if (box) {
-
-            $("contentSummary").textContent =
-                "Box Only";
-
-        } else {
-
-            $("contentSummary").textContent =
-                "None";
-
-        }
-
-    }
-
-
-    if ($("borderSummary")) {
-
-        const borders = [];
-
-        if (checked("pageBorder"))
-            borders.push("Page");
-
-        if (checked("poBorder"))
-            borders.push("PO");
-
-        if (checked("boxBorder"))
-            borders.push("Box");
-
-        if (checked("combinedBorder"))
-            borders.length = 0,
-            borders.push("Combined");
-
-
-        $("borderSummary").textContent =
-            borders.length
-                ? borders.join(" + ")
-                : "None";
-
-    }
-
-}
-
-
-/* =========================================================
-   MASTER LIVE PREVIEW
-========================================================= */
-
-function updateLivePreview() {
-
-    if (
-        state.currentFeature ===
-        "coco-blue"
-    ) {
-
-        updatePreviewPage();
-
-        const visiblePO =
-            checked("showPO");
-
-        const visibleBox =
-            checked("showBox");
-
-        const sameLine =
-            value(
-                "sameLine"
-            ) === "same";
-
-
-        const po =
-            getFirstPO();
-
-        const box =
-            getBoxNumber();
-
-
-        updatePreviewLabel(
-            "previewLabel1",
-            "previewPO1",
-            "previewBox1",
-            po,
-            box,
-            visiblePO,
-            visibleBox,
-            sameLine
-        );
-
-
-        updatePreviewLabel(
-            "previewLabel2",
-            "previewPO2",
-            "previewBox2",
-            po,
-            box,
-            visiblePO,
-            visibleBox,
-            sameLine
-        );
-
-
-        updatePreviewBorders();
-
-        updateLabelsPreview();
-
-        updateSummaries();
-
-    }
-
-
-    updateISBNPreview();
-
-    updateAddressPreview();
-
-}
-
-
-/* =========================================================
-   ISBN BARCODE
-========================================================= */
-
-function updateISBNPreview() {
-
-    const container =
-        $("isbnBarcodePreview");
-
-    if (!container) return;
-
-
-    const isbn =
-        value("isbnNumber").trim();
-
-    const title =
-        value("isbnTitle").trim();
-
-
-    container.innerHTML = "";
-
-
-    if (!isbn) {
-
-        container.innerHTML = `
-            <div style="
-                color:#6b7280;
-                font-size:12px;
-                text-align:center;
-            ">
-                Enter ISBN to preview barcode
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    if (typeof JsBarcode === "undefined") {
-
-        container.textContent =
-            isbn;
-
-        return;
-
-    }
-
-
-    const svg =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "svg"
-        );
-
-
-    container.appendChild(svg);
-
-
-    try {
-
-        JsBarcode(
-            svg,
-            isbn.replace(/\D/g, ""),
-            {
-                format: "EAN13",
-                displayValue: true,
-                width: 2,
-                height: 70,
-                margin: 10,
-                fontSize: 13,
-                lineColor: "#111827"
-            }
-        );
-
-    } catch (error) {
-
-        try {
-
-            JsBarcode(
-                svg,
-                isbn,
-                {
-                    format: "CODE128",
-                    displayValue: true,
-                    width: 2,
-                    height: 70,
-                    margin: 10,
-                    fontSize: 13,
-                    lineColor: "#111827"
-                }
-            );
-
-        } catch (fallbackError) {
-
-            container.innerHTML =
-                `<span style="
-                    font-size:12px;
-                    color:#dc2626;
-                ">Invalid barcode value</span>`;
-
-        }
-
-    }
-
-
-    if (title) {
-
-        const titleElement =
-            document.createElement("div");
-
-        titleElement.style.marginTop =
-            "7px";
-
-        titleElement.style.fontSize =
-            "11px";
-
-        titleElement.style.color =
-            "#4b5563";
-
-        titleElement.textContent =
-            title;
-
-        container.appendChild(
-            titleElement
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   QR CODE
-========================================================= */
-
-function makeQR(
-    containerId,
-    text
-) {
-
-    const container =
-        $(containerId);
-
-    if (!container) return;
-
-
-    container.innerHTML = "";
-
-
-    if (!text) return;
-
-
-    if (
-        typeof QRCode ===
-        "undefined"
-    ) {
-
-        container.textContent =
-            "QR library unavailable.";
-
-        return;
-
-    }
-
-
-    const canvas =
-        document.createElement("canvas");
-
-
-    QRCode.toCanvas(
-        canvas,
-        text,
-        {
-            width: 145,
-            margin: 2,
-            errorCorrectionLevel: "M"
-        },
-        error => {
-
-            if (error) {
-
-                console.error(
-                    "QR error:",
-                    error
-                );
-
-                return;
-
-            }
-
-            container.appendChild(
-                canvas
-            );
-
-        }
-    );
-
-}
-
-
-function updateAddressPreview() {
-
-    const from =
-        value("fromAddress").trim();
-
-    const to =
-        value("toAddress").trim();
-
-    const email =
-        value("addressEmail").trim();
-
-
-    if ($("addressLivePreview")) {
-
-        $("addressLivePreview").innerHTML = `
-
-            <div style="
-                width:min(100%,520px);
-                background:white;
-                border:1px solid #e5e7eb;
-                border-radius:10px;
-                padding:18px;
-                display:grid;
-                grid-template-columns:1fr 1fr;
-                gap:14px;
-                box-shadow:0 8px 24px rgba(15,23,42,.08);
-            ">
-
-                <div style="
-                    border:1px solid #dbe1e8;
-                    border-radius:8px;
-                    padding:12px;
-                ">
-
-                    <strong style="
-                        font-size:10px;
-                        color:#6b7280;
-                    ">
-                        FROM
-                    </strong>
-
-                    <div style="
-                        margin-top:7px;
-                        font-size:12px;
-                        white-space:pre-wrap;
-                    ">
-                        ${escapeHTML(
-                            from || "From Address"
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div style="
-                    border:1px solid #dbe1e8;
-                    border-radius:8px;
-                    padding:12px;
-                ">
-
-                    <strong style="
-                        font-size:10px;
-                        color:#6b7280;
-                    ">
-                        TO
-                    </strong>
-
-                    <div style="
-                        margin-top:7px;
-                        font-size:12px;
-                        white-space:pre-wrap;
-                    ">
-                        ${escapeHTML(
-                            to || "To Address"
-                        )}
-                    </div>
-
-                </div>
-
-            </div>
-        `;
-
-    }
-
-
-    makeQR(
-        "addressQR",
-        to || from
-    );
-
-
-    makeQR(
-        "emailQR",
-        email
-            ? `mailto:${email}`
-            : ""
-    );
-
-}
-
-
-/* =========================================================
-   LIVE INPUTS
-========================================================= */
-
-function initLiveInputs() {
-
-    $$(
-        "input, textarea, select"
-    ).forEach(element => {
-
-        if (
-            element.type === "file"
-        ) {
-            return;
-        }
-
-
-        element.addEventListener(
-            "input",
-            () => {
-
-                updateLivePreview();
-
-            }
-        );
-
-
-        element.addEventListener(
-            "change",
-            () => {
-
-                updateLivePreview();
-
-            }
-        );
-
-    });
-
-}
-
-
-/* =========================================================
-   RESET COCO
-========================================================= */
-
-function resetCoco() {
-
-    for (let i = 1; i <= 20; i++) {
-
-        const input =
-            $(`cocoPO${i}`);
-
-        if (input) {
-            input.value = "";
-        }
-
-    }
-
-
-    if ($("cocoBulkInput")) {
-        $("cocoBulkInput").value = "";
-    }
-
-
-    state.cocoExcelData = [];
-
-
-    if ($("cocoExcelFile")) {
-        $("cocoExcelFile").value = "";
-    }
-
-
-    if ($("cocoExcelFileName")) {
-        $("cocoExcelFileName").textContent =
-            "No file selected";
-    }
-
-
-    if ($("cocoExcelPreview")) {
-        $("cocoExcelPreview").innerHTML =
-            "";
-    }
-
-
-    if ($("showPO")) {
-        $("showPO").checked = true;
-    }
-
-    if ($("showBox")) {
-        $("showBox").checked = true;
-    }
-
-    if ($("combinePOBox")) {
-        $("combinePOBox").checked = false;
-    }
-
-
-    if ($("pageBorder")) {
-        $("pageBorder").checked = false;
-    }
-
-    if ($("poBorder")) {
-        $("poBorder").checked = false;
-    }
-
-    if ($("boxBorder")) {
-        $("boxBorder").checked = false;
-    }
-
-    if ($("combinedBorder")) {
-        $("combinedBorder").checked = false;
-    }
-
-
-    if ($("pageSize")) {
-        $("pageSize").value = "4x6";
-    }
-
-    if ($("orientation")) {
-        $("orientation").value = "portrait";
-    }
-
-    if ($("customWidth")) {
-        $("customWidth").value = 70;
-    }
-
-    if ($("customHeight")) {
-        $("customHeight").value = 35;
-    }
-
-
-    if ($("labelsPerPage")) {
-        $("labelsPerPage").value = "2";
-    }
-
-
-    if ($("sameLine")) {
-        $("sameLine").checked = false;
-    }
-
-    if ($("separateLine")) {
-        $("separateLine").checked = true;
-    }
-
-
-    switchCocoMode("manual");
-
-    updateCustomSize(
-        "pageSize",
-        "customPageSizeFields",
-        "customWidth",
-        "customHeight"
-    );
-
-    updateContentState(false);
-
-    updateBorderState(false);
-
-    updateManualCount();
-
-    updateLivePreview();
-
-
-    showToast(
-        "Coco Blue settings have been reset.",
-        "success",
-        "Reset Complete"
-    );
-
-}
-
-
-/* =========================================================
-   RESET OTHER
-========================================================= */
-
-function resetOther() {
-
-    for (let i = 1; i <= 20; i++) {
-
-        const input =
-            $(`otherPO${i}`);
-
-        if (input) {
-            input.value = "";
-        }
-
-    }
-
-
-    if ($("otherBulkInput")) {
-        $("otherBulkInput").value = "";
-    }
-
-
-    state.otherExcelData = [];
-
-
-    if ($("otherExcelFile")) {
-        $("otherExcelFile").value = "";
-    }
-
-
-    if ($("otherExcelPreview")) {
-        $("otherExcelPreview").innerHTML =
-            "";
-    }
-
-
-    switchOtherMode("manual");
-
-    updateLivePreview();
-
-
-    showToast(
-        "Other PO settings have been reset.",
-        "success",
-        "Reset Complete"
-    );
-
-}
-
-
-/* =========================================================
-   RESET ISBN
-========================================================= */
-
-function resetISBN() {
-
-    if ($("isbnNumber")) {
-        $("isbnNumber").value = "";
-    }
-
-    if ($("isbnTitle")) {
-        $("isbnTitle").value = "";
-    }
-
-    if ($("isbnPageSize")) {
-        $("isbnPageSize").value = "4x6";
-    }
-
-    if ($("isbnCustomWidth")) {
-        $("isbnCustomWidth").value = "";
-    }
-
-    if ($("isbnCustomHeight")) {
-        $("isbnCustomHeight").value = "";
-    }
-
-
-    updateCustomSize(
-        "isbnPageSize",
-        "isbnCustomSize",
-        "isbnCustomWidth",
-        "isbnCustomHeight"
-    );
-
-
-    updateISBNPreview();
-
-
-    showToast(
-        "ISBN settings have been reset.",
-        "success",
-        "Reset Complete"
-    );
-
-}
-
-
-/* =========================================================
-   RESET ADDRESS
-========================================================= */
-
-function resetAddress() {
-
-    [
-        "fromAddress",
-        "toAddress",
-        "addressEmail"
-    ].forEach(id => {
-
-        if ($(id)) {
-            $(id).value = "";
-        }
-
-    });
-
-
-    if ($("addressPageSize")) {
-        $("addressPageSize").value = "4x6";
-    }
-
-
-    updateCustomSize(
-        "addressPageSize",
-        "addressCustomSize",
-        "addressCustomWidth",
-        "addressCustomHeight"
-    );
-
-
-    updateAddressPreview();
-
-
-    showToast(
-        "Address settings have been reset.",
-        "success",
-        "Reset Complete"
-    );
-
-}
-
-
-/* =========================================================
-   PDF HELPERS
-========================================================= */
-
-function getPDFDimensions(
-    sizeId,
-    widthId,
-    heightId,
-    orientationId
-) {
-
-    const d =
-        getDimensions(
-            value(sizeId, "4x6"),
-            value(widthId, 70),
-            value(heightId, 35)
-        );
-
-
-    return applyOrientation(
-        d,
-        value(
-            orientationId,
-            "portrait"
-        )
-    );
-
-}
-
-
-function createPDF(
-    dimensions
-) {
-
-    if (
-        !window.jspdf ||
-        !window.jspdf.jsPDF
-    ) {
-
-        showToast(
-            "PDF library is not loaded.",
-            "error",
-            "PDF Generator"
-        );
-
-        return null;
-
-    }
-
-
-    const orientation =
-        dimensions.width >
-        dimensions.height
-            ? "landscape"
-            : "portrait";
-
-
-    return new window.jspdf.jsPDF({
-        orientation,
-        unit: "mm",
-        format: [
-            dimensions.width,
-            dimensions.height
-        ]
-    });
-
-}
-
-
-/* =========================================================
-   PDF FONT
-========================================================= */
-
-function pdfFontStyle(settings) {
-
-    if (
-        settings.bold &&
-        settings.italic
-    ) {
-        return "bolditalic";
-    }
-
-    if (settings.bold) {
-        return "bold";
-    }
-
-    if (settings.italic) {
-        return "italic";
-    }
-
-    return "normal";
-}
-
-
-/* =========================================================
-   DRAW LABEL TO PDF
-========================================================= */
-
-function drawPDFLabel(
-    doc,
-    x,
-    y,
-    width,
-    height,
-    po,
-    box
-) {
-
-    const showPO =
-        checked("showPO");
-
-    const showBox =
-        checked("showBox");
-
-    const combined =
-        checked("combinePOBox");
-
-    const pageBorder =
-        checked("pageBorder");
-
-    const poBorder =
-        checked("poBorder");
-
-    const boxBorder =
-        checked("boxBorder");
-
-    const combinedBorder =
-        checked("combinedBorder");
-
-
-    const poFont =
-        getFontSettings("po");
-
-    const boxFont =
-        getFontSettings("box");
-
-
-    /*
-     * Background.
-     */
-
-    doc.setFillColor(
-        255,
-        255,
-        255
-    );
-
-    doc.rect(
-        x,
-        y,
-        width,
-        height,
-        "F"
-    );
-
-
-    /*
-     * Border.
-     */
-
-    if (
-        pageBorder ||
-        combinedBorder
-    ) {
-
-        doc.setDrawColor(
-            17,
-            24,
-            39
-        );
-
-        doc.setLineWidth(
-            0.5
-        );
-
-        doc.rect(
-            x,
-            y,
-            width,
-            height
-        );
-
-    }
-
-
-    const sameLine =
-        value(
-            "sameLine"
-        ) === "same";
-
-
-    const centerX =
-        x + width / 2;
-
-
-    let centerY =
-        y + height / 2;
-
-
-    /*
-     * Combined PO + Box.
-     */
-
-    if (combined) {
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
-        doc.setFontSize(
-            Math.min(
-                poFont.size,
-                32
-            )
-        );
-
-
-        doc.text(
-            `${po} | BOX ${box}`,
-            centerX,
-            centerY,
-            {
-                align: "center"
-            }
-        );
-
-
-        return;
-
-    }
-
-
-    /*
-     * Same line.
-     */
-
-    if (
-        sameLine &&
-        showPO &&
-        showBox
-    ) {
-
-        doc.setFont(
-            poFont.family,
-            pdfFontStyle(poFont)
-        );
-
-        doc.setFontSize(
-            poFont.size
-        );
-
-
-        doc.text(
-            `${po}   |   ${box}`,
-            centerX,
-            centerY,
-            {
-                align: "center"
-            }
-        );
-
-
-        return;
-
-    }
-
-
-    /*
-     * Separate lines.
-     */
-
-    let offset = 0;
-
-
-    if (showPO) {
-
-        doc.setFont(
-            poFont.family,
-            pdfFontStyle(poFont)
-        );
-
-        doc.setFontSize(
-            poFont.size
-        );
-
-
-        doc.text(
-            String(po),
-            centerX,
-            centerY - 5,
-            {
-                align: "center"
-            }
-        );
-
-
-        if (
-            poBorder &&
-            !combinedBorder
-        ) {
-
-            doc.setLineWidth(
-                0.4
-            );
-
-            doc.rect(
-                x + 4,
-                centerY - 12,
-                width - 8,
-                14
-            );
-
-        }
-
-
-        offset = 10;
-
-    }
-
-
-    if (showBox) {
-
-        doc.setFont(
-            boxFont.family,
-            pdfFontStyle(boxFont)
-        );
-
-        doc.setFontSize(
-            boxFont.size
-        );
-
-
-        doc.text(
-            String(box),
-            centerX,
-            centerY + offset + 3,
-            {
-                align: "center"
-            }
-        );
-
-
-        if (
-            boxBorder &&
-            !combinedBorder
-        ) {
-
-            doc.setLineWidth(
-                0.4
-            );
-
-            doc.rect(
-                x + 4,
-                centerY + offset - 5,
-                width - 8,
-                14
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   GENERATE COCO PDF
-========================================================= */
-
-function generateCocoPDF() {
-
-    const dimensions =
-        getPDFDimensions(
-            "pageSize",
-            "customWidth",
-            "customHeight",
-            "orientation"
-        );
-
-
-    const doc =
-        createPDF(dimensions);
-
-    if (!doc) return;
-
-
-    const pos =
-        getCocoPOs();
-
-
-    const list =
-        pos.length
-            ? pos
-            : ["PO NUMBER"];
-
-
-    const labelsPerPage =
-        getLabelsPerPage();
-
-
-    const labelGap =
-        Math.max(
-            0,
-            numberValue(
-                "labelGap",
-                2
-            )
-        );
-
-
-    /*
-     * Keep box number sequential.
-     */
-
-    let boxNumber = 1;
-
-
-    for (
-        let index = 0;
-        index < list.length;
-        index += labelsPerPage
-    ) {
-
-        if (index > 0) {
-
-            doc.addPage(
-                [
-                    dimensions.width,
-                    dimensions.height
-                ]
-            );
-
-        }
-
-
-        const batch =
-            list.slice(
-                index,
-                index + labelsPerPage
-            );
-
-
-        const availableHeight =
-            dimensions.height -
-            labelGap *
-            (batch.length + 1);
-
-
-        const labelHeight =
-            availableHeight /
-            batch.length;
-
-
-        batch.forEach(
-            (po, position) => {
-
-                const x =
-                    labelGap;
-
-                const y =
-                    labelGap +
-                    position *
-                    (
-                        labelHeight +
-                        labelGap
-                    );
-
-
-                const width =
-                    dimensions.width -
-                    labelGap * 2;
-
-
-                drawPDFLabel(
-                    doc,
-                    x,
-                    y,
-                    width,
-                    labelHeight,
-                    po,
-                    boxNumber++
-                );
-
-            }
-        );
-
-    }
-
-
-    doc.save(
-        "books-label-studio-coco-blue.pdf"
-    );
-
-
-    showToast(
-        "PDF generated successfully.",
-        "success",
-        "Coco Blue"
-    );
-
-}
-
-
-/* =========================================================
-   OTHER PO PDF
-========================================================= */
-
-function generateOtherPDF() {
-
-    const dimensions =
-        getPDFDimensions(
-            "otherPageSize",
-            "otherCustomWidth",
-            "otherCustomHeight",
-            "otherOrientation"
-        );
-
-
-    const doc =
-        createPDF(dimensions);
-
-    if (!doc) return;
-
-
-    const pos =
-        getOtherPOs();
-
-
-    const list =
-        pos.length
-            ? pos
-            : ["PO NUMBER"];
-
-
-    list.forEach(
-        (po, index) => {
-
-            if (index > 0) {
-
-                doc.addPage(
-                    [
-                        dimensions.width,
-                        dimensions.height
-                    ]
-                );
-
-            }
-
-
-            doc.setFont(
-                "helvetica",
-                "bold"
-            );
-
-            doc.setFontSize(
-                28
-            );
-
-
-            doc.text(
-                String(po),
-                dimensions.width / 2,
-                dimensions.height / 2,
-                {
-                    align: "center"
-                }
-            );
-
-        }
-    );
-
-
-    doc.save(
-        "books-label-studio-other-po.pdf"
-    );
-
-
-    showToast(
-        "Other PO PDF generated successfully.",
-        "success",
-        "Other PO"
-    );
-
-}
-
-
-/* =========================================================
-   ISBN PDF
-========================================================= */
-
-function generateISBNPDF() {
-
-    const dimensions =
-        getPDFDimensions(
-            "isbnPageSize",
-            "isbnCustomWidth",
-            "isbnCustomHeight",
-            "isbnOrientation"
-        );
-
-
-    const doc =
-        createPDF(dimensions);
-
-    if (!doc) return;
-
-
-    const isbn =
-        value(
-            "isbnNumber",
-            "ISBN"
-        ).trim();
-
-
-    const title =
-        value(
-            "isbnTitle"
-        ).trim();
-
-
-    doc.setFont(
-        "helvetica",
-        "bold"
-    );
-
-    doc.setFontSize(
-        18
-    );
-
-
-    doc.text(
-        title || "ISBN",
-        dimensions.width / 2,
-        20,
-        {
-            align: "center"
-        }
-    );
-
-
-    if (typeof JsBarcode !== "undefined") {
-
-        /*
-         * Generate barcode on an SVG.
-         * SVG-to-PDF conversion is not guaranteed
-         * without additional plugins, so use a
-         * clean text representation as fallback.
-         */
-
-        doc.setFont(
-            "courier",
-            "normal"
-        );
-
-        doc.setFontSize(
-            14
-        );
-
-
-        doc.text(
-            isbn,
-            dimensions.width / 2,
-            dimensions.height / 2,
-            {
-                align: "center"
-            }
-        );
-
-    } else {
-
-        doc.text(
-            isbn,
-            dimensions.width / 2,
-            dimensions.height / 2,
-            {
-                align: "center"
-            }
-        );
-
-    }
-
-
-    doc.save(
-        "books-label-studio-isbn.pdf"
-    );
-
-
-    showToast(
-        "ISBN PDF generated successfully.",
-        "success",
-        "ISBN Barcode Maker"
-    );
-
-}
-
-
-/* =========================================================
-   ADDRESS PDF
-========================================================= */
-
-function generateAddressPDF() {
-
-    const dimensions =
-        getDimensions(
-            value(
-                "addressPageSize",
-                "4x6"
-            ),
-
-            value(
-                "addressCustomWidth",
-                70
-            ),
-
-            value(
-                "addressCustomHeight",
-                35
-            )
-        );
-
-
-    const doc =
-        createPDF(dimensions);
-
-    if (!doc) return;
-
-
-    const from =
-        value(
-            "fromAddress",
-            "From Address"
-        );
-
-
-    const to =
-        value(
-            "toAddress",
-            "To Address"
-        );
-
-
-    doc.setFont(
-        "helvetica",
-        "bold"
-    );
-
-    doc.setFontSize(
-        10
-    );
-
-
-    doc.text(
-        "FROM",
-        10,
-        15
-    );
-
-
-    doc.setFont(
-        "helvetica",
-        "normal"
-    );
-
-    doc.setFontSize(
-        11
-    );
-
-
-    const fromLines =
-        doc.splitTextToSize(
-            from,
-            dimensions.width - 20
-        );
-
-
-    doc.text(
-        fromLines,
-        10,
-        22
-    );
-
-
-    const toY =
-        dimensions.height / 2;
-
-
-    doc.setFont(
-        "helvetica",
-        "bold"
-    );
-
-    doc.setFontSize(
-        10
-    );
-
-
-    doc.text(
-        "TO",
-        10,
-        toY
-    );
-
-
-    doc.setFont(
-        "helvetica",
-        "normal"
-    );
-
-
-    const toLines =
-        doc.splitTextToSize(
-            to,
-            dimensions.width - 20
-        );
-
-
-    doc.text(
-        toLines,
-        10,
-        toY + 7
-    );
-
-
-    doc.save(
-        "books-label-studio-address.pdf"
-    );
-
-
-    showToast(
-        "Address PDF generated successfully.",
-        "success",
-        "Address Label Maker"
-    );
-
-}
-
-
-/* =========================================================
-   ACTION BUTTONS
-========================================================= */
-
-function initActions() {
-
-    const actions = {
-
-        cocoResetButton:
-            resetCoco,
-
-        cocoGenerateButton:
-            generateCocoPDF,
-
-        otherResetButton:
-            resetOther,
-
-        otherGenerateButton:
-            generateOtherPDF,
-
-        isbnResetButton:
-            resetISBN,
-
-        isbnGenerateButton:
-            generateISBNPDF,
-
-        addressResetButton:
-            resetAddress,
-
-        addressGenerateButton:
-            generateAddressPDF
-
-    };
-
-
-    Object.entries(actions).forEach(
-        ([id, handler]) => {
-
-            const button = $(id);
-
-            if (!button) return;
-
-            button.addEventListener(
-                "click",
-                handler
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   ADDRESS QR LIVE INPUTS
-========================================================= */
-
-function initAddress() {
-
-    [
-        "fromAddress",
-        "toAddress",
-        "addressEmail"
-    ].forEach(id => {
-
-        const element = $(id);
-
-        if (!element) return;
-
-        element.addEventListener(
-            "input",
-            updateAddressPreview
-        );
-
-    });
-
-
-    updateAddressPreview();
-
-}
-
-
-/* =========================================================
-   ISBN EVENTS
+   ISBN PREVIEW
 ========================================================= */
 
 function initISBN() {
 
-    [
-        "isbnNumber",
-        "isbnTitle",
-        "isbnCustomWidth",
-        "isbnCustomHeight"
-    ].forEach(id => {
+  const isbnInput =
+    $("#isbnNumber");
 
-        const element = $(id);
+  const isbnPreview =
+    $("#isbnPreview");
 
-        if (!element) return;
+  if (!isbnInput || !isbnPreview) {
+    return;
+  }
 
-        element.addEventListener(
-            "input",
-            updateISBNPreview
-        );
+  isbnInput.addEventListener(
+    "input",
+    () => {
 
+      isbnPreview.textContent =
+        isbnInput.value.trim() ||
+        "Enter ISBN";
+    }
+  );
+}
+
+/* =========================================================
+   ADDRESS PREVIEW
+========================================================= */
+
+function initAddress() {
+
+  const address =
+    $("#addressInput");
+
+  const email =
+    $("#addressEmail");
+
+  const align =
+    $("#addressAlign");
+
+  const preview =
+    $("#addressPreview");
+
+  if (!preview) return;
+
+  function update() {
+
+    const addressText =
+      address?.value.trim() ||
+      "Your address will appear here.";
+
+    const emailText =
+      email?.value.trim();
+
+    preview.innerHTML =
+      addressText.replace(
+        /\n/g,
+        "<br>"
+      ) +
+      (
+        emailText
+          ? `<br><br>✉️ ${emailText}`
+          : ""
+      );
+
+    if (align) {
+
+      preview.style.textAlign =
+        align.value.toLowerCase();
+    }
+  }
+
+  [address, email, align]
+    .filter(Boolean)
+    .forEach(element => {
+
+      element.addEventListener(
+        "input",
+        update
+      );
+
+      element.addEventListener(
+        "change",
+        update
+      );
     });
 
+  update();
 }
 
-
 /* =========================================================
-   STATUS
+   LIVE COCO CONTROLS
 ========================================================= */
 
-function setAppReady() {
+function initLiveCocoControls() {
 
-    if ($("appStatusText")) {
+  const panel =
+    $("#cocoPanel");
 
-        $("appStatusText").textContent =
-            "Ready";
+  if (!panel) return;
 
-    }
+  $$(
+    "input, select, textarea",
+    panel
+  ).forEach(element => {
 
-    if ($("appStatus")) {
+    element.addEventListener(
+      "input",
+      updateCocoPreview
+    );
 
-        $("appStatus").style.background =
-            "#16a34a";
-
-    }
-
+    element.addEventListener(
+      "change",
+      updateCocoPreview
+    );
+  });
 }
 
-
 /* =========================================================
-   INITIALIZE
+   RESET COCOBLUE
 ========================================================= */
 
-function initApp() {
+function initCocoReset() {
 
-    try {
+  const reset =
+    $("#cocoReset");
 
-        initFeatureCards();
+  if (!reset) return;
 
-        initPopups();
+  reset.addEventListener(
+    "click",
+    () => {
 
-        initCocoModes();
+      const panel =
+        $("#cocoPanel");
 
-        initOtherModes();
+      $$(
+        "input",
+        panel
+      ).forEach(input => {
 
-        createManualInputs(
-            "manualPOGrid",
-            "cocoPO",
-            20
+        if (
+          input.type === "text" ||
+          input.type === "number"
+        ) {
+          input.value = "";
+        }
+
+        if (
+          input.type === "checkbox"
+        ) {
+          input.checked = false;
+          input.disabled = false;
+        }
+
+        if (
+          input.type === "radio"
+        ) {
+          input.disabled = false;
+        }
+      });
+
+      if ($("#boxPrefix")) {
+        $("#boxPrefix").value =
+          "BOX NO.";
+      }
+
+      if ($("#poOnly")) {
+        $("#poOnly").checked = true;
+      }
+
+      if ($("#pageSize")) {
+        $("#pageSize").value = "4x6";
+      }
+
+      if ($("#labelsPerPage")) {
+        $("#labelsPerPage").value = "2";
+      }
+
+      if ($("#combinedFreeze")) {
+        $("#combinedFreeze").checked = false;
+      }
+
+      $$("#cocoPanel .border-card")
+        .forEach(card => {
+          card.classList.remove("frozen");
+        });
+
+      if ($("#customPage")) {
+        $("#customPage")
+          .classList.remove("open");
+      }
+
+      if ($("#customLabels")) {
+        $("#customLabels")
+          .classList.remove("open");
+      }
+
+      updateCocoPreview();
+
+      showToast(
+        "green",
+        "Settings Reset",
+        "CocoBlue settings have been reset."
+      );
+    }
+  );
+}
+
+/* =========================================================
+   GENERATE PDF
+   Separate from Print PDF
+========================================================= */
+
+function generatePDF(moduleName = "BooksWagon Label") {
+
+  const activePanel =
+    $(".panel.active");
+
+  if (!activePanel) {
+
+    showToast(
+      "red",
+      "PDF Error",
+      "No active tool is selected."
+    );
+
+    return;
+  }
+
+  const preview =
+    $(".preview-page", activePanel);
+
+  if (!preview) {
+
+    showToast(
+      "red",
+      "PDF Error",
+      "No preview is available."
+    );
+
+    return;
+  }
+
+  const popup =
+    window.open(
+      "",
+      "_blank",
+      "width=900,height=900"
+    );
+
+  if (!popup) {
+
+    showToast(
+      "red",
+      "Popup Blocked",
+      "Please allow browser popups to generate the PDF."
+    );
+
+    return;
+  }
+
+  const printCSS = `
+    <style>
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 20px;
+        background: white;
+        font-family: Arial, sans-serif;
+      }
+
+      .preview-page {
+        background: white;
+        box-shadow: none !important;
+        margin: auto;
+      }
+
+      .label {
+        break-inside: avoid;
+      }
+
+      @media print {
+
+        body {
+          padding: 0;
+        }
+
+        .preview-page {
+          box-shadow: none !important;
+        }
+      }
+
+    </style>
+  `;
+
+  popup.document.open();
+
+  popup.document.write(`
+    <!DOCTYPE html>
+
+    <html>
+
+    <head>
+
+      <meta charset="UTF-8">
+
+      <title>
+        ${moduleName}
+      </title>
+
+      ${printCSS}
+
+    </head>
+
+    <body>
+
+      ${preview.outerHTML}
+
+    </body>
+
+    </html>
+  `);
+
+  popup.document.close();
+
+  showToast(
+    "green",
+    "PDF Generated",
+    `${moduleName} PDF is ready.`
+  );
+}
+
+/* =========================================================
+   PRINT PDF
+   Opens browser print dialog
+========================================================= */
+
+function printPDF() {
+
+  showToast(
+    "green",
+    "Print PDF",
+    "Opening the print dialog."
+  );
+
+  setTimeout(() => {
+    window.print();
+  }, 300);
+}
+
+/* =========================================================
+   OPTIONAL BUTTON HANDLERS
+========================================================= */
+
+function initPDFButtons() {
+
+  const generate =
+    $("#generatePDF");
+
+  const print =
+    $("#printPDF");
+
+  if (generate) {
+
+    generate.addEventListener(
+      "click",
+      () => {
+
+        generatePDF(
+          "CocoBlue"
         );
+      }
+    );
+  }
 
-        createManualInputs(
-            "otherManualPOGrid",
-            "otherPO",
-            20
-        );
+  if (print) {
 
-        initExcel();
+    print.addEventListener(
+      "click",
+      () => {
+        printPDF();
+      }
+    );
+  }
 
-        initPageSettings();
+  /*
+    Other modules already use
+    inline onclick handlers in the HTML.
+  */
+}
 
-        initContentSettings();
+/* =========================================================
+   LIVE PREVIEW ROUTER
+========================================================= */
 
-        initBorderSettings();
+function refreshActivePreview() {
 
-        initFontSettings();
+  const active =
+    $(".panel.active");
 
-        initFlowSettings();
+  if (!active) return;
 
-        initLiveInputs();
+  if (
+    active.id === "cocoPanel"
+  ) {
+    updateCocoPreview();
+  }
 
-        initActions();
+  else if (
+    active.id === "otherPanel"
+  ) {
+    updateOtherPreview();
+  }
 
-        initAddress();
+  else if (
+    active.id === "isbnPanel"
+  ) {
 
-        initISBN();
+    const input =
+      $("#isbnNumber");
 
+    const preview =
+      $("#isbnPreview");
 
-        /*
-         * Default workspace.
-         */
+    if (input && preview) {
 
-        openFeature(
-            "coco-blue"
-        );
+      preview.textContent =
+        input.value.trim() ||
+        "Enter ISBN";
+    }
+  }
+}
 
+/* =========================================================
+   OTHER PO LIVE INPUTS
+========================================================= */
 
-        /*
-         * Initial preview.
-         */
+function initOtherLive() {
 
-        updateManualCount();
+  const panel =
+    $("#otherPanel");
 
-        updateLivePreview();
+  if (!panel) return;
 
-        setAppReady();
+  $$(
+    "input, select, textarea",
+    panel
+  ).forEach(element => {
 
+    element.addEventListener(
+      "input",
+      updateOtherPreview
+    );
 
-        console.log(
-            "Books Label Studio initialized."
-        );
+    element.addEventListener(
+      "change",
+      updateOtherPreview
+    );
+  });
+}
 
+/* =========================================================
+   GENERAL ENABLE / DISABLE TOAST
+========================================================= */
 
-    } catch (error) {
+function initGeneralToggleMessages() {
 
-        console.error(
-            "Initialization error:",
-            error
-        );
+  $$(
+    'input[type="checkbox"]'
+  ).forEach(input => {
 
+    if (
+      input.id === "combinedFreeze" ||
+      input.id === "allBorder"
+    ) {
+      return;
+    }
+
+    input.addEventListener(
+      "change",
+      () => {
+
+        const wrapper =
+          input.closest(
+            ".choice,.format,.border-card"
+          );
+
+        const label =
+          wrapper?.querySelector(
+            "label,strong"
+          );
+
+        const name =
+          label?.textContent.trim() ||
+          "Feature";
 
         showToast(
-            "Something went wrong while starting the website.",
-            "error",
-            "Application Error"
+          input.checked
+            ? "green"
+            : "red",
+
+          input.checked
+            ? "Feature Enabled"
+            : "Feature Disabled",
+
+          `${name} has been ${
+            input.checked
+              ? "enabled"
+              : "disabled"
+          }.`
         );
-
-    }
-
+      }
+    );
+  });
 }
 
+/* =========================================================
+   KEYBOARD SHORTCUTS
+========================================================= */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    /*
+      Ctrl + P
+      Browser print dialog
+    */
+
+    if (
+      event.ctrlKey &&
+      event.key.toLowerCase() === "p"
+    ) {
+
+      event.preventDefault();
+
+      printPDF();
+    }
+  }
+);
 
 /* =========================================================
-   START AFTER DOM
+   INITIALIZE EVERYTHING
+========================================================= */
+
+function initBooksWagonStudio() {
+
+  populateFontDropdowns();
+
+  populateBorderDropdowns();
+
+  createManualPOFields();
+
+  initModules();
+
+  initCocoTabs();
+
+  initBulkInput();
+
+  initExcel();
+
+  initContentMode();
+
+  initCustomPage();
+
+  initCustomLabelCount();
+
+  initCocoRange();
+
+  initOtherRange();
+
+  initAllBorder();
+
+  initToggleToasts();
+
+  initLiveCocoControls();
+
+  initCocoReset();
+
+  initISBN();
+
+  initAddress();
+
+  initOtherLive();
+
+  initPDFButtons();
+
+  initGeneralToggleMessages();
+
+  updateCocoPreview();
+
+  updateOtherPreview();
+
+  refreshActivePreview();
+}
+
+/* =========================================================
+   START
 ========================================================= */
 
 if (
-    document.readyState ===
-    "loading"
+  document.readyState === "loading"
 ) {
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        initApp
-    );
+  document.addEventListener(
+    "DOMContentLoaded",
+    initBooksWagonStudio
+  );
 
 } else {
 
-    initApp();
-
+  initBooksWagonStudio();
 }
