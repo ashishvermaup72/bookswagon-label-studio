@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
@@ -13,11 +14,14 @@
         content="#2563eb"
     >
 
+    <meta
+        name="description"
+        content="Books Label Studio - Professional Label, PO, Barcode and QR Generator"
+    >
+
     <title>Books Label Studio</title>
 
-    <!-- =====================================================
-         CSS
-    ====================================================== -->
+    <!-- YOUR CSS -->
     <link
         rel="stylesheet"
         href="style.css"
@@ -62,6 +66,7 @@
             </label>
 
             <select id="languageSelect">
+
                 <option value="en">
                     English
                 </option>
@@ -69,6 +74,7 @@
                 <option value="hi">
                     हिन्दी
                 </option>
+
             </select>
 
         </div>
@@ -77,7 +83,7 @@
 
 
     <!-- =====================================================
-         MAIN TOOL NAVIGATION
+         MAIN CATEGORY NAVIGATION
     ====================================================== -->
 
     <nav
@@ -154,7 +160,7 @@
         </div>
 
 
-        <!-- SUB NAV -->
+        <!-- COCO MODES -->
 
         <div class="sub-navigation">
 
@@ -196,9 +202,7 @@
         </div>
 
 
-        <!-- =================================================
-             INDIVIDUAL PO
-        ================================================== -->
+        <!-- INDIVIDUAL -->
 
         <section
             id="cocoIndividualPanel"
@@ -210,6 +214,7 @@
                 <div class="panel-title">
 
                     <div>
+
                         <h3>
                             ✏️ Enter PO Numbers
                         </h3>
@@ -217,6 +222,7 @@
                         <p>
                             Enter individual PO values.
                         </p>
+
                     </div>
 
                     <span class="limit-badge">
@@ -236,9 +242,7 @@
         </section>
 
 
-        <!-- =================================================
-             MULTIPLE PO
-        ================================================== -->
+        <!-- MULTIPLE -->
 
         <section
             id="cocoMultiplePanel"
@@ -250,13 +254,15 @@
                 <div class="panel-title">
 
                     <div>
+
                         <h3>
                             📋 Multiple PO
                         </h3>
 
                         <p>
-                            Enter one PO per line, comma or semicolon.
+                            One PO per line, comma or semicolon.
                         </p>
+
                     </div>
 
                 </div>
@@ -280,9 +286,7 @@
         </section>
 
 
-        <!-- =================================================
-             EXCEL PO
-        ================================================== -->
+        <!-- EXCEL -->
 
         <section
             id="cocoExcelPanel"
@@ -294,13 +298,15 @@
                 <div class="panel-title">
 
                     <div>
+
                         <h3>
                             📊 Upload PO Excel
                         </h3>
 
                         <p>
-                            First row is treated as the header and ignored during processing.
+                            First row is treated as header and ignored.
                         </p>
+
                     </div>
 
                 </div>
@@ -313,7 +319,7 @@
                     </strong>
 
                     <p>
-                        XLSX OR XLS OR CSV
+                        XLSX / XLS / CSV
                     </p>
 
                     <input
@@ -323,7 +329,7 @@
                     >
 
                     <span id="cocoExcelFileName">
-                        No file selected yet
+                        No file selected
                     </span>
 
                 </div>
@@ -339,9 +345,7 @@
         </section>
 
 
-        <!-- =================================================
-             COCO ADDRESS
-        ================================================== -->
+        <!-- ADDRESS -->
 
         <section
             id="cocoAddressPanel"
@@ -353,9 +357,11 @@
                 <div class="panel-title">
 
                     <div>
+
                         <h3>
                             📍 Address
                         </h3>
+
                     </div>
 
                 </div>
@@ -397,15 +403,14 @@
         </section>
 
 
-        <!-- =================================================
-             COCO BOX SETTINGS
-        ================================================== -->
+        <!-- BOX SETTINGS -->
 
         <section class="panel-card">
 
             <div class="panel-title">
 
                 <div>
+
                     <h3>
                         📦 Box Settings
                     </h3>
@@ -413,6 +418,7 @@
                     <p>
                         Configure Box Number sequence.
                     </p>
+
                 </div>
 
             </div>
@@ -472,15 +478,14 @@
         </section>
 
 
-        <!-- =================================================
-             PAGE SETTINGS
-        ================================================== -->
+        <!-- PAGE SETTINGS -->
 
         <section class="panel-card">
 
             <div class="panel-title">
 
                 <div>
+
                     <h3>
                         📄 Page & Label Settings
                     </h3>
@@ -488,6 +493,7 @@
                     <p>
                         Preview changes live.
                     </p>
+
                 </div>
 
             </div>
@@ -636,15 +642,14 @@
         </section>
 
 
-        <!-- =================================================
-             FEATURES
-        ================================================== -->
+        <!-- FEATURES -->
 
         <section class="panel-card">
 
             <div class="panel-title">
 
                 <div>
+
                     <h3>
                         ⚙️ Label Features
                     </h3>
@@ -652,6 +657,7 @@
                     <p>
                         Enable or disable label elements.
                     </p>
+
                 </div>
 
             </div>
@@ -805,18 +811,18 @@
         </section>
 
 
-        <!-- =================================================
-             FONT SETTINGS
-        ================================================== -->
+        <!-- PO STYLE -->
 
         <section class="panel-card">
 
             <div class="panel-title">
 
                 <div>
+
                     <h3>
                         🔤 PO Text Style
                     </h3>
+
                 </div>
 
             </div>
@@ -914,14 +920,18 @@
         </section>
 
 
+        <!-- BOX STYLE -->
+
         <section class="panel-card">
 
             <div class="panel-title">
 
                 <div>
+
                     <h3>
                         🔤 Box Text Style
                     </h3>
+
                 </div>
 
             </div>
@@ -1019,9 +1029,7 @@
         </section>
 
 
-        <!-- =================================================
-             LIVE PREVIEW
-        ================================================== -->
+        <!-- LIVE PREVIEW -->
 
         <section class="panel-card preview-card">
 
@@ -1085,9 +1093,7 @@
         </section>
 
 
-        <!-- =================================================
-             ACTIONS
-        ================================================== -->
+        <!-- ACTIONS -->
 
         <div class="action-bar">
 
@@ -1244,7 +1250,7 @@
                     </strong>
 
                     <p>
-                        First row is treated as header and ignored.
+                        First row is header and ignored.
                     </p>
 
                     <input
@@ -1254,7 +1260,7 @@
                     >
 
                     <span id="otherExcelFileName">
-                        No file selected yet
+                        No file selected
                     </span>
 
                 </div>
@@ -1435,7 +1441,7 @@
 
 
     <!-- =====================================================
-         ISBN
+         ISBN / BARCODE
     ====================================================== -->
 
     <main
@@ -1691,7 +1697,7 @@
             </h2>
 
             <p>
-                Generate address labels with location and email QR codes.
+                Generate address labels with QR codes.
             </p>
 
         </div>
@@ -1718,6 +1724,8 @@
 
         </div>
 
+
+        <!-- MANUAL -->
 
         <section
             id="addressManualPanel"
@@ -1780,6 +1788,8 @@
         </section>
 
 
+        <!-- ADDRESS EXCEL -->
+
         <section
             id="addressExcelPanel"
             class="address-mode-panel"
@@ -1794,7 +1804,7 @@
                     </strong>
 
                     <p>
-                        First row is the header and will be ignored.
+                        First row is header and ignored.
                     </p>
 
                     <input
@@ -1816,9 +1826,7 @@
         </section>
 
 
-        <!-- =================================================
-             ADDRESS PAGE
-        ================================================== -->
+        <!-- ADDRESS PAGE -->
 
         <section class="panel-card">
 
@@ -1919,9 +1927,7 @@
         </section>
 
 
-        <!-- =================================================
-             QR CODES
-        ================================================== -->
+        <!-- QR -->
 
         <section class="panel-card">
 
@@ -1934,7 +1940,7 @@
                     </h3>
 
                     <p>
-                        Location and email QR codes.
+                        Address and Email QR codes.
                     </p>
 
                 </div>
@@ -1976,18 +1982,18 @@
         </section>
 
 
-        <!-- =================================================
-             FROM FONT
-        ================================================== -->
+        <!-- FROM STYLE -->
 
         <section class="panel-card">
 
             <div class="panel-title">
 
                 <div>
+
                     <h3>
                         📤 From Text Style
                     </h3>
+
                 </div>
 
             </div>
@@ -2038,38 +2044,50 @@
                 <div class="text-style-controls">
 
                     <label>
+
                         <input
                             id="fromBold"
                             type="checkbox"
                         >
+
                         Bold
+
                     </label>
 
 
                     <label>
+
                         <input
                             id="fromItalic"
                             type="checkbox"
                         >
+
                         Italic
+
                     </label>
 
 
                     <label>
+
                         <input
                             id="fromUnderline"
                             type="checkbox"
                         >
+
                         Underline
+
                     </label>
 
 
                     <label>
+
                         <input
                             id="fromBorder"
                             type="checkbox"
                         >
+
                         Border
+
                     </label>
 
                 </div>
@@ -2079,18 +2097,18 @@
         </section>
 
 
-        <!-- =================================================
-             TO FONT
-        ================================================== -->
+        <!-- TO STYLE -->
 
         <section class="panel-card">
 
             <div class="panel-title">
 
                 <div>
+
                     <h3>
                         📥 To Text Style
                     </h3>
+
                 </div>
 
             </div>
@@ -2141,38 +2159,50 @@
                 <div class="text-style-controls">
 
                     <label>
+
                         <input
                             id="toBold"
                             type="checkbox"
                         >
+
                         Bold
+
                     </label>
 
 
                     <label>
+
                         <input
                             id="toItalic"
                             type="checkbox"
                         >
+
                         Italic
+
                     </label>
 
 
                     <label>
+
                         <input
                             id="toUnderline"
                             type="checkbox"
                         >
+
                         Underline
+
                     </label>
 
 
                     <label>
+
                         <input
                             id="toBorder"
                             type="checkbox"
                         >
+
                         Border
+
                     </label>
 
                 </div>
@@ -2229,7 +2259,7 @@
 
 
     <!-- =====================================================
-         OPTIONAL MODAL
+         MODAL
     ====================================================== -->
 
     <div
@@ -2320,39 +2350,142 @@
 
 <!-- =========================================================
      EXTERNAL LIBRARIES
-========================================================== -->
+     
+     IMPORTANT:
+     Libraries MUST load BEFORE app.js
+========================================================= -->
 
-<!-- Excel -->
+<!-- XLSX / EXCEL -->
 <script
     src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
 ></script>
 
 
-<!-- QR Code -->
+<!-- QR CODE -->
 <script
     src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"
 ></script>
 
 
-<!-- Barcode -->
+<!-- BARCODE -->
 <script
     src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
 ></script>
 
 
-<!-- PDF -->
+<!-- PDF — CORRECTED -->
 <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"
+    src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
 ></script>
 
 
 <!-- =========================================================
-     APP JS
-========================================================== -->
+     LIBRARY CHECK
+========================================================= -->
+
+<script>
+
+    window.addEventListener(
+        "load",
+        function () {
+
+            console.log(
+                "Books Label Studio libraries:"
+            );
+
+            console.log(
+                "XLSX:",
+                typeof window.XLSX
+            );
+
+            console.log(
+                "QRCode:",
+                typeof window.QRCode
+            );
+
+            console.log(
+                "JsBarcode:",
+                typeof window.JsBarcode
+            );
+
+            console.log(
+                "jsPDF:",
+                window.jspdf &&
+                typeof window.jspdf.jsPDF === "function"
+                    ? "LOADED"
+                    : "NOT LOADED"
+            );
+
+        }
+    );
+
+</script>
+
+
+<!-- =========================================================
+     YOUR JAVASCRIPT
+     
+     MUST BE LAST
+========================================================= -->
 
 <script
     src="app.js"
 ></script>
+
+
+<!-- =========================================================
+     FINAL PDF LIBRARY SAFETY CHECK
+========================================================= -->
+
+<script>
+
+    window.addEventListener(
+        "load",
+        function () {
+
+            if (
+                !window.jspdf ||
+                typeof window.jspdf.jsPDF !== "function"
+            ) {
+
+                console.error(
+                    "jsPDF failed to load."
+                );
+
+                const toast =
+                    document.getElementById("toast");
+
+                const message =
+                    document.getElementById("toastMessage");
+
+                if (
+                    toast &&
+                    message
+                ) {
+
+                    toast.classList.remove(
+                        "success"
+                    );
+
+                    toast.classList.add(
+                        "error"
+                    );
+
+                    message.textContent =
+                        "PDF library failed to load. Check internet/CDN access.";
+
+                    toast.classList.add(
+                        "show"
+                    );
+
+                }
+
+            }
+
+        }
+    );
+
+</script>
 
 </body>
 </html>
