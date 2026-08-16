@@ -3,4589 +3,1253 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>Books Label Studio</title>
-
-<!-- External Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
+<title>IRONMARK — Labels Built to Last</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 
 /* =========================================================
-   OLD / SIMPLE STYLE
-   No major redesign
+   TOKENS
 ========================================================= */
+:root{
+    --charcoal:#1a1a1c;
+    --charcoal-2:#232326;
+    --steel:#2e2e32;
+    --steel-line:#3d3d42;
+    --kraft:#e9ddc2;
+    --kraft-dark:#cdbd93;
+    --paper:#f4efe2;
+    --ink:#17171a;
+    --ink-soft:#5a564c;
+    --orange:#e35205;
+    --orange-dark:#b7420a;
+    --white:#faf8f3;
 
-*{
-    box-sizing:border-box;
+    --display: "Oswald", sans-serif;
+    --body: "Inter", sans-serif;
+    --mono: "JetBrains Mono", monospace;
+
+    --stripe: repeating-linear-gradient(
+        135deg,
+        var(--orange) 0px, var(--orange) 22px,
+        var(--charcoal) 22px, var(--charcoal) 44px
+    );
 }
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html{ scroll-behavior:smooth; }
 
 body{
-    margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f4f6f9;
-    color:#222;
+    font-family:var(--body);
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.5;
 }
 
-button,
-input,
-select,
-textarea{
-    font-family:inherit;
+img{ max-width:100%; display:block; }
+
+a{ color:inherit; text-decoration:none; }
+
+button{ font-family:inherit; cursor:pointer; }
+
+.eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--orange);
+    font-weight:600;
 }
 
-button{
-    cursor:pointer;
+.wrap{
+    max-width:1240px;
+    margin:0 auto;
+    padding:0 24px;
 }
 
-.header{
-    background:#fff;
-    border-bottom:1px solid #ddd;
-    padding:14px 18px;
+h1,h2,h3{
+    font-family:var(--display);
+    text-transform:uppercase;
+    letter-spacing:0.01em;
+    line-height:1.05;
+}
+
+:focus-visible{
+    outline:3px solid var(--orange);
+    outline-offset:2px;
+}
+
+@media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+}
+
+/* =========================================================
+   HAZARD STRIPE DIVIDER — signature element
+========================================================= */
+.hazard{
+    height:14px;
+    background:var(--stripe);
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+.site-header{
+    background:var(--charcoal);
+    border-bottom:3px solid var(--orange);
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.header-top{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:15px;
-    position:sticky;
-    top:0;
-    z-index:1000;
-}
-
-.logo-title{
-    display:flex;
-    align-items:center;
-    gap:10px;
+    gap:20px;
+    padding:14px 0;
 }
 
 .logo{
-    width:42px;
-    height:42px;
-    border-radius:8px;
-    background:#2563eb;
-    color:#fff;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--display);
+    font-size:24px;
+    font-weight:700;
+    color:var(--white);
+    letter-spacing:0.03em;
+    white-space:nowrap;
+}
+
+.logo .mark{
+    width:38px;
+    height:38px;
+    background:var(--orange);
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:21px;
-}
-
-.logo-title h1{
-    margin:0;
+    font-family:var(--display);
     font-size:20px;
+    color:var(--charcoal);
+    transform:skew(-8deg);
+    flex-shrink:0;
 }
 
-.logo-title small{
-    color:#777;
-}
+.logo span{ color:var(--orange); }
 
-.top-actions{
+.search-bar{
+    flex:1;
+    max-width:520px;
     display:flex;
+    background:var(--white);
+}
+
+.search-bar input{
+    flex:1;
+    border:none;
+    padding:11px 14px;
+    font-family:var(--body);
+    font-size:14px;
+    background:transparent;
+    color:var(--ink);
+}
+
+.search-bar input:focus{ outline:none; }
+
+.search-bar button{
+    background:var(--orange);
+    border:none;
+    color:var(--white);
+    padding:0 18px;
+    font-size:16px;
+}
+
+.search-bar button:hover{ background:var(--orange-dark); }
+
+.header-actions{
+    display:flex;
+    align-items:center;
+    gap:22px;
+    color:var(--white);
+    font-size:13px;
+    white-space:nowrap;
+}
+
+.header-actions .action{
+    display:flex;
+    align-items:center;
     gap:6px;
+}
+
+.header-actions .badge{
+    background:var(--orange);
+    color:var(--white);
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:600;
+    padding:1px 6px;
+    border-radius:50%;
+}
+
+.nav-row{
+    background:var(--charcoal-2);
+    border-top:1px solid var(--steel-line);
+}
+
+.nav-row .wrap{
+    display:flex;
+    align-items:center;
+    gap:28px;
+    overflow-x:auto;
+}
+
+.nav-row a{
+    display:block;
+    padding:12px 0;
+    color:#cfcdc6;
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    border-bottom:3px solid transparent;
+    white-space:nowrap;
+}
+
+.nav-row a:hover,
+.nav-row a.active{
+    color:var(--white);
+    border-color:var(--orange);
+}
+
+.nav-row .call{
+    margin-left:auto;
+    color:var(--orange);
+    font-weight:600;
+}
+
+.menu-toggle{
+    display:none;
+    background:none;
+    border:1px solid var(--steel-line);
+    color:var(--white);
+    padding:8px 12px;
+    font-size:13px;
+    font-family:var(--mono);
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+.hero{
+    background:
+        linear-gradient(180deg, rgba(26,26,28,0.94), rgba(26,26,28,0.98)),
+        repeating-linear-gradient(45deg, #232326 0px, #232326 2px, #1a1a1c 2px, #1a1a1c 34px);
+    color:var(--white);
+    padding:72px 0 0;
+    position:relative;
+    overflow:hidden;
+}
+
+.hero-grid{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:40px;
+    align-items:center;
+    padding-bottom:56px;
+}
+
+.hero h1{
+    font-size:clamp(38px,5.4vw,64px);
+    color:var(--white);
+    margin:14px 0 18px;
+}
+
+.hero h1 em{
+    font-style:normal;
+    color:var(--orange);
+}
+
+.hero p.lede{
+    font-size:17px;
+    color:#c7c4bb;
+    max-width:480px;
+    margin-bottom:28px;
+}
+
+.hero-ctas{
+    display:flex;
+    gap:14px;
     flex-wrap:wrap;
 }
 
 .btn{
-    border:1px solid #ccc;
-    background:#fff;
-    color:#333;
-    padding:8px 12px;
-    border-radius:6px;
-    font-size:13px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:14px 26px;
+    font-family:var(--display);
+    font-size:15px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    border:2px solid transparent;
+    transition:transform .12s ease, background .15s ease;
 }
 
-.btn:hover{
-    background:#f1f5f9;
-}
+.btn:hover{ transform:translateY(-2px); }
 
-.btn.primary{
-    background:#2563eb;
-    border-color:#2563eb;
-    color:#fff;
+.btn-primary{
+    background:var(--orange);
+    color:var(--white);
 }
+.btn-primary:hover{ background:var(--orange-dark); }
 
-.btn.success{
-    background:#16a34a;
-    border-color:#16a34a;
-    color:#fff;
+.btn-outline{
+    background:transparent;
+    border-color:var(--white);
+    color:var(--white);
 }
+.btn-outline:hover{ background:var(--white); color:var(--charcoal); }
 
-.btn.danger{
-    color:#dc2626;
-}
-
-.btn.warning{
-    background:#f59e0b;
-    border-color:#f59e0b;
-    color:#fff;
-}
-
-.main{
-    padding:16px;
-    max-width:1500px;
-    margin:auto;
-}
-
-.tabs{
+.hero-visual{
+    position:relative;
+    height:100%;
+    min-height:340px;
+    background:var(--kraft);
     display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin-bottom:15px;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--steel-line);
 }
 
-.tab{
-    border:1px solid #d1d5db;
-    background:#fff;
-    padding:10px 15px;
-    border-radius:6px;
-    color:#444;
-    font-weight:bold;
+.roll-icon{
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    background:conic-gradient(from 90deg, #cdbd93, #e9ddc2 40%, #b39f6a 70%, #e9ddc2);
+    border:10px solid var(--charcoal);
+    position:relative;
+    box-shadow:0 20px 40px rgba(0,0,0,0.35);
 }
 
-.tab.active{
-    background:#2563eb;
-    color:#fff;
-    border-color:#2563eb;
+.roll-icon::after{
+    content:"";
+    position:absolute;
+    inset:40%;
+    background:var(--charcoal);
+    border-radius:50%;
 }
 
-.section{
-    display:none;
+.hero-visual .tag{
+    position:absolute;
+    bottom:18px;
+    left:18px;
+    background:var(--charcoal);
+    color:var(--orange);
+    font-family:var(--mono);
+    font-size:12px;
+    padding:6px 10px;
+    letter-spacing:0.05em;
 }
 
-.section.active{
+/* Configure bar — spec-sheet styled quick finder */
+.configure{
+    background:var(--white);
+    border-top:4px solid var(--orange);
+    display:grid;
+    grid-template-columns:repeat(4,1fr) auto;
+    align-items:stretch;
+}
+
+.configure .field{
+    padding:16px 22px;
+    border-right:1px solid #e2ddd0;
+}
+
+.configure .field:last-of-type{ border-right:none; }
+
+.configure label{
     display:block;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:4px;
 }
 
-.card{
-    background:#fff;
-    border:1px solid #ddd;
-    border-radius:8px;
-    padding:15px;
-    margin-bottom:15px;
-}
-
-.card h2,
-.card h3{
-    margin-top:0;
-}
-
-.sub-tabs{
-    display:flex;
-    flex-wrap:wrap;
-    gap:5px;
-    margin-bottom:12px;
-}
-
-.sub-tab{
-    border:1px solid #ddd;
-    background:#fafafa;
-    padding:8px 11px;
-    border-radius:5px;
-    font-size:12px;
-}
-
-.sub-tab.active{
-    background:#2563eb;
-    color:#fff;
-}
-
-.grid-2{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-}
-
-.grid-3{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:12px;
-}
-
-.grid-4{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:12px;
-}
-
-.field{
-    margin-bottom:10px;
-}
-
-.field label{
-    display:block;
-    font-size:12px;
-    font-weight:bold;
-    margin-bottom:5px;
-    color:#444;
-}
-
-input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="color"],
-select,
-textarea{
+.configure select{
     width:100%;
-    padding:8px 9px;
-    border:1px solid #ccc;
-    border-radius:5px;
-    background:#fff;
+    border:none;
+    background:transparent;
+    font-family:var(--body);
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
 }
 
-textarea{
-    min-height:100px;
-    resize:vertical;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-    border-color:#2563eb;
-    outline:none;
-}
-
-.checks{
-    display:flex;
-    flex-wrap:wrap;
-    gap:7px;
-}
-
-.check{
-    display:flex;
-    align-items:center;
-    gap:5px;
-    border:1px solid #ddd;
-    padding:7px 9px;
-    border-radius:5px;
-    background:#fafafa;
-    font-size:12px;
-}
-
-.po-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:7px;
-}
-
-.po-grid input{
-    width:100%;
-}
-
-.upload{
-    border:2px dashed #cbd5e1;
-    padding:20px;
-    text-align:center;
-    border-radius:7px;
-    background:#fafafa;
-}
-
-.preview-layout{
-    display:grid;
-    grid-template-columns:420px 1fr;
-    gap:15px;
-}
-
-.preview-area{
-    background:#eef1f5;
-    border:1px solid #ddd;
-    padding:20px;
-    min-height:500px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    overflow:auto;
-}
-
-.page{
-    width:380px;
-    min-height:540px;
-    background:#fff;
-    border:1px solid #bbb;
-    padding:20px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.label-preview{
-    width:90%;
-    min-height:180px;
-    border:2px solid #222;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-    background:#fff;
-}
-
-.preview-po{
-    font-size:26px;
-    font-weight:bold;
-    text-align:center;
-}
-
-.preview-box{
-    font-size:20px;
-    font-weight:bold;
-    margin-top:15px;
-    text-align:center;
-}
-
-.excel-preview{
-    overflow:auto;
-    max-height:300px;
-    margin-top:10px;
-}
-
-.excel-preview table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:12px;
-}
-
-.excel-preview th,
-.excel-preview td{
-    border:1px solid #ddd;
-    padding:6px;
+.configure .go{
+    background:var(--charcoal);
+    color:var(--white);
+    border:none;
+    padding:0 30px;
+    font-family:var(--display);
+    font-size:14px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
     white-space:nowrap;
 }
 
-.excel-preview th{
-    background:#eef2ff;
+.configure .go:hover{ background:var(--orange); }
+
+/* =========================================================
+   TRUST BAR
+========================================================= */
+.trust-bar{
+    background:var(--kraft);
+    border-bottom:1px solid var(--kraft-dark);
 }
 
-.border-grid{
+.trust-bar .wrap{
     display:grid;
     grid-template-columns:repeat(4,1fr);
-    gap:8px;
+    gap:0;
 }
 
-.border-option{
-    border:1px solid #ddd;
-    background:#fff;
-    padding:8px;
-    border-radius:5px;
-    text-align:center;
-    font-size:11px;
+.trust-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:20px 18px;
+    border-left:1px solid var(--kraft-dark);
 }
 
-.border-option:hover{
-    background:#f1f5f9;
-}
+.trust-item:first-child{ border-left:none; }
 
-.border-option.active{
-    border-color:#2563eb;
-    background:#eff6ff;
-    color:#2563eb;
-}
-
-.border-sample{
-    height:25px;
-    margin-bottom:5px;
-    background:#fff;
-}
-
-.solid{
-    border:2px solid #222;
-}
-
-.double{
-    border:4px double #222;
-}
-
-.dashed{
-    border:2px dashed #222;
-}
-
-.dotted{
-    border:2px dotted #222;
-}
-
-.groove{
-    border:4px groove #777;
-}
-
-.ridge{
-    border:4px ridge #777;
-}
-
-.inset{
-    border:4px inset #777;
-}
-
-.outset{
-    border:4px outset #777;
-}
-
-.thin{
-    border:1px solid #222;
-}
-
-.medium{
-    border:3px solid #222;
-}
-
-.thick{
-    border:5px solid #222;
-}
-
-.double-thin{
-    border:3px double #222;
-}
-
-.double-thick{
-    border:6px double #222;
-}
-
-.dash-dot{
-    border:2px dashed #222;
-}
-
-.shadow{
-    border:2px solid #222;
-    box-shadow:4px 4px 0 #aaa;
-}
-
-.rounded{
-    border:2px solid #222;
-    border-radius:8px;
-}
-
-.blue{
-    border:2px solid #2563eb;
-}
-
-.red{
-    border:2px solid #dc2626;
-}
-
-.green{
-    border:2px solid #16a34a;
-}
-
-.gray{
-    border:2px solid #64748b;
-}
-
-.inside-preview{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-}
-
-.qr-box{
-    min-height:190px;
-    border:1px solid #ddd;
+.trust-item .icon{
+    width:36px;
+    height:36px;
+    flex-shrink:0;
+    background:var(--charcoal);
+    color:var(--orange);
     display:flex;
     align-items:center;
     justify-content:center;
-    background:#fff;
+    font-size:17px;
+    font-weight:700;
 }
 
-.footer{
+.trust-item strong{
+    display:block;
+    font-size:13.5px;
+    font-weight:700;
+}
+
+.trust-item span{
+    font-size:12px;
+    color:var(--ink-soft);
+}
+
+/* =========================================================
+   SECTION SHARED
+========================================================= */
+.section{ padding:64px 0; }
+
+.section-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:32px;
+    flex-wrap:wrap;
+}
+
+.section-head h2{
+    font-size:clamp(26px,3.4vw,38px);
+    margin-top:8px;
+}
+
+.section-head p{
+    color:var(--ink-soft);
+    max-width:460px;
+    font-size:14.5px;
+}
+
+.link-arrow{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--orange);
+    font-weight:600;
+    white-space:nowrap;
+}
+
+/* =========================================================
+   CATEGORY CARDS
+========================================================= */
+.cat-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+.cat-card{
+    background:var(--white);
+    border:1px solid #e2ddd0;
+    position:relative;
+    overflow:hidden;
+    transition:box-shadow .15s ease, transform .15s ease;
+}
+
+.cat-card:hover{
+    box-shadow:0 14px 30px rgba(0,0,0,0.12);
+    transform:translateY(-4px);
+}
+
+.cat-card .thumb{
+    height:150px;
+    background:var(--kraft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-soft);
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    position:relative;
+    border-bottom:3px solid var(--charcoal);
+}
+
+.cat-card .thumb .swatch{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    border:8px solid var(--charcoal);
+}
+
+.cat-card .body{ padding:18px 18px 20px; }
+
+.cat-card h3{
+    font-size:17px;
+    margin-bottom:8px;
+}
+
+.cat-card p{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+}
+
+.cat-card .links{
+    display:flex;
+    gap:16px;
+    font-family:var(--mono);
+    font-size:12px;
+    font-weight:600;
+}
+
+.cat-card .links a{ color:var(--orange); }
+.cat-card .links a:hover{ text-decoration:underline; }
+
+.cat-card .stock-tag{
+    position:absolute;
+    top:12px;
+    left:12px;
+    background:var(--orange);
+    color:var(--white);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:0.06em;
+    padding:4px 8px;
+    text-transform:uppercase;
+}
+
+/* =========================================================
+   INDUSTRIES BAND (dark)
+========================================================= */
+.industries{
+    background:var(--charcoal);
+    color:var(--white);
+}
+
+.industries .eyebrow{ color:var(--orange); }
+
+.industries h2{ color:var(--white); }
+
+.ind-grid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:14px;
+    margin-top:32px;
+}
+
+.ind-card{
+    border:1px solid var(--steel-line);
+    background:var(--charcoal-2);
+    padding:20px 14px;
     text-align:center;
-    padding:20px;
-    margin-top:20px;
-    border-top:1px solid #ddd;
-    color:#666;
+}
+
+.ind-card .icon{
+    width:44px;
+    height:44px;
+    margin:0 auto 12px;
+    background:var(--orange);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    color:var(--charcoal);
+    transform:rotate(45deg);
+}
+.ind-card .icon span{ transform:rotate(-45deg); font-size:15px; }
+
+.ind-card p{
+    font-size:12.5px;
+    color:#c7c4bb;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    font-family:var(--mono);
+}
+
+/* =========================================================
+   STATS STRIP
+========================================================= */
+.stats-strip{
+    background:var(--orange);
+    color:var(--white);
+}
+
+.stats-strip .wrap{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    padding:36px 24px;
+}
+
+.stat{
+    text-align:center;
+    border-left:1px solid rgba(255,255,255,0.35);
+}
+.stat:first-child{ border-left:none; }
+
+.stat strong{
+    display:block;
+    font-family:var(--display);
+    font-size:clamp(28px,4vw,40px);
+}
+
+.stat span{
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    opacity:0.9;
+}
+
+/* =========================================================
+   PROCESS / HOW IT WORKS
+========================================================= */
+.process-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:0;
+}
+
+.process-step{
+    position:relative;
+    padding:0 20px 0 0;
+}
+
+.process-step .num{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--orange);
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.process-step h3{
+    font-size:16px;
+    margin-bottom:8px;
+}
+
+.process-step p{
+    font-size:13.5px;
+    color:var(--ink-soft);
+}
+
+.process-step:not(:last-child)::after{
+    content:"";
+    position:absolute;
+    top:8px;
+    right:0;
+    width:16px;
+    height:2px;
+    background:var(--kraft-dark);
+}
+
+/* =========================================================
+   TESTIMONIALS
+========================================================= */
+.testimonials{ background:var(--kraft); }
+
+.test-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+.test-card{
+    background:var(--paper);
+    border-left:4px solid var(--orange);
+    padding:22px 22px 20px;
+}
+
+.test-card .stars{
+    color:var(--orange);
+    font-size:13px;
+    margin-bottom:12px;
+    letter-spacing:2px;
+}
+
+.test-card p{
+    font-size:14px;
+    margin-bottom:16px;
+    color:var(--ink);
+}
+
+.test-card .who{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+}
+
+/* =========================================================
+   QUOTE / NEWSLETTER BAND
+========================================================= */
+.cta-band{
+    background:var(--charcoal);
+    color:var(--white);
+    position:relative;
+    overflow:hidden;
+}
+
+.cta-band .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:30px;
+    flex-wrap:wrap;
+    padding:54px 24px;
+}
+
+.cta-band h2{
+    color:var(--white);
+    font-size:clamp(24px,3.2vw,32px);
+    max-width:480px;
+}
+
+.cta-band p{
+    color:#c7c4bb;
+    margin-top:8px;
+    font-size:14px;
+}
+
+.cta-form{
+    display:flex;
+    gap:0;
+    flex-shrink:0;
+}
+
+.cta-form input{
+    border:2px solid var(--steel-line);
+    border-right:none;
+    background:var(--charcoal-2);
+    color:var(--white);
+    padding:14px 16px;
+    font-size:14px;
+    font-family:var(--body);
+    min-width:240px;
+}
+
+.cta-form input::placeholder{ color:#8b877c; }
+
+.cta-form input:focus{ outline:none; border-color:var(--orange); }
+
+.cta-form button{
+    background:var(--orange);
+    color:var(--white);
+    border:none;
+    padding:0 22px;
+    font-family:var(--display);
+    font-size:14px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+}
+.cta-form button:hover{ background:var(--orange-dark); }
+
+/* =========================================================
+   FOOTER
+========================================================= */
+.site-footer{
+    background:var(--charcoal-2);
+    color:#c7c4bb;
+    padding:56px 0 0;
+    font-size:13.5px;
+}
+
+.footer-grid{
+    display:grid;
+    grid-template-columns:1.4fr repeat(4,1fr);
+    gap:30px;
+    padding-bottom:40px;
+    border-bottom:1px solid var(--steel-line);
+}
+
+.footer-grid h4{
+    color:var(--white);
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-bottom:16px;
+}
+
+.footer-grid ul{ list-style:none; }
+.footer-grid li{ margin-bottom:9px; }
+.footer-grid a:hover{ color:var(--orange); }
+
+.footer-brand .logo{ margin-bottom:14px; }
+.footer-brand p{ max-width:280px; color:#9d9a90; margin-bottom:16px; }
+
+.socials{ display:flex; gap:10px; }
+.socials a{
+    width:32px; height:32px;
+    border:1px solid var(--steel-line);
+    display:flex; align-items:center; justify-content:center;
     font-size:12px;
 }
+.socials a:hover{ border-color:var(--orange); color:var(--orange); }
 
-.toast{
-    position:fixed;
-    right:20px;
-    top:75px;
-    z-index:99999;
-    min-width:250px;
-    max-width:400px;
-    padding:12px 15px;
-    border-radius:6px;
-    color:#fff;
-    font-weight:bold;
-    font-size:13px;
-    opacity:0;
-    transform:translateX(120%);
-    transition:.25s;
-}
-
-.toast.show{
-    opacity:1;
-    transform:translateX(0);
-}
-
-.toast.green{
-    background:#16a34a;
-}
-
-.toast.red{
-    background:#dc2626;
-}
-
-.toast.orange{
-    background:#f59e0b;
-}
-
-.hidden{
-    display:none !important;
-}
-
-.toolbar{
+.footer-bottom{
     display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 0;
+    font-size:12px;
+    color:#8b877c;
     flex-wrap:wrap;
-    gap:6px;
-    margin-bottom:12px;
+    gap:10px;
 }
 
-.status{
-    padding:6px 10px;
-    background:#f1f5f9;
-    border-radius:5px;
-    font-size:11px;
+.footer-bottom .legal-links{ display:flex; gap:18px; }
+.footer-bottom .legal-links a:hover{ color:var(--orange); }
+
+/* back to top */
+.top-btn{
+    position:fixed;
+    right:22px;
+    bottom:22px;
+    width:46px;
+    height:46px;
+    background:var(--orange);
+    color:var(--white);
+    border:none;
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:99;
+}
+.top-btn.show{ opacity:1; pointer-events:auto; }
+.top-btn:hover{ background:var(--orange-dark); transform:translateY(-3px); }
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width:980px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .configure{ grid-template-columns:repeat(2,1fr); }
+    .configure .go{ grid-column:1/-1; padding:16px; }
+    .trust-bar .wrap{ grid-template-columns:repeat(2,1fr); }
+    .trust-item:nth-child(3){ border-left:none; }
+    .cat-grid{ grid-template-columns:repeat(2,1fr); }
+    .ind-grid{ grid-template-columns:repeat(3,1fr); }
+    .stats-strip .wrap{ grid-template-columns:repeat(2,1fr); gap:20px 0; }
+    .process-grid{ grid-template-columns:repeat(2,1fr); gap:24px; }
+    .process-step:not(:last-child)::after{ display:none; }
+    .test-grid{ grid-template-columns:1fr; }
+    .footer-grid{ grid-template-columns:1fr 1fr; }
 }
 
-@media(max-width:900px){
-
-    .preview-layout{
-        grid-template-columns:1fr;
-    }
-
-    .grid-3,
-    .grid-4{
-        grid-template-columns:1fr 1fr;
-    }
-
-}
-
-@media(max-width:600px){
-
-    .header{
-        flex-direction:column;
-        align-items:flex-start;
-    }
-
-    .grid-2,
-    .grid-3,
-    .grid-4{
-        grid-template-columns:1fr;
-    }
-
-    .po-grid{
-        grid-template-columns:1fr 1fr;
-    }
-
-    .border-grid{
-        grid-template-columns:1fr 1fr;
-    }
-
-    .page{
-        width:280px;
-        min-height:400px;
-    }
-
+@media (max-width:680px){
+    .search-bar{ display:none; }
+    .header-actions .label-text{ display:none; }
+    .nav-row a{ font-size:12px; }
+    .cat-grid{ grid-template-columns:1fr; }
+    .ind-grid{ grid-template-columns:repeat(2,1fr); }
+    .footer-grid{ grid-template-columns:1fr; }
+    .cta-band .wrap{ flex-direction:column; align-items:flex-start; }
+    .cta-form{ width:100%; }
+    .cta-form input{ min-width:0; flex:1; }
 }
 
 </style>
 </head>
-
 <body>
 
-<!-- ======================================================
-     HEADER
-====================================================== -->
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+    <div class="wrap header-top">
+        <a href="#top" class="logo"><span class="mark">IM</span>IRON<span>MARK</span></a>
 
-<header class="header">
+        <form class="search-bar" role="search">
+            <input type="text" placeholder="Search labels, sizes, materials…" aria-label="Search for a product">
+            <button type="submit" aria-label="Search">&#128269;</button>
+        </form>
 
-    <div class="logo-title">
-
-        <div class="logo">📚</div>
-
-        <div>
-            <h1>Books Label Studio</h1>
-            <small>Label &amp; PO Generator</small>
+        <div class="header-actions">
+            <span class="action"><span class="label-text">Live Chat</span></span>
+            <span class="action"><span class="label-text">1-888-575-2235</span></span>
+            <span class="action"><span class="label-text">Account</span></span>
+            <span class="action">Cart <span class="badge">0</span></span>
         </div>
-
     </div>
 
-    <div class="top-actions">
-
-        <button class="btn" id="undoBtn">
-            ↶ Undo
-        </button>
-
-        <button class="btn" id="redoBtn">
-            ↷ Redo
-        </button>
-
-        <button class="btn" id="saveDefaultBtn">
-            💾 Default
-        </button>
-
-        <button class="btn" id="resetBtn">
-            ♻ Reset
-        </button>
-
-        <button class="btn" id="copyStyleBtn">
-            📋 Copy Style
-        </button>
-
-        <button class="btn" id="pasteStyleBtn">
-            📌 Paste Style
-        </button>
-
-    </div>
-
+    <nav class="nav-row">
+        <div class="wrap" style="display:flex;align-items:center;gap:28px;">
+            <a href="#categories" class="active">Blank Labels</a>
+            <a href="#categories">Custom Labels</a>
+            <a href="#industries">Industrial &amp; Hazmat</a>
+            <a href="#process">Design &amp; Templates</a>
+            <a href="#reviews">Reviews</a>
+            <a href="#quote">Bulk Quote</a>
+            <a href="#" class="call">Get a Free Sample Kit &rarr;</a>
+        </div>
+    </nav>
 </header>
 
+<div class="hazard" role="presentation"></div>
 
-<main class="main">
-
-<!-- ======================================================
-     MAIN TABS
-====================================================== -->
-
-<div class="tabs">
-
-    <button class="tab active" data-section="coco">
-        🟦 Coco Blue
-    </button>
-
-    <button class="tab" data-section="other">
-        📄 Other PO
-    </button>
-
-    <button class="tab" data-section="isbn">
-        🔖 ISBN
-    </button>
-
-    <button class="tab" data-section="address">
-        📍 Address
-    </button>
-
-</div>
-
-
-<!-- ======================================================
-     COCO BLUE
-====================================================== -->
-
-<section class="section active" id="section-coco">
-
-    <div class="card">
-
-        <h2>🟦 Coco Blue</h2>
-
-        <div class="sub-tabs">
-
-            <button class="sub-tab active"
-                    data-mode="coco-individual">
-                ✏ Individual
-            </button>
-
-            <button class="sub-tab"
-                    data-mode="coco-multiple">
-                📚 Multiple
-            </button>
-
-            <button class="sub-tab"
-                    data-mode="coco-excel">
-                📊 Excel
-            </button>
-
-        </div>
-
-
-        <!-- INDIVIDUAL -->
-
-        <div class="mode active"
-             id="mode-coco-individual">
-
-            <div class="card">
-
-                <h3>📋 PO Data</h3>
-
-                <div class="po-grid"
-                     id="cocoPOGrid">
-                </div>
-
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+    <div class="wrap hero-grid">
+        <div>
+            <span class="eyebrow">// Industrial-grade label supply</span>
+            <h1>Built to stick.<br><em>Made to last.</em></h1>
+            <p class="lede">Blank stock, custom prints, and hazmat-rated labels that hold up on drums, crates, cold storage, and the open road — shipped from our own presses.</p>
+            <div class="hero-ctas">
+                <a href="#categories" class="btn btn-primary">Shop Label Sizes</a>
+                <a href="#quote" class="btn btn-outline">Request Bulk Quote</a>
             </div>
-
         </div>
-
-
-        <!-- MULTIPLE -->
-
-        <div class="mode"
-             id="mode-coco-multiple">
-
-            <div class="field">
-
-                <label>
-                    📚 PO Numbers
-                </label>
-
-                <textarea
-                    id="cocoMultiplePO"
-                    placeholder="Enter one PO per line"></textarea>
-
-            </div>
-
+        <div class="hero-visual">
+            <div class="roll-icon"></div>
+            <span class="tag">500m ROLL · WATERPROOF</span>
         </div>
-
-
-        <!-- EXCEL -->
-
-        <div class="mode"
-             id="mode-coco-excel">
-
-            <div class="upload">
-
-                <strong>
-                    📊 Upload Excel / CSV
-                </strong>
-
-                <br><br>
-
-                <input
-                    type="file"
-                    id="cocoExcel"
-                    accept=".xlsx,.xls,.csv">
-
-                <p>
-                    First row will be treated as HEADER and ignored.
-                </p>
-
-            </div>
-
-            <div class="excel-preview"
-                 id="cocoExcelPreview">
-            </div>
-
-        </div>
-
     </div>
 
-
-    <!-- PO / BOX -->
-
-    <div class="card">
-
-        <h3>🏷 PO / Box Settings</h3>
-
-        <div class="grid-3">
-
-            <div class="field">
-
-                <label>
-                    Starting Box Number
-                </label>
-
-                <input
-                    type="number"
-                    id="startBox"
-                    value="1"
-                    min="1">
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Labels Per Page
-                </label>
-
-                <select id="labelsPerPage">
-
-                    <option value="1">1 Label</option>
-                    <option value="2" selected>2 Labels</option>
-                    <option value="4">4 Labels</option>
-                    <option value="6">6 Labels</option>
-                    <option value="8">8 Labels</option>
-                    <option value="9">9 Labels</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Page Size
-                </label>
-
-                <select id="pageSize">
-
-                    <option value="4x6" selected>
-                        4 × 6 inch
-                    </option>
-
-                    <option value="a4">
-                        A4
-                    </option>
-
-                    <option value="a5">
-                        A5
-                    </option>
-
-                    <option value="letter">
-                        Letter
-                    </option>
-
-                    <option value="custom">
-                        Custom
-                    </option>
-
-                </select>
-
-            </div>
-
-        </div>
-
-
-        <div class="grid-2">
-
-            <div class="field">
-
-                <label>
-                    Orientation
-                </label>
-
-                <select id="orientation">
-
-                    <option value="portrait">
-                        Portrait
-                    </option>
-
-                    <option value="landscape">
-                        Landscape
-                    </option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Display Options
-                </label>
-
-                <div class="checks">
-
-                    <label class="check">
-                        <input
-                            type="checkbox"
-                            id="showPO"
-                            checked>
-                        PO
-                    </label>
-
-                    <label class="check">
-                        <input
-                            type="checkbox"
-                            id="showBox"
-                            checked>
-                        Box
-                    </label>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- FONT -->
-
-    <div class="card">
-
-        <h3>🔤 Font Design</h3>
-
-        <div class="grid-4">
-
-            <div class="field">
-
-                <label>PO Font</label>
-
-                <select id="poFont">
-
-                    <option>Arial</option>
-                    <option>Calibri</option>
-                    <option>Cambria</option>
-                    <option>Georgia</option>
-                    <option>Times New Roman</option>
-                    <option>Verdana</option>
-                    <option>Tahoma</option>
-                    <option>Trebuchet MS</option>
-                    <option>Courier New</option>
-                    <option>Garamond</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>PO Font Size</label>
-
-                <select id="poFontPreset">
-
-                    <option value="10">10</option>
-                    <option value="12">12</option>
-                    <option value="14">14</option>
-                    <option value="16">16</option>
-                    <option value="18">18</option>
-                    <option value="20">20</option>
-                    <option value="24">24</option>
-                    <option value="28">28</option>
-                    <option value="32">32</option>
-                    <option value="36">36</option>
-                    <option value="48">48</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Or Type Size
-                </label>
-
-                <input
-                    type="number"
-                    id="poFontSize"
-                    value="26"
-                    min="1"
-                    max="200">
-
-            </div>
-
-            <div class="field">
-
-                <label>Alignment</label>
-
-                <select id="poAlign">
-
-                    <option value="center">
-                        Center
-                    </option>
-
-                    <option value="left">
-                        Left
-                    </option>
-
-                    <option value="right">
-                        Right
-                    </option>
-
-                </select>
-
-            </div>
-
-        </div>
-
-
-        <div class="grid-3">
-
-            <div class="field">
-
-                <label>Box Font</label>
-
-                <select id="boxFont">
-
-                    <option>Arial</option>
-                    <option>Calibri</option>
-                    <option>Cambria</option>
-                    <option>Georgia</option>
-                    <option>Times New Roman</option>
-                    <option>Verdana</option>
-                    <option>Tahoma</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>Box Font Size</label>
-
-                <select id="boxFontPreset">
-
-                    <option value="10">10</option>
-                    <option value="12">12</option>
-                    <option value="14">14</option>
-                    <option value="16">16</option>
-                    <option value="18">18</option>
-                    <option value="20" selected>20</option>
-                    <option value="24">24</option>
-                    <option value="28">28</option>
-                    <option value="32">32</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Or Type Size
-                </label>
-
-                <input
-                    type="number"
-                    id="boxFontSize"
-                    value="20"
-                    min="1"
-                    max="200">
-
-            </div>
-
-        </div>
-
-
-        <div class="checks">
-
-            <label class="check">
-                <input type="checkbox" id="poBold" checked>
-                Bold
-            </label>
-
-            <label class="check">
-                <input type="checkbox" id="poItalic">
-                Italic
-            </label>
-
-            <label class="check">
-                <input type="checkbox" id="poUnderline">
-                Underline
-            </label>
-
-            <label class="check">
-                <input type="checkbox" id="boxBold" checked>
-                Box Bold
-            </label>
-
-            <label class="check">
-                <input type="checkbox" id="boxItalic">
-                Box Italic
-            </label>
-
-        </div>
-
-    </div>
-
-
-    <!-- BORDER -->
-
-    <div class="card">
-
-        <h3>🖼 Border Design</h3>
-
-        <div class="border-grid">
-
-            <button class="border-option active"
-                    data-border="solid">
-
-                <div class="border-sample solid"></div>
-                Solid
-
-            </button>
-
-            <button class="border-option"
-                    data-border="double">
-
-                <div class="border-sample double"></div>
-                Double
-
-            </button>
-
-            <button class="border-option"
-                    data-border="dashed">
-
-                <div class="border-sample dashed"></div>
-                Dashed
-
-            </button>
-
-            <button class="border-option"
-                    data-border="dotted">
-
-                <div class="border-sample dotted"></div>
-                Dotted
-
-            </button>
-
-            <button class="border-option"
-                    data-border="groove">
-
-                <div class="border-sample groove"></div>
-                Groove
-
-            </button>
-
-            <button class="border-option"
-                    data-border="ridge">
-
-                <div class="border-sample ridge"></div>
-                Ridge
-
-            </button>
-
-            <button class="border-option"
-                    data-border="inset">
-
-                <div class="border-sample inset"></div>
-                Inset
-
-            </button>
-
-            <button class="border-option"
-                    data-border="outset">
-
-                <div class="border-sample outset"></div>
-                Outset
-
-            </button>
-
-            <button class="border-option"
-                    data-border="thin">
-
-                <div class="border-sample thin"></div>
-                Thin
-
-            </button>
-
-            <button class="border-option"
-                    data-border="medium">
-
-                <div class="border-sample medium"></div>
-                Medium
-
-            </button>
-
-            <button class="border-option"
-                    data-border="thick">
-
-                <div class="border-sample thick"></div>
-                Thick
-
-            </button>
-
-            <button class="border-option"
-                    data-border="double-thin">
-
-                <div class="border-sample double-thin"></div>
-                Thin Double
-
-            </button>
-
-            <button class="border-option"
-                    data-border="double-thick">
-
-                <div class="border-sample double-thick"></div>
-                Thick Double
-
-            </button>
-
-            <button class="border-option"
-                    data-border="dash-dot">
-
-                <div class="border-sample dash-dot"></div>
-                Dash
-
-            </button>
-
-            <button class="border-option"
-                    data-border="shadow">
-
-                <div class="border-sample shadow"></div>
-                Shadow
-
-            </button>
-
-            <button class="border-option"
-                    data-border="rounded">
-
-                <div class="border-sample rounded"></div>
-                Rounded
-
-            </button>
-
-            <button class="border-option"
-                    data-border="blue">
-
-                <div class="border-sample blue"></div>
-                Blue
-
-            </button>
-
-            <button class="border-option"
-                    data-border="red">
-
-                <div class="border-sample red"></div>
-                Red
-
-            </button>
-
-            <button class="border-option"
-                    data-border="green">
-
-                <div class="border-sample green"></div>
-                Green
-
-            </button>
-
-            <button class="border-option"
-                    data-border="gray">
-
-                <div class="border-sample gray"></div>
-                Gray
-
-            </button>
-
-        </div>
-
-
-        <div class="grid-3">
-
-            <div class="field">
-
-                <label>
-                    Border Width
-                </label>
-
-                <input
-                    type="number"
-                    id="borderWidth"
-                    value="2"
-                    min="0"
-                    max="20">
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Border Color
-                </label>
-
-                <input
-                    type="color"
-                    id="borderColor"
-                    value="#222222">
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Border Radius
-                </label>
-
-                <input
-                    type="number"
-                    id="borderRadius"
-                    value="0"
-                    min="0"
-                    max="50">
-
-            </div>
-
-        </div>
-
-
-        <div class="checks">
-
-            <label class="check">
-                <input type="checkbox"
-                       id="borderTop"
-                       checked>
-                Top
-            </label>
-
-            <label class="check">
-                <input type="checkbox"
-                       id="borderRight"
-                       checked>
-                Right
-            </label>
-
-            <label class="check">
-                <input type="checkbox"
-                       id="borderBottom"
-                       checked>
-                Bottom
-            </label>
-
-            <label class="check">
-                <input type="checkbox"
-                       id="borderLeft"
-                       checked>
-                Left
-            </label>
-
-            <label class="check">
-                <input type="checkbox"
-                       id="pageBorder">
-                Page Border
-            </label>
-
-        </div>
-
-    </div>
-
-
-    <!-- PREVIEW -->
-
-    <div class="card">
-
-        <h3>👁 Live Page Preview</h3>
-
-        <div class="preview-area">
-
-            <div class="page"
-                 id="previewPage">
-
-                <div class="label-preview"
-                     id="labelPreview">
-
-                    <div class="preview-po"
-                         id="previewPO">
-                        ABC123
-                    </div>
-
-                    <div class="preview-box"
-                         id="previewBox">
-                        BOX NO. 1
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="toolbar">
-
-        <button class="btn primary"
-                id="cocoPDF">
-            📄 Generate PDF
-        </button>
-
-    </div>
-
-</section>
-
-
-<!-- ======================================================
-     OTHER PO
-====================================================== -->
-
-<section class="section"
-         id="section-other">
-
-    <div class="card">
-
-        <h2>📄 Other PO</h2>
-
+    <div class="configure wrap" style="max-width:1240px;margin:0 auto;">
         <div class="field">
-
-            <label>
-                PO Numbers
-            </label>
-
-            <textarea
-                id="otherPO"
-                placeholder="One PO per line"></textarea>
-
+            <label>Type</label>
+            <select><option>Blank Labels</option><option>Custom Labels</option><option>Hazmat / DOT</option></select>
         </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>🔤 Font Design</h3>
-
-        <div class="grid-3">
-
-            <div class="field">
-
-                <label>Font</label>
-
-                <select id="otherFont">
-
-                    <option>Arial</option>
-                    <option>Calibri</option>
-                    <option>Cambria</option>
-                    <option>Georgia</option>
-                    <option>Times New Roman</option>
-                    <option>Verdana</option>
-                    <option>Tahoma</option>
-                    <option>Courier New</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>Font Size</label>
-
-                <select id="otherFontPreset">
-
-                    <option value="10">10</option>
-                    <option value="12">12</option>
-                    <option value="14">14</option>
-                    <option value="16">16</option>
-                    <option value="18">18</option>
-                    <option value="20" selected>20</option>
-                    <option value="24">24</option>
-                    <option value="28">28</option>
-                    <option value="32">32</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Type Size
-                </label>
-
-                <input
-                    type="number"
-                    id="otherFontSize"
-                    value="20"
-                    min="1"
-                    max="200">
-
-            </div>
-
+        <div class="field">
+            <label>Format</label>
+            <select><option>Sheets</option><option>Rolls</option><option>Fanfold</option></select>
         </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>🖼 Border Design</h3>
-
-        <div class="border-grid">
-
-            <button class="border-option"
-                    data-other-border="solid">
-                Solid
-            </button>
-
-            <button class="border-option"
-                    data-other-border="double">
-                Double
-            </button>
-
-            <button class="border-option"
-                    data-other-border="dashed">
-                Dashed
-            </button>
-
-            <button class="border-option"
-                    data-other-border="dotted">
-                Dotted
-            </button>
-
-            <button class="border-option"
-                    data-other-border="groove">
-                Groove
-            </button>
-
-            <button class="border-option"
-                    data-other-border="ridge">
-                Ridge
-            </button>
-
-            <button class="border-option"
-                    data-other-border="inset">
-                Inset
-            </button>
-
-            <button class="border-option"
-                    data-other-border="outset">
-                Outset
-            </button>
-
-            <button class="border-option"
-                    data-other-border="thin">
-                Thin
-            </button>
-
-            <button class="border-option"
-                    data-other-border="medium">
-                Medium
-            </button>
-
-            <button class="border-option"
-                    data-other-border="thick">
-                Thick
-            </button>
-
-            <button class="border-option"
-                    data-other-border="shadow">
-                Shadow
-            </button>
-
+        <div class="field">
+            <label>Material</label>
+            <select><option>Paper</option><option>Waterproof Poly</option><option>Foil</option></select>
         </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>👁 Preview</h3>
-
-        <div class="preview-area">
-
-            <div class="page">
-
-                <div class="label-preview"
-                     id="otherPreview">
-
-                    ABC123
-
-                </div>
-
-            </div>
-
+        <div class="field">
+            <label>Size</label>
+            <select><option>Choose a size</option><option>2" x 3"</option><option>4" x 6"</option></select>
         </div>
-
+        <button class="go">Find My Label &rarr;</button>
     </div>
-
-
-    <button class="btn primary"
-            id="otherPDF">
-        📄 Generate PDF
-    </button>
-
 </section>
 
-
-<!-- ======================================================
-     ISBN
-====================================================== -->
-
-<section class="section"
-         id="section-isbn">
-
-    <div class="card">
-
-        <h2>🔖 ISBN</h2>
-
-        <div class="grid-2">
-
-            <div class="field">
-
-                <label>
-                    ISBN
-                </label>
-
-                <input
-                    type="text"
-                    id="isbn"
-                    placeholder="9781234567890">
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Book Title
-                </label>
-
-                <input
-                    type="text"
-                    id="bookTitle"
-                    placeholder="Book Title">
-
-            </div>
-
+<!-- ============ TRUST BAR ============ -->
+<section class="trust-bar">
+    <div class="wrap">
+        <div class="trust-item">
+            <div class="icon">&#128230;</div>
+            <div><strong>No Minimum Orders</strong><span>Order 1 sheet or 10,000</span></div>
         </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>🔤 Font Design</h3>
-
-        <div class="grid-3">
-
-            <div class="field">
-
-                <label>Font</label>
-
-                <select id="isbnFont">
-
-                    <option>Arial</option>
-                    <option>Calibri</option>
-                    <option>Cambria</option>
-                    <option>Georgia</option>
-                    <option>Times New Roman</option>
-                    <option>Verdana</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>Font Size</label>
-
-                <select id="isbnFontPreset">
-
-                    <option value="10">10</option>
-                    <option value="12">12</option>
-                    <option value="14">14</option>
-                    <option value="16" selected>16</option>
-                    <option value="18">18</option>
-                    <option value="20">20</option>
-                    <option value="24">24</option>
-                    <option value="28">28</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Type Size
-                </label>
-
-                <input
-                    type="number"
-                    id="isbnFontSize"
-                    value="16"
-                    min="1"
-                    max="200">
-
-            </div>
-
+        <div class="trust-item">
+            <div class="icon">$</div>
+            <div><strong>Lowest Price Guarantee</strong><span>Beat any verified quote</span></div>
         </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>🖼 Border Design</h3>
-
-        <div class="border-grid">
-
-            <button class="border-option"
-                    data-isbn-border="solid">
-                Solid
-            </button>
-
-            <button class="border-option"
-                    data-isbn-border="double">
-                Double
-            </button>
-
-            <button class="border-option"
-                    data-isbn-border="dashed">
-                Dashed
-            </button>
-
-            <button class="border-option"
-                    data-isbn-border="dotted">
-                Dotted
-            </button>
-
-            <button class="border-option"
-                    data-isbn-border="groove">
-                Groove
-            </button>
-
-            <button class="border-option"
-                    data-isbn-border="ridge">
-                Ridge
-            </button>
-
-            <button class="border-option"
-                    data-isbn-border="inset">
-                Inset
-            </button>
-
-            <button class="border-option"
-                    data-isbn-border="outset">
-                Outset
-            </button>
-
-            <button class="border-option"
-                    data-isbn-border="thin">
-                Thin
-            </button>
-
-            <button class="border-option"
-                    data-isbn-border="thick">
-                Thick
-            </button>
-
-            <button class="border-option"
-                    data-isbn-border="shadow">
-                Shadow
-            </button>
-
+        <div class="trust-item">
+            <div class="icon">&#9878;</div>
+            <div><strong>Free Design Templates</strong><span>Print-ready, any size</span></div>
         </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>👁 ISBN Preview</h3>
-
-        <div class="preview-area">
-
-            <div class="page">
-
-                <div class="label-preview"
-                     id="isbnPreview">
-
-                    <strong id="isbnPreviewTitle">
-                        Book Title
-                    </strong>
-
-                    <svg id="barcode"></svg>
-
-                    <span id="isbnPreviewNumber">
-                        ISBN
-                    </span>
-
-                </div>
-
-            </div>
-
+        <div class="trust-item">
+            <div class="icon">&#128666;</div>
+            <div><strong>Same Day Shipping</strong><span>Orders before 4 PM ET</span></div>
         </div>
-
     </div>
-
-
-    <button class="btn primary"
-            id="isbnPDF">
-        📄 Generate PDF
-    </button>
-
 </section>
 
-
-<!-- ======================================================
-     ADDRESS
-====================================================== -->
-
-<section class="section"
-         id="section-address">
-
-    <div class="card">
-
-        <h2>📍 Address</h2>
-
-        <div class="grid-2">
-
-            <div class="field">
-
-                <label>
-                    📤 From Address
-                </label>
-
-                <textarea
-                    id="fromAddress"
-                    placeholder="From Address"></textarea>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    📥 To Address
-                </label>
-
-                <textarea
-                    id="toAddress"
-                    placeholder="To Address"></textarea>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>🔤 Font Design</h3>
-
-        <div class="grid-3">
-
-            <div class="field">
-
-                <label>
-                    Address Font
-                </label>
-
-                <select id="addressFont">
-
-                    <option>Arial</option>
-                    <option>Calibri</option>
-                    <option>Cambria</option>
-                    <option>Georgia</option>
-                    <option>Times New Roman</option>
-                    <option>Verdana</option>
-                    <option>Tahoma</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Font Size
-                </label>
-
-                <select id="addressFontPreset">
-
-                    <option value="10">10</option>
-                    <option value="12">12</option>
-                    <option value="14" selected>14</option>
-                    <option value="16">16</option>
-                    <option value="18">18</option>
-                    <option value="20">20</option>
-                    <option value="24">24</option>
-                    <option value="28">28</option>
-                    <option value="32">32</option>
-
-                </select>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Type Size
-                </label>
-
-                <input
-                    type="number"
-                    id="addressFontSize"
-                    value="14"
-                    min="1"
-                    max="200">
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>🖼 Border Design</h3>
-
-        <div class="border-grid">
-
-            <button class="border-option"
-                    data-address-border="solid">
-                Solid
-            </button>
-
-            <button class="border-option"
-                    data-address-border="double">
-                Double
-            </button>
-
-            <button class="border-option"
-                    data-address-border="dashed">
-                Dashed
-            </button>
-
-            <button class="border-option"
-                    data-address-border="dotted">
-                Dotted
-            </button>
-
-            <button class="border-option"
-                    data-address-border="groove">
-                Groove
-            </button>
-
-            <button class="border-option"
-                    data-address-border="ridge">
-                Ridge
-            </button>
-
-            <button class="border-option"
-                    data-address-border="inset">
-                Inset
-            </button>
-
-            <button class="border-option"
-                    data-address-border="outset">
-                Outset
-            </button>
-
-            <button class="border-option"
-                    data-address-border="thin">
-                Thin
-            </button>
-
-            <button class="border-option"
-                    data-address-border="thick">
-                Thick
-            </button>
-
-            <button class="border-option"
-                    data-address-border="shadow">
-                Shadow
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>🔳 Address QR</h3>
-
-        <div class="inside-preview">
-
+<!-- ============ CATEGORIES ============ -->
+<section class="section" id="categories">
+    <div class="wrap">
+        <div class="section-head">
             <div>
-
-                <div class="field">
-
-                    <label>
-                        Address QR
-                    </label>
-
-                    <button
-                        class="btn primary"
-                        id="addressQRBtn">
-                        Generate Address QR
-                    </button>
-
-                </div>
-
-                <div class="qr-box"
-                     id="addressQR">
-                </div>
-
+                <span class="eyebrow">Shop by product</span>
+                <h2>Four ways to label it</h2>
+                <p>From single blank sheets to full-run custom prints — pick the format that matches the job.</p>
             </div>
-
-
-            <div>
-
-                <div class="field">
-
-                    <label>
-                        ✉ Email ID
-                    </label>
-
-                    <input
-                        type="email"
-                        id="email"
-                        placeholder="email@example.com">
-
-                </div>
-
-                <button
-                    class="btn primary"
-                    id="emailQRBtn">
-                    Generate Email QR
-                </button>
-
-                <div class="qr-box"
-                     id="emailQR">
-                </div>
-
-            </div>
-
+            <a href="#" class="link-arrow">View full catalog &rarr;</a>
         </div>
 
-    </div>
-
-
-    <div class="card">
-
-        <h3>👁 Live Preview</h3>
-
-        <div class="preview-area">
-
-            <div class="page">
-
-                <div class="label-preview"
-                     id="addressPreview">
-
-                    <div id="previewFrom">
-                        FROM ADDRESS
-                    </div>
-
-                    <hr style="width:80%;">
-
-                    <div id="previewTo">
-                        TO ADDRESS
-                    </div>
-
+        <div class="cat-grid">
+            <div class="cat-card">
+                <span class="stock-tag">In Stock</span>
+                <div class="thumb"><div class="swatch"></div></div>
+                <div class="body">
+                    <h3>Blank Labels</h3>
+                    <p>Thousands of blank sheet and roll sizes, ready to print at home or in bulk.</p>
+                    <div class="links"><a href="#">Shop Sheets</a><a href="#">Shop Rolls</a></div>
                 </div>
-
             </div>
-
+            <div class="cat-card">
+                <span class="stock-tag">Popular</span>
+                <div class="thumb"><div class="swatch" style="background:var(--orange);border-color:var(--charcoal);"></div></div>
+                <div class="body">
+                    <h3>Custom Labels</h3>
+                    <p>Professionally printed and delivered — your art, your brand, your sizes.</p>
+                    <div class="links"><a href="#">Shop Sheets</a><a href="#">Shop Rolls</a></div>
+                </div>
+            </div>
+            <div class="cat-card">
+                <span class="stock-tag">Rugged</span>
+                <div class="thumb"><div class="swatch" style="background:var(--charcoal);"></div></div>
+                <div class="body">
+                    <h3>Waterproof &amp; Poly</h3>
+                    <p>Tear, chemical, and UV-resistant stock for outdoor and cold-chain use.</p>
+                    <div class="links"><a href="#">Shop Poly</a><a href="#">Shop Foil</a></div>
+                </div>
+            </div>
+            <div class="cat-card">
+                <span class="stock-tag">DOT / OSHA</span>
+                <div class="thumb"><div class="swatch" style="background:var(--stripe);border:none;border-radius:0;width:70px;height:70px;"></div></div>
+                <div class="body">
+                    <h3>Hazmat &amp; Industrial</h3>
+                    <p>GHS, DOT, and pipe-marking labels built to spec for regulated shipping.</p>
+                    <div class="links"><a href="#">Shop GHS</a><a href="#">Shop DOT</a></div>
+                </div>
+            </div>
         </div>
-
     </div>
-
-
-    <button class="btn primary"
-            id="addressPDF">
-        📄 Generate PDF
-    </button>
-
 </section>
 
+<!-- ============ STATS ============ -->
+<section class="stats-strip">
+    <div class="wrap">
+        <div class="stat"><strong>25+</strong><span>Years Printing</span></div>
+        <div class="stat"><strong>60,000+</strong><span>Label Sizes Stocked</span></div>
+        <div class="stat"><strong>1.2M</strong><span>Orders Shipped</span></div>
+        <div class="stat"><strong>4.9/5</strong><span>Average Rating</span></div>
+    </div>
+</section>
 
-<!-- ======================================================
-     FOOTER
-====================================================== -->
+<!-- ============ INDUSTRIES ============ -->
+<section class="section industries" id="industries">
+    <div class="wrap">
+        <span class="eyebrow">Where our labels work</span>
+        <h2>Trusted across the supply chain</h2>
+        <div class="ind-grid">
+            <div class="ind-card"><div class="icon"><span>&#127974;</span></div><p>Warehousing</p></div>
+            <div class="ind-card"><div class="icon"><span>&#129466;</span></div><p>Food &amp; Bev</p></div>
+            <div class="ind-card"><div class="icon"><span>&#9879;</span></div><p>Chemical</p></div>
+            <div class="ind-card"><div class="icon"><span>&#128677;</span></div><p>Logistics</p></div>
+            <div class="ind-card"><div class="icon"><span>&#128138;</span></div><p>Pharma</p></div>
+            <div class="ind-card"><div class="icon"><span>&#128736;</span></div><p>Manufacturing</p></div>
+        </div>
+    </div>
+</section>
 
-<footer class="footer">
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section" id="process">
+    <div class="wrap">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">From order to install</span>
+                <h2>Four steps, no guesswork</h2>
+            </div>
+        </div>
+        <div class="process-grid">
+            <div class="process-step">
+                <div class="num">01</div>
+                <h3>Pick a size</h3>
+                <p>Search by product, dimension, or upload a die-line.</p>
+            </div>
+            <div class="process-step">
+                <div class="num">02</div>
+                <h3>Choose material</h3>
+                <p>Paper, poly, foil, or chemical-resistant stock.</p>
+            </div>
+            <div class="process-step">
+                <div class="num">03</div>
+                <h3>Upload or design</h3>
+                <p>Use a free template or send print-ready art.</p>
+            </div>
+            <div class="process-step">
+                <div class="num">04</div>
+                <h3>Ship same day</h3>
+                <p>Orders before 4 PM ET leave our dock today.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <strong>
-        Created &amp; Developed by Ashish Verma
-    </strong>
+<!-- ============ TESTIMONIALS ============ -->
+<section class="section testimonials" id="reviews">
+    <div class="wrap">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">From the warehouse floor</span>
+                <h2>What operators say</h2>
+            </div>
+        </div>
+        <div class="test-grid">
+            <div class="test-card">
+                <div class="stars">★★★★★</div>
+                <p>"We run poly labels through -20°C cold storage daily. Zero peel-off in two years."</p>
+                <div class="who">— Ops Lead, Cold Chain Logistics</div>
+            </div>
+            <div class="test-card">
+                <div class="stars">★★★★★</div>
+                <p>"Custom die-cuts arrived exactly to spec, no minimum order hassle for a small batch test run."</p>
+                <div class="who">— Packaging Manager, Consumer Goods</div>
+            </div>
+            <div class="test-card">
+                <div class="stars">★★★★★</div>
+                <p>"DOT hazmat labels passed inspection first try. Templates made the layout painless."</p>
+                <div class="who">— Compliance Officer, Chemical Transport</div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <br>
+<!-- ============ QUOTE / NEWSLETTER ============ -->
+<section class="cta-band" id="quote">
+    <div class="wrap">
+        <div>
+            <h2>Ordering 500+ rolls? Get a bulk quote in 24 hours.</h2>
+            <p>Or drop your email for restock alerts and new material drops.</p>
+        </div>
+        <form class="cta-form">
+            <input type="email" placeholder="you@company.com" aria-label="Email address">
+            <button type="submit">Get Quote</button>
+        </form>
+    </div>
+</section>
 
-    © 2026 Ashish Verma. All Rights Reserved.
-    <br>
-    All rights, source code, design and functionality are
-    reserved by Ashish Verma.
+<div class="hazard" role="presentation"></div>
 
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+    <div class="wrap footer-grid">
+        <div class="footer-brand">
+            <a href="#top" class="logo" style="color:var(--white);"><span class="mark">IM</span>IRON<span>MARK</span></a>
+            <p>Industrial and commercial label supply — blank stock, custom print, and regulated hazmat labeling, shipped from our own facility.</p>
+            <div class="socials">
+                <a href="#" aria-label="Facebook">f</a>
+                <a href="#" aria-label="Instagram">ig</a>
+                <a href="#" aria-label="LinkedIn">in</a>
+            </div>
+        </div>
+        <div>
+            <h4>Shop</h4>
+            <ul>
+                <li><a href="#categories">Blank Labels</a></li>
+                <li><a href="#categories">Custom Labels</a></li>
+                <li><a href="#categories">Waterproof &amp; Poly</a></li>
+                <li><a href="#categories">Hazmat &amp; DOT</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Resources</h4>
+            <ul>
+                <li><a href="#process">Design Templates</a></li>
+                <li><a href="#">Material Guide</a></li>
+                <li><a href="#">Size Chart</a></li>
+                <li><a href="#">Compliance Info</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Company</h4>
+            <ul>
+                <li><a href="#">About Ironmark</a></li>
+                <li><a href="#industries">Industries Served</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+                <li><a href="#">Careers</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Support</h4>
+            <ul>
+                <li><a href="#">Live Chat</a></li>
+                <li><a href="#">1-888-575-2235</a></li>
+                <li><a href="#quote">Bulk Quote</a></li>
+                <li><a href="#">Track Order</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="wrap footer-bottom">
+        <span>&copy; 2026 Ironmark Labels. All rights reserved.</span>
+        <div class="legal-links">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Shipping Policy</a>
+        </div>
+    </div>
 </footer>
 
-</main>
-
-
-<!-- ======================================================
-     TOAST
-====================================================== -->
-
-<div id="toast"
-     class="toast">
-
-    <span id="toastText"></span>
-
-</div>
-
+<button class="top-btn" id="topBtn" aria-label="Back to top">&uarr;</button>
 
 <script>
+(function(){
+    "use strict";
 
-/* =========================================================
-   STATE
-========================================================= */
+    var topBtn = document.getElementById("topBtn");
 
-const state = {
-
-    section:"coco",
-
-    cocoBorder:"solid",
-    otherBorder:"solid",
-    isbnBorder:"solid",
-    addressBorder:"solid",
-
-    history:[],
-    historyIndex:-1
-
-};
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-const $ = id =>
-    document.getElementById(id);
-
-const $$ = selector =>
-    [...document.querySelectorAll(selector)];
-
-
-function showToast(
-    message,
-    type="green"
-){
-
-    const toast =
-        $("toast");
-
-    $("toastText").textContent =
-        message;
-
-    toast.className =
-        "toast " +
-        type +
-        " show";
-
-    clearTimeout(
-        showToast.timer
-    );
-
-    showToast.timer =
-        setTimeout(
-            ()=>{
-                toast.classList.remove(
-                    "show"
-                );
-            },
-            2600
-        );
-}
-
-
-/* =========================================================
-   MAIN TABS
-========================================================= */
-
-$$(".tab").forEach(
-    tab=>{
-
-        tab.addEventListener(
-            "click",
-            ()=>{
-
-                const section =
-                    tab.dataset.section;
-
-                state.section =
-                    section;
-
-                $$(".tab").forEach(
-                    x=>{
-                        x.classList.toggle(
-                            "active",
-                            x===tab
-                        );
-                    }
-                );
-
-                $$(".section").forEach(
-                    x=>{
-                        x.classList.toggle(
-                            "active",
-                            x.id===
-                            "section-"+section
-                        );
-                    }
-                );
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   COCO SUB TABS
-========================================================= */
-
-$$("[data-mode]").forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                const mode =
-                    button.dataset.mode;
-
-                $$(".sub-tab").forEach(
-                    x=>{
-
-                        x.classList.toggle(
-                            "active",
-                            x===button
-                        );
-
-                    }
-                );
-
-                $$(".mode").forEach(
-                    panel=>{
-
-                        panel.classList.toggle(
-                            "active",
-                            panel.id===
-                            "mode-"+mode
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   PO INPUTS
-========================================================= */
-
-function createPOInputs(){
-
-    const container =
-        $("cocoPOGrid");
-
-    container.innerHTML="";
-
-    for(
-        let i=1;
-        i<=20;
-        i++
-    ){
-
-        const input =
-            document.createElement(
-                "input"
-            );
-
-        input.type="text";
-
-        input.placeholder=
-            "PO "+i;
-
-        input.addEventListener(
-            "input",
-            livePreview
-        );
-
-        container.appendChild(
-            input
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   PO VALUE
-========================================================= */
-
-function getPO(){
-
-    const inputs =
-        $(
-            "#cocoPOGrid"
-        ).querySelectorAll(
-            "input"
-        );
-
-    for(
-        const input of inputs
-    ){
-
-        if(
-            input.value.trim()
-        ){
-
-            return input.value.trim();
-
+    window.addEventListener("scroll", function(){
+        if(window.scrollY > 500){
+            topBtn.classList.add("show");
+        }else{
+            topBtn.classList.remove("show");
         }
-
-    }
-
-    const multiple =
-        $("cocoMultiplePO");
-
-    if(
-        multiple &&
-        multiple.value.trim()
-    ){
-
-        return multiple.value
-            .split(/\r?\n/)
-            .map(x=>x.trim())
-            .filter(Boolean)[0]
-            || "ABC123";
-
-    }
-
-    return "ABC123";
-}
-
-
-/* =========================================================
-   LIVE PREVIEW
-========================================================= */
-
-function livePreview(){
-
-    const po =
-        getPO();
-
-    const previewPO =
-        $("previewPO");
-
-    const previewBox =
-        $("previewBox");
-
-    if(
-        $("showPO").checked
-    ){
-
-        previewPO.textContent =
-            po;
-
-        previewPO.style.display =
-            "block";
-
-    }else{
-
-        previewPO.style.display =
-            "none";
-
-    }
-
-
-    if(
-        $("showBox").checked
-    ){
-
-        const box =
-            Math.max(
-                1,
-                Number(
-                    $("startBox").value
-                )||1
-            );
-
-        /*
-          IMPORTANT:
-          PO itself only shows actual PO value.
-          Box is shown BELOW as BOX NO.
-        */
-
-        previewBox.textContent =
-            "BOX NO. " +
-            box;
-
-        previewBox.style.display =
-            "block";
-
-    }else{
-
-        previewBox.style.display =
-            "none";
-
-    }
-
-
-    previewPO.style.fontFamily =
-        $("poFont").value;
-
-    previewPO.style.fontSize =
-        $("poFontSize").value +
-        "px";
-
-    previewPO.style.textAlign =
-        $("poAlign").value;
-
-    previewPO.style.fontWeight =
-        $("poBold").checked
-            ? "bold"
-            : "normal";
-
-    previewPO.style.fontStyle =
-        $("poItalic").checked
-            ? "italic"
-            : "normal";
-
-    previewPO.style.textDecoration =
-        $("poUnderline").checked
-            ? "underline"
-            : "none";
-
-
-    previewBox.style.fontFamily =
-        $("boxFont").value;
-
-    previewBox.style.fontSize =
-        $("boxFontSize").value +
-        "px";
-
-    previewBox.style.fontWeight =
-        $("boxBold").checked
-            ? "bold"
-            : "normal";
-
-    previewBox.style.fontStyle =
-        $("boxItalic").checked
-            ? "italic"
-            : "normal";
-
-
-    applyCocoBorder();
-
-    updatePagePreview();
-
-}
-
-
-/* =========================================================
-   BORDER
-========================================================= */
-
-function applyCocoBorder(){
-
-    const label =
-        $("labelPreview");
-
-    const style =
-        state.cocoBorder;
-
-    const width =
-        Math.max(
-            0,
-            Number(
-                $("borderWidth").value
-            )||2
-        );
-
-    const color =
-        $("borderColor").value;
-
-    const radius =
-        Math.max(
-            0,
-            Number(
-                $("borderRadius").value
-            )||0
-        );
-
-
-    label.style.borderWidth =
-        width+"px";
-
-    label.style.borderColor =
-        color;
-
-    label.style.borderRadius =
-        radius+"px";
-
-    label.style.borderStyle =
-        getCSSBorderStyle(
-            style
-        );
-
-
-    if(
-        style==="shadow"
-    ){
-
-        label.style.boxShadow =
-            "5px 5px 0 #aaa";
-
-    }else{
-
-        label.style.boxShadow =
-            "none";
-
-    }
-
-
-    label.style.borderTopStyle =
-        $("borderTop").checked
-            ? getCSSBorderStyle(style)
-            : "none";
-
-    label.style.borderRightStyle =
-        $("borderRight").checked
-            ? getCSSBorderStyle(style)
-            : "none";
-
-    label.style.borderBottomStyle =
-        $("borderBottom").checked
-            ? getCSSBorderStyle(style)
-            : "none";
-
-    label.style.borderLeftStyle =
-        $("borderLeft").checked
-            ? getCSSBorderStyle(style)
-            : "none";
-
-}
-
-
-function getCSSBorderStyle(
-    style
-){
-
-    if(
-        style==="double-thin" ||
-        style==="double-thick"
-    ){
-
-        return "double";
-    }
-
-    if(
-        style==="medium" ||
-        style==="thick"
-    ){
-
-        return "solid";
-    }
-
-    if(
-        style==="shadow" ||
-        style==="blue" ||
-        style==="red" ||
-        style==="green" ||
-        style==="gray" ||
-        style==="rounded"
-    ){
-
-        return "solid";
-    }
-
-    return style;
-}
-
-
-/* =========================================================
-   BORDER BUTTONS
-========================================================= */
-
-$$("[data-border]").forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                state.cocoBorder =
-                    button.dataset.border;
-
-                $$(".border-option").forEach(
-                    x=>{
-                        x.classList.remove(
-                            "active"
-                        );
-                    }
-                );
-
-                button.classList.add(
-                    "active"
-                );
-
-                applyCocoBorder();
-
-                showToast(
-                    "Border style applied",
-                    "green"
-                );
-
-            }
-        );
-
-    }
-);
-
-
-$$("[data-other-border]").forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                state.otherBorder =
-                    button.dataset.otherBorder;
-
-                applyOtherBorder();
-
-                showToast(
-                    "Other PO border changed",
-                    "green"
-                );
-
-            }
-        );
-
-    }
-);
-
-
-$$("[data-isbn-border]").forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                state.isbnBorder =
-                    button.dataset.isbnBorder;
-
-                applyISBNBorder();
-
-                showToast(
-                    "ISBN border changed",
-                    "green"
-                );
-
-            }
-        );
-
-    }
-);
-
-
-$$("[data-address-border]").forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                state.addressBorder =
-                    button.dataset.addressBorder;
-
-                applyAddressBorder();
-
-                showToast(
-                    "Address border changed",
-                    "green"
-                );
-
-            }
-        );
-
-    }
-);
-
-
-function applyOtherBorder(){
-
-    const el =
-        $("otherPreview");
-
-    if(!el)return;
-
-    el.style.borderStyle =
-        getCSSBorderStyle(
-            state.otherBorder
-        );
-
-}
-
-
-function applyISBNBorder(){
-
-    const el =
-        $("isbnPreview");
-
-    if(!el)return;
-
-    el.style.borderStyle =
-        getCSSBorderStyle(
-            state.isbnBorder
-        );
-
-}
-
-
-function applyAddressBorder(){
-
-    const el =
-        $("addressPreview");
-
-    if(!el)return;
-
-    el.style.borderStyle =
-        getCSSBorderStyle(
-            state.addressBorder
-        );
-
-}
-
-
-/* =========================================================
-   FONT SIZE DROPDOWN + MANUAL TYPE
-========================================================= */
-
-function connectFontSize(
-    selectId,
-    inputId
-){
-
-    const select =
-        $(selectId);
-
-    const input =
-        $(inputId);
-
-    select.addEventListener(
-        "change",
-        ()=>{
-
-            input.value =
-                select.value;
-
-            livePreview();
-
-        }
-    );
-
-    input.addEventListener(
-        "input",
-        ()=>{
-
-            select.value =
-                "";
-
-            livePreview();
-
-        }
-    );
-
-}
-
-
-connectFontSize(
-    "poFontPreset",
-    "poFontSize"
-);
-
-connectFontSize(
-    "boxFontPreset",
-    "boxFontSize"
-);
-
-connectFontSize(
-    "otherFontPreset",
-    "otherFontSize"
-);
-
-connectFontSize(
-    "isbnFontPreset",
-    "isbnFontSize"
-);
-
-connectFontSize(
-    "addressFontPreset",
-    "addressFontSize"
-);
-
-
-/* =========================================================
-   GENERIC LIVE INPUT
-========================================================= */
-
-$$(
-    "input,select,textarea"
-).forEach(
-    element=>{
-
-        element.addEventListener(
-            "input",
-            ()=>{
-                livePreview();
-                updateAllPreview();
-            }
-        );
-
-        element.addEventListener(
-            "change",
-            ()=>{
-                livePreview();
-                updateAllPreview();
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   PAGE PREVIEW
-========================================================= */
-
-function updatePagePreview(){
-
-    const page =
-        $("previewPage");
-
-    const size =
-        $("pageSize").value;
-
-    const orientation =
-        $("orientation").value;
-
-    let width=380;
-    let height=540;
-
-    if(size==="a4"){
-        width=420;
-        height=594;
-    }
-
-    if(size==="a5"){
-        width=350;
-        height=495;
-    }
-
-    if(size==="letter"){
-        width=420;
-        height=545;
-    }
-
-    if(
-        orientation==="landscape"
-    ){
-
-        const temp=width;
-
-        width=height;
-        height=temp;
-
-    }
-
-    page.style.width =
-        width+"px";
-
-    page.style.minHeight =
-        height+"px";
-
-
-    const labels =
-        Number(
-            $("labelsPerPage").value
-        )||1;
-
-    const label =
-        $("labelPreview");
-
-    if(labels===1){
-
-        page.style.display =
-            "flex";
-
-        label.style.width =
-            "90%";
-
-    }else{
-
-        page.style.display =
-            "grid";
-
-        const columns =
-            labels===2
-                ? 1
-                : labels<=6
-                    ? 2
-                    : 3;
-
-        page.style.gridTemplateColumns =
-            "repeat("+columns+",1fr)";
-
-        page.style.gap =
-            "7px";
-
-        label.style.width =
-            "100%";
-
-    }
-
-}
-
-
-/* =========================================================
-   EXCEL HEADER IGNORE
-========================================================= */
-
-$("cocoExcel")
-.addEventListener(
-    "change",
-    async event=>{
-
-        const file =
-            event.target.files[0];
-
-        if(!file)return;
-
-        try{
-
-            const data =
-                await file.arrayBuffer();
-
-            const workbook =
-                XLSX.read(
-                    data,
-                    {
-                        type:"array"
-                    }
-                );
-
-            const sheet =
-                workbook.Sheets[
-                    workbook.SheetNames[0]
-                ];
-
-            const rows =
-                XLSX.utils.sheet_to_json(
-                    sheet,
-                    {
-                        header:1,
-                        defval:""
-                    }
-                );
-
-
-            /*
-              FIRST ROW = HEADER
-              IGNORE IT COMPLETELY
-            */
-
-            const dataRows =
-                rows.slice(1);
-
-
-            const grid =
-                $("cocoPOGrid");
-
-            const inputs =
-                grid.querySelectorAll(
-                    "input"
-                );
-
-            inputs.forEach(
-                (input,index)=>{
-
-                    input.value =
-                        dataRows[index] &&
-                        dataRows[index][0] !== undefined
-                            ? dataRows[index][0]
-                            : "";
-
-                }
-            );
-
-
-            renderExcel(
-                rows
-            );
-
-            livePreview();
-
-            showToast(
-                "Excel loaded — first header row ignored",
-                "green"
-            );
-
-        }catch(error){
-
-            console.error(error);
-
-            showToast(
-                "Excel file could not be read",
-                "red"
-            );
-
-        }
-
-    }
-);
-
-
-function renderExcel(rows){
-
-    const container =
-        $("cocoExcelPreview");
-
-    if(
-        !rows.length
-    ){
-
-        container.innerHTML =
-            "";
-
-        return;
-    }
-
-    let html=
-        "<table><thead><tr>";
-
-    rows[0].forEach(
-        cell=>{
-            html +=
-                "<th>"+
-                escapeHTML(cell)+
-                "</th>";
-        }
-    );
-
-    html +=
-        "</tr></thead><tbody>";
-
-    rows.slice(1,31).forEach(
-        row=>{
-
-            html += "<tr>";
-
-            rows[0].forEach(
-                (_,index)=>{
-
-                    html +=
-                        "<td>"+
-                        escapeHTML(
-                            row[index]??""
-                        )+
-                        "</td>";
-
-                }
-            );
-
-            html += "</tr>";
-
-        }
-    );
-
-    html +=
-        "</tbody></table>";
-
-    container.innerHTML =
-        html;
-
-}
-
-
-function escapeHTML(text){
-
-    return String(text)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;");
-
-}
-
-
-/* =========================================================
-   QR CODE
-========================================================= */
-
-function makeQR(
-    container,
-    text
-){
-
-    container.innerHTML="";
-
-    if(
-        !text.trim()
-    ){
-
-        return;
-    }
-
-    if(
-        typeof QRCode==="undefined"
-    ){
-
-        showToast(
-            "QR library is not loaded",
-            "red"
-        );
-
-        return;
-    }
-
-    const canvas =
-        document.createElement(
-            "canvas"
-        );
-
-    container.appendChild(
-        canvas
-    );
-
-    QRCode.toCanvas(
-        canvas,
-        text,
-        {
-            width:150,
-            margin:2
-        },
-        error=>{
-
-            if(error){
-
-                console.error(
-                    error
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-$("addressQRBtn")
-.addEventListener(
-    "click",
-    ()=>{
-
-        const text =
-            $("fromAddress").value+
-            "\n"+
-            $("toAddress").value;
-
-        makeQR(
-            $("addressQR"),
-            text
-        );
-
-        showToast(
-            "Address QR generated",
-            "green"
-        );
-
-    }
-);
-
-
-$("emailQRBtn")
-.addEventListener(
-    "click",
-    ()=>{
-
-        const email =
-            $("email").value.trim();
-
-        if(!email){
-
-            showToast(
-                "Enter email address first",
-                "red"
-            );
-
-            return;
-        }
-
-        makeQR(
-            $("emailQR"),
-            "mailto:"+email
-        );
-
-        showToast(
-            "Email QR generated",
-            "green"
-        );
-
-    }
-);
-
-
-/* =========================================================
-   ISBN BARCODE
-========================================================= */
-
-function updateISBN(){
-
-    const isbn =
-        $("isbn").value.trim();
-
-    const title =
-        $("bookTitle").value.trim();
-
-    $("isbnPreviewTitle")
-        .textContent =
-        title ||
-        "Book Title";
-
-    $("isbnPreviewNumber")
-        .textContent =
-        isbn ||
-        "ISBN";
-
-    if(
-        !isbn ||
-        typeof JsBarcode==="undefined"
-    ){
-
-        $("barcode")
-            .innerHTML="";
-
-        return;
-    }
-
-    try{
-
-        JsBarcode(
-            "#barcode",
-            isbn,
-            {
-                format:"auto",
-                width:1.5,
-                height:55,
-                displayValue:true,
-                margin:5
-            }
-        );
-
-    }catch(error){
-
-        console.error(error);
-
-        $("barcode")
-            .innerHTML="";
-
-    }
-
-}
-
-
-function updateAllPreview(){
-
-    updateISBN();
-
-    applyOtherBorder();
-
-    applyISBNBorder();
-
-    applyAddressBorder();
-
-}
-
-
-/* =========================================================
-   UNDO / REDO
-========================================================= */
-
-function snapshot(){
-
-    const data={};
-
-    $$(
-        "input,select,textarea"
-    ).forEach(
-        el=>{
-
-            if(
-                !el.id ||
-                el.type==="file"
-            ){
-
-                return;
-            }
-
-            data[el.id] =
-                el.type==="checkbox"
-                    ? el.checked
-                    : el.value;
-
-        }
-    );
-
-    data._state =
-        JSON.stringify(
-            state
-        );
-
-    return data;
-
-}
-
-
-function restore(
-    data
-){
-
-    if(!data)return;
-
-    Object.keys(data).forEach(
-        id=>{
-
-            if(
-                id==="_state"
-            ){
-
-                return;
-            }
-
-            const el =
-                $(id);
-
-            if(!el)return;
-
-            if(
-                el.type==="checkbox"
-            ){
-
-                el.checked =
-                    !!data[id];
-
-            }else{
-
-                el.value =
-                    data[id];
-
-            }
-
-        }
-    );
-
-    if(
-        data._state
-    ){
-
-        try{
-
-            const old =
-                JSON.parse(
-                    data._state
-                );
-
-            Object.assign(
-                state,
-                old
-            );
-
-        }catch(e){}
-
-    }
-
-    livePreview();
-
-    updateAllPreview();
-
-}
-
-
-function saveHistory(){
-
-    const current =
-        snapshot();
-
-    const last =
-        state.history[
-            state.historyIndex
-        ];
-
-    if(
-        last &&
-        JSON.stringify(last)===
-        JSON.stringify(current)
-    ){
-
-        return;
-    }
-
-    state.history =
-        state.history.slice(
-            0,
-            state.historyIndex+1
-        );
-
-    state.history.push(
-        current
-    );
-
-    if(
-        state.history.length>50
-    ){
-
-        state.history.shift();
-
-    }
-
-    state.historyIndex =
-        state.history.length-1;
-
-}
-
-
-$("undoBtn")
-.addEventListener(
-    "click",
-    ()=>{
-
-        if(
-            state.historyIndex<=0
-        ){
-
-            showToast(
-                "Nothing to undo",
-                "orange"
-            );
-
-            return;
-        }
-
-        state.historyIndex--;
-
-        restore(
-            state.history[
-                state.historyIndex
-            ]
-        );
-
-        showToast(
-            "Undo",
-            "green"
-        );
-
-    }
-);
-
-
-$("redoBtn")
-.addEventListener(
-    "click",
-    ()=>{
-
-        if(
-            state.historyIndex>=
-            state.history.length-1
-        ){
-
-            showToast(
-                "Nothing to redo",
-                "orange"
-            );
-
-            return;
-        }
-
-        state.historyIndex++;
-
-        restore(
-            state.history[
-                state.historyIndex
-            ]
-        );
-
-        showToast(
-            "Redo",
-            "green"
-        );
-
-    }
-);
-
-
-/* =========================================================
-   COPY / PASTE STYLE
-========================================================= */
-
-let copiedStyle=null;
-
-
-$("copyStyleBtn")
-.addEventListener(
-    "click",
-    ()=>{
-
-        copiedStyle = {
-
-            poFont:
-                $("poFont").value,
-
-            poFontSize:
-                $("poFontSize").value,
-
-            boxFont:
-                $("boxFont").value,
-
-            boxFontSize:
-                $("boxFontSize").value,
-
-            border:
-                state.cocoBorder,
-
-            borderWidth:
-                $("borderWidth").value,
-
-            borderColor:
-                $("borderColor").value,
-
-            borderRadius:
-                $("borderRadius").value
-
-        };
-
-        showToast(
-            "Style copied",
-            "green"
-        );
-
-    }
-);
-
-
-$("pasteStyleBtn")
-.addEventListener(
-    "click",
-    ()=>{
-
-        if(!copiedStyle){
-
-            showToast(
-                "No copied style",
-                "orange"
-            );
-
-            return;
-        }
-
-        $("poFont").value =
-            copiedStyle.poFont;
-
-        $("poFontSize").value =
-            copiedStyle.poFontSize;
-
-        $("boxFont").value =
-            copiedStyle.boxFont;
-
-        $("boxFontSize").value =
-            copiedStyle.boxFontSize;
-
-        $("borderWidth").value =
-            copiedStyle.borderWidth;
-
-        $("borderColor").value =
-            copiedStyle.borderColor;
-
-        $("borderRadius").value =
-            copiedStyle.borderRadius;
-
-        state.cocoBorder =
-            copiedStyle.border;
-
-        livePreview();
-
-        saveHistory();
-
-        showToast(
-            "Style pasted",
-            "green"
-        );
-
-    }
-);
-
-
-/* =========================================================
-   DEFAULT
-========================================================= */
-
-let defaultState=null;
-
-
-$("saveDefaultBtn")
-.addEventListener(
-    "click",
-    ()=>{
-
-        defaultState =
-            snapshot();
-
-        localStorage.setItem(
-            "booksLabelStudioDefault",
-            JSON.stringify(
-                defaultState
-            )
-        );
-
-        showToast(
-            "Default saved",
-            "green"
-        );
-
-    }
-);
-
-
-/* =========================================================
-   RESET
-========================================================= */
-
-$("resetBtn")
-.addEventListener(
-    "click",
-    ()=>{
-
-        if(
-            !confirm(
-                "Reset all settings?"
-            )
-        ){
-
-            return;
-        }
-
-        location.reload();
-
-    }
-);
-
-
-/* =========================================================
-   KEYBOARD UNDO / REDO
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    event=>{
-
-        if(
-            event.ctrlKey &&
-            event.key.toLowerCase()==="z"
-        ){
-
-            event.preventDefault();
-
-            $("undoBtn").click();
-
-        }
-
-        if(
-            event.ctrlKey &&
-            event.key.toLowerCase()==="y"
-        ){
-
-            event.preventDefault();
-
-            $("redoBtn").click();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   PDF
-========================================================= */
-
-function getJsPDF(){
-
-    if(
-        window.jspdf &&
-        typeof window.jspdf.jsPDF===
-        "function"
-    ){
-
-        return window.jspdf.jsPDF;
-
-    }
-
-    if(
-        typeof window.jsPDF===
-        "function"
-    ){
-
-        return window.jsPDF;
-
-    }
-
-    return null;
-
-}
-
-
-function pdfLibrary(){
-
-    const jsPDF =
-        getJsPDF();
-
-    if(!jsPDF){
-
-        showToast(
-            "PDF library is not loaded. Please check internet connection and reload.",
-            "red"
-        );
-
-        return null;
-
-    }
-
-    return jsPDF;
-
-}
-
-
-function pageSizePDF(){
-
-    const size =
-        $("pageSize").value;
-
-    if(size==="4x6"){
-
-        return [
-            101.6,
-            152.4
-        ];
-
-    }
-
-    if(size==="a5"){
-
-        return [
-            148,
-            210
-        ];
-
-    }
-
-    if(size==="letter"){
-
-        return [
-            215.9,
-            279.4
-        ];
-
-    }
-
-    return [
-        210,
-        297
-    ];
-
-}
-
-
-function drawPDFBorder(
-    doc,
-    x,
-    y,
-    w,
-    h
-){
-
-    const color =
-        $("borderColor").value;
-
-    const rgb =
-        color.match(
-            /\w\w/g
-        )||[
-            "22",
-            "22",
-            "22"
-        ];
-
-    doc.setDrawColor(
-        parseInt(rgb[0],16),
-        parseInt(rgb[1],16),
-        parseInt(rgb[2],16)
-    );
-
-    doc.setLineWidth(
-        Number(
-            $("borderWidth").value
-        )||2
-    );
-
-    const style =
-        state.cocoBorder;
-
-    if(
-        style==="dashed"
-    ){
-
-        doc.setLineDashPattern(
-            [3,2],
-            0
-        );
-
-    }else{
-
-        doc.setLineDashPattern(
-            [],
-            0
-        );
-
-    }
-
-    doc.rect(
-        x,
-        y,
-        w,
-        h
-    );
-
-    if(
-        style==="double" ||
-        style==="double-thin" ||
-        style==="double-thick"
-    ){
-
-        doc.rect(
-            x+2,
-            y+2,
-            w-4,
-            h-4
-        );
-
-    }
-
-    doc.setLineDashPattern(
-        [],
-        0
-    );
-
-}
-
-
-/* =========================================================
-   COCO PDF
-========================================================= */
-
-$("cocoPDF")
-.addEventListener(
-    "click",
-    ()=>{
-
-        const jsPDF =
-            pdfLibrary();
-
-        if(!jsPDF)return;
-
-        try{
-
-            let [
-                pageW,
-                pageH
-            ] =
-                pageSizePDF();
-
-
-            if(
-                $("orientation").value===
-                "landscape"
-            ){
-
-                [
-                    pageW,
-                    pageH
-                ]=[
-                    pageH,
-                    pageW
-                ];
-
-            }
-
-
-            const doc =
-                new jsPDF({
-                    orientation:
-                        pageW>pageH
-                            ?"landscape"
-                            :"portrait",
-
-                    unit:"mm",
-
-                    format:[
-                        pageW,
-                        pageH
-                    ]
-                });
-
-
-            const labels =
-                Number(
-                    $("labelsPerPage").value
-                )||1;
-
-            const cols =
-                labels===1
-                    ?1
-                    :labels<=6
-                        ?2
-                        :3;
-
-            const rows =
-                Math.ceil(
-                    labels/cols
-                );
-
-            const margin=8;
-
-            const gap=4;
-
-            const cellW =
-                (
-                    pageW -
-                    margin*2 -
-                    gap*(cols-1)
-                )/cols;
-
-            const cellH =
-                (
-                    pageH -
-                    margin*2 -
-                    gap*(rows-1)
-                )/rows;
-
-
-            const po =
-                getPO();
-
-
-            for(
-                let i=0;
-                i<labels;
-                i++
-            ){
-
-                if(
-                    i>0 &&
-                    i%labels===0
-                ){
-
-                    doc.addPage();
-
-                }
-
-
-                const row =
-                    Math.floor(
-                        i/cols
-                    );
-
-                const col =
-                    i%cols;
-
-
-                const x =
-                    margin+
-                    col*
-                    (
-                        cellW+gap
-                    );
-
-                const y =
-                    margin+
-                    row*
-                    (
-                        cellH+gap
-                    );
-
-
-                drawPDFBorder(
-                    doc,
-                    x,
-                    y,
-                    cellW,
-                    cellH
-                );
-
-
-                if(
-                    $("showPO").checked
-                ){
-
-                    doc.setFont(
-                        $("poFont").value
-                            .toLowerCase()
-                            .includes("times")
-                            ?"times"
-                            :"helvetica",
-
-                        $("poBold").checked
-                            ?"bold"
-                            :"normal"
-                    );
-
-                    doc.setFontSize(
-                        Number(
-                            $("poFontSize").value
-                        )||26
-                    );
-
-                    doc.text(
-                        po,
-                        x+
-                        cellW/2,
-                        y+
-                        cellH*.43,
-                        {
-                            align:"center"
-                        }
-                    );
-
-                }
-
-
-                if(
-                    $("showBox").checked
-                ){
-
-                    doc.setFont(
-                        $("boxFont").value
-                            .toLowerCase()
-                            .includes("times")
-                            ?"times"
-                            :"helvetica",
-
-                        $("boxBold").checked
-                            ?"bold"
-                            :"normal"
-                    );
-
-                    doc.setFontSize(
-                        Number(
-                            $("boxFontSize").value
-                        )||20
-                    );
-
-                    const box =
-                        (
-                            Number(
-                                $("startBox").value
-                            )||1
-                        )+i;
-
-
-                    doc.text(
-                        "BOX NO. "+
-                        box,
-                        x+
-                        cellW/2,
-                        y+
-                        cellH*.63,
-                        {
-                            align:"center"
-                        }
-                    );
-
-                }
-
-            }
-
-
-            doc.save(
-                "Books-Label-Studio-Coco-Blue.pdf"
-            );
-
-
-            showToast(
-                "PDF generated successfully",
-                "green"
-            );
-
-
-        }catch(error){
-
-            console.error(error);
-
-            showToast(
-                "PDF generation failed: "+
-                error.message,
-                "red"
-            );
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   OTHER PDF
-========================================================= */
-
-$("otherPDF")
-.addEventListener(
-    "click",
-    ()=>{
-
-        const jsPDF =
-            pdfLibrary();
-
-        if(!jsPDF)return;
-
-        try{
-
-            const doc =
-                new jsPDF({
-                    unit:"mm",
-                    format:"a4"
-                });
-
-            const text =
-                $("otherPO").value
-                    .split(/\r?\n/)
-                    .map(x=>x.trim())
-                    .filter(Boolean);
-
-
-            if(
-                !text.length
-            ){
-
-                text.push(
-                    "ABC123"
-                );
-
-            }
-
-
-            text.forEach(
-                (po,index)=>{
-
-                    if(
-                        index>0 &&
-                        index%5===0
-                    ){
-
-                        doc.addPage();
-
-                    }
-
-                    const y =
-                        20+
-                        (
-                            index%5
-                        )*
-                        50;
-
-                    doc.setFontSize(
-                        Number(
-                            $("otherFontSize")
-                                .value
-                        )||20
-                    );
-
-                    doc.text(
-                        po,
-                        105,
-                        y,
-                        {
-                            align:"center"
-                        }
-                    );
-
-                    doc.setLineWidth(1);
-
-                    doc.rect(
-                        25,
-                        y-12,
-                        160,
-                        25
-                    );
-
-                }
-            );
-
-
-            doc.save(
-                "Books-Label-Studio-Other-PO.pdf"
-            );
-
-            showToast(
-                "Other PO PDF generated",
-                "green"
-            );
-
-        }catch(error){
-
-            console.error(error);
-
-            showToast(
-                "PDF generation failed",
-                "red"
-            );
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   ISBN PDF
-========================================================= */
-
-$("isbnPDF")
-.addEventListener(
-    "click",
-    ()=>{
-
-        const jsPDF =
-            pdfLibrary();
-
-        if(!jsPDF)return;
-
-        try{
-
-            const doc =
-                new jsPDF({
-                    unit:"mm",
-                    format:"a4"
-                });
-
-            const title =
-                $("bookTitle")
-                    .value
-                    .trim() ||
-                "Book Title";
-
-            const isbn =
-                $("isbn")
-                    .value
-                    .trim() ||
-                "ISBN";
-
-
-            doc.setFontSize(
-                Number(
-                    $("isbnFontSize").value
-                )||16
-            );
-
-            doc.text(
-                title,
-                105,
-                30,
-                {
-                    align:"center"
-                }
-            );
-
-
-            let x=60;
-
-            const clean =
-                isbn.replace(
-                    /\D/g,
-                    ""
-                ) ||
-                "123456789";
-
-
-            for(
-                let i=0;
-                i<clean.length;
-                i++
-            ){
-
-                const width =
-                    Number(
-                        clean[i]
-                    )%2
-                        ?1
-                        :2;
-
-                doc.setFillColor(
-                    0,
-                    0,
-                    0
-                );
-
-                doc.rect(
-                    x,
-                    50,
-                    width,
-                    40,
-                    "F"
-                );
-
-                x+=
-                    width+1;
-
-            }
-
-
-            doc.setFontSize(11);
-
-            doc.text(
-                isbn,
-                105,
-                100,
-                {
-                    align:"center"
-                }
-            );
-
-
-            doc.save(
-                "Books-Label-Studio-ISBN.pdf"
-            );
-
-            showToast(
-                "ISBN PDF generated",
-                "green"
-            );
-
-        }catch(error){
-
-            console.error(error);
-
-            showToast(
-                "ISBN PDF generation failed",
-                "red"
-            );
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   ADDRESS PDF
-========================================================= */
-
-$("addressPDF")
-.addEventListener(
-    "click",
-    ()=>{
-
-        const jsPDF =
-            pdfLibrary();
-
-        if(!jsPDF)return;
-
-        try{
-
-            const doc =
-                new jsPDF({
-                    unit:"mm",
-                    format:"a4"
-                });
-
-            const from =
-                $("fromAddress")
-                    .value ||
-                "FROM ADDRESS";
-
-            const to =
-                $("toAddress")
-                    .value ||
-                "TO ADDRESS";
-
-
-            doc.setFontSize(
-                Number(
-                    $("addressFontSize")
-                        .value
-                )||14
-            );
-
-
-            doc.text(
-                from,
-                105,
-                35,
-                {
-                    align:"center",
-                    maxWidth:170
-                }
-            );
-
-
-            doc.text(
-                to,
-                105,
-                100,
-                {
-                    align:"center",
-                    maxWidth:170
-                }
-            );
-
-
-            doc.rect(
-                15,
-                15,
-                180,
-                130
-            );
-
-
-            doc.save(
-                "Books-Label-Studio-Address.pdf"
-            );
-
-
-            showToast(
-                "Address PDF generated",
-                "green"
-            );
-
-        }catch(error){
-
-            console.error(error);
-
-            showToast(
-                "Address PDF generation failed",
-                "red"
-            );
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   ENABLE / DISABLE POPUP
-========================================================= */
-
-$$(
-    'input[type="checkbox"]'
-).forEach(
-    checkbox=>{
-
-        checkbox.addEventListener(
-            "change",
-            ()=>{
-
-                const label =
-                    checkbox
-                        .parentElement
-                        ?.textContent
-                        ?.trim()
-                        || "Feature";
-
-
-                if(
-                    checkbox.checked
-                ){
-
-                    showToast(
-                        label+
-                        " Enabled",
-                        "green"
-                    );
-
-                }else{
-
-                    showToast(
-                        label+
-                        " Disabled",
-                        "red"
-                    );
-
-                }
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   PAGE SIZE / LIVE PREVIEW
-========================================================= */
-
-$("pageSize")
-.addEventListener(
-    "change",
-    ()=>{
-        updatePagePreview();
-        showToast(
-            "Page size updated",
-            "green"
-        );
-    }
-);
-
-$("orientation")
-.addEventListener(
-    "change",
-    ()=>{
-        updatePagePreview();
-    }
-);
-
-$("labelsPerPage")
-.addEventListener(
-    "change",
-    ()=>{
-        updatePagePreview();
-
-        showToast(
-            $("labelsPerPage").value+
-            " labels per page",
-            "green"
-        );
-    }
-);
-
-
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-createPOInputs();
-
-livePreview();
-
-updateISBN();
-
-updateAllPreview();
-
-saveHistory();
-
-
-/* =========================================================
-   LOAD DEFAULT IF AVAILABLE
-========================================================= */
-
-try{
-
-    const saved =
-        localStorage.getItem(
-            "booksLabelStudioDefault"
-        );
-
-    if(saved){
-
-        defaultState =
-            JSON.parse(saved);
-
-    }
-
-}catch(error){
-
-    console.warn(
-        "Default style unavailable"
-    );
-
-}
-
-
-console.log(
-    "Books Label Studio loaded successfully."
-);
-
+    });
+
+    topBtn.addEventListener("click", function(){
+        window.scrollTo({ top:0, behavior:"smooth" });
+    });
+
+    document.querySelectorAll('.nav-row a[href^="#"]').forEach(function(link){
+        link.addEventListener("click", function(){
+            document.querySelectorAll(".nav-row a").forEach(function(a){ a.classList.remove("active"); });
+            link.classList.add("active");
+        });
+    });
+
+    var forms = document.querySelectorAll(".cta-form, .search-bar");
+    forms.forEach(function(form){
+        form.addEventListener("submit", function(e){
+            e.preventDefault();
+        });
+    });
+
+})();
 </script>
 
 </body>
