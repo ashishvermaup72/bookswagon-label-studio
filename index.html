@@ -1,858 +1,641 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#2563eb">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<title>Books Label Studio</title>
 
-    <meta
-        name="theme-color"
-        content="#2563eb"
-    >
-
-    <meta
-        name="description"
-        content="Books Label Studio - Professional Label, PO, Barcode and QR Generator"
-    >
-
-    <title>Books Label Studio</title>
-
-    <!-- YOUR CSS -->
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="app-shell">
 
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-    <header class="app-header">
+<header class="app-header">
 
-        <div class="brand-area">
+    <div class="brand-area">
 
-            <div class="brand-logo">
-                📚
+        <div class="brand-logo">📚</div>
+
+        <div class="brand-text">
+            <h1>Books Label Studio</h1>
+            <p>Professional Label, PO, Barcode & QR Generator</p>
+        </div>
+
+    </div>
+
+    <div class="header-actions">
+
+        <button
+            type="button"
+            id="undoButton"
+            class="header-tool-btn"
+            title="Undo"
+        >
+            ↶ Undo
+        </button>
+
+        <button
+            type="button"
+            id="redoButton"
+            class="header-tool-btn"
+            title="Redo"
+        >
+            ↷ Redo
+        </button>
+
+        <button
+            type="button"
+            id="saveDefaultButton"
+            class="header-tool-btn"
+        >
+            💾 Save Default
+        </button>
+
+        <button
+            type="button"
+            id="loadDefaultButton"
+            class="header-tool-btn"
+        >
+            📂 Load Default
+        </button>
+
+        <button
+            type="button"
+            id="resetAllButton"
+            class="header-tool-btn danger"
+        >
+            ↺ Reset All
+        </button>
+
+        <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+        </select>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN MODULE NAVIGATION
+===================================================== -->
+
+<nav class="category-nav">
+
+    <button
+        type="button"
+        class="category-btn active"
+        data-category="cocoBlue"
+    >
+        📘
+        <span>Coco Blue</span>
+    </button>
+
+    <button
+        type="button"
+        class="category-btn"
+        data-category="otherPO"
+    >
+        📦
+        <span>Other PO</span>
+    </button>
+
+    <button
+        type="button"
+        class="category-btn"
+        data-category="isbn"
+    >
+        🏷️
+        <span>ISBN / Barcode</span>
+    </button>
+
+    <button
+        type="button"
+        class="category-btn"
+        data-category="address"
+    >
+        📍
+        <span>Address / QR</span>
+    </button>
+
+</nav>
+
+
+<!-- =====================================================
+     GLOBAL ADVANCED STYLE TOOLBAR
+===================================================== -->
+
+<section class="global-style-toolbar">
+
+    <div class="toolbar-title">
+        <span>🎨</span>
+
+        <div>
+            <strong>Advanced Design Studio</strong>
+            <small>
+                Deep formatting controls • Live preview • Undo / Redo
+            </small>
+        </div>
+    </div>
+
+
+    <div class="toolbar-actions">
+
+        <button
+            type="button"
+            id="copyStyleButton"
+            class="toolbar-btn"
+        >
+            📋 Copy Style
+        </button>
+
+        <button
+            type="button"
+            id="pasteStyleButton"
+            class="toolbar-btn"
+        >
+            📌 Paste Style
+        </button>
+
+        <button
+            type="button"
+            id="resetStyleButton"
+            class="toolbar-btn"
+        >
+            ↺ Reset Style
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     COCO BLUE
+===================================================== -->
+
+<main
+    id="cocoblueWorkspace"
+    class="tool-section active"
+    data-tool="cocoBlue"
+>
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            📘 COCO BLUE
+        </span>
+
+        <h2>Coco Blue PO Labels</h2>
+
+        <p>
+            Professional PO and Box label generation.
+        </p>
+
+    </div>
+
+
+    <!-- MODE NAV -->
+
+    <div class="sub-navigation">
+
+        <button
+            type="button"
+            class="sub-category-btn active"
+            data-coco-mode="individual"
+        >
+            ✏️ Individual
+        </button>
+
+        <button
+            type="button"
+            class="sub-category-btn"
+            data-coco-mode="multiple"
+        >
+            📋 Multiple PO
+        </button>
+
+        <button
+            type="button"
+            class="sub-category-btn"
+            data-coco-mode="excel"
+        >
+            📊 Excel Upload
+        </button>
+
+        <button
+            type="button"
+            class="sub-category-btn"
+            data-coco-mode="address"
+        >
+            📍 Address
+        </button>
+
+    </div>
+
+
+    <!-- INDIVIDUAL -->
+
+    <section
+        id="cocoIndividualPanel"
+        class="mode-panel active"
+    >
+
+        <div class="panel-card">
+
+            <div class="panel-title">
+
+                <div>
+                    <h3>✏️ PO Numbers</h3>
+
+                    <p>
+                        Enter only the actual PO value.
+                    </p>
+                </div>
+
+                <span class="limit-badge">
+                    MAX 40
+                </span>
+
             </div>
 
-            <div class="brand-text">
+            <div
+                id="individualPOGrid"
+                class="po-input-grid"
+            ></div>
 
-                <h1>
-                    Books Label Studio
-                </h1>
+        </div>
+
+    </section>
+
+
+    <!-- MULTIPLE -->
+
+    <section
+        id="cocoMultiplePanel"
+        class="mode-panel"
+    >
+
+        <div class="panel-card">
+
+            <div class="panel-title">
+                <h3>📋 Multiple PO</h3>
+            </div>
+
+            <div class="field">
+
+                <label for="cocoMultiplePO">
+                    PO Values
+                </label>
+
+                <textarea
+                    id="cocoMultiplePO"
+                    placeholder="ABC123&#10;DEF456&#10;GHI789"
+                ></textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- EXCEL -->
+
+    <section
+        id="cocoExcelPanel"
+        class="mode-panel"
+    >
+
+        <div class="panel-card">
+
+            <div class="upload-area">
+
+                <strong>📊 Upload Excel File</strong>
 
                 <p>
-                    Professional Label & Barcode Generator
+                    First row is treated as Header and ignored.
                 </p>
 
-            </div>
+                <input
+                    id="cocoExcelFile"
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                >
 
-        </div>
-
-
-        <div class="header-right">
-
-            <label for="languageSelect">
-                Language
-            </label>
-
-            <select id="languageSelect">
-
-                <option value="en">
-                    English
-                </option>
-
-                <option value="hi">
-                    हिन्दी
-                </option>
-
-            </select>
-
-        </div>
-
-    </header>
-
-
-    <!-- =====================================================
-         MAIN CATEGORY NAVIGATION
-    ====================================================== -->
-
-    <nav
-        class="category-nav"
-        aria-label="Main tools"
-    >
-
-        <button
-            type="button"
-            class="category-btn active"
-            data-category="cocoBlue"
-        >
-            📘
-            <span>Coco Blue</span>
-        </button>
-
-
-        <button
-            type="button"
-            class="category-btn"
-            data-category="otherPO"
-        >
-            📦
-            <span>Other PO</span>
-        </button>
-
-
-        <button
-            type="button"
-            class="category-btn"
-            data-category="isbn"
-        >
-            🏷️
-            <span>ISBN / Barcode</span>
-        </button>
-
-
-        <button
-            type="button"
-            class="category-btn"
-            data-category="address"
-        >
-            📍
-            <span>Address / QR</span>
-        </button>
-
-    </nav>
-
-
-    <!-- =====================================================
-         COCO BLUE
-    ====================================================== -->
-
-    <main
-        id="cocoblueWorkspace"
-        class="tool-section active"
-        data-tool="cocoBlue"
-    >
-
-        <div class="section-heading">
-
-            <span class="section-label">
-                📘 COCO BLUE
-            </span>
-
-            <h2>
-                Coco Blue PO Labels
-            </h2>
-
-            <p>
-                Create PO and Box labels with live page preview.
-            </p>
-
-        </div>
-
-
-        <!-- COCO MODES -->
-
-        <div class="sub-navigation">
-
-            <button
-                type="button"
-                class="sub-category-btn active"
-                data-coco-mode="individual"
-            >
-                ✏️ Individual
-            </button>
-
-
-            <button
-                type="button"
-                class="sub-category-btn"
-                data-coco-mode="multiple"
-            >
-                📋 Multiple PO
-            </button>
-
-
-            <button
-                type="button"
-                class="sub-category-btn"
-                data-coco-mode="excel"
-            >
-                📊 Excel Upload
-            </button>
-
-
-            <button
-                type="button"
-                class="sub-category-btn"
-                data-coco-mode="address"
-            >
-                📍 Address
-            </button>
-
-        </div>
-
-
-        <!-- INDIVIDUAL -->
-
-        <section
-            id="cocoIndividualPanel"
-            class="mode-panel active"
-        >
-
-            <div class="panel-card">
-
-                <div class="panel-title">
-
-                    <div>
-
-                        <h3>
-                            ✏️ Enter PO Numbers
-                        </h3>
-
-                        <p>
-                            Enter individual PO values.
-                        </p>
-
-                    </div>
-
-                    <span class="limit-badge">
-                        MAX 40
-                    </span>
-
-                </div>
-
-
-                <div
-                    id="individualPOGrid"
-                    class="po-input-grid"
-                ></div>
+                <span id="cocoExcelFileName">
+                    No file selected
+                </span>
 
             </div>
 
-        </section>
+            <div
+                id="cocoExcelPreview"
+                class="excel-preview"
+            ></div>
+
+        </div>
+
+    </section>
 
 
-        <!-- MULTIPLE -->
+    <!-- ADDRESS -->
 
-        <section
-            id="cocoMultiplePanel"
-            class="mode-panel"
-        >
+    <section
+        id="cocoAddressPanel"
+        class="mode-panel"
+    >
 
-            <div class="panel-card">
+        <div class="panel-card">
 
-                <div class="panel-title">
-
-                    <div>
-
-                        <h3>
-                            📋 Multiple PO
-                        </h3>
-
-                        <p>
-                            One PO per line, comma or semicolon.
-                        </p>
-
-                    </div>
-
-                </div>
-
+            <div class="two-column-fields">
 
                 <div class="field">
 
-                    <label for="cocoMultiplePO">
-                        PO Values
+                    <label for="cocoFromAddress">
+                        From Address
                     </label>
 
                     <textarea
-                        id="cocoMultiplePO"
-                        placeholder="ABC123&#10;DEF456&#10;GHI789"
+                        id="cocoFromAddress"
+                        placeholder="Enter From Address"
+                    ></textarea>
+
+                </div>
+
+                <div class="field">
+
+                    <label for="cocoToAddress">
+                        To Address
+                    </label>
+
+                    <textarea
+                        id="cocoToAddress"
+                        placeholder="Enter To Address"
                     ></textarea>
 
                 </div>
 
             </div>
 
-        </section>
+        </div>
+
+    </section>
 
 
-        <!-- EXCEL -->
+    <!-- BOX SETTINGS -->
 
-        <section
-            id="cocoExcelPanel"
-            class="mode-panel"
+    <section class="panel-card">
+
+        <div class="panel-title">
+            <h3>📦 Box Settings</h3>
+        </div>
+
+        <div class="three-column-fields">
+
+            <div class="field">
+
+                <label for="startBoxNumber">
+                    Start Box
+                </label>
+
+                <input
+                    id="startBoxNumber"
+                    type="number"
+                    min="1"
+                    value="1"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="endBoxNumber">
+                    End Box
+                </label>
+
+                <input
+                    id="endBoxNumber"
+                    type="number"
+                    min="1"
+                    value="10"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="boxRepeatCount">
+                    Repeat
+                </label>
+
+                <input
+                    id="boxRepeatCount"
+                    type="number"
+                    min="1"
+                    value="1"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PAGE SETTINGS -->
+
+    <section class="panel-card">
+
+        <div class="panel-title">
+            <h3>📄 Page Settings</h3>
+        </div>
+
+        <div class="three-column-fields">
+
+            <div class="field">
+
+                <label for="pageSize">
+                    Page Size
+                </label>
+
+                <select id="pageSize">
+
+                    <option value="4x6">
+                        4 × 6 Inches
+                    </option>
+
+                    <option value="70x35">
+                        70 × 35 mm
+                    </option>
+
+                    <option value="a4">
+                        A4
+                    </option>
+
+                    <option value="a5">
+                        A5
+                    </option>
+
+                    <option value="letter">
+                        Letter
+                    </option>
+
+                    <option value="legal">
+                        Legal
+                    </option>
+
+                    <option value="custom">
+                        Custom
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="orientation">
+                    Orientation
+                </label>
+
+                <select id="orientation">
+
+                    <option value="portrait">
+                        Portrait
+                    </option>
+
+                    <option value="landscape">
+                        Landscape
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="labelsPerPage">
+                    Labels Per Page
+                </label>
+
+                <select id="labelsPerPage">
+
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="4">4</option>
+                    <option value="6">6</option>
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                    <option value="12">12</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="customSizePanel"
+            class="custom-size-panel hidden"
         >
 
-            <div class="panel-card">
-
-                <div class="panel-title">
-
-                    <div>
-
-                        <h3>
-                            📊 Upload PO Excel
-                        </h3>
-
-                        <p>
-                            First row is treated as header and ignored.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="upload-area">
-
-                    <strong>
-                        📁 Upload Excel File
-                    </strong>
-
-                    <p>
-                        XLSX / XLS / CSV
-                    </p>
-
-                    <input
-                        id="cocoExcelFile"
-                        type="file"
-                        accept=".xlsx,.xls,.csv"
-                    >
-
-                    <span id="cocoExcelFileName">
-                        No file selected
-                    </span>
-
-                </div>
-
-
-                <div
-                    id="cocoExcelPreview"
-                    class="excel-preview"
-                ></div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ADDRESS -->
-
-        <section
-            id="cocoAddressPanel"
-            class="mode-panel"
-        >
-
-            <div class="panel-card">
-
-                <div class="panel-title">
-
-                    <div>
-
-                        <h3>
-                            📍 Address
-                        </h3>
-
-                    </div>
-
-                </div>
-
-
-                <div class="two-column-fields">
-
-                    <div class="field">
-
-                        <label for="cocoFromAddress">
-                            From Address
-                        </label>
-
-                        <textarea
-                            id="cocoFromAddress"
-                            placeholder="Enter from address"
-                        ></textarea>
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="cocoToAddress">
-                            To Address
-                        </label>
-
-                        <textarea
-                            id="cocoToAddress"
-                            placeholder="Enter to address"
-                        ></textarea>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- BOX SETTINGS -->
-
-        <section class="panel-card">
-
-            <div class="panel-title">
-
-                <div>
-
-                    <h3>
-                        📦 Box Settings
-                    </h3>
-
-                    <p>
-                        Configure Box Number sequence.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="three-column-fields">
+            <div class="two-column-fields">
 
                 <div class="field">
 
-                    <label for="startBoxNumber">
-                        Start Box
+                    <label for="customWidth">
+                        Width (mm)
                     </label>
 
                     <input
-                        id="startBoxNumber"
+                        id="customWidth"
                         type="number"
+                        value="70"
                         min="1"
-                        value="1"
                     >
 
                 </div>
 
-
                 <div class="field">
 
-                    <label for="endBoxNumber">
-                        End Box
+                    <label for="customHeight">
+                        Height (mm)
                     </label>
 
                     <input
-                        id="endBoxNumber"
+                        id="customHeight"
                         type="number"
+                        value="35"
                         min="1"
-                        value="10"
-                    >
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="boxRepeatCount">
-                        Repeat
-                    </label>
-
-                    <input
-                        id="boxRepeatCount"
-                        type="number"
-                        min="1"
-                        value="1"
                     >
 
                 </div>
 
             </div>
 
-        </section>
+        </div>
+
+    </section>
 
 
-        <!-- PAGE SETTINGS -->
+    <!-- =================================================
+         COCO TEXT STYLE
+    ================================================== -->
 
-        <section class="panel-card">
+    <section class="panel-card">
 
-            <div class="panel-title">
+        <div class="panel-title">
+            <div>
+                <h3>🔤 PO & Box Typography</h3>
 
-                <div>
-
-                    <h3>
-                        📄 Page & Label Settings
-                    </h3>
-
-                    <p>
-                        Preview changes live.
-                    </p>
-
-                </div>
-
+                <p>
+                    Full font, size, alignment and decoration controls.
+                </p>
             </div>
+        </div>
 
 
-            <div class="three-column-fields">
+        <!-- PO -->
 
-                <div class="field">
+        <div class="deep-style-block">
 
-                    <label for="pageSize">
-                        Page Size
-                    </label>
+            <h4>📘 PO Text</h4>
 
-                    <select id="pageSize">
-
-                        <option value="4x6">
-                            4 × 6 Inches
-                        </option>
-
-                        <option value="70x35">
-                            70 × 35 mm
-                        </option>
-
-                        <option value="a4">
-                            A4
-                        </option>
-
-                        <option value="custom">
-                            Custom
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="orientation">
-                        Orientation
-                    </label>
-
-                    <select id="orientation">
-
-                        <option value="portrait">
-                            Portrait
-                        </option>
-
-                        <option value="landscape">
-                            Landscape
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="labelsPerPage">
-                        Labels Per Page
-                    </label>
-
-                    <select id="labelsPerPage">
-
-                        <option value="1">
-                            1
-                        </option>
-
-                        <option
-                            value="2"
-                            selected
-                        >
-                            2
-                        </option>
-
-                        <option value="4">
-                            4
-                        </option>
-
-                        <option value="6">
-                            6
-                        </option>
-
-                        <option value="8">
-                            8
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="customSizePanel"
-                class="custom-size-panel hidden"
-            >
-
-                <div class="two-column-fields">
-
-                    <div class="field">
-
-                        <label for="customWidth">
-                            Width (mm)
-                        </label>
-
-                        <input
-                            id="customWidth"
-                            type="number"
-                            min="1"
-                            value="70"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="customHeight">
-                            Height (mm)
-                        </label>
-
-                        <input
-                            id="customHeight"
-                            type="number"
-                            min="1"
-                            value="35"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="selectedPageInfo"
-                class="selected-page-info"
-            >
-                101.6 × 152.4 mm
-            </div>
-
-        </section>
-
-
-        <!-- FEATURES -->
-
-        <section class="panel-card">
-
-            <div class="panel-title">
-
-                <div>
-
-                    <h3>
-                        ⚙️ Label Features
-                    </h3>
-
-                    <p>
-                        Enable or disable label elements.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="feature-checkbox-list">
-
-                <label class="feature-check">
-
-                    <input
-                        id="poNumberCheck"
-                        type="checkbox"
-                        checked
-                    >
-
-                    <span>
-                        PO Value
-                    </span>
-
-                </label>
-
-
-                <label class="feature-check">
-
-                    <input
-                        id="boxNumberCheck"
-                        type="checkbox"
-                        checked
-                    >
-
-                    <span>
-                        Box Number
-                    </span>
-
-                </label>
-
-
-                <label class="feature-check">
-
-                    <input
-                        id="poPlusBoxCheck"
-                        type="checkbox"
-                    >
-
-                    <span>
-                        PO + Box
-                    </span>
-
-                </label>
-
-
-                <label class="feature-check">
-
-                    <input
-                        id="combinedBorderCheck"
-                        type="checkbox"
-                    >
-
-                    <span>
-                        Combined Border
-                    </span>
-
-                </label>
-
-
-                <label class="feature-check">
-
-                    <input
-                        id="poBorderCheck"
-                        type="checkbox"
-                    >
-
-                    <span>
-                        PO Border
-                    </span>
-
-                </label>
-
-
-                <label class="feature-check">
-
-                    <input
-                        id="boxBorderCheck"
-                        type="checkbox"
-                    >
-
-                    <span>
-                        Box Border
-                    </span>
-
-                </label>
-
-
-                <label class="feature-check">
-
-                    <input
-                        id="cutLineCheck"
-                        type="checkbox"
-                    >
-
-                    <span>
-                        Cut Line
-                    </span>
-
-                </label>
-
-
-                <label class="feature-check">
-
-                    <input
-                        id="pageBorderCheck"
-                        type="checkbox"
-                    >
-
-                    <span>
-                        Page Border
-                    </span>
-
-                </label>
-
-
-                <label class="feature-check">
-
-                    <input
-                        id="samePOPageFlow"
-                        type="checkbox"
-                    >
-
-                    <span>
-                        Same PO Flow
-                    </span>
-
-                </label>
-
-
-                <label class="feature-check">
-
-                    <input
-                        id="halfPageFlowCheck"
-                        type="checkbox"
-                    >
-
-                    <span>
-                        Half Page Flow
-                    </span>
-
-                </label>
-
-            </div>
-
-        </section>
-
-
-        <!-- PO STYLE -->
-
-        <section class="panel-card">
-
-            <div class="panel-title">
-
-                <div>
-
-                    <h3>
-                        🔤 PO Text Style
-                    </h3>
-
-                </div>
-
-            </div>
-
-
-            <div class="three-column-fields">
+            <div class="four-column-fields">
 
                 <div class="field">
 
                     <label for="poFontFamily">
-                        Font
+                        Font Family
                     </label>
 
                     <select id="poFontFamily">
 
-                        <option value="Arial">
-                            Arial
-                        </option>
-
-                        <option value="Verdana">
-                            Verdana
-                        </option>
-
-                        <option value="Georgia">
-                            Georgia
-                        </option>
-
-                        <option value="Tahoma">
-                            Tahoma
-                        </option>
+                        <option>Arial</option>
+                        <option>Calibri</option>
+                        <option>Cambria</option>
+                        <option>Times New Roman</option>
+                        <option>Georgia</option>
+                        <option>Verdana</option>
+                        <option>Tahoma</option>
+                        <option>Trebuchet MS</option>
+                        <option>Courier New</option>
+                        <option>Impact</option>
+                        <option>Garamond</option>
+                        <option>Book Antiqua</option>
 
                     </select>
 
@@ -862,106 +645,158 @@
                 <div class="field">
 
                     <label for="poFontSize">
-                        Size
+                        Font Size
                     </label>
+
+                    <select id="poFontSizePreset">
+
+                        <option value="">Custom</option>
+
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="14">14</option>
+                        <option value="16">16</option>
+                        <option value="18">18</option>
+                        <option value="20">20</option>
+                        <option value="22">22</option>
+                        <option value="24" selected>24</option>
+                        <option value="26">26</option>
+                        <option value="28">28</option>
+                        <option value="32">32</option>
+                        <option value="36">36</option>
+                        <option value="40">40</option>
+                        <option value="48">48</option>
+                        <option value="56">56</option>
+                        <option value="64">64</option>
+                        <option value="72">72</option>
+
+                    </select>
 
                     <input
                         id="poFontSize"
                         type="number"
-                        min="6"
-                        max="100"
+                        min="1"
+                        max="300"
                         value="24"
+                        placeholder="Type size"
                     >
 
                 </div>
 
 
-                <div class="text-style-controls">
+                <div class="field">
 
-                    <label>
-
-                        <input
-                            id="poBoldCheck"
-                            type="checkbox"
-                        >
-
-                        Bold
-
+                    <label for="poAlignment">
+                        Alignment
                     </label>
 
+                    <select id="poAlignment">
 
-                    <label>
+                        <option value="left">Left</option>
+                        <option value="center" selected>Center</option>
+                        <option value="right">Right</option>
 
-                        <input
-                            id="poItalicCheck"
-                            type="checkbox"
-                        >
-
-                        Italic
-
-                    </label>
-
-
-                    <label>
-
-                        <input
-                            id="poUnderlineCheck"
-                            type="checkbox"
-                        >
-
-                        Underline
-
-                    </label>
+                    </select>
 
                 </div>
 
-            </div>
 
-        </section>
+                <div class="field">
 
+                    <label for="poLineHeight">
+                        Line Height
+                    </label>
 
-        <!-- BOX STYLE -->
-
-        <section class="panel-card">
-
-            <div class="panel-title">
-
-                <div>
-
-                    <h3>
-                        🔤 Box Text Style
-                    </h3>
+                    <input
+                        id="poLineHeight"
+                        type="number"
+                        min="0.5"
+                        max="5"
+                        step="0.1"
+                        value="1"
+                    >
 
                 </div>
 
             </div>
 
 
-            <div class="three-column-fields">
+            <div class="style-options-row">
+
+                <label>
+                    <input
+                        id="poBoldCheck"
+                        type="checkbox"
+                    >
+                    <span>Bold</span>
+                </label>
+
+                <label>
+                    <input
+                        id="poItalicCheck"
+                        type="checkbox"
+                    >
+                    <span>Italic</span>
+                </label>
+
+                <label>
+                    <input
+                        id="poUnderlineCheck"
+                        type="checkbox"
+                    >
+                    <span>Underline</span>
+                </label>
+
+                <label>
+                    <input
+                        id="poStrikeCheck"
+                        type="checkbox"
+                    >
+                    <span>Strike</span>
+                </label>
+
+                <label>
+                    <input
+                        id="poUppercaseCheck"
+                        type="checkbox"
+                    >
+                    <span>Uppercase</span>
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- BOX -->
+
+        <div class="deep-style-block">
+
+            <h4>📦 Box Text</h4>
+
+            <div class="four-column-fields">
 
                 <div class="field">
 
                     <label for="boxFontFamily">
-                        Font
+                        Font Family
                     </label>
 
                     <select id="boxFontFamily">
 
-                        <option value="Arial">
-                            Arial
-                        </option>
-
-                        <option value="Verdana">
-                            Verdana
-                        </option>
-
-                        <option value="Georgia">
-                            Georgia
-                        </option>
-
-                        <option value="Tahoma">
-                            Tahoma
-                        </option>
+                        <option>Arial</option>
+                        <option>Calibri</option>
+                        <option>Cambria</option>
+                        <option>Times New Roman</option>
+                        <option>Georgia</option>
+                        <option>Verdana</option>
+                        <option>Tahoma</option>
+                        <option>Trebuchet MS</option>
+                        <option>Courier New</option>
+                        <option>Impact</option>
 
                     </select>
 
@@ -971,1035 +806,2006 @@
                 <div class="field">
 
                     <label for="boxFontSize">
-                        Size
+                        Font Size
                     </label>
+
+                    <select id="boxFontSizePreset">
+
+                        <option value="">Custom</option>
+
+                        <option value="8">8</option>
+                        <option value="10">10</option>
+                        <option value="12">12</option>
+                        <option value="14">14</option>
+                        <option value="16">16</option>
+                        <option value="18">18</option>
+                        <option value="20" selected>20</option>
+                        <option value="22">22</option>
+                        <option value="24">24</option>
+                        <option value="28">28</option>
+                        <option value="32">32</option>
+                        <option value="36">36</option>
+                        <option value="40">40</option>
+                        <option value="48">48</option>
+                        <option value="56">56</option>
+                        <option value="64">64</option>
+                        <option value="72">72</option>
+
+                    </select>
 
                     <input
                         id="boxFontSize"
                         type="number"
-                        min="6"
-                        max="100"
+                        min="1"
+                        max="300"
                         value="20"
+                        placeholder="Type size"
                     >
 
                 </div>
 
 
-                <div class="text-style-controls">
+                <div class="field">
 
-                    <label>
-
-                        <input
-                            id="boxBoldCheck"
-                            type="checkbox"
-                        >
-
-                        Bold
-
+                    <label for="boxAlignment">
+                        Alignment
                     </label>
 
+                    <select id="boxAlignment">
 
-                    <label>
+                        <option value="left">Left</option>
+                        <option value="center" selected>Center</option>
+                        <option value="right">Right</option>
 
-                        <input
-                            id="boxItalicCheck"
-                            type="checkbox"
-                        >
+                    </select>
 
-                        Italic
+                </div>
 
+
+                <div class="field">
+
+                    <label for="boxLineHeight">
+                        Line Height
                     </label>
 
-
-                    <label>
-
-                        <input
-                            id="boxUnderlineCheck"
-                            type="checkbox"
-                        >
-
-                        Underline
-
-                    </label>
+                    <input
+                        id="boxLineHeight"
+                        type="number"
+                        min="0.5"
+                        max="5"
+                        step="0.1"
+                        value="1"
+                    >
 
                 </div>
 
             </div>
 
-        </section>
+
+            <div class="style-options-row">
+
+                <label>
+                    <input
+                        id="boxBoldCheck"
+                        type="checkbox"
+                    >
+                    <span>Bold</span>
+                </label>
+
+                <label>
+                    <input
+                        id="boxItalicCheck"
+                        type="checkbox"
+                    >
+                    <span>Italic</span>
+                </label>
+
+                <label>
+                    <input
+                        id="boxUnderlineCheck"
+                        type="checkbox"
+                    >
+                    <span>Underline</span>
+                </label>
+
+                <label>
+                    <input
+                        id="boxStrikeCheck"
+                        type="checkbox"
+                    >
+                    <span>Strike</span>
+                </label>
+
+            </div>
+
+        </div>
+
+    </section>
 
 
-        <!-- LIVE PREVIEW -->
+    <!-- =================================================
+         FULL BORDER DESIGN
+    ================================================== -->
 
-        <section class="panel-card preview-card">
+    <section class="panel-card border-design-section">
 
-            <div class="panel-title">
+        <div class="panel-title">
 
-                <div>
+            <div>
+                <h3>🖼️ Advanced Border Designer</h3>
 
-                    <h3>
-                        👁️ Live Page Preview
-                    </h3>
+                <p>
+                    Microsoft Office style border controls.
+                </p>
+            </div>
 
-                    <p>
-                        Changes appear here instantly.
-                    </p>
+        </div>
 
-                </div>
 
-                <span
-                    id="previewPageSize"
-                    class="limit-badge"
+        <!-- OBJECT -->
+
+        <div class="field">
+
+            <label for="cocoBorderTarget">
+                Apply Border To
+            </label>
+
+            <select id="cocoBorderTarget">
+
+                <option value="label">
+                    Whole Label
+                </option>
+
+                <option value="po">
+                    PO Text
+                </option>
+
+                <option value="box">
+                    Box Text
+                </option>
+
+                <option value="page">
+                    Page
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- 25+ STYLES -->
+
+        <div class="border-style-grid">
+
+            <button
+                type="button"
+                class="border-style-option active"
+                data-border-style="solid"
+            >
+                <span class="border-preview solid"></span>
+                Solid
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="double"
+            >
+                <span class="border-preview double"></span>
+                Double
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="dashed"
+            >
+                <span class="border-preview dashed"></span>
+                Dashed
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="dotted"
+            >
+                <span class="border-preview dotted"></span>
+                Dotted
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="groove"
+            >
+                <span class="border-preview groove"></span>
+                Groove
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="ridge"
+            >
+                <span class="border-preview ridge"></span>
+                Ridge
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="inset"
+            >
+                <span class="border-preview inset"></span>
+                Inset
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="outset"
+            >
+                <span class="border-preview outset"></span>
+                Outset
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="thin"
+            >
+                <span class="border-preview thin"></span>
+                Thin
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="medium"
+            >
+                <span class="border-preview medium"></span>
+                Medium
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="thick"
+            >
+                <span class="border-preview thick"></span>
+                Thick
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="thinDouble"
+            >
+                <span class="border-preview thin-double"></span>
+                Thin Double
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="thickDouble"
+            >
+                <span class="border-preview thick-double"></span>
+                Thick Double
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="dashDot"
+            >
+                <span class="border-preview dash-dot"></span>
+                Dash Dot
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="dashDotDot"
+            >
+                <span class="border-preview dash-dot-dot"></span>
+                Dash Dot Dot
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="longDash"
+            >
+                <span class="border-preview long-dash"></span>
+                Long Dash
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="longDashDot"
+            >
+                <span class="border-preview long-dash-dot"></span>
+                Long Dash Dot
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="dotDash"
+            >
+                <span class="border-preview dot-dash"></span>
+                Dot Dash
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="triple"
+            >
+                <span class="border-preview triple"></span>
+                Triple
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="hairline"
+            >
+                <span class="border-preview hairline"></span>
+                Hairline
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="wave"
+            >
+                <span class="border-preview wave"></span>
+                Wave
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="doubleWave"
+            >
+                <span class="border-preview double-wave"></span>
+                Double Wave
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="threeD"
+            >
+                <span class="border-preview three-d"></span>
+                3D
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="shadow"
+            >
+                <span class="border-preview shadow"></span>
+                Shadow
+            </button>
+
+            <button
+                type="button"
+                class="border-style-option"
+                data-border-style="custom"
+            >
+                <span class="border-preview custom"></span>
+                Custom
+            </button>
+
+        </div>
+
+
+        <!-- SIDE CONTROLS -->
+
+        <div class="border-side-grid">
+
+            <label>
+                <input
+                    id="borderTopEnabled"
+                    type="checkbox"
+                    checked
                 >
-                    4 × 6 Inches
-                </span>
+                Top
+            </label>
+
+            <label>
+                <input
+                    id="borderRightEnabled"
+                    type="checkbox"
+                    checked
+                >
+                Right
+            </label>
+
+            <label>
+                <input
+                    id="borderBottomEnabled"
+                    type="checkbox"
+                    checked
+                >
+                Bottom
+            </label>
+
+            <label>
+                <input
+                    id="borderLeftEnabled"
+                    type="checkbox"
+                    checked
+                >
+                Left
+            </label>
+
+            <label>
+                <input
+                    id="borderInsideEnabled"
+                    type="checkbox"
+                >
+                Inside
+            </label>
+
+            <label>
+                <input
+                    id="borderOutsideEnabled"
+                    type="checkbox"
+                    checked
+                >
+                Outside
+            </label>
+
+        </div>
+
+
+        <!-- BORDER PROPERTIES -->
+
+        <div class="four-column-fields">
+
+            <div class="field">
+
+                <label for="borderWidth">
+                    Border Width
+                </label>
+
+                <select id="borderWidthPreset">
+
+                    <option value="0.25">0.25 pt</option>
+                    <option value="0.5">0.5 pt</option>
+                    <option value="0.75">0.75 pt</option>
+                    <option value="1">1 pt</option>
+                    <option value="1.5">1.5 pt</option>
+                    <option value="2" selected>2 pt</option>
+                    <option value="3">3 pt</option>
+                    <option value="4">4 pt</option>
+                    <option value="5">5 pt</option>
+                    <option value="6">6 pt</option>
+                    <option value="8">8 pt</option>
+                    <option value="10">10 pt</option>
+
+                </select>
+
+                <input
+                    id="borderWidth"
+                    type="number"
+                    min="0"
+                    max="50"
+                    step="0.25"
+                    value="2"
+                    placeholder="Custom width"
+                >
 
             </div>
 
 
-            <div class="preview-container">
+            <div class="field">
+
+                <label for="borderColor">
+                    Border Color
+                </label>
+
+                <input
+                    id="borderColor"
+                    type="color"
+                    value="#111827"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="borderOpacity">
+                    Opacity
+                </label>
+
+                <input
+                    id="borderOpacity"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="100"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="borderRadius">
+                    Corner Radius
+                </label>
+
+                <input
+                    id="borderRadius"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value="0"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- PRESET -->
+
+        <div class="border-preset-row">
+
+            <button
+                type="button"
+                id="applyBorderButton"
+                class="primary-btn"
+            >
+                ✓ Apply Border
+            </button>
+
+            <button
+                type="button"
+                id="clearBorderButton"
+                class="secondary-btn"
+            >
+                ✕ Remove Border
+            </button>
+
+            <button
+                type="button"
+                id="saveBorderPresetButton"
+                class="secondary-btn"
+            >
+                💾 Save Border Preset
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         LABEL OPTIONS
+    ================================================== -->
+
+    <section class="panel-card">
+
+        <div class="panel-title">
+            <h3>⚙️ Label Features</h3>
+        </div>
+
+        <div class="feature-checkbox-list">
+
+            <label class="feature-check">
+                <input
+                    id="poNumberCheck"
+                    type="checkbox"
+                    checked
+                >
+                PO Value
+            </label>
+
+            <label class="feature-check">
+                <input
+                    id="boxNumberCheck"
+                    type="checkbox"
+                    checked
+                >
+                Box Number
+            </label>
+
+            <label class="feature-check">
+                <input
+                    id="poPlusBoxCheck"
+                    type="checkbox"
+                >
+                PO + Box
+            </label>
+
+            <label class="feature-check">
+                <input
+                    id="cutLineCheck"
+                    type="checkbox"
+                >
+                Cut Line
+            </label>
+
+            <label class="feature-check">
+                <input
+                    id="pageBorderCheck"
+                    type="checkbox"
+                >
+                Page Border
+            </label>
+
+            <label class="feature-check">
+                <input
+                    id="samePOPageFlow"
+                    type="checkbox"
+                >
+                Same PO Flow
+            </label>
+
+            <label class="feature-check">
+                <input
+                    id="halfPageFlowCheck"
+                    type="checkbox"
+                >
+                Half Page Flow
+            </label>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         LIVE PREVIEW
+    ================================================== -->
+
+    <section class="panel-card preview-card">
+
+        <div class="panel-title">
+
+            <div>
+                <h3>👁️ Live Page Preview</h3>
+
+                <p>
+                    Page size, labels, font and borders update live.
+                </p>
+            </div>
+
+            <span
+                id="previewPageSize"
+                class="limit-badge"
+            >
+                4 × 6 Inches
+            </span>
+
+        </div>
+
+
+        <div class="preview-container">
+
+            <div
+                id="previewPage"
+                class="preview-page"
+            >
 
                 <div
-                    id="previewPage"
-                    class="preview-page"
+                    id="previewLabel"
+                    class="preview-label"
                 >
 
                     <div
-                        id="previewLabel"
-                        class="preview-label"
+                        id="previewPO"
+                        class="preview-po"
                     >
+                        ABC123
+                    </div>
 
-                        <div
-                            id="previewPO"
-                            class="preview-po"
-                        >
-                            ABC123
-                        </div>
-
-
-                        <div
-                            id="previewBox"
-                            class="preview-box"
-                        >
-                            BOX NO. 1
-                        </div>
-
+                    <div
+                        id="previewBox"
+                        class="preview-box"
+                    >
+                        BOX NO. 1
                     </div>
 
                 </div>
 
             </div>
 
-        </section>
-
-
-        <!-- ACTIONS -->
-
-        <div class="action-bar">
-
-            <button
-                id="cocoResetButton"
-                type="button"
-                class="secondary-btn"
-            >
-                ↺ Reset
-            </button>
-
-
-            <button
-                id="cocoGenerateButton"
-                type="button"
-                class="primary-btn"
-            >
-                📄 Generate PDF
-            </button>
-
         </div>
 
-    </main>
+    </section>
 
 
-    <!-- =====================================================
-         OTHER PO
-    ====================================================== -->
+    <!-- ACTIONS -->
 
-    <main
-        id="otherpoWorkspace"
-        class="tool-section"
-        data-tool="otherPO"
+    <div class="action-bar">
+
+        <button
+            id="cocoResetButton"
+            type="button"
+            class="secondary-btn"
+        >
+            ↺ Reset
+        </button>
+
+        <button
+            id="cocoGenerateButton"
+            type="button"
+            class="primary-btn"
+        >
+            📄 Generate PDF
+        </button>
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     OTHER PO
+===================================================== -->
+
+<main
+    id="otherpoWorkspace"
+    class="tool-section"
+    data-tool="otherPO"
+>
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            📦 OTHER PO
+        </span>
+
+        <h2>Other PO Labels</h2>
+
+        <p>
+            Full PO label design and formatting.
+        </p>
+
+    </div>
+
+
+    <div class="sub-navigation">
+
+        <button
+            type="button"
+            class="sub-category-btn active"
+            data-other-mode="individual"
+        >
+            ✏️ Individual
+        </button>
+
+        <button
+            type="button"
+            class="sub-category-btn"
+            data-other-mode="multiple"
+        >
+            📋 Multiple
+        </button>
+
+        <button
+            type="button"
+            class="sub-category-btn"
+            data-other-mode="excel"
+        >
+            📊 Excel
+        </button>
+
+        <button
+            type="button"
+            class="sub-category-btn"
+            data-other-mode="address"
+        >
+            📍 Address
+        </button>
+
+    </div>
+
+
+    <section
+        id="otherIndividualPanel"
+        class="mode-panel active"
     >
 
-        <div class="section-heading">
+        <div class="panel-card">
 
-            <span class="section-label">
-                📦 OTHER PO
-            </span>
-
-            <h2>
-                Other PO Labels
-            </h2>
-
-            <p>
-                Create labels for other purchase orders.
-            </p>
+            <div
+                id="otherIndividualPOGrid"
+                class="po-input-grid"
+            ></div>
 
         </div>
 
-
-        <div class="sub-navigation">
-
-            <button
-                type="button"
-                class="sub-category-btn active"
-                data-other-mode="individual"
-            >
-                ✏️ Individual
-            </button>
+    </section>
 
 
-            <button
-                type="button"
-                class="sub-category-btn"
-                data-other-mode="multiple"
-            >
-                📋 Multiple
-            </button>
+    <section
+        id="otherMultiplePanel"
+        class="mode-panel"
+    >
 
+        <div class="panel-card">
 
-            <button
-                type="button"
-                class="sub-category-btn"
-                data-other-mode="excel"
-            >
-                📊 Excel
-            </button>
-
-
-            <button
-                type="button"
-                class="sub-category-btn"
-                data-other-mode="address"
-            >
-                📍 Address
-            </button>
+            <textarea
+                id="otherMultiplePO"
+                placeholder="Enter PO values..."
+            ></textarea>
 
         </div>
 
+    </section>
 
-        <section
-            id="otherIndividualPanel"
-            class="mode-panel active"
-        >
 
-            <div class="panel-card">
+    <section
+        id="otherExcelPanel"
+        class="mode-panel"
+    >
 
-                <div class="panel-title">
+        <div class="panel-card">
 
-                    <h3>
-                        ✏️ PO Numbers
-                    </h3>
+            <div class="upload-area">
 
-                </div>
+                <strong>📊 Upload Excel</strong>
 
-                <div
-                    id="otherIndividualPOGrid"
-                    class="po-input-grid"
-                ></div>
+                <p>
+                    First row = header and ignored.
+                </p>
+
+                <input
+                    id="otherExcelFile"
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                >
+
+                <span id="otherExcelFileName">
+                    No file selected
+                </span>
 
             </div>
 
-        </section>
+            <div
+                id="otherExcelPreview"
+                class="excel-preview"
+            ></div>
+
+        </div>
+
+    </section>
 
 
-        <section
-            id="otherMultiplePanel"
-            class="mode-panel"
+    <section
+        id="otherAddressPanel"
+        class="mode-panel"
+    >
+
+        <div class="panel-card">
+
+            <textarea
+                placeholder="Enter address..."
+            ></textarea>
+
+        </div>
+
+    </section>
+
+
+    <!-- OTHER PO TYPOGRAPHY -->
+
+    <section class="panel-card">
+
+        <div class="panel-title">
+            <h3>🔤 Full Typography</h3>
+        </div>
+
+        <div class="four-column-fields">
+
+            <div class="field">
+
+                <label for="otherFontFamily">
+                    Font
+                </label>
+
+                <select id="otherFontFamily">
+
+                    <option>Arial</option>
+                    <option>Calibri</option>
+                    <option>Cambria</option>
+                    <option>Times New Roman</option>
+                    <option>Georgia</option>
+                    <option>Verdana</option>
+                    <option>Tahoma</option>
+                    <option>Trebuchet MS</option>
+                    <option>Courier New</option>
+                    <option>Impact</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="otherFontSize">
+                    Font Size
+                </label>
+
+                <select id="otherFontSizePreset">
+
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                    <option value="12">12</option>
+                    <option value="14">14</option>
+                    <option value="16">16</option>
+                    <option value="18">18</option>
+                    <option value="20" selected>20</option>
+                    <option value="24">24</option>
+                    <option value="28">28</option>
+                    <option value="32">32</option>
+                    <option value="36">36</option>
+                    <option value="48">48</option>
+                    <option value="56">56</option>
+                    <option value="72">72</option>
+
+                </select>
+
+                <input
+                    id="otherFontSize"
+                    type="number"
+                    value="20"
+                    min="1"
+                    max="300"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="otherAlignment">
+                    Alignment
+                </label>
+
+                <select id="otherAlignment">
+
+                    <option>Left</option>
+                    <option selected>Center</option>
+                    <option>Right</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="otherLineHeight">
+                    Line Height
+                </label>
+
+                <input
+                    id="otherLineHeight"
+                    type="number"
+                    value="1"
+                    step=".1"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="style-options-row">
+
+            <label>
+                <input
+                    id="otherBold"
+                    type="checkbox"
+                >
+                Bold
+            </label>
+
+            <label>
+                <input
+                    id="otherItalic"
+                    type="checkbox"
+                >
+                Italic
+            </label>
+
+            <label>
+                <input
+                    id="otherUnderline"
+                    type="checkbox"
+                >
+                Underline
+            </label>
+
+            <label>
+                <input
+                    id="otherStrike"
+                    type="checkbox"
+                >
+                Strike
+            </label>
+
+        </div>
+
+    </section>
+
+
+    <!-- OTHER BORDER -->
+
+    <section class="panel-card">
+
+        <div class="panel-title">
+
+            <div>
+                <h3>🖼️ Full Border Designer</h3>
+
+                <p>
+                    Same deep border controls as Coco Blue.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="border-style-grid">
+
+            <button type="button" class="border-style-option active" data-other-border="solid">
+                <span class="border-preview solid"></span>
+                Solid
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="double">
+                <span class="border-preview double"></span>
+                Double
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="dashed">
+                <span class="border-preview dashed"></span>
+                Dashed
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="dotted">
+                <span class="border-preview dotted"></span>
+                Dotted
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="groove">
+                <span class="border-preview groove"></span>
+                Groove
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="ridge">
+                <span class="border-preview ridge"></span>
+                Ridge
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="inset">
+                <span class="border-preview inset"></span>
+                Inset
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="outset">
+                <span class="border-preview outset"></span>
+                Outset
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="thin">
+                <span class="border-preview thin"></span>
+                Thin
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="medium">
+                <span class="border-preview medium"></span>
+                Medium
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="thick">
+                <span class="border-preview thick"></span>
+                Thick
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="thinDouble">
+                <span class="border-preview thin-double"></span>
+                Thin Double
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="thickDouble">
+                <span class="border-preview thick-double"></span>
+                Thick Double
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="dashDot">
+                <span class="border-preview dash-dot"></span>
+                Dash Dot
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="dashDotDot">
+                <span class="border-preview dash-dot-dot"></span>
+                Dash Dot Dot
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="longDash">
+                <span class="border-preview long-dash"></span>
+                Long Dash
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="longDashDot">
+                <span class="border-preview long-dash-dot"></span>
+                Long Dash Dot
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="dotDash">
+                <span class="border-preview dot-dash"></span>
+                Dot Dash
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="triple">
+                <span class="border-preview triple"></span>
+                Triple
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="hairline">
+                <span class="border-preview hairline"></span>
+                Hairline
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="wave">
+                <span class="border-preview wave"></span>
+                Wave
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="doubleWave">
+                <span class="border-preview double-wave"></span>
+                Double Wave
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="threeD">
+                <span class="border-preview three-d"></span>
+                3D
+            </button>
+
+            <button type="button" class="border-style-option" data-other-border="shadow">
+                <span class="border-preview shadow"></span>
+                Shadow
+            </button>
+
+        </div>
+
+
+        <div class="border-side-grid">
+
+            <label>
+                <input id="otherBorderTop" type="checkbox" checked>
+                Top
+            </label>
+
+            <label>
+                <input id="otherBorderRight" type="checkbox" checked>
+                Right
+            </label>
+
+            <label>
+                <input id="otherBorderBottom" type="checkbox" checked>
+                Bottom
+            </label>
+
+            <label>
+                <input id="otherBorderLeft" type="checkbox" checked>
+                Left
+            </label>
+
+        </div>
+
+
+        <div class="four-column-fields">
+
+            <div class="field">
+
+                <label for="otherBorderWidth">
+                    Width
+                </label>
+
+                <select id="otherBorderWidthPreset">
+
+                    <option>0.25</option>
+                    <option>0.5</option>
+                    <option>1</option>
+                    <option selected>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>6</option>
+                    <option>8</option>
+                    <option>10</option>
+
+                </select>
+
+                <input
+                    id="otherBorderWidth"
+                    type="number"
+                    value="2"
+                    min="0"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="otherBorderColor">
+                    Color
+                </label>
+
+                <input
+                    id="otherBorderColor"
+                    type="color"
+                    value="#111827"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="otherBorderRadius">
+                    Radius
+                </label>
+
+                <input
+                    id="otherBorderRadius"
+                    type="number"
+                    value="0"
+                    min="0"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="otherBorderOpacity">
+                    Opacity
+                </label>
+
+                <input
+                    id="otherBorderOpacity"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="100"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="border-preset-row">
+
+            <button
+                type="button"
+                id="otherApplyBorderButton"
+                class="primary-btn"
+            >
+                ✓ Apply Border
+            </button>
+
+            <button
+                type="button"
+                id="otherClearBorderButton"
+                class="secondary-btn"
+            >
+                ✕ Remove
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel-card preview-card">
+
+        <div class="panel-title">
+            <h3>👁️ Live Preview</h3>
+        </div>
+
+        <div class="preview-container">
+
+            <div
+                id="otherPreviewPage"
+                class="preview-page"
+            >
+
+                <div
+                    id="otherPreviewLabel"
+                    class="preview-label"
+                >
+                    ABC123
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="action-bar">
+
+        <button
+            id="otherResetButton"
+            type="button"
+            class="secondary-btn"
+        >
+            ↺ Reset
+        </button>
+
+        <button
+            id="otherGenerateButton"
+            type="button"
+            class="primary-btn"
+        >
+            📄 Generate PDF
+        </button>
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     ISBN / BARCODE
+===================================================== -->
+
+<main
+    id="isbnWorkspace"
+    class="tool-section"
+    data-tool="isbn"
+>
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            🏷️ ISBN
+        </span>
+
+        <h2>ISBN / Barcode Generator</h2>
+
+    </div>
+
+
+    <section class="panel-card">
+
+        <div class="three-column-fields">
+
+            <div class="field">
+
+                <label for="isbnValue">
+                    ISBN
+                </label>
+
+                <input
+                    id="isbnValue"
+                    type="text"
+                    placeholder="978XXXXXXXXXX"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="isbnBookTitle">
+                    Book Title
+                </label>
+
+                <input
+                    id="isbnBookTitle"
+                    type="text"
+                    placeholder="Book Title"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="isbnEdition">
+                    Edition
+                </label>
+
+                <input
+                    id="isbnEdition"
+                    type="text"
+                    placeholder="Edition"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ISBN FONT -->
+
+    <section class="panel-card">
+
+        <div class="panel-title">
+            <h3>🔤 ISBN Typography</h3>
+        </div>
+
+        <div class="four-column-fields">
+
+            <div class="field">
+
+                <label for="isbnFontFamily">
+                    Font
+                </label>
+
+                <select id="isbnFontFamily">
+
+                    <option>Arial</option>
+                    <option>Calibri</option>
+                    <option>Cambria</option>
+                    <option>Times New Roman</option>
+                    <option>Georgia</option>
+                    <option>Verdana</option>
+                    <option>Tahoma</option>
+                    <option>Courier New</option>
+                    <option>Impact</option>
+
+                </select>
+
+            </div>
+
+            <div class="field">
+
+                <label for="isbnFontSize">
+                    Font Size
+                </label>
+
+                <select id="isbnFontSizePreset">
+
+                    <option>8</option>
+                    <option>10</option>
+                    <option>12</option>
+                    <option>14</option>
+                    <option selected>16</option>
+                    <option>18</option>
+                    <option>20</option>
+                    <option>24</option>
+                    <option>28</option>
+                    <option>32</option>
+                    <option>36</option>
+                    <option>48</option>
+                    <option>56</option>
+                    <option>72</option>
+
+                </select>
+
+                <input
+                    id="isbnFontSize"
+                    type="number"
+                    value="16"
+                    min="1"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="isbnAlignment">
+                    Alignment
+                </label>
+
+                <select id="isbnAlignment">
+
+                    <option>Left</option>
+                    <option selected>Center</option>
+                    <option>Right</option>
+
+                </select>
+
+            </div>
+
+            <div class="field">
+
+                <label for="isbnLineHeight">
+                    Line Height
+                </label>
+
+                <input
+                    id="isbnLineHeight"
+                    type="number"
+                    value="1"
+                    step=".1"
+                >
+
+            </div>
+
+        </div>
+
+        <div class="style-options-row">
+
+            <label>
+                <input id="isbnBold" type="checkbox">
+                Bold
+            </label>
+
+            <label>
+                <input id="isbnItalic" type="checkbox">
+                Italic
+            </label>
+
+            <label>
+                <input id="isbnUnderline" type="checkbox">
+                Underline
+            </label>
+
+        </div>
+
+    </section>
+
+
+    <!-- ISBN BORDER -->
+
+    <section class="panel-card">
+
+        <div class="panel-title">
+            <h3>🖼️ ISBN Border Designer</h3>
+        </div>
+
+
+        <div class="border-style-grid">
+
+            <button type="button" class="border-style-option active" data-isbn-border="solid">
+                <span class="border-preview solid"></span>
+                Solid
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="double">
+                <span class="border-preview double"></span>
+                Double
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="dashed">
+                <span class="border-preview dashed"></span>
+                Dashed
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="dotted">
+                <span class="border-preview dotted"></span>
+                Dotted
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="groove">
+                <span class="border-preview groove"></span>
+                Groove
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="ridge">
+                <span class="border-preview ridge"></span>
+                Ridge
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="inset">
+                <span class="border-preview inset"></span>
+                Inset
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="outset">
+                <span class="border-preview outset"></span>
+                Outset
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="thick">
+                <span class="border-preview thick"></span>
+                Thick
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="dashDot">
+                <span class="border-preview dash-dot"></span>
+                Dash Dot
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="triple">
+                <span class="border-preview triple"></span>
+                Triple
+            </button>
+
+            <button type="button" class="border-style-option" data-isbn-border="shadow">
+                <span class="border-preview shadow"></span>
+                Shadow
+            </button>
+
+        </div>
+
+
+        <div class="four-column-fields">
+
+            <div class="field">
+
+                <label for="isbnBorderWidth">
+                    Width
+                </label>
+
+                <select id="isbnBorderWidthPreset">
+
+                    <option>0.5</option>
+                    <option>1</option>
+                    <option selected>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>6</option>
+                    <option>8</option>
+
+                </select>
+
+                <input
+                    id="isbnBorderWidth"
+                    type="number"
+                    value="2"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="isbnBorderColor">
+                    Color
+                </label>
+
+                <input
+                    id="isbnBorderColor"
+                    type="color"
+                    value="#111827"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="isbnBorderRadius">
+                    Radius
+                </label>
+
+                <input
+                    id="isbnBorderRadius"
+                    type="number"
+                    value="0"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="isbnBorderOpacity">
+                    Opacity
+                </label>
+
+                <input
+                    id="isbnBorderOpacity"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="100"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="border-side-grid">
+
+            <label>
+                <input id="isbnBorderTop" type="checkbox" checked>
+                Top
+            </label>
+
+            <label>
+                <input id="isbnBorderRight" type="checkbox" checked>
+                Right
+            </label>
+
+            <label>
+                <input id="isbnBorderBottom" type="checkbox" checked>
+                Bottom
+            </label>
+
+            <label>
+                <input id="isbnBorderLeft" type="checkbox" checked>
+                Left
+            </label>
+
+        </div>
+
+    </section>
+
+
+    <!-- ISBN PAGE -->
+
+    <section class="panel-card">
+
+        <div class="three-column-fields">
+
+            <div class="field">
+
+                <label for="isbnPageSize">
+                    Page Size
+                </label>
+
+                <select id="isbnPageSize">
+
+                    <option value="4x6">4 × 6 Inches</option>
+                    <option value="70x35">70 × 35 mm</option>
+                    <option value="a4">A4</option>
+                    <option value="a5">A5</option>
+                    <option value="letter">Letter</option>
+                    <option value="custom">Custom</option>
+
+                </select>
+
+            </div>
+
+            <div class="field">
+
+                <label for="isbnOrientation">
+                    Orientation
+                </label>
+
+                <select id="isbnOrientation">
+
+                    <option value="portrait">
+                        Portrait
+                    </option>
+
+                    <option value="landscape">
+                        Landscape
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="isbnCustomSizePanel"
+            class="custom-size-panel hidden"
         >
 
-            <div class="panel-card">
+            <div class="two-column-fields">
 
                 <div class="field">
 
-                    <label for="otherMultiplePO">
-                        Multiple PO Values
+                    <label for="isbnCustomWidth">
+                        Width
+                    </label>
+
+                    <input
+                        id="isbnCustomWidth"
+                        type="number"
+                        value="70"
+                    >
+
+                </div>
+
+                <div class="field">
+
+                    <label for="isbnCustomHeight">
+                        Height
+                    </label>
+
+                    <input
+                        id="isbnCustomHeight"
+                        type="number"
+                        value="35"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel-card preview-card">
+
+        <div class="panel-title">
+            <h3>👁️ Barcode Live Preview</h3>
+        </div>
+
+        <div
+            id="barcodePreview"
+            class="barcode-preview"
+        >
+
+            <svg id="isbnBarcodeSvg"></svg>
+
+            <div id="isbnBarcodeText">
+                Enter ISBN to preview
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="action-bar">
+
+        <button
+            id="isbnResetButton"
+            type="button"
+            class="secondary-btn"
+        >
+            ↺ Reset
+        </button>
+
+        <button
+            id="isbnGenerateButton"
+            type="button"
+            class="primary-btn"
+        >
+            🏷️ Generate PDF
+        </button>
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     ADDRESS + QR
+===================================================== -->
+
+<main
+    id="addressWorkspace"
+    class="tool-section"
+    data-tool="address"
+>
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            📍 ADDRESS + QR
+        </span>
+
+        <h2>Address & QR Labels</h2>
+
+        <p>
+            Address, email and QR label designer.
+        </p>
+
+    </div>
+
+
+    <div class="sub-navigation">
+
+        <button
+            type="button"
+            class="sub-category-btn active"
+            data-address-mode="manual"
+        >
+            ✏️ Manual
+        </button>
+
+        <button
+            type="button"
+            class="sub-category-btn"
+            data-address-mode="excel"
+        >
+            📊 Excel
+        </button>
+
+    </div>
+
+
+    <section
+        id="addressManualPanel"
+        class="address-mode-panel active"
+    >
+
+        <div class="panel-card">
+
+            <div class="two-column-fields">
+
+                <div class="field">
+
+                    <label for="addressFrom">
+                        📤 From Address
                     </label>
 
                     <textarea
-                        id="otherMultiplePO"
-                        placeholder="ABC123&#10;DEF456"
+                        id="addressFrom"
+                        placeholder="Enter From Address"
+                    ></textarea>
+
+                </div>
+
+                <div class="field">
+
+                    <label for="addressTo">
+                        📥 To Address
+                    </label>
+
+                    <textarea
+                        id="addressTo"
+                        placeholder="Enter To Address"
                     ></textarea>
 
                 </div>
 
             </div>
 
-        </section>
-
-
-        <section
-            id="otherExcelPanel"
-            class="mode-panel"
-        >
-
-            <div class="panel-card">
-
-                <div class="upload-area">
-
-                    <strong>
-                        📊 Upload Excel
-                    </strong>
-
-                    <p>
-                        First row is header and ignored.
-                    </p>
-
-                    <input
-                        id="otherExcelFile"
-                        type="file"
-                        accept=".xlsx,.xls,.csv"
-                    >
-
-                    <span id="otherExcelFileName">
-                        No file selected
-                    </span>
-
-                </div>
-
-
-                <div
-                    id="otherExcelPreview"
-                    class="excel-preview"
-                ></div>
-
-            </div>
-
-        </section>
-
-
-        <section
-            id="otherAddressPanel"
-            class="mode-panel"
-        >
-
-            <div class="panel-card">
-
-                <div class="two-column-fields">
-
-                    <div class="field">
-
-                        <label>
-                            From
-                        </label>
-
-                        <textarea
-                            placeholder="From address"
-                        ></textarea>
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label>
-                            To
-                        </label>
-
-                        <textarea
-                            placeholder="To address"
-                        ></textarea>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="panel-card">
-
-            <div class="three-column-fields">
-
-                <div class="field">
-
-                    <label for="otherPageSize">
-                        Page Size
-                    </label>
-
-                    <select id="otherPageSize">
-
-                        <option value="4x6">
-                            4 × 6 Inches
-                        </option>
-
-                        <option value="70x35">
-                            70 × 35 mm
-                        </option>
-
-                        <option value="a4">
-                            A4
-                        </option>
-
-                        <option value="custom">
-                            Custom
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="otherOrientation">
-                        Orientation
-                    </label>
-
-                    <select id="otherOrientation">
-
-                        <option value="portrait">
-                            Portrait
-                        </option>
-
-                        <option value="landscape">
-                            Landscape
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="otherCustomSizePanel"
-                class="custom-size-panel hidden"
-            >
-
-                <div class="two-column-fields">
-
-                    <div class="field">
-
-                        <label for="otherCustomWidth">
-                            Width
-                        </label>
-
-                        <input
-                            id="otherCustomWidth"
-                            type="number"
-                            value="70"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="otherCustomHeight">
-                            Height
-                        </label>
-
-                        <input
-                            id="otherCustomHeight"
-                            type="number"
-                            value="35"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <div class="action-bar">
-
-            <button
-                id="otherResetButton"
-                type="button"
-                class="secondary-btn"
-            >
-                ↺ Reset
-            </button>
-
-
-            <button
-                id="otherGenerateButton"
-                type="button"
-                class="primary-btn"
-            >
-                📄 Generate PDF
-            </button>
-
         </div>
 
-    </main>
+    </section>
 
 
-    <!-- =====================================================
-         ISBN / BARCODE
-    ====================================================== -->
-
-    <main
-        id="isbnWorkspace"
-        class="tool-section"
-        data-tool="isbn"
+    <section
+        id="addressExcelPanel"
+        class="address-mode-panel"
     >
 
-        <div class="section-heading">
+        <div class="panel-card">
 
-            <span class="section-label">
-                🏷️ ISBN
-            </span>
+            <div class="upload-area">
 
-            <h2>
-                ISBN / Barcode Generator
-            </h2>
+                <strong>
+                    📊 Upload Address Excel
+                </strong>
 
-            <p>
-                Generate ISBN barcode labels.
-            </p>
+                <p>
+                    First row = Header and ignored.
+                </p>
 
-        </div>
-
-
-        <section class="panel-card">
-
-            <div class="three-column-fields">
-
-                <div class="field">
-
-                    <label for="isbnValue">
-                        ISBN
-                    </label>
-
-                    <input
-                        id="isbnValue"
-                        type="text"
-                        placeholder="978XXXXXXXXXX"
-                    >
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="isbnBookTitle">
-                        Book Title
-                    </label>
-
-                    <input
-                        id="isbnBookTitle"
-                        type="text"
-                        placeholder="Book title"
-                    >
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="isbnEdition">
-                        Edition
-                    </label>
-
-                    <input
-                        id="isbnEdition"
-                        type="text"
-                        placeholder="Edition"
-                    >
-
-                </div>
+                <input
+                    id="addressExcelFile"
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                >
 
             </div>
-
-        </section>
-
-
-        <section class="panel-card">
-
-            <div class="three-column-fields">
-
-                <div class="field">
-
-                    <label for="isbnPageSize">
-                        Page Size
-                    </label>
-
-                    <select id="isbnPageSize">
-
-                        <option value="4x6">
-                            4 × 6 Inches
-                        </option>
-
-                        <option value="70x35">
-                            70 × 35 mm
-                        </option>
-
-                        <option value="a4">
-                            A4
-                        </option>
-
-                        <option value="custom">
-                            Custom
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="isbnOrientation">
-                        Orientation
-                    </label>
-
-                    <select id="isbnOrientation">
-
-                        <option value="portrait">
-                            Portrait
-                        </option>
-
-                        <option value="landscape">
-                            Landscape
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
 
             <div
-                id="isbnCustomSizePanel"
-                class="custom-size-panel hidden"
-            >
-
-                <div class="two-column-fields">
-
-                    <div class="field">
-
-                        <label for="isbnCustomWidth">
-                            Width
-                        </label>
-
-                        <input
-                            id="isbnCustomWidth"
-                            type="number"
-                            value="70"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="isbnCustomHeight">
-                            Height
-                        </label>
-
-                        <input
-                            id="isbnCustomHeight"
-                            type="number"
-                            value="35"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="panel-card">
-
-            <div class="panel-title">
-
-                <div>
-
-                    <h3>
-                        🔢 Barcode Preview
-                    </h3>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="barcodePreview"
-                class="barcode-preview"
-            >
-
-                <svg
-                    id="isbnBarcodeSvg"
-                ></svg>
-
-                <div id="isbnBarcodeText">
-                    Enter ISBN to preview
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <div class="action-bar">
-
-            <button
-                id="isbnResetButton"
-                type="button"
-                class="secondary-btn"
-            >
-                ↺ Reset
-            </button>
-
-
-            <button
-                id="isbnGenerateButton"
-                type="button"
-                class="primary-btn"
-            >
-                🏷️ Generate PDF
-            </button>
+                id="addressExcelPreview"
+                class="excel-preview"
+            ></div>
 
         </div>
 
-    </main>
+    </section>
 
 
-    <!-- =====================================================
-         ADDRESS / QR
-    ====================================================== -->
+    <!-- ADDRESS FONT -->
 
-    <main
-        id="addressWorkspace"
-        class="tool-section"
-        data-tool="address"
-    >
+    <section class="panel-card">
 
-        <div class="section-heading">
-
-            <span class="section-label">
-                📍 ADDRESS + QR
-            </span>
-
-            <h2>
-                Address & QR Labels
-            </h2>
-
-            <p>
-                Generate address labels with QR codes.
-            </p>
-
+        <div class="panel-title">
+            <h3>🔤 Address Typography</h3>
         </div>
 
 
-        <div class="sub-navigation">
+        <div class="deep-style-block">
 
-            <button
-                type="button"
-                class="sub-category-btn active"
-                data-address-mode="manual"
-            >
-                ✏️ Manual
-            </button>
+            <h4>📤 From Address</h4>
 
-
-            <button
-                type="button"
-                class="sub-category-btn"
-                data-address-mode="excel"
-            >
-                📊 Excel
-            </button>
-
-        </div>
-
-
-        <!-- MANUAL -->
-
-        <section
-            id="addressManualPanel"
-            class="address-mode-panel active"
-        >
-
-            <div class="panel-card">
-
-                <div class="address-two-column">
-
-                    <div class="address-editor">
-
-                        <h3>
-                            📤 From Address
-                        </h3>
-
-
-                        <div class="field">
-
-                            <label for="addressFrom">
-                                From
-                            </label>
-
-                            <textarea
-                                id="addressFrom"
-                                placeholder="Enter sender address"
-                            ></textarea>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="address-editor">
-
-                        <h3>
-                            📥 To Address
-                        </h3>
-
-
-                        <div class="field">
-
-                            <label for="addressTo">
-                                To
-                            </label>
-
-                            <textarea
-                                id="addressTo"
-                                placeholder="Enter receiver address"
-                            ></textarea>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ADDRESS EXCEL -->
-
-        <section
-            id="addressExcelPanel"
-            class="address-mode-panel"
-        >
-
-            <div class="panel-card">
-
-                <div class="upload-area">
-
-                    <strong>
-                        📊 Upload Address Excel
-                    </strong>
-
-                    <p>
-                        First row is header and ignored.
-                    </p>
-
-                    <input
-                        id="addressExcelFile"
-                        type="file"
-                        accept=".xlsx,.xls,.csv"
-                    >
-
-                </div>
-
-
-                <div
-                    id="addressExcelPreview"
-                    class="excel-preview"
-                ></div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ADDRESS PAGE -->
-
-        <section class="panel-card">
-
-            <div class="three-column-fields">
-
-                <div class="field">
-
-                    <label for="addressPageSize">
-                        Page Size
-                    </label>
-
-                    <select id="addressPageSize">
-
-                        <option value="4x6">
-                            4 × 6 Inches
-                        </option>
-
-                        <option value="70x35">
-                            70 × 35 mm
-                        </option>
-
-                        <option value="a4">
-                            A4
-                        </option>
-
-                        <option value="custom">
-                            Custom
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="addressOrientation">
-                        Orientation
-                    </label>
-
-                    <select id="addressOrientation">
-
-                        <option value="portrait">
-                            Portrait
-                        </option>
-
-                        <option value="landscape">
-                            Landscape
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="addressCustomSizePanel"
-                class="custom-size-panel hidden"
-            >
-
-                <div class="two-column-fields">
-
-                    <div class="field">
-
-                        <label for="addressCustomWidth">
-                            Width
-                        </label>
-
-                        <input
-                            id="addressCustomWidth"
-                            type="number"
-                            value="70"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="addressCustomHeight">
-                            Height
-                        </label>
-
-                        <input
-                            id="addressCustomHeight"
-                            type="number"
-                            value="35"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- QR -->
-
-        <section class="panel-card">
-
-            <div class="panel-title">
-
-                <div>
-
-                    <h3>
-                        📱 QR Codes
-                    </h3>
-
-                    <p>
-                        Address and Email QR codes.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="address-two-column">
-
-                <div class="address-editor">
-
-                    <h3>
-                        📍 Address / Location QR
-                    </h3>
-
-                    <div
-                        id="addressQRPreview"
-                        class="qr-preview"
-                    ></div>
-
-                </div>
-
-
-                <div class="address-editor">
-
-                    <h3>
-                        ✉️ Email QR
-                    </h3>
-
-                    <div
-                        id="emailQRPreview"
-                        class="qr-preview"
-                    ></div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- FROM STYLE -->
-
-        <section class="panel-card">
-
-            <div class="panel-title">
-
-                <div>
-
-                    <h3>
-                        📤 From Text Style
-                    </h3>
-
-                </div>
-
-            </div>
-
-
-            <div class="three-column-fields">
+            <div class="four-column-fields">
 
                 <div class="field">
 
@@ -2009,17 +2815,15 @@
 
                     <select id="fromFontFamily">
 
-                        <option value="Arial">
-                            Arial
-                        </option>
-
-                        <option value="Verdana">
-                            Verdana
-                        </option>
-
-                        <option value="Georgia">
-                            Georgia
-                        </option>
+                        <option>Arial</option>
+                        <option>Calibri</option>
+                        <option>Cambria</option>
+                        <option>Times New Roman</option>
+                        <option>Georgia</option>
+                        <option>Verdana</option>
+                        <option>Tahoma</option>
+                        <option>Trebuchet MS</option>
+                        <option>Courier New</option>
 
                     </select>
 
@@ -2029,92 +2833,106 @@
                 <div class="field">
 
                     <label for="fromFontSize">
-                        Size
+                        Font Size
                     </label>
+
+                    <select id="fromFontSizePreset">
+
+                        <option>8</option>
+                        <option>10</option>
+                        <option>12</option>
+                        <option selected>14</option>
+                        <option>16</option>
+                        <option>18</option>
+                        <option>20</option>
+                        <option>22</option>
+                        <option>24</option>
+                        <option>28</option>
+                        <option>32</option>
+                        <option>36</option>
+                        <option>48</option>
+                        <option>56</option>
+                        <option>72</option>
+
+                    </select>
 
                     <input
                         id="fromFontSize"
                         type="number"
                         value="14"
+                        min="1"
                     >
 
                 </div>
 
 
-                <div class="text-style-controls">
+                <div class="field">
 
-                    <label>
-
-                        <input
-                            id="fromBold"
-                            type="checkbox"
-                        >
-
-                        Bold
-
+                    <label for="fromAlignment">
+                        Alignment
                     </label>
 
+                    <select id="fromAlignment">
 
-                    <label>
+                        <option>Left</option>
+                        <option selected>Center</option>
+                        <option>Right</option>
 
-                        <input
-                            id="fromItalic"
-                            type="checkbox"
-                        >
-
-                        Italic
-
-                    </label>
-
-
-                    <label>
-
-                        <input
-                            id="fromUnderline"
-                            type="checkbox"
-                        >
-
-                        Underline
-
-                    </label>
-
-
-                    <label>
-
-                        <input
-                            id="fromBorder"
-                            type="checkbox"
-                        >
-
-                        Border
-
-                    </label>
+                    </select>
 
                 </div>
 
-            </div>
 
-        </section>
+                <div class="field">
 
+                    <label for="fromLineHeight">
+                        Line Height
+                    </label>
 
-        <!-- TO STYLE -->
-
-        <section class="panel-card">
-
-            <div class="panel-title">
-
-                <div>
-
-                    <h3>
-                        📥 To Text Style
-                    </h3>
+                    <input
+                        id="fromLineHeight"
+                        type="number"
+                        value="1"
+                        step=".1"
+                    >
 
                 </div>
 
             </div>
 
 
-            <div class="three-column-fields">
+            <div class="style-options-row">
+
+                <label>
+                    <input id="fromBold" type="checkbox">
+                    Bold
+                </label>
+
+                <label>
+                    <input id="fromItalic" type="checkbox">
+                    Italic
+                </label>
+
+                <label>
+                    <input id="fromUnderline" type="checkbox">
+                    Underline
+                </label>
+
+                <label>
+                    <input id="fromStrike" type="checkbox">
+                    Strike
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <div class="deep-style-block">
+
+            <h4>📥 To Address</h4>
+
+            <div class="four-column-fields">
 
                 <div class="field">
 
@@ -2124,17 +2942,15 @@
 
                     <select id="toFontFamily">
 
-                        <option value="Arial">
-                            Arial
-                        </option>
-
-                        <option value="Verdana">
-                            Verdana
-                        </option>
-
-                        <option value="Georgia">
-                            Georgia
-                        </option>
+                        <option>Arial</option>
+                        <option>Calibri</option>
+                        <option>Cambria</option>
+                        <option>Times New Roman</option>
+                        <option>Georgia</option>
+                        <option>Verdana</option>
+                        <option>Tahoma</option>
+                        <option>Trebuchet MS</option>
+                        <option>Courier New</option>
 
                     </select>
 
@@ -2144,348 +2960,719 @@
                 <div class="field">
 
                     <label for="toFontSize">
-                        Size
+                        Font Size
                     </label>
+
+                    <select id="toFontSizePreset">
+
+                        <option>8</option>
+                        <option>10</option>
+                        <option>12</option>
+                        <option selected>14</option>
+                        <option>16</option>
+                        <option>18</option>
+                        <option>20</option>
+                        <option>22</option>
+                        <option>24</option>
+                        <option>28</option>
+                        <option>32</option>
+                        <option>36</option>
+                        <option>48</option>
+                        <option>56</option>
+                        <option>72</option>
+
+                    </select>
 
                     <input
                         id="toFontSize"
                         type="number"
                         value="14"
+                        min="1"
                     >
 
                 </div>
 
 
-                <div class="text-style-controls">
+                <div class="field">
 
-                    <label>
-
-                        <input
-                            id="toBold"
-                            type="checkbox"
-                        >
-
-                        Bold
-
+                    <label for="toAlignment">
+                        Alignment
                     </label>
 
+                    <select id="toAlignment">
 
-                    <label>
+                        <option>Left</option>
+                        <option selected>Center</option>
+                        <option>Right</option>
 
-                        <input
-                            id="toItalic"
-                            type="checkbox"
-                        >
+                    </select>
 
-                        Italic
+                </div>
 
+
+                <div class="field">
+
+                    <label for="toLineHeight">
+                        Line Height
                     </label>
 
-
-                    <label>
-
-                        <input
-                            id="toUnderline"
-                            type="checkbox"
-                        >
-
-                        Underline
-
-                    </label>
-
-
-                    <label>
-
-                        <input
-                            id="toBorder"
-                            type="checkbox"
-                        >
-
-                        Border
-
-                    </label>
+                    <input
+                        id="toLineHeight"
+                        type="number"
+                        value="1"
+                        step=".1"
+                    >
 
                 </div>
 
             </div>
 
-        </section>
 
+            <div class="style-options-row">
 
-        <div class="action-bar">
+                <label>
+                    <input id="toBold" type="checkbox">
+                    Bold
+                </label>
 
-            <button
-                id="addressResetButton"
-                type="button"
-                class="secondary-btn"
-            >
-                ↺ Reset
-            </button>
+                <label>
+                    <input id="toItalic" type="checkbox">
+                    Italic
+                </label>
 
+                <label>
+                    <input id="toUnderline" type="checkbox">
+                    Underline
+                </label>
 
-            <button
-                id="addressGenerateButton"
-                type="button"
-                class="primary-btn"
-            >
-                📄 Generate PDF
-            </button>
-
-        </div>
-
-    </main>
-
-
-    <!-- =====================================================
-         TOAST
-    ====================================================== -->
-
-    <div
-        id="toast"
-        class="toast"
-        role="status"
-        aria-live="polite"
-    >
-
-        <span id="toastIcon">
-            ✓
-        </span>
-
-        <span id="toastMessage">
-            Done
-        </span>
-
-    </div>
-
-
-    <!-- =====================================================
-         MODAL
-    ====================================================== -->
-
-    <div
-        id="confirmationModal"
-        class="modal"
-        aria-hidden="true"
-    >
-
-        <div class="modal-box">
-
-            <button
-                id="modalCloseButton"
-                type="button"
-                class="modal-close"
-                aria-label="Close"
-            >
-                ×
-            </button>
-
-
-            <h3>
-                Confirmation
-            </h3>
-
-
-            <p>
-                Please confirm this action.
-            </p>
-
-
-            <div class="modal-actions">
-
-                <button
-                    id="modalCancelButton"
-                    type="button"
-                    class="secondary-btn"
-                >
-                    Cancel
-                </button>
+                <label>
+                    <input id="toStrike" type="checkbox">
+                    Strike
+                </label>
 
             </div>
 
         </div>
 
+    </section>
+
+
+    <!-- ADDRESS BORDER -->
+
+    <section class="panel-card">
+
+        <div class="panel-title">
+
+            <div>
+                <h3>🖼️ Address Border Designer</h3>
+
+                <p>
+                    Full border controls for From / To / Page.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="field">
+
+            <label for="addressBorderTarget">
+                Apply To
+            </label>
+
+            <select id="addressBorderTarget">
+
+                <option value="from">From Address</option>
+                <option value="to">To Address</option>
+                <option value="both">Both</option>
+                <option value="page">Page</option>
+
+            </select>
+
+        </div>
+
+
+        <div class="border-style-grid">
+
+            <button type="button" class="border-style-option active" data-address-border="solid">
+                <span class="border-preview solid"></span>
+                Solid
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="double">
+                <span class="border-preview double"></span>
+                Double
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="dashed">
+                <span class="border-preview dashed"></span>
+                Dashed
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="dotted">
+                <span class="border-preview dotted"></span>
+                Dotted
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="groove">
+                <span class="border-preview groove"></span>
+                Groove
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="ridge">
+                <span class="border-preview ridge"></span>
+                Ridge
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="inset">
+                <span class="border-preview inset"></span>
+                Inset
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="outset">
+                <span class="border-preview outset"></span>
+                Outset
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="thin">
+                <span class="border-preview thin"></span>
+                Thin
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="medium">
+                <span class="border-preview medium"></span>
+                Medium
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="thick">
+                <span class="border-preview thick"></span>
+                Thick
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="thinDouble">
+                <span class="border-preview thin-double"></span>
+                Thin Double
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="thickDouble">
+                <span class="border-preview thick-double"></span>
+                Thick Double
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="dashDot">
+                <span class="border-preview dash-dot"></span>
+                Dash Dot
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="dashDotDot">
+                <span class="border-preview dash-dot-dot"></span>
+                Dash Dot Dot
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="longDash">
+                <span class="border-preview long-dash"></span>
+                Long Dash
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="longDashDot">
+                <span class="border-preview long-dash-dot"></span>
+                Long Dash Dot
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="triple">
+                <span class="border-preview triple"></span>
+                Triple
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="hairline">
+                <span class="border-preview hairline"></span>
+                Hairline
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="wave">
+                <span class="border-preview wave"></span>
+                Wave
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="doubleWave">
+                <span class="border-preview double-wave"></span>
+                Double Wave
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="threeD">
+                <span class="border-preview three-d"></span>
+                3D
+            </button>
+
+            <button type="button" class="border-style-option" data-address-border="shadow">
+                <span class="border-preview shadow"></span>
+                Shadow
+            </button>
+
+        </div>
+
+
+        <div class="border-side-grid">
+
+            <label>
+                <input id="addressBorderTop" type="checkbox" checked>
+                Top
+            </label>
+
+            <label>
+                <input id="addressBorderRight" type="checkbox" checked>
+                Right
+            </label>
+
+            <label>
+                <input id="addressBorderBottom" type="checkbox" checked>
+                Bottom
+            </label>
+
+            <label>
+                <input id="addressBorderLeft" type="checkbox" checked>
+                Left
+            </label>
+
+            <label>
+                <input id="addressBorderInside" type="checkbox">
+                Inside
+            </label>
+
+            <label>
+                <input id="addressBorderOutside" type="checkbox" checked>
+                Outside
+            </label>
+
+        </div>
+
+
+        <div class="four-column-fields">
+
+            <div class="field">
+
+                <label for="addressBorderWidth">
+                    Width
+                </label>
+
+                <select id="addressBorderWidthPreset">
+
+                    <option>0.25</option>
+                    <option>0.5</option>
+                    <option>1</option>
+                    <option selected>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>6</option>
+                    <option>8</option>
+                    <option>10</option>
+
+                </select>
+
+                <input
+                    id="addressBorderWidth"
+                    type="number"
+                    value="2"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="addressBorderColor">
+                    Color
+                </label>
+
+                <input
+                    id="addressBorderColor"
+                    type="color"
+                    value="#111827"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="addressBorderRadius">
+                    Radius
+                </label>
+
+                <input
+                    id="addressBorderRadius"
+                    type="number"
+                    value="0"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label for="addressBorderOpacity">
+                    Opacity
+                </label>
+
+                <input
+                    id="addressBorderOpacity"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="100"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="border-preset-row">
+
+            <button
+                id="addressApplyBorderButton"
+                type="button"
+                class="primary-btn"
+            >
+                ✓ Apply Border
+            </button>
+
+            <button
+                id="addressClearBorderButton"
+                type="button"
+                class="secondary-btn"
+            >
+                ✕ Remove Border
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- QR -->
+
+    <section class="panel-card">
+
+        <div class="panel-title">
+
+            <div>
+                <h3>📱 QR Codes</h3>
+
+                <p>
+                    Address / Location and Email QR.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="address-two-column">
+
+            <div class="address-editor">
+
+                <h3>📍 Address QR</h3>
+
+                <div
+                    id="addressQRPreview"
+                    class="qr-preview"
+                ></div>
+
+            </div>
+
+
+            <div class="address-editor">
+
+                <h3>✉️ Email QR</h3>
+
+                <div
+                    id="emailQRPreview"
+                    class="qr-preview"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ADDRESS PAGE -->
+
+    <section class="panel-card">
+
+        <div class="three-column-fields">
+
+            <div class="field">
+
+                <label for="addressPageSize">
+                    Page Size
+                </label>
+
+                <select id="addressPageSize">
+
+                    <option value="4x6">4 × 6 Inches</option>
+                    <option value="70x35">70 × 35 mm</option>
+                    <option value="a4">A4</option>
+                    <option value="a5">A5</option>
+                    <option value="letter">Letter</option>
+                    <option value="custom">Custom</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="addressOrientation">
+                    Orientation
+                </label>
+
+                <select id="addressOrientation">
+
+                    <option value="portrait">
+                        Portrait
+                    </option>
+
+                    <option value="landscape">
+                        Landscape
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="addressCustomSizePanel"
+            class="custom-size-panel hidden"
+        >
+
+            <div class="two-column-fields">
+
+                <div class="field">
+
+                    <label for="addressCustomWidth">
+                        Width
+                    </label>
+
+                    <input
+                        id="addressCustomWidth"
+                        type="number"
+                        value="70"
+                    >
+
+                </div>
+
+                <div class="field">
+
+                    <label for="addressCustomHeight">
+                        Height
+                    </label>
+
+                    <input
+                        id="addressCustomHeight"
+                        type="number"
+                        value="35"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel-card preview-card">
+
+        <div class="panel-title">
+            <h3>👁️ Address Live Preview</h3>
+        </div>
+
+        <div class="preview-container">
+
+            <div
+                id="addressPreviewPage"
+                class="preview-page"
+            >
+
+                <div
+                    id="addressPreviewLabel"
+                    class="preview-label"
+                >
+
+                    <div id="addressPreviewFrom">
+                        FROM ADDRESS
+                    </div>
+
+                    <div id="addressPreviewTo">
+                        TO ADDRESS
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="action-bar">
+
+        <button
+            id="addressResetButton"
+            type="button"
+            class="secondary-btn"
+        >
+            ↺ Reset
+        </button>
+
+        <button
+            id="addressGenerateButton"
+            type="button"
+            class="primary-btn"
+        >
+            📄 Generate PDF
+        </button>
+
     </div>
 
-
-    <!-- =====================================================
-         FOOTER
-    ====================================================== -->
-
-    <footer class="app-footer">
-
-        <div>
-
-            <strong>
-                Created & Developed by Ashish Verma
-            </strong>
-
-            <span>
-                © 2026 Ashish Verma. All Rights Reserved.
-            </span>
-
-            <span>
-                This software, design, UI, workflow and source code
-                are protected and remain the property of Ashish Verma.
-            </span>
-
-        </div>
+</main>
 
 
-        <div class="contact-area">
+<!-- =====================================================
+     TOP RIGHT TOAST
+===================================================== -->
 
-            <strong>
-                📚 Books Label Studio
-            </strong>
+<div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+>
 
-            <span>
-                Professional Label Generation Tool
-            </span>
+    <span id="toastIcon">✓</span>
 
-        </div>
-
-    </footer>
+    <span id="toastMessage">
+        Done
+    </span>
 
 </div>
 
 
-<!-- =========================================================
-     EXTERNAL LIBRARIES
-     
-     IMPORTANT:
-     Libraries MUST load BEFORE app.js
-========================================================= -->
+<!-- =====================================================
+     FOOTER
+===================================================== -->
 
-<!-- XLSX / EXCEL -->
+<footer class="app-footer">
+
+    <div>
+
+        <strong>
+            Created & Developed by Ashish Verma
+        </strong>
+
+        <span>
+            © 2026 Ashish Verma. All Rights Reserved.
+        </span>
+
+        <span>
+            All rights reserved. Software, UI design,
+            workflow, templates and source code remain
+            the intellectual property of Ashish Verma.
+        </span>
+
+    </div>
+
+
+    <div class="contact-area">
+
+        <strong>
+            📚 Books Label Studio
+        </strong>
+
+        <span>
+            Professional Label Design & Generation Tool
+        </span>
+
+    </div>
+
+</footer>
+
+
+</div>
+
+
+<!-- =====================================================
+     LIBRARIES
+     MUST LOAD BEFORE app.js
+===================================================== -->
+
 <script
-    src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
-></script>
+src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
+</script>
 
-
-<!-- QR CODE -->
 <script
-    src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"
-></script>
+src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js">
+</script>
 
-
-<!-- BARCODE -->
 <script
-    src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
-></script>
+src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js">
+</script>
 
-
-<!-- PDF — CORRECTED -->
 <script
-    src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
-></script>
+src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js">
+</script>
 
 
-<!-- =========================================================
+<!-- =====================================================
      LIBRARY CHECK
-========================================================= -->
+===================================================== -->
 
 <script>
 
-    window.addEventListener(
-        "load",
-        function () {
+window.addEventListener("load", function () {
 
-            console.log(
-                "Books Label Studio libraries:"
-            );
-
-            console.log(
-                "XLSX:",
-                typeof window.XLSX
-            );
-
-            console.log(
-                "QRCode:",
-                typeof window.QRCode
-            );
-
-            console.log(
-                "JsBarcode:",
-                typeof window.JsBarcode
-            );
-
-            console.log(
-                "jsPDF:",
-                window.jspdf &&
-                typeof window.jspdf.jsPDF === "function"
-                    ? "LOADED"
-                    : "NOT LOADED"
-            );
-
-        }
+    console.log(
+        "Books Label Studio libraries"
     );
+
+    console.log(
+        "XLSX:",
+        typeof window.XLSX !== "undefined"
+    );
+
+    console.log(
+        "QRCode:",
+        typeof window.QRCode !== "undefined"
+    );
+
+    console.log(
+        "JsBarcode:",
+        typeof window.JsBarcode !== "undefined"
+    );
+
+    console.log(
+        "jsPDF:",
+        !!(
+            window.jspdf &&
+            typeof window.jspdf.jsPDF === "function"
+        )
+    );
+
+});
 
 </script>
 
 
-<!-- =========================================================
-     YOUR JAVASCRIPT
-     
-     MUST BE LAST
-========================================================= -->
+<!-- =====================================================
+     FINAL JAVASCRIPT
+===================================================== -->
 
-<script
-    src="app.js"
-></script>
-
-
-<!-- =========================================================
-     FINAL PDF LIBRARY SAFETY CHECK
-========================================================= -->
-
-<script>
-
-    window.addEventListener(
-        "load",
-        function () {
-
-            if (
-                !window.jspdf ||
-                typeof window.jspdf.jsPDF !== "function"
-            ) {
-
-                console.error(
-                    "jsPDF failed to load."
-                );
-
-                const toast =
-                    document.getElementById("toast");
-
-                const message =
-                    document.getElementById("toastMessage");
-
-                if (
-                    toast &&
-                    message
-                ) {
-
-                    toast.classList.remove(
-                        "success"
-                    );
-
-                    toast.classList.add(
-                        "error"
-                    );
-
-                    message.textContent =
-                        "PDF library failed to load. Check internet/CDN access.";
-
-                    toast.classList.add(
-                        "show"
-                    );
-
-                }
-
-            }
-
-        }
-    );
-
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
