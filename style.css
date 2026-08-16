@@ -1,1047 +1,4590 @@
-* {
-    box-sizing: border-box;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ashish Verma — Label Studio</title>
+
+<!-- External Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<style>
+:root{
+  --blue:#2563eb;
+  --blue2:#1d4ed8;
+  --blue-soft:#eff6ff;
+  --green:#16a34a;
+  --red:#dc2626;
+  --orange:#f59e0b;
+  --bg:#f5f7fb;
+  --card:#fff;
+  --border:#dbe1ea;
+  --text:#20242b;
+  --muted:#6b7280;
+  --shadow:0 4px 18px rgba(15,23,42,.07);
+  --radius:10px;
 }
 
-:root {
-    --blue: #2563eb;
-    --blue-dark: #1d4ed8;
-    --blue-soft: #eff6ff;
+*{box-sizing:border-box}
 
-    --green: #16a34a;
-    --red: #dc2626;
-    --orange: #f59e0b;
-
-    --bg: #f5f7fa;
-    --card: #ffffff;
-    --border: #d9dee7;
-    --text: #20252d;
-    --muted: #6b7280;
-
-    --radius: 8px;
-    --shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
 }
 
-html {
-    scroll-behavior: smooth;
+button,input,select,textarea{
+  font:inherit;
 }
 
-body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
-}
-
-button,
-input,
-select,
-textarea {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-}
+button{cursor:pointer}
 
 button:disabled,
 input:disabled,
-select:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
+select:disabled{
+  cursor:not-allowed;
+  opacity:.48;
 }
 
-/* ================= HEADER ================= */
-
-.header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-
-    min-height: 64px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-
-    padding: 10px 18px;
-
-    background: #fff;
-    border-bottom: 1px solid var(--border);
+/* HEADER */
+.header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  min-height:68px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:10px 20px;
+  background:#fff;
+  border-bottom:1px solid var(--border);
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
-.brand-logo {
-    width: 40px;
-    height: 40px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: var(--blue);
-    color: #fff;
-
-    border-radius: 8px;
-
-    font-size: 19px;
-    font-weight: bold;
+.logo{
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:9px;
+  background:var(--blue);
+  color:#fff;
+  font-size:20px;
+  font-weight:800;
 }
 
-.brand h1 {
-    margin: 0;
-    font-size: 18px;
+.brand h1{
+  margin:0;
+  font-size:18px;
 }
 
-.brand small {
-    display: block;
-    margin-top: 2px;
-    color: var(--muted);
-    font-size: 11px;
+.brand small{
+  color:var(--muted);
+  font-size:10px;
 }
 
-.header-actions {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+.header-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
 }
 
-/* ================= BUTTONS ================= */
-
-.btn {
-    min-height: 34px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-
-    padding: 7px 11px;
-
-    border: 1px solid var(--border);
-    border-radius: 6px;
-
-    background: #fff;
-    color: #333;
-
-    font-size: 12px;
-
-    transition:
-        background 0.15s,
-        border-color 0.15s,
-        transform 0.15s;
+/* APP */
+.app{
+  max-width:1550px;
+  margin:auto;
+  padding:16px;
 }
 
-.btn:hover {
-    background: #f8fafc;
-    border-color: #bcc5d1;
+/* MAIN NAV */
+.main-nav{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:15px;
 }
 
-.btn:active {
-    transform: translateY(1px);
+.nav-card{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:11px;
+  padding:15px;
+  text-align:left;
+  transition:.18s ease;
+  box-shadow:var(--shadow);
 }
 
-.btn.primary {
-    background: var(--blue);
-    border-color: var(--blue);
-    color: #fff;
+.nav-card:hover{
+  transform:translateY(-2px);
+  border-color:#b8c4d4;
 }
 
-.btn.primary:hover {
-    background: var(--blue-dark);
+.nav-card.active{
+  background:var(--blue);
+  border-color:var(--blue);
+  color:#fff;
+  transform:translateY(-2px);
+  box-shadow:0 8px 25px rgba(37,99,235,.22);
 }
 
-.btn.green {
-    background: var(--green);
-    border-color: var(--green);
-    color: #fff;
+.nav-icon{
+  font-size:22px;
+  margin-bottom:8px;
 }
 
-.btn.red {
-    background: var(--red);
-    border-color: var(--red);
-    color: #fff;
+.nav-title{
+  font-size:13px;
+  font-weight:800;
 }
 
-/* ================= APP ================= */
-
-.app {
-    max-width: 1550px;
-    margin: auto;
-    padding: 15px;
+.nav-sub{
+  margin-top:4px;
+  font-size:10px;
+  opacity:.72;
 }
 
-/* ================= NAV ================= */
-
-.main-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 14px;
+/* WORKSPACE */
+.workspace{
+  display:grid;
+  grid-template-columns:450px minmax(0,1fr);
+  gap:15px;
+  align-items:start;
 }
 
-.nav-btn {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-
-    padding: 9px 13px;
-
-    background: #fff;
-    color: #444;
-
-    border: 1px solid var(--border);
-    border-radius: 7px;
-
-    font-size: 12px;
-    font-weight: bold;
-
-    transition: 0.15s;
+.preview-side{
+  position:sticky;
+  top:84px;
 }
 
-.nav-btn:hover {
-    transform: translateY(-1px);
-    background: #f8fafc;
+/* CARD */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:var(--shadow);
 }
 
-.nav-btn.active {
-    background: var(--blue);
-    border-color: var(--blue);
-    color: #fff;
+.card-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+  font-size:13px;
+  font-weight:800;
 }
 
-/* ================= LAYOUT ================= */
-
-.workspace {
-    display: grid;
-    grid-template-columns: 430px minmax(0, 1fr);
-    gap: 14px;
-    align-items: start;
+.card-title small{
+  color:var(--muted);
+  font-size:9px;
+  font-weight:400;
 }
 
-.controls {
-    min-width: 0;
+/* MODE */
+.mode-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
 }
 
-.preview-panel {
-    position: sticky;
-    top: 78px;
+.mode-btn{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:7px;
+  padding:9px 5px;
+  font-size:11px;
+  font-weight:700;
+  transition:.15s;
 }
 
-/* ================= CARD ================= */
-
-.card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px;
-    margin-bottom: 12px;
-    box-shadow: var(--shadow);
+.mode-btn:hover{
+  background:#f8fafc;
 }
 
-.card-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-
-    margin-bottom: 12px;
-
-    font-size: 14px;
-    font-weight: bold;
+.mode-btn.active{
+  background:var(--blue);
+  color:#fff;
+  border-color:var(--blue);
 }
 
-.card-title small {
-    color: var(--muted);
-    font-size: 10px;
-    font-weight: normal;
+.mode-panel{
+  display:none;
+  margin-top:12px;
 }
 
-/* ================= SECTIONS ================= */
-
-.section {
-    display: none;
+.mode-panel.active{
+  display:block;
 }
 
-.section.active {
-    display: block;
+/* FORM */
+.field{
+  margin-bottom:10px;
 }
 
-/* ================= FORM ================= */
-
-.field {
-    margin-bottom: 10px;
+.field label{
+  display:block;
+  margin-bottom:5px;
+  color:#4b5563;
+  font-size:10px;
+  font-weight:800;
 }
 
-.field:last-child {
-    margin-bottom: 0;
-}
-
-.field label {
-    display: block;
-    margin-bottom: 5px;
-
-    font-size: 11px;
-    font-weight: bold;
-    color: #4b5563;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="number"],
+input[type=text],
+input[type=number],
+input[type=email],
+input[type=url],
 select,
-textarea {
-    width: 100%;
-
-    min-height: 34px;
-
-    padding: 7px 9px;
-
-    background: #fff;
-    color: #222;
-
-    border: 1px solid var(--border);
-    border-radius: 6px;
-
-    outline: none;
-
-    transition:
-        border-color 0.15s,
-        box-shadow 0.15s;
+textarea{
+  width:100%;
+  min-height:35px;
+  padding:7px 9px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  background:#fff;
+  outline:none;
 }
 
-textarea {
-    min-height: 80px;
-    resize: vertical;
+textarea{
+  min-height:85px;
+  resize:vertical;
 }
 
 input:focus,
 select:focus,
-textarea:focus {
-    border-color: var(--blue);
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
+textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(37,99,235,.08);
 }
 
-input[type="color"] {
-    width: 100%;
-    height: 34px;
-    padding: 2px;
+input[type=color]{
+  width:100%;
+  height:35px;
+  padding:2px;
 }
 
-/* ================= GRID ================= */
-
-.grid-2 {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
+.grid2{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:9px;
 }
 
-.grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 9px;
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
 }
 
-/* ================= MODE ================= */
-
-.mode-tabs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    margin-bottom: 12px;
+/* CHECKS */
+.check-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
 }
 
-.mode-btn {
-    border: 1px solid var(--border);
-    background: #fff;
-    color: #444;
-
-    border-radius: 6px;
-
-    padding: 9px 5px;
-
-    font-size: 11px;
-    font-weight: bold;
+.check{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:7px 8px;
+  background:#fafafa;
+  border:1px solid var(--border);
+  border-radius:7px;
+  font-size:10px;
 }
 
-.mode-btn.active {
-    background: var(--blue);
-    color: #fff;
-    border-color: var(--blue);
+.check input{
+  accent-color:var(--blue);
 }
 
-/* ================= CHECKBOX ================= */
-
-.check-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+/* BUTTONS */
+.btn{
+  min-height:34px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:7px 11px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  background:#fff;
+  color:#333;
+  font-size:11px;
+  font-weight:700;
+  transition:.15s;
 }
 
-.check {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    padding: 7px 8px;
-
-    background: #fafafa;
-
-    border: 1px solid var(--border);
-    border-radius: 6px;
-
-    font-size: 11px;
+.btn:hover{
+  background:#f8fafc;
+  border-color:#bcc7d5;
 }
 
-.check input {
-    accent-color: var(--blue);
+.btn.primary{
+  background:var(--blue);
+  border-color:var(--blue);
+  color:#fff;
 }
 
-/* ================= FROZEN ================= */
-
-.frozen {
-    position: relative;
-    opacity: 0.45;
+.btn.primary:hover{
+  background:var(--blue2);
 }
 
-.frozen::after {
-    content: "🔒 Frozen by Combined Mode";
-
-    position: absolute;
-    right: 6px;
-    top: 6px;
-
-    padding: 3px 5px;
-
-    background: #fff1f2;
-    color: var(--red);
-
-    border: 1px solid #fecaca;
-    border-radius: 4px;
-
-    font-size: 9px;
-    font-weight: bold;
+.btn.green{
+  background:var(--green);
+  border-color:var(--green);
+  color:#fff;
 }
 
-/* ================= BORDER GRID ================= */
-
-.border-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
+.btn.red{
+  background:var(--red);
+  border-color:var(--red);
+  color:#fff;
 }
 
-.border-option {
-    min-height: 53px;
-
-    padding: 5px;
-
-    border: 1px solid var(--border);
-    border-radius: 6px;
-
-    background: #fff;
-
-    color: #444;
-
-    font-size: 9px;
-
-    transition: 0.15s;
+.btn.orange{
+  background:var(--orange);
+  border-color:var(--orange);
+  color:#fff;
 }
 
-.border-option:hover {
-    background: #f8fafc;
-    transform: translateY(-1px);
+.action-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
 }
 
-.border-option.active {
-    background: var(--blue-soft);
-    border-color: var(--blue);
-    color: var(--blue);
+/* BORDER SELECT */
+.border-select-wrap{
+  position:relative;
 }
 
-.border-sample {
-    height: 22px;
-    margin-bottom: 4px;
-    background: #fff;
+.border-select-wrap select{
+  font-weight:600;
 }
 
-/* ================= BORDER STYLES ================= */
-
-.sample-solid {
-    border: 2px solid #222;
+/* EXCEL */
+.upload{
+  border:2px dashed #cbd5e1;
+  border-radius:9px;
+  padding:18px;
+  text-align:center;
+  background:#fafcff;
 }
 
-.sample-double {
-    border: 4px double #222;
+.upload strong{
+  display:block;
+  margin-bottom:5px;
 }
 
-.sample-dashed {
-    border: 2px dashed #222;
+.upload small{
+  color:var(--muted);
+  font-size:9px;
 }
 
-.sample-dotted {
-    border: 2px dotted #222;
+.excel-preview{
+  max-height:220px;
+  overflow:auto;
+  margin-top:10px;
+  border:1px solid var(--border);
+  border-radius:7px;
 }
 
-.sample-groove {
-    border: 4px groove #777;
-}
-
-.sample-ridge {
-    border: 4px ridge #777;
-}
-
-.sample-inset {
-    border: 4px inset #777;
-}
-
-.sample-outset {
-    border: 4px outset #777;
-}
-
-.sample-thin {
-    border: 1px solid #222;
-}
-
-.sample-medium {
-    border: 3px solid #222;
-}
-
-.sample-thick {
-    border: 5px solid #222;
-}
-
-.sample-doublethin {
-    border: 3px double #222;
-}
-
-.sample-doublethick {
-    border: 6px double #222;
-}
-
-.sample-blue {
-    border: 2px solid #2563eb;
-}
-
-.sample-red {
-    border: 2px solid #dc2626;
-}
-
-.sample-green {
-    border: 2px solid #16a34a;
-}
-
-.sample-gray {
-    border: 2px solid #64748b;
-}
-
-.sample-shadow {
-    border: 2px solid #222;
-    box-shadow: 4px 4px 0 #aaa;
-}
-
-.sample-softshadow {
-    border: 1px solid #555;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
-}
-
-.sample-rounded {
-    border: 2px solid #222;
-    border-radius: 7px;
-}
-
-.sample-double-rounded {
-    border: 4px double #222;
-    border-radius: 7px;
-}
-
-.sample-groove-thick {
-    border: 6px groove #777;
-}
-
-.sample-ridge-thick {
-    border: 6px ridge #777;
-}
-
-.sample-inset-thick {
-    border: 6px inset #777;
-}
-
-.sample-outset-thick {
-    border: 6px outset #777;
-}
-
-/* ================= UPLOAD ================= */
-
-.upload-box {
-    padding: 15px;
-
-    text-align: center;
-
-    border: 2px dashed #cbd5e1;
-    border-radius: 7px;
-
-    background: #fafafa;
-}
-
-.upload-box strong {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.upload-box small {
-    color: var(--muted);
-    font-size: 10px;
-}
-
-/* ================= EXCEL ================= */
-
-.excel-preview {
-    max-height: 230px;
-    overflow: auto;
-
-    margin-top: 10px;
-
-    border: 1px solid var(--border);
-    border-radius: 6px;
-}
-
-.excel-preview table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 10px;
+.excel-preview table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:9px;
 }
 
 .excel-preview th,
-.excel-preview td {
-    padding: 6px;
-    border: 1px solid var(--border);
-    white-space: nowrap;
+.excel-preview td{
+  padding:6px;
+  border:1px solid var(--border);
+  white-space:nowrap;
 }
 
-.excel-preview th {
-    position: sticky;
-    top: 0;
-    background: #eef4ff;
-    z-index: 2;
+.excel-preview th{
+  position:sticky;
+  top:0;
+  background:#eef4ff;
 }
 
-/* ================= PREVIEW ================= */
-
-.preview-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-
-    margin-bottom: 10px;
+/* FROZEN */
+.freeze-box{
+  position:relative;
+  opacity:.48;
 }
 
-.live-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-
-    padding: 5px 8px;
-
-    background: #ecfdf5;
-    color: var(--green);
-
-    border: 1px solid #bbf7d0;
-    border-radius: 20px;
-
-    font-size: 10px;
-    font-weight: bold;
+.freeze-box::after{
+  content:"🔒 FROZEN";
+  position:absolute;
+  right:7px;
+  top:7px;
+  padding:3px 6px;
+  border-radius:5px;
+  background:#fff1f2;
+  color:var(--red);
+  border:1px solid #fecaca;
+  font-size:8px;
+  font-weight:800;
 }
 
-.live-dot {
-    width: 6px;
-    height: 6px;
-
-    border-radius: 50%;
-
-    background: var(--green);
+/* PREVIEW */
+.preview-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
 }
 
-/* ================= PREVIEW CANVAS ================= */
+.live{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 9px;
+  border-radius:20px;
+  background:#ecfdf5;
+  color:var(--green);
+  border:1px solid #bbf7d0;
+  font-size:9px;
+  font-weight:800;
+}
 
-.preview-canvas {
-    min-height: 680px;
+.live-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--green);
+}
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.preview-canvas{
+  min-height:700px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px;
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:9px;
 
-    padding: 25px;
+  background-color:#eef1f5;
+  background-image:
+    linear-gradient(45deg,#e2e6ec 25%,transparent 25%),
+    linear-gradient(-45deg,#e2e6ec 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#e2e6ec 75%),
+    linear-gradient(-45deg,transparent 75%,#e2e6ec 75%);
+  background-size:20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0;
+}
 
-    overflow: auto;
+.paper{
+  position:relative;
+  width:381px;
+  height:540px;
+  padding:10px;
+  background:#fff;
+  border:1px solid #aaa;
+  box-shadow:0 10px 30px rgba(15,23,42,.18);
+  transition:.2s ease;
+}
 
-    background:
-        linear-gradient(
-            45deg,
-            #edf0f4 25%,
-            transparent 25%
-        ),
-        linear-gradient(
-            -45deg,
-            #edf0f4 25%,
-            transparent 25%
-        ),
-        linear-gradient(
-            45deg,
-            transparent 75%,
-            #edf0f4 75%
-        ),
-        linear-gradient(
-            -45deg,
-            transparent 75%,
-            #edf0f4 75%
+.paper-grid{
+  width:100%;
+  height:100%;
+  display:grid;
+  gap:6px;
+}
+
+.label-preview{
+  width:100%;
+  min-height:150px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:14px;
+  background:#fff;
+  overflow:hidden;
+}
+
+.po-preview{
+  max-width:100%;
+  text-align:center;
+  word-break:break-word;
+  line-height:1.15;
+}
+
+.box-preview{
+  max-width:100%;
+  text-align:center;
+  word-break:break-word;
+  line-height:1.15;
+}
+
+.combined-preview{
+  max-width:100%;
+  display:none;
+  text-align:center;
+  word-break:break-word;
+  line-height:1.15;
+}
+
+.combined-preview.show{
+  display:block;
+}
+
+.address-preview,
+.isbn-preview,
+.other-preview{
+  width:100%;
+  height:100%;
+  display:none;
+  padding:18px;
+  background:#fff;
+  overflow:hidden;
+}
+
+/* ADDRESS */
+.address-preview h4{
+  margin:0 0 5px;
+  font-size:10px;
+}
+
+.address-block{
+  margin-bottom:14px;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+/* ISBN */
+.isbn-preview{
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+.isbn-preview.show{
+  display:flex;
+}
+
+#isbnBarcode{
+  max-width:90%;
+}
+
+/* QR */
+.qr-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:9px;
+}
+
+.qr-card{
+  min-height:155px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:#fafafa;
+}
+
+.qr-card canvas{
+  max-width:125px;
+  max-height:125px;
+}
+
+/* TOAST */
+.toast{
+  position:fixed;
+  top:82px;
+  right:18px;
+  z-index:99999;
+  min-width:250px;
+  max-width:390px;
+  padding:11px 14px;
+  border-radius:8px;
+  color:#fff;
+  font-size:11px;
+  font-weight:800;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+  transform:translateX(120%);
+  opacity:0;
+  transition:.25s;
+  pointer-events:none;
+}
+
+.toast.show{
+  transform:translateX(0);
+  opacity:1;
+}
+
+.toast.green{background:var(--green)}
+.toast.red{background:var(--red)}
+.toast.orange{background:var(--orange)}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  padding:20px 10px 8px;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.8;
+}
+
+.footer strong{
+  color:#374151;
+}
+
+/* RESPONSIVE */
+@media(max-width:1150px){
+  .workspace{
+    grid-template-columns:1fr;
+  }
+
+  .preview-side{
+    position:relative;
+    top:0;
+  }
+}
+
+@media(max-width:750px){
+  .header{
+    position:relative;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .main-nav{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .grid2,
+  .grid3{
+    grid-template-columns:1fr;
+  }
+
+  .preview-canvas{
+    min-height:550px;
+    padding:12px;
+  }
+}
+
+@media(max-width:450px){
+  .main-nav{
+    grid-template-columns:1fr;
+  }
+
+  .mode-tabs{
+    grid-template-columns:1fr;
+  }
+
+  .paper{
+    transform:scale(.82);
+    transform-origin:center;
+  }
+}
+
+@media print{
+  .header,
+  .main-nav,
+  .controls,
+  .preview-toolbar,
+  .footer{
+    display:none!important;
+  }
+
+  body{
+    background:#fff;
+  }
+
+  .app{
+    padding:0;
+  }
+
+  .preview-canvas{
+    padding:0;
+    border:0;
+    background:#fff;
+  }
+
+  .paper{
+    box-shadow:none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+  <div class="brand">
+    <div class="logo">AV</div>
+    <div>
+      <h1>Label Studio</h1>
+      <small>Professional PO • ISBN • Address Label Generator</small>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <button class="btn" id="undoBtn">↶ Undo</button>
+    <button class="btn" id="redoBtn">↷ Redo</button>
+    <button class="btn" id="defaultBtn">↺ Default</button>
+    <button class="btn" id="saveDefaultBtn">💾 Save</button>
+  </div>
+
+</header>
+
+
+<main class="app">
+
+  <!-- MAIN OPTIONS -->
+
+  <div class="main-nav">
+
+    <button class="nav-card active" data-section="coco">
+      <div class="nav-icon">📘</div>
+      <div class="nav-title">Coco Blue PO</div>
+      <div class="nav-sub">PO & Box Label</div>
+    </button>
+
+    <button class="nav-card" data-section="other">
+      <div class="nav-icon">📄</div>
+      <div class="nav-title">Other PO</div>
+      <div class="nav-sub">Other Purchase Orders</div>
+    </button>
+
+    <button class="nav-card" data-section="isbn">
+      <div class="nav-icon">🔖</div>
+      <div class="nav-title">ISBN</div>
+      <div class="nav-sub">ISBN Barcode Labels</div>
+    </button>
+
+    <button class="nav-card" data-section="address">
+      <div class="nav-icon">📍</div>
+      <div class="nav-title">Address</div>
+      <div class="nav-sub">Address & Email QR</div>
+    </button>
+
+  </div>
+
+
+  <div class="workspace">
+
+    <!-- LEFT -->
+
+    <div class="controls">
+
+      <!-- PAGE SETTINGS -->
+
+      <div class="card">
+
+        <div class="card-title">
+          <span>⚙ Page Settings</span>
+          <small>Live Preview</small>
+        </div>
+
+        <div class="grid2">
+
+          <div class="field">
+            <label>Page Size</label>
+
+            <select id="pageSize">
+
+              <option value="4x6">4 × 6 Inches</option>
+
+              <option value="70x35">
+                70 × 35 mm
+              </option>
+
+              <option value="a4">
+                A4
+              </option>
+
+              <option value="custom">
+                Custom
+              </option>
+
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Orientation</label>
+
+            <select id="orientation">
+
+              <option value="portrait">
+                Portrait
+              </option>
+
+              <option value="landscape">
+                Landscape
+              </option>
+
+            </select>
+          </div>
+
+        </div>
+
+
+        <div id="customSizeBox"
+             style="display:none">
+
+          <div class="grid2">
+
+            <div class="field">
+              <label>Custom Width (mm)</label>
+              <input id="customWidth"
+                     type="number"
+                     value="101.6"
+                     min="1">
+            </div>
+
+            <div class="field">
+              <label>Custom Height (mm)</label>
+              <input id="customHeight"
+                     type="number"
+                     value="152.4"
+                     min="1">
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="grid2">
+
+          <div class="field">
+            <label>Labels Per Page</label>
+
+            <select id="labelsPerPage">
+              <option value="1">1 Label</option>
+              <option value="2">2 Labels</option>
+              <option value="4">4 Labels</option>
+              <option value="6">6 Labels</option>
+              <option value="9">9 Labels</option>
+              <option value="12">12 Labels</option>
+            </select>
+
+          </div>
+
+          <div class="field">
+            <label>Label Gap (mm)</label>
+            <input id="labelGap"
+                   type="number"
+                   value="3"
+                   min="0">
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- COCO BLUE -->
+
+      <section class="section active"
+               id="section-coco">
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>📘 Coco Blue PO</span>
+          </div>
+
+          <div class="mode-tabs">
+
+            <button class="mode-btn active"
+                    data-mode="manual">
+              ✍ Manual
+            </button>
+
+            <button class="mode-btn"
+                    data-mode="multiple">
+              🔢 Multiple
+            </button>
+
+            <button class="mode-btn"
+                    data-mode="excel">
+              📊 Excel
+            </button>
+
+          </div>
+
+
+          <!-- MANUAL -->
+
+          <div class="mode-panel active"
+               id="mode-manual">
+
+            <div class="field">
+              <label>PO Number</label>
+              <input id="poInput"
+                     type="text"
+                     placeholder="ABC123">
+            </div>
+
+            <div class="field">
+              <label>Box Number</label>
+              <input id="boxInput"
+                     type="number"
+                     value="1"
+                     min="1">
+            </div>
+
+          </div>
+
+
+          <!-- MULTIPLE -->
+
+          <div class="mode-panel"
+               id="mode-multiple">
+
+            <div class="field">
+              <label>
+                PO Numbers — Comma Separated — No Limit
+              </label>
+
+              <textarea id="multiplePO"
+                        placeholder="ABC123, ABC124, ABC125, ABC126..."></textarea>
+            </div>
+
+            <div class="field">
+              <label>Starting Box Number</label>
+              <input id="multipleBox"
+                     type="number"
+                     value="1"
+                     min="1">
+            </div>
+
+          </div>
+
+
+          <!-- EXCEL -->
+
+          <div class="mode-panel"
+               id="mode-excel">
+
+            <div class="upload">
+
+              <strong>📊 Upload Excel File</strong>
+
+              <small>
+                First row is treated as Header and ignored as PO data.
+              </small>
+
+              <br><br>
+
+              <input id="excelInput"
+                     type="file"
+                     accept=".xlsx,.xls,.csv">
+
+            </div>
+
+            <div class="excel-preview"
+                 id="excelPreview">
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- PO / BOX DISPLAY -->
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>👁 PO / Box Display</span>
+          </div>
+
+          <div class="check-row">
+
+            <label class="check">
+              <input id="showPO"
+                     type="checkbox"
+                     checked>
+              Show PO Number
+            </label>
+
+            <label class="check">
+              <input id="showBox"
+                     type="checkbox"
+                     checked>
+              Show Box Number
+            </label>
+
+            <label class="check">
+              <input id="mergePOBox"
+                     type="checkbox">
+              Combine PO + Box
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <!-- PO FONT -->
+
+        <div class="card"
+             id="poFontCard">
+
+          <div class="card-title">
+            <span>🔤 PO Number Font</span>
+          </div>
+
+          <div class="grid2">
+
+            <div class="field">
+              <label>Font</label>
+
+              <select id="poFont">
+
+                <option>Arial</option>
+                <option>Calibri</option>
+                <option>Cambria</option>
+                <option>Times New Roman</option>
+                <option>Georgia</option>
+                <option>Verdana</option>
+                <option>Tahoma</option>
+                <option>Trebuchet MS</option>
+                <option>Courier New</option>
+                <option>Lucida Console</option>
+                <option>Impact</option>
+                <option>Comic Sans MS</option>
+                <option>Garamond</option>
+                <option>Palatino Linotype</option>
+                <option>Book Antiqua</option>
+                <option>Century Gothic</option>
+                <option>Arial Black</option>
+                <option>Franklin Gothic Medium</option>
+                <option>Segoe UI</option>
+                <option>Segoe Print</option>
+                <option>Segoe Script</option>
+                <option>Consolas</option>
+                <option>Gill Sans</option>
+                <option>Helvetica</option>
+                <option>Monaco</option>
+                <option>Optima</option>
+                <option>Futura</option>
+                <option>Rockwell</option>
+                <option>Bookman</option>
+                <option>Didot</option>
+                <option>Baskerville</option>
+                <option>American Typewriter</option>
+                <option>Lucida Sans</option>
+                <option>Arial Narrow</option>
+                <option>Roboto</option>
+                <option>Open Sans</option>
+                <option>Montserrat</option>
+                <option>Lato</option>
+                <option>Poppins</option>
+                <option>Nunito</option>
+                <option>Ubuntu</option>
+
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Font Size</label>
+
+              <select id="poFontSize">
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+                <option>11</option>
+                <option>12</option>
+                <option>14</option>
+                <option>16</option>
+                <option>18</option>
+                <option>20</option>
+                <option selected>24</option>
+                <option>26</option>
+                <option>28</option>
+                <option>32</option>
+                <option>36</option>
+                <option>40</option>
+                <option>48</option>
+                <option>56</option>
+                <option>64</option>
+                <option>72</option>
+              </select>
+
+            </div>
+
+          </div>
+
+          <div class="check-row">
+
+            <label class="check">
+              <input id="poBold"
+                     type="checkbox"
+                     checked>
+              Bold
+            </label>
+
+            <label class="check">
+              <input id="poItalic"
+                     type="checkbox">
+              Italic
+            </label>
+
+            <label class="check">
+              <input id="poUnderline"
+                     type="checkbox">
+              Underline
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <!-- BOX FONT -->
+
+        <div class="card"
+             id="boxFontCard">
+
+          <div class="card-title">
+            <span>🔢 Box Number Font</span>
+          </div>
+
+          <div class="grid2">
+
+            <div class="field">
+
+              <label>Font</label>
+
+              <select id="boxFont">
+
+                <option>Arial</option>
+                <option>Calibri</option>
+                <option>Cambria</option>
+                <option>Times New Roman</option>
+                <option>Georgia</option>
+                <option>Verdana</option>
+                <option>Tahoma</option>
+                <option>Trebuchet MS</option>
+                <option>Courier New</option>
+                <option>Lucida Console</option>
+                <option>Impact</option>
+                <option>Garamond</option>
+                <option>Palatino Linotype</option>
+                <option>Book Antiqua</option>
+                <option>Century Gothic</option>
+                <option>Arial Black</option>
+                <option>Segoe UI</option>
+                <option>Consolas</option>
+                <option>Gill Sans</option>
+                <option>Helvetica</option>
+                <option>Roboto</option>
+                <option>Open Sans</option>
+                <option>Montserrat</option>
+                <option>Lato</option>
+                <option>Poppins</option>
+
+              </select>
+
+            </div>
+
+            <div class="field">
+
+              <label>Font Size</label>
+
+              <select id="boxFontSize">
+                <option>8</option>
+                <option>10</option>
+                <option>12</option>
+                <option>14</option>
+                <option>16</option>
+                <option>18</option>
+                <option selected>20</option>
+                <option>22</option>
+                <option>24</option>
+                <option>28</option>
+                <option>32</option>
+                <option>36</option>
+                <option>40</option>
+                <option>48</option>
+              </select>
+
+            </div>
+
+          </div>
+
+          <div class="check-row">
+
+            <label class="check">
+              <input id="boxBold"
+                     type="checkbox"
+                     checked>
+              Bold
+            </label>
+
+            <label class="check">
+              <input id="boxItalic"
+                     type="checkbox">
+              Italic
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <!-- PO BORDER -->
+
+        <div class="card"
+             id="poBorderCard">
+
+          <div class="card-title">
+            <span>▣ PO Number Border</span>
+          </div>
+
+          <div class="field">
+
+            <label>Border Style</label>
+
+            <select id="poBorder">
+
+              <option value="none">None</option>
+              <option value="solid">Solid</option>
+              <option value="double">Double</option>
+              <option value="dashed">Dashed</option>
+              <option value="dotted">Dotted</option>
+              <option value="groove">Groove</option>
+              <option value="ridge">Ridge</option>
+              <option value="inset">Inset</option>
+              <option value="outset">Outset</option>
+              <option value="thin">Thin</option>
+              <option value="medium">Medium</option>
+              <option value="thick">Thick</option>
+              <option value="double-thin">Double Thin</option>
+              <option value="double-medium">Double Medium</option>
+              <option value="double-thick">Double Thick</option>
+              <option value="dash-dot">Dash Dot</option>
+              <option value="dash-dot-dot">Dash Dot Dot</option>
+              <option value="long-dash">Long Dash</option>
+              <option value="short-dash">Short Dash</option>
+              <option value="short-dot">Short Dot</option>
+              <option value="dot-dash">Dot Dash</option>
+              <option value="dot-dot-dash">Dot Dot Dash</option>
+              <option value="triple">Triple</option>
+              <option value="triple-thin">Triple Thin</option>
+              <option value="triple-thick">Triple Thick</option>
+              <option value="wave">Wave</option>
+              <option value="double-wave">Double Wave</option>
+              <option value="zigzag">Zigzag</option>
+              <option value="shadow">Shadow</option>
+              <option value="soft-shadow">Soft Shadow</option>
+              <option value="rounded">Rounded</option>
+              <option value="double-rounded">Double Rounded</option>
+              <option value="blue">Blue</option>
+              <option value="red">Red</option>
+              <option value="green">Green</option>
+              <option value="gray">Gray</option>
+              <option value="black">Black</option>
+              <option value="navy">Navy</option>
+              <option value="purple">Purple</option>
+              <option value="orange">Orange</option>
+              <option value="teal">Teal</option>
+              <option value="gold">Gold</option>
+              <option value="silver">Silver</option>
+              <option value="double-color">Double Color</option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- BOX BORDER -->
+
+        <div class="card"
+             id="boxBorderCard">
+
+          <div class="card-title">
+            <span>▣ Box Number Border</span>
+          </div>
+
+          <div class="field">
+
+            <label>Border Style</label>
+
+            <select id="boxBorder">
+
+              <option value="none">None</option>
+              <option value="solid">Solid</option>
+              <option value="double">Double</option>
+              <option value="dashed">Dashed</option>
+              <option value="dotted">Dotted</option>
+              <option value="groove">Groove</option>
+              <option value="ridge">Ridge</option>
+              <option value="inset">Inset</option>
+              <option value="outset">Outset</option>
+              <option value="thin">Thin</option>
+              <option value="medium">Medium</option>
+              <option value="thick">Thick</option>
+              <option value="double-thin">Double Thin</option>
+              <option value="double-medium">Double Medium</option>
+              <option value="double-thick">Double Thick</option>
+              <option value="dash-dot">Dash Dot</option>
+              <option value="dash-dot-dot">Dash Dot Dot</option>
+              <option value="long-dash">Long Dash</option>
+              <option value="short-dash">Short Dash</option>
+              <option value="short-dot">Short Dot</option>
+              <option value="dot-dash">Dot Dash</option>
+              <option value="dot-dot-dash">Dot Dot Dash</option>
+              <option value="triple">Triple</option>
+              <option value="triple-thin">Triple Thin</option>
+              <option value="triple-thick">Triple Thick</option>
+              <option value="wave">Wave</option>
+              <option value="double-wave">Double Wave</option>
+              <option value="zigzag">Zigzag</option>
+              <option value="shadow">Shadow</option>
+              <option value="soft-shadow">Soft Shadow</option>
+              <option value="rounded">Rounded</option>
+              <option value="double-rounded">Double Rounded</option>
+              <option value="blue">Blue</option>
+              <option value="red">Red</option>
+              <option value="green">Green</option>
+              <option value="gray">Gray</option>
+              <option value="black">Black</option>
+              <option value="navy">Navy</option>
+              <option value="purple">Purple</option>
+              <option value="orange">Orange</option>
+              <option value="teal">Teal</option>
+              <option value="gold">Gold</option>
+              <option value="silver">Silver</option>
+              <option value="double-color">Double Color</option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- COMBINED -->
+
+        <div class="card"
+             id="combinedCard">
+
+          <div class="card-title">
+            <span>🔗 Combined PO + Box</span>
+            <small>Freezes individual controls</small>
+          </div>
+
+          <div class="field">
+
+            <label>Combined Format</label>
+
+            <select id="combinedFormat">
+
+              <option value="po-box">
+                PO — BOX NO. 1
+              </option>
+
+              <option value="box-po">
+                BOX NO. 1 — PO
+              </option>
+
+              <option value="po-slash-box">
+                PO / BOX NO. 1
+              </option>
+
+              <option value="po-newline-box">
+                PO on Top + Box Below
+              </option>
+
+            </select>
+
+          </div>
+
+          <div class="field">
+
+            <label>Combined Border</label>
+
+            <select id="combinedBorder">
+
+              <option value="solid">Solid</option>
+              <option value="double">Double</option>
+              <option value="dashed">Dashed</option>
+              <option value="dotted">Dotted</option>
+              <option value="groove">Groove</option>
+              <option value="ridge">Ridge</option>
+              <option value="inset">Inset</option>
+              <option value="outset">Outset</option>
+              <option value="thick">Thick</option>
+              <option value="double-thick">Double Thick</option>
+              <option value="shadow">Shadow</option>
+              <option value="rounded">Rounded</option>
+              <option value="double-rounded">Double Rounded</option>
+              <option value="blue">Blue</option>
+              <option value="red">Red</option>
+              <option value="green">Green</option>
+              <option value="gray">Gray</option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- PDF -->
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>📄 PDF</span>
+          </div>
+
+          <button class="btn primary"
+                  id="generatePDF"
+                  style="width:100%">
+            ⬇ Generate PDF
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- OTHER PO -->
+
+      <section class="section"
+               id="section-other">
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>📄 Other PO</span>
+          </div>
+
+          <div class="mode-tabs">
+
+            <button class="mode-btn active"
+                    data-other-mode="manual">
+              ✍ Manual
+            </button>
+
+            <button class="mode-btn"
+                    data-other-mode="multiple">
+              🔢 Multiple
+            </button>
+
+            <button class="mode-btn"
+                    data-other-mode="excel">
+              📊 Excel
+            </button>
+
+          </div>
+
+          <div id="otherManual">
+
+            <div class="field">
+              <label>PO Number</label>
+              <input id="otherPO"
+                     type="text"
+                     placeholder="ABC123">
+            </div>
+
+          </div>
+
+          <div id="otherMultiple"
+               style="display:none">
+
+            <div class="field">
+              <label>PO Numbers — No Limit</label>
+              <textarea id="otherMultiplePO"
+                        placeholder="ABC123, ABC124, ABC125..."></textarea>
+            </div>
+
+          </div>
+
+          <div id="otherExcel"
+               style="display:none">
+
+            <input id="otherExcelInput"
+                   type="file"
+                   accept=".xlsx,.xls,.csv">
+
+            <div class="excel-preview"
+                 id="otherExcelPreview"></div>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>🔤 Other PO Font</span>
+          </div>
+
+          <div class="grid2">
+
+            <div class="field">
+              <label>Font</label>
+
+              <select id="otherFont">
+
+                <option>Arial</option>
+                <option>Calibri</option>
+                <option>Cambria</option>
+                <option>Times New Roman</option>
+                <option>Georgia</option>
+                <option>Verdana</option>
+                <option>Tahoma</option>
+                <option>Trebuchet MS</option>
+                <option>Courier New</option>
+                <option>Garamond</option>
+                <option>Segoe UI</option>
+                <option>Roboto</option>
+                <option>Open Sans</option>
+                <option>Montserrat</option>
+                <option>Poppins</option>
+
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Font Size</label>
+
+              <select id="otherFontSize">
+
+                <option>8</option>
+                <option>10</option>
+                <option>12</option>
+                <option>14</option>
+                <option>16</option>
+                <option selected>20</option>
+                <option>24</option>
+                <option>28</option>
+                <option>32</option>
+                <option>36</option>
+                <option>40</option>
+                <option>48</option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+          <div class="field">
+
+            <label>Border Style</label>
+
+            <select id="otherBorder">
+
+              <option value="none">None</option>
+              <option value="solid">Solid</option>
+              <option value="double">Double</option>
+              <option value="dashed">Dashed</option>
+              <option value="dotted">Dotted</option>
+              <option value="groove">Groove</option>
+              <option value="ridge">Ridge</option>
+              <option value="inset">Inset</option>
+              <option value="outset">Outset</option>
+              <option value="thin">Thin</option>
+              <option value="medium">Medium</option>
+              <option value="thick">Thick</option>
+              <option value="shadow">Shadow</option>
+              <option value="soft-shadow">Soft Shadow</option>
+              <option value="rounded">Rounded</option>
+              <option value="double-rounded">Double Rounded</option>
+              <option value="blue">Blue</option>
+              <option value="red">Red</option>
+              <option value="green">Green</option>
+              <option value="gray">Gray</option>
+              <option value="navy">Navy</option>
+              <option value="purple">Purple</option>
+              <option value="orange">Orange</option>
+              <option value="teal">Teal</option>
+              <option value="gold">Gold</option>
+              <option value="silver">Silver</option>
+
+            </select>
+
+          </div>
+
+          <label class="check">
+            <input id="otherBold"
+                   type="checkbox"
+                   checked>
+            Bold
+          </label>
+
+        </div>
+
+        <div class="card">
+
+          <button class="btn primary"
+                  id="generateOtherPDF"
+                  style="width:100%">
+            ⬇ Generate Other PO PDF
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- ISBN -->
+
+      <section class="section"
+               id="section-isbn">
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>🔖 ISBN Barcode Generator</span>
+          </div>
+
+          <div class="mode-tabs">
+
+            <button class="mode-btn active"
+                    data-isbn-mode="manual">
+              ✍ Manual
+            </button>
+
+            <button class="mode-btn"
+                    data-isbn-mode="multiple">
+              🔢 Multiple
+            </button>
+
+            <button class="mode-btn"
+                    data-isbn-mode="excel">
+              📊 Excel
+            </button>
+
+          </div>
+
+
+          <div id="isbnManual">
+
+            <div class="field">
+              <label>Book Title</label>
+              <input id="bookTitle"
+                     type="text"
+                     placeholder="Book Title">
+            </div>
+
+            <div class="field">
+              <label>ISBN Number</label>
+              <input id="isbn"
+                     type="text"
+                     placeholder="9781234567890">
+            </div>
+
+          </div>
+
+
+          <div id="isbnMultiple"
+               style="display:none">
+
+            <div class="field">
+
+              <label>
+                ISBN Numbers — No Limit
+              </label>
+
+              <textarea id="multipleISBN"
+                        placeholder="978..., 978..., 978..."></textarea>
+
+            </div>
+
+          </div>
+
+
+          <div id="isbnExcel"
+               style="display:none">
+
+            <input id="isbnExcelInput"
+                   type="file"
+                   accept=".xlsx,.xls,.csv">
+
+            <div class="excel-preview"
+                 id="isbnExcelPreview"></div>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>🔤 ISBN Font & Border</span>
+          </div>
+
+          <div class="grid2">
+
+            <div class="field">
+              <label>Font</label>
+
+              <select id="isbnFont">
+
+                <option>Arial</option>
+                <option>Calibri</option>
+                <option>Cambria</option>
+                <option>Times New Roman</option>
+                <option>Georgia</option>
+                <option>Verdana</option>
+                <option>Tahoma</option>
+                <option>Garamond</option>
+                <option>Segoe UI</option>
+                <option>Roboto</option>
+                <option>Open Sans</option>
+                <option>Montserrat</option>
+                <option>Poppins</option>
+
+              </select>
+
+            </div>
+
+            <div class="field">
+              <label>Font Size</label>
+
+              <select id="isbnFontSize">
+
+                <option>8</option>
+                <option>10</option>
+                <option>12</option>
+                <option selected>14</option>
+                <option>16</option>
+                <option>18</option>
+                <option>20</option>
+                <option>24</option>
+                <option>28</option>
+                <option>32</option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>Border Style</label>
+
+            <select id="isbnBorder">
+
+              <option value="none">None</option>
+              <option value="solid">Solid</option>
+              <option value="double">Double</option>
+              <option value="dashed">Dashed</option>
+              <option value="dotted">Dotted</option>
+              <option value="groove">Groove</option>
+              <option value="ridge">Ridge</option>
+              <option value="inset">Inset</option>
+              <option value="outset">Outset</option>
+              <option value="thin">Thin</option>
+              <option value="medium">Medium</option>
+              <option value="thick">Thick</option>
+              <option value="shadow">Shadow</option>
+              <option value="rounded">Rounded</option>
+              <option value="double-rounded">Double Rounded</option>
+              <option value="blue">Blue</option>
+              <option value="red">Red</option>
+              <option value="green">Green</option>
+              <option value="gray">Gray</option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <button class="btn primary"
+                  id="generateISBNPDF"
+                  style="width:100%">
+            ⬇ Generate ISBN PDF
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- ADDRESS -->
+
+      <section class="section"
+               id="section-address">
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>📍 Address Labels</span>
+          </div>
+
+          <div class="mode-tabs">
+
+            <button class="mode-btn active"
+                    data-address-mode="manual">
+              ✍ Manual
+            </button>
+
+            <button class="mode-btn"
+                    data-address-mode="multiple">
+              🔢 Multiple
+            </button>
+
+            <button class="mode-btn"
+                    data-address-mode="excel">
+              📊 Excel
+            </button>
+
+          </div>
+
+
+          <div id="addressManual">
+
+            <div class="field">
+              <label>From Address</label>
+
+              <textarea id="fromAddress"
+                        placeholder="From address"></textarea>
+            </div>
+
+            <div class="field">
+              <label>To Address</label>
+
+              <textarea id="toAddress"
+                        placeholder="To address"></textarea>
+            </div>
+
+            <div class="field">
+              <label>Email</label>
+
+              <input id="email"
+                     type="email"
+                     placeholder="email@example.com">
+
+            </div>
+
+          </div>
+
+
+          <div id="addressMultiple"
+               style="display:none">
+
+            <div class="field">
+
+              <label>
+                Addresses — No Limit
+              </label>
+
+              <textarea id="multipleAddress"
+                        placeholder="Address 1&#10;Address 2&#10;Address 3"></textarea>
+
+            </div>
+
+          </div>
+
+
+          <div id="addressExcel"
+               style="display:none">
+
+            <input id="addressExcelInput"
+                   type="file"
+                   accept=".xlsx,.xls,.csv">
+
+            <div class="excel-preview"
+                 id="addressExcelPreview"></div>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>🔤 Address Font & Border</span>
+          </div>
+
+          <div class="grid2">
+
+            <div class="field">
+
+              <label>Font</label>
+
+              <select id="addressFont">
+
+                <option>Arial</option>
+                <option>Calibri</option>
+                <option>Cambria</option>
+                <option>Times New Roman</option>
+                <option>Georgia</option>
+                <option>Verdana</option>
+                <option>Tahoma</option>
+                <option>Trebuchet MS</option>
+                <option>Courier New</option>
+                <option>Garamond</option>
+                <option>Segoe UI</option>
+                <option>Roboto</option>
+                <option>Open Sans</option>
+                <option>Montserrat</option>
+                <option>Poppins</option>
+
+              </select>
+
+            </div>
+
+            <div class="field">
+
+              <label>Font Size</label>
+
+              <select id="addressFontSize">
+
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+                <option>11</option>
+                <option selected>12</option>
+                <option>14</option>
+                <option>16</option>
+                <option>18</option>
+                <option>20</option>
+                <option>24</option>
+                <option>28</option>
+                <option>32</option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>Border Style</label>
+
+            <select id="addressBorder">
+
+              <option value="none">None</option>
+              <option value="solid">Solid</option>
+              <option value="double">Double</option>
+              <option value="dashed">Dashed</option>
+              <option value="dotted">Dotted</option>
+              <option value="groove">Groove</option>
+              <option value="ridge">Ridge</option>
+              <option value="inset">Inset</option>
+              <option value="outset">Outset</option>
+              <option value="thin">Thin</option>
+              <option value="medium">Medium</option>
+              <option value="thick">Thick</option>
+              <option value="shadow">Shadow</option>
+              <option value="soft-shadow">Soft Shadow</option>
+              <option value="rounded">Rounded</option>
+              <option value="double-rounded">Double Rounded</option>
+              <option value="blue">Blue</option>
+              <option value="red">Red</option>
+              <option value="green">Green</option>
+              <option value="gray">Gray</option>
+              <option value="navy">Navy</option>
+              <option value="purple">Purple</option>
+              <option value="orange">Orange</option>
+              <option value="teal">Teal</option>
+              <option value="gold">Gold</option>
+              <option value="silver">Silver</option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="card-title">
+            <span>🔳 QR Codes</span>
+          </div>
+
+          <div class="qr-grid">
+
+            <div class="qr-card">
+
+              <strong>📍 Address QR</strong>
+
+              <div id="addressQR"></div>
+
+              <button class="btn"
+                      id="addressQRBtn">
+                Generate QR
+              </button>
+
+            </div>
+
+            <div class="qr-card">
+
+              <strong>✉ Email QR</strong>
+
+              <div id="emailQR"></div>
+
+              <button class="btn"
+                      id="emailQRBtn">
+                Generate QR
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <button class="btn primary"
+                  id="generateAddressPDF"
+                  style="width:100%">
+            ⬇ Generate Address PDF
+          </button>
+
+        </div>
+
+      </section>
+
+    </div>
+
+
+    <!-- RIGHT PREVIEW -->
+
+    <div class="preview-side">
+
+      <div class="card">
+
+        <div class="preview-toolbar">
+
+          <div>
+            <strong>Live Page Preview</strong>
+          </div>
+
+          <span class="live">
+            <span class="live-dot"></span>
+            LIVE
+          </span>
+
+        </div>
+
+
+        <div class="preview-canvas">
+
+          <div class="paper"
+               id="paper">
+
+            <div class="paper-grid"
+                 id="paperGrid">
+
+              <!-- COCO -->
+
+              <div class="label-preview"
+                   id="labelPreview">
+
+                <div class="po-preview"
+                     id="previewPO">
+                  ABC123
+                </div>
+
+                <div class="box-preview"
+                     id="previewBox">
+                  BOX NO. 1
+                </div>
+
+                <div class="combined-preview"
+                     id="combinedPreview">
+                </div>
+
+              </div>
+
+
+              <!-- OTHER -->
+
+              <div class="other-preview"
+                   id="otherPreview">
+                ABC123
+              </div>
+
+
+              <!-- ISBN -->
+
+              <div class="isbn-preview"
+                   id="isbnPreview">
+
+                <strong id="isbnTitlePreview">
+                  Book Title
+                </strong>
+
+                <svg id="isbnBarcode"></svg>
+
+                <small id="isbnNumberPreview">
+                  ISBN
+                </small>
+
+              </div>
+
+
+              <!-- ADDRESS -->
+
+              <div class="address-preview"
+                   id="addressPreview">
+
+                <h4>FROM</h4>
+
+                <div class="address-block"
+                     id="fromPreview">
+                  FROM ADDRESS
+                </div>
+
+                <h4>TO</h4>
+
+                <div class="address-block"
+                     id="toPreview">
+                  TO ADDRESS
+                </div>
+
+                <div id="emailPreview"></div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <footer class="footer">
+
+    <div>
+      Created & Developed by
+      <strong>Ashish Verma</strong>
+    </div>
+
+    <div>
+      © 2026 Ashish Verma. All Rights Reserved.
+    </div>
+
+    <div>
+      This application and its original design/code are
+      protected and remain the property of Ashish Verma.
+    </div>
+
+  </footer>
+
+</main>
+
+
+<!-- TOAST -->
+
+<div class="toast"
+     id="toast">
+
+  <span id="toastText"></span>
+
+</div>
+
+
+<script>
+"use strict";
+
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+const $$ = selector =>
+  Array.from(document.querySelectorAll(selector));
+
+
+let activeSection = "coco";
+let activeMode = "manual";
+
+let otherMode = "manual";
+let isbnMode = "manual";
+let addressMode = "manual";
+
+let history = [];
+let historyIndex = -1;
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function toast(message,type="green"){
+
+  const box=$("toast");
+  const text=$("toastText");
+
+  text.textContent=message;
+
+  box.className="toast "+type+" show";
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer=setTimeout(()=>{
+    box.classList.remove("show");
+  },2400);
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+$$(".nav-card").forEach(button=>{
+
+  button.addEventListener("click",()=>{
+
+    const next=button.dataset.section;
+
+    $$(".nav-card").forEach(b=>{
+      b.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    if(next!==activeSection){
+
+      toast(
+        `${button.querySelector(".nav-title").textContent} Enabled`,
+        "green"
+      );
+    }
+
+    activeSection=next;
+
+    $$(".section").forEach(section=>{
+      section.classList.toggle(
+        "active",
+        section.id==="section-"+activeSection
+      );
+    });
+
+    updatePreview();
+  });
+
+});
+
+
+/* =========================================================
+   GENERIC MODE SWITCHER
+========================================================= */
+
+function setupModeButtons(){
+
+  $$(".mode-btn").forEach(button=>{
+
+    button.addEventListener("click",()=>{
+
+      if(button.dataset.mode){
+
+        activeMode=button.dataset.mode;
+
+        $$(".mode-btn").forEach(b=>{
+          if(b.dataset.mode){
+            b.classList.toggle(
+              "active",
+              b===button
+            );
+          }
+        });
+
+        $$(".mode-panel").forEach(p=>{
+          p.classList.remove("active");
+        });
+
+        const panel=$("mode-"+activeMode);
+
+        if(panel){
+          panel.classList.add("active");
+        }
+
+        toast(
+          activeMode.toUpperCase()+" mode enabled",
+          "green"
         );
 
-    background-size: 20px 20px;
-    background-position:
-        0 0,
-        0 10px,
-        10px -10px,
-        -10px 0;
+        updatePreview();
+      }
 
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    });
+
+  });
+
+
+  /* OTHER */
+
+  $$(".mode-btn").forEach(button=>{
+
+    button.addEventListener("click",()=>{
+
+      if(button.dataset.otherMode){
+
+        otherMode=
+          button.dataset.otherMode;
+
+        const parent=
+          button.closest(".card");
+
+        parent
+          .querySelectorAll("[data-other-mode]")
+          .forEach(b=>{
+            b.classList.toggle(
+              "active",
+              b===button
+            );
+          });
+
+        $("otherManual").style.display=
+          otherMode==="manual"
+            ?"block":"none";
+
+        $("otherMultiple").style.display=
+          otherMode==="multiple"
+            ?"block":"none";
+
+        $("otherExcel").style.display=
+          otherMode==="excel"
+            ?"block":"none";
+
+        toast(
+          otherMode.toUpperCase()+" mode enabled",
+          "green"
+        );
+
+        updatePreview();
+      }
+
+
+      if(button.dataset.isbnMode){
+
+        isbnMode=
+          button.dataset.isbnMode;
+
+        const parent=
+          button.closest(".card");
+
+        parent
+          .querySelectorAll("[data-isbn-mode]")
+          .forEach(b=>{
+            b.classList.toggle(
+              "active",
+              b===button
+            );
+          });
+
+        $("isbnManual").style.display=
+          isbnMode==="manual"
+            ?"block":"none";
+
+        $("isbnMultiple").style.display=
+          isbnMode==="multiple"
+            ?"block":"none";
+
+        $("isbnExcel").style.display=
+          isbnMode==="excel"
+            ?"block":"none";
+
+        toast(
+          isbnMode.toUpperCase()+" mode enabled",
+          "green"
+        );
+
+        updatePreview();
+      }
+
+
+      if(button.dataset.addressMode){
+
+        addressMode=
+          button.dataset.addressMode;
+
+        const parent=
+          button.closest(".card");
+
+        parent
+          .querySelectorAll("[data-address-mode]")
+          .forEach(b=>{
+            b.classList.toggle(
+              "active",
+              b===button
+            );
+          });
+
+        $("addressManual").style.display=
+          addressMode==="manual"
+            ?"block":"none";
+
+        $("addressMultiple").style.display=
+          addressMode==="multiple"
+            ?"block":"none";
+
+        $("addressExcel").style.display=
+          addressMode==="excel"
+            ?"block":"none";
+
+        toast(
+          addressMode.toUpperCase()+" mode enabled",
+          "green"
+        );
+
+        updatePreview();
+      }
+
+    });
+
+  });
+
 }
 
-/* ================= PAPER ================= */
 
-.paper {
-    position: relative;
+/* =========================================================
+   CUSTOM PAGE SIZE
+========================================================= */
 
-    width: 380px;
-    min-height: 540px;
+$("pageSize").addEventListener("change",()=>{
 
-    padding: 18px;
+  const custom=
+    $("pageSize").value==="custom";
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  $("customSizeBox").style.display=
+    custom ? "block":"none";
 
-    background: #fff;
+  if(custom){
 
-    border: 1px solid #aaa;
+    toast(
+      "Custom page size enabled",
+      "green"
+    );
 
-    box-shadow:
-        0 8px 25px rgba(15, 23, 42, 0.14);
+  }else{
 
-    transition:
-        width 0.2s ease,
-        min-height 0.2s ease;
+    toast(
+      "Custom page size disabled",
+      "red"
+    );
+  }
+
+  updatePreview();
+});
+
+
+/* =========================================================
+   PAGE PREVIEW
+========================================================= */
+
+function getPageSize(){
+
+  const value=$("pageSize").value;
+
+  if(value==="4x6"){
+    return [101.6,152.4];
+  }
+
+  if(value==="70x35"){
+    return [70,35];
+  }
+
+  if(value==="a4"){
+    return [210,297];
+  }
+
+  return [
+    Number($("customWidth").value)||101.6,
+    Number($("customHeight").value)||152.4
+  ];
 }
 
-/* ================= LABEL ================= */
 
-.label {
-    width: 90%;
-    min-height: 180px;
+function updatePaper(){
 
-    display: flex;
-    flex-direction: column;
+  let [w,h]=getPageSize();
 
-    align-items: center;
-    justify-content: center;
+  if($("orientation").value==="landscape"){
+    [w,h]=[h,w];
+  }
 
-    gap: 12px;
+  const maxW=650;
+  const maxH=700;
 
-    padding: 18px;
+  const scale=
+    Math.min(
+      maxW/w,
+      maxH/h
+    );
 
-    background: #fff;
+  const paper=$("paper");
 
-    border: 2px solid #222;
+  paper.style.width=
+    Math.max(220,w*scale)+"px";
 
-    overflow: hidden;
+  paper.style.height=
+    Math.max(220,h*scale)+"px";
 
-    transition: all 0.2s ease;
+
+  const labels=
+    Number($("labelsPerPage").value)||1;
+
+  const grid=$("paperGrid");
+
+  let columns=1;
+
+  if(labels===2) columns=2;
+  else if(labels<=4) columns=2;
+  else if(labels<=6) columns=2;
+  else columns=3;
+
+  grid.style.gridTemplateColumns=
+    `repeat(${columns},1fr)`;
+
+  grid.style.gap=
+    `${Number($("labelGap").value)||3}px`;
+
 }
 
-.preview-po {
-    display: block;
 
-    max-width: 100%;
+[
+  "orientation",
+  "customWidth",
+  "customHeight",
+  "labelsPerPage",
+  "labelGap"
+].forEach(id=>{
 
-    font-family: Arial, sans-serif;
-    font-size: 26px;
-    font-weight: bold;
+  $(id).addEventListener(
+    "input",
+    updatePaper
+  );
 
-    text-align: center;
+  $(id).addEventListener(
+    "change",
+    updatePaper
+  );
 
-    word-break: break-word;
+});
+
+
+/* =========================================================
+   FONT LIVE PREVIEW
+========================================================= */
+
+function applyTextStyles(){
+
+  const po=$("previewPO");
+  const box=$("previewBox");
+
+  po.style.fontFamily=$("poFont").value;
+  po.style.fontSize=$("poFontSize").value+"px";
+  po.style.fontWeight=
+    $("poBold").checked
+      ?"700":"400";
+  po.style.fontStyle=
+    $("poItalic").checked
+      ?"italic":"normal";
+  po.style.textDecoration=
+    $("poUnderline").checked
+      ?"underline":"none";
+
+
+  box.style.fontFamily=$("boxFont").value;
+  box.style.fontSize=$("boxFontSize").value+"px";
+  box.style.fontWeight=
+    $("boxBold").checked
+      ?"700":"400";
+  box.style.fontStyle=
+    $("boxItalic").checked
+      ?"italic":"normal";
+
+
+  $("otherPreview").style.fontFamily=
+    $("otherFont").value;
+
+  $("otherPreview").style.fontSize=
+    $("otherFontSize").value+"px";
+
+
+  $("isbnPreview").style.fontFamily=
+    $("isbnFont").value;
+
+  $("isbnPreview").style.fontSize=
+    $("isbnFontSize").value+"px";
+
+
+  $("addressPreview").style.fontFamily=
+    $("addressFont").value;
+
+  $("addressPreview").style.fontSize=
+    $("addressFontSize").value+"px";
 }
 
-.preview-box {
-    display: block;
 
-    max-width: 100%;
+/* =========================================================
+   BORDER
+========================================================= */
 
-    font-family: Arial, sans-serif;
-    font-size: 20px;
-    font-weight: bold;
+function borderCSS(style){
 
-    text-align: center;
+  const colorMap={
+    blue:"#2563eb",
+    red:"#dc2626",
+    green:"#16a34a",
+    gray:"#64748b",
+    black:"#111827",
+    navy:"#1e3a8a",
+    purple:"#7c3aed",
+    orange:"#f97316",
+    teal:"#0f766e",
+    gold:"#ca8a04",
+    silver:"#64748b"
+  };
 
-    word-break: break-word;
+  const color=
+    colorMap[style]||"#222";
+
+  if(style==="none"){
+    return "none";
+  }
+
+  if(style==="thin"){
+    return "1px solid #222";
+  }
+
+  if(style==="medium"){
+    return "3px solid #222";
+  }
+
+  if(style==="thick"){
+    return "5px solid #222";
+  }
+
+  if(style==="double-thin"){
+    return "2px double #222";
+  }
+
+  if(style==="double-medium"){
+    return "4px double #222";
+  }
+
+  if(style==="double-thick"){
+    return "7px double #222";
+  }
+
+  if(style==="dash-dot"){
+    return "2px dashed #222";
+  }
+
+  if(style==="dash-dot-dot"){
+    return "2px dashed #222";
+  }
+
+  if(style==="long-dash"){
+    return "2px dashed #222";
+  }
+
+  if(style==="short-dash"){
+    return "1px dashed #222";
+  }
+
+  if(style==="short-dot"){
+    return "2px dotted #222";
+  }
+
+  if(style==="dot-dash"){
+    return "2px dotted #222";
+  }
+
+  if(style==="dot-dot-dash"){
+    return "2px dotted #222";
+  }
+
+  if(style==="triple"){
+    return "6px double #222";
+  }
+
+  if(style==="triple-thin"){
+    return "3px double #222";
+  }
+
+  if(style==="triple-thick"){
+    return "8px double #222";
+  }
+
+  if(style==="wave"){
+    return "3px solid #222";
+  }
+
+  if(style==="double-wave"){
+    return "5px double #222";
+  }
+
+  if(style==="zigzag"){
+    return "3px solid #222";
+  }
+
+  if(style==="double-color"){
+    return "5px double "+color;
+  }
+
+  if(
+    [
+      "blue",
+      "red",
+      "green",
+      "gray",
+      "black",
+      "navy",
+      "purple",
+      "orange",
+      "teal",
+      "gold",
+      "silver"
+    ].includes(style)
+  ){
+    return "2px solid "+color;
+  }
+
+  if(style==="shadow"){
+    return "2px solid #222";
+  }
+
+  if(style==="soft-shadow"){
+    return "1px solid #555";
+  }
+
+  if(style==="rounded"){
+    return "2px solid #222";
+  }
+
+  if(style==="double-rounded"){
+    return "4px double #222";
+  }
+
+  return "2px "+style+" #222";
 }
 
-.combined-preview {
-    display: none;
 
-    max-width: 100%;
+function applyBorder(element,style){
 
-    font-weight: bold;
-    text-align: center;
+  if(!element)return;
 
-    word-break: break-word;
+  element.style.border=
+    borderCSS(style);
+
+  element.style.borderRadius=
+    [
+      "rounded",
+      "double-rounded"
+    ].includes(style)
+      ?"8px":"0";
+
+  if(style==="shadow"){
+    element.style.boxShadow=
+      "5px 5px 0 #aaa";
+  }
+  else if(style==="soft-shadow"){
+    element.style.boxShadow=
+      "0 4px 12px rgba(0,0,0,.25)";
+  }
+  else{
+    element.style.boxShadow="none";
+  }
 }
 
-.combined-preview.show {
-    display: block;
+
+/* =========================================================
+   MERGE / FREEZE
+========================================================= */
+
+function applyMergeState(){
+
+  const merged=
+    $("mergePOBox").checked;
+
+  const poCard=
+    $("poFontCard");
+
+  const boxCard=
+    $("boxFontCard");
+
+  const poBorder=
+    $("poBorderCard");
+
+  const boxBorder=
+    $("boxBorderCard");
+
+  [
+    poCard,
+    boxCard,
+    poBorder,
+    boxBorder
+  ].forEach(card=>{
+
+    card.classList.toggle(
+      "freeze-box",
+      merged
+    );
+
+    card.querySelectorAll(
+      "input,select"
+    ).forEach(el=>{
+      el.disabled=merged;
+    });
+
+  });
+
+
+  if(merged){
+
+    $("combinedCard").style.display=
+      "block";
+
+    $("previewPO").style.display=
+      "none";
+
+    $("previewBox").style.display=
+      "none";
+
+    $("combinedPreview").classList.add(
+      "show"
+    );
+
+    toast(
+      "PO + Box Combined — individual controls frozen",
+      "green"
+    );
+
+  }else{
+
+    $("combinedCard").style.display=
+      "block";
+
+    $("combinedPreview").classList.remove(
+      "show"
+    );
+
+    $("previewPO").style.display=
+      $("showPO").checked
+        ?"block":"none";
+
+    $("previewBox").style.display=
+      $("showBox").checked
+        ?"block":"none";
+
+    toast(
+      "PO + Box controls unfrozen",
+      "red"
+    );
+  }
+
+  updatePreview();
 }
 
-/* ================= QR ================= */
 
-.qr-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-}
+$("mergePOBox").addEventListener(
+  "change",
+  applyMergeState
+);
 
-.qr-card {
-    min-height: 170px;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+/* =========================================================
+   PREVIEW
+========================================================= */
 
-    gap: 7px;
+function updateCocoPreview(){
 
-    padding: 10px;
+  const po=
+    $("poInput").value.trim()||
+    "ABC123";
 
-    border: 1px solid var(--border);
-    border-radius: 7px;
+  const box=
+    $("boxInput").value||
+    "1";
 
-    background: #fafafa;
-}
+  $("previewPO").textContent=
+    po;
 
-.qr-card canvas,
-.qr-card img {
-    max-width: 140px;
-    max-height: 140px;
-}
+  $("previewBox").textContent=
+    "BOX NO. "+box;
 
-/* ================= ISBN ================= */
 
-.isbn-preview {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  const merged=
+    $("mergePOBox").checked;
 
-    gap: 8px;
 
-    min-height: 200px;
+  if(merged){
 
-    width: 90%;
+    const format=
+      $("combinedFormat").value;
 
-    padding: 15px;
+    let text="";
 
-    background: #fff;
-
-    border: 2px solid #222;
-}
-
-.isbn-title {
-    font-weight: bold;
-    text-align: center;
-}
-
-.isbn-number {
-    font-size: 11px;
-}
-
-#isbnBarcode {
-    max-width: 90%;
-}
-
-/* ================= TOAST ================= */
-
-.toast {
-    position: fixed;
-
-    top: 75px;
-    right: 18px;
-
-    z-index: 99999;
-
-    min-width: 250px;
-    max-width: 380px;
-
-    padding: 11px 14px;
-
-    border-radius: 7px;
-
-    color: #fff;
-
-    font-size: 12px;
-    font-weight: bold;
-
-    box-shadow:
-        0 8px 25px rgba(0, 0, 0, 0.18);
-
-    opacity: 0;
-
-    transform: translateX(120%);
-
-    pointer-events: none;
-
-    transition:
-        opacity 0.25s,
-        transform 0.25s;
-}
-
-.toast.show {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.toast.green {
-    background: var(--green);
-}
-
-.toast.red {
-    background: var(--red);
-}
-
-.toast.orange {
-    background: var(--orange);
-}
-
-/* ================= FOOTER ================= */
-
-.footer {
-    padding: 20px 10px 10px;
-
-    text-align: center;
-
-    color: var(--muted);
-
-    font-size: 11px;
-
-    line-height: 1.7;
-}
-
-.footer strong {
-    color: #374151;
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media (max-width: 1100px) {
-    .workspace {
-        grid-template-columns: 1fr;
+    if(format==="po-box"){
+      text=
+        `${po} — BOX NO. ${box}`;
     }
 
-    .preview-panel {
-        position: relative;
-        top: 0;
+    if(format==="box-po"){
+      text=
+        `BOX NO. ${box} — ${po}`;
     }
+
+    if(format==="po-slash-box"){
+      text=
+        `${po} / BOX NO. ${box}`;
+    }
+
+    if(format==="po-newline-box"){
+      text=
+        `${po}\nBOX NO. ${box}`;
+    }
+
+    $("combinedPreview").textContent=
+      text;
+
+    $("combinedPreview").style.whiteSpace=
+      format==="po-newline-box"
+        ?"pre-line":"normal";
+
+    $("combinedPreview").style.fontFamily=
+      $("poFont").value;
+
+    $("combinedPreview").style.fontSize=
+      $("poFontSize").value+"px";
+
+    $("combinedPreview").style.fontWeight=
+      $("poBold").checked
+        ?"700":"400";
+
+    applyBorder(
+      $("labelPreview"),
+      $("combinedBorder").value
+    );
+
+  }else{
+
+    applyBorder(
+      $("previewPO"),
+      $("poBorder").value
+    );
+
+    applyBorder(
+      $("previewBox"),
+      $("boxBorder").value
+    );
+
+  }
 }
 
-@media (max-width: 700px) {
-    .header {
-        position: relative;
-        align-items: flex-start;
-        flex-direction: column;
-    }
 
-    .header-actions {
-        width: 100%;
-    }
+function updateOtherPreview(){
 
-    .grid-2,
-    .grid-3 {
-        grid-template-columns: 1fr;
-    }
+  let value=
+    $("otherPO").value.trim()||
+    "ABC123";
 
-    .border-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+  if(otherMode==="multiple"){
 
-    .qr-grid {
-        grid-template-columns: 1fr;
-    }
+    value=
+      $("otherMultiplePO").value
+        .split(",")
+        .map(x=>x.trim())
+        .filter(Boolean)[0]
+      ||"ABC123";
+  }
 
-    .preview-canvas {
-        min-height: 500px;
-        padding: 12px;
-    }
+  $("otherPreview").textContent=
+    value;
 
-    .paper {
-        width: 290px;
-        min-height: 410px;
-    }
-
-    .toast {
-        left: 10px;
-        right: 10px;
-        min-width: 0;
-        max-width: none;
-    }
+  applyBorder(
+    $("otherPreview"),
+    $("otherBorder").value
+  );
 }
 
-@media (max-width: 450px) {
-    .border-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
 
-    .mode-tabs {
-        grid-template-columns: 1fr;
-    }
+function updateISBNPreview(){
+
+  const title=
+    $("bookTitle").value||
+    "Book Title";
+
+  const isbn=
+    $("isbn").value||
+    "ISBN";
+
+  $("isbnTitlePreview").textContent=
+    title;
+
+  $("isbnNumberPreview").textContent=
+    isbn;
+
+  applyBorder(
+    $("isbnPreview"),
+    $("isbnBorder").value
+  );
+
+  generateISBNBarcode();
 }
 
-/* ================= PRINT ================= */
 
-@media print {
-    body {
-        background: #fff;
-    }
+function generateISBNBarcode(){
 
-    .header,
-    .main-nav,
-    .controls,
-    .preview-toolbar,
-    .footer {
-        display: none !important;
-    }
+  const value=
+    $("isbn").value.trim();
 
-    .app {
-        padding: 0;
-    }
+  if(!value){
+    $("isbnBarcode").innerHTML="";
+    return;
+  }
 
-    .workspace {
-        display: block;
-    }
+  if(typeof JsBarcode==="undefined"){
+    return;
+  }
 
-    .preview-canvas {
-        padding: 0;
-        border: 0;
-        background: #fff;
-    }
+  try{
 
-    .paper {
-        box-shadow: none;
-        border: 0;
-    }
+    JsBarcode(
+      "#isbnBarcode",
+      value,
+      {
+        format:"auto",
+        width:1.4,
+        height:50,
+        displayValue:true,
+        margin:4
+      }
+    );
+
+  }catch(e){
+    console.warn(e);
+  }
 }
+
+
+function updateAddressPreview(){
+
+  $("fromPreview").textContent=
+    $("fromAddress").value||
+    "FROM ADDRESS";
+
+  $("toPreview").textContent=
+    $("toAddress").value||
+    "TO ADDRESS";
+
+  const email=
+    $("email").value.trim();
+
+  $("emailPreview").textContent=
+    email
+      ?"Email: "+email
+      :"";
+
+  applyBorder(
+    $("addressPreview"),
+    $("addressBorder").value
+  );
+}
+
+
+function updatePreview(){
+
+  updatePaper();
+  applyTextStyles();
+
+  $("labelPreview").style.display="none";
+  $("otherPreview").style.display="none";
+  $("isbnPreview").style.display="none";
+  $("addressPreview").style.display="none";
+
+
+  if(activeSection==="coco"){
+
+    $("labelPreview").style.display=
+      "flex";
+
+    updateCocoPreview();
+
+  }
+
+  else if(activeSection==="other"){
+
+    $("otherPreview").style.display=
+      "flex";
+
+    updateOtherPreview();
+
+  }
+
+  else if(activeSection==="isbn"){
+
+    $("isbnPreview").style.display=
+      "flex";
+
+    updateISBNPreview();
+
+  }
+
+  else if(activeSection==="address"){
+
+    $("addressPreview").style.display=
+      "block";
+
+    updateAddressPreview();
+
+  }
+
+}
+
+
+/* =========================================================
+   LIVE INPUTS
+========================================================= */
+
+$$("input,select,textarea").forEach(element=>{
+
+  element.addEventListener(
+    "input",
+    ()=>{
+
+      updatePreview();
+      scheduleHistory();
+
+    }
+  );
+
+  element.addEventListener(
+    "change",
+    ()=>{
+
+      updatePreview();
+      scheduleHistory();
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   ENABLE / DISABLE TOASTS
+========================================================= */
+
+[
+  "showPO",
+  "showBox"
+].forEach(id=>{
+
+  $(id).addEventListener(
+    "change",
+    ()=>{
+
+      if($(id).checked){
+
+        toast(
+          id==="showPO"
+            ?"PO Number Enabled"
+            :"Box Number Enabled",
+          "green"
+        );
+
+      }else{
+
+        toast(
+          id==="showPO"
+            ?"PO Number Disabled"
+            :"Box Number Disabled",
+          "red"
+        );
+
+      }
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   QR
+========================================================= */
+
+$("addressQRBtn").addEventListener(
+  "click",
+  async()=>{
+
+    if(typeof QRCode==="undefined"){
+
+      toast(
+        "QR library is not loaded",
+        "red"
+      );
+
+      return;
+    }
+
+    const value=[
+      $("fromAddress").value,
+      $("toAddress").value
+    ]
+    .filter(Boolean)
+    .join("\n");
+
+    if(!value){
+
+      toast(
+        "Enter address first",
+        "red"
+      );
+
+      return;
+    }
+
+    $("addressQR").innerHTML="";
+
+    const canvas=
+      document.createElement("canvas");
+
+    $("addressQR").appendChild(canvas);
+
+    await QRCode.toCanvas(
+      canvas,
+      value,
+      {
+        width:120,
+        margin:2
+      }
+    );
+
+    toast(
+      "Address QR generated",
+      "green"
+    );
+
+  }
+);
+
+
+$("emailQRBtn").addEventListener(
+  "click",
+  async()=>{
+
+    if(typeof QRCode==="undefined"){
+
+      toast(
+        "QR library is not loaded",
+        "red"
+      );
+
+      return;
+    }
+
+    const email=
+      $("email").value.trim();
+
+    if(!email){
+
+      toast(
+        "Enter email first",
+        "red"
+      );
+
+      return;
+    }
+
+    $("emailQR").innerHTML="";
+
+    const canvas=
+      document.createElement("canvas");
+
+    $("emailQR").appendChild(canvas);
+
+    await QRCode.toCanvas(
+      canvas,
+      "mailto:"+email,
+      {
+        width:120,
+        margin:2
+      }
+    );
+
+    toast(
+      "Email QR generated",
+      "green"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   EXCEL
+========================================================= */
+
+async function readExcel(
+  input,
+  preview,
+  target
+){
+
+  const file=
+    input.files[0];
+
+  if(!file)return;
+
+  if(typeof XLSX==="undefined"){
+
+    toast(
+      "Excel library is not loaded",
+      "red"
+    );
+
+    return;
+  }
+
+  try{
+
+    const buffer=
+      await file.arrayBuffer();
+
+    const workbook=
+      XLSX.read(
+        buffer,
+        {type:"array"}
+      );
+
+    const sheet=
+      workbook.Sheets[
+        workbook.SheetNames[0]
+      ];
+
+    const rows=
+      XLSX.utils.sheet_to_json(
+        sheet,
+        {
+          header:1,
+          defval:""
+        }
+      );
+
+    if(!rows.length){
+      toast(
+        "Excel file is empty",
+        "red"
+      );
+      return;
+    }
+
+
+    /* FIRST ROW = HEADER / IGNORED */
+
+    const header=rows[0];
+
+    const data=rows.slice(1);
+
+
+    let html="<table><thead><tr>";
+
+    header.forEach(h=>{
+      html+=
+        `<th>${escapeHTML(h)}</th>`;
+    });
+
+    html+="</tr></thead><tbody>";
+
+    data.slice(0,200).forEach(row=>{
+
+      html+="<tr>";
+
+      header.forEach((_,i)=>{
+
+        html+=
+          `<td>${escapeHTML(
+            row[i]??""
+          )}</td>`;
+
+      });
+
+      html+="</tr>";
+
+    });
+
+    html+="</tbody></table>";
+
+    preview.innerHTML=html;
+
+
+    if(target){
+
+      const values=
+        data
+          .map(row=>row[0])
+          .filter(v=>v!=="");
+
+      target.value=
+        values.join(", ");
+
+    }
+
+
+    toast(
+      "Excel loaded — Header row ignored",
+      "green"
+    );
+
+    updatePreview();
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      "Excel file could not be read",
+      "red"
+    );
+
+  }
+}
+
+
+$("excelInput").addEventListener(
+  "change",
+  ()=>readExcel(
+    $("excelInput"),
+    $("excelPreview"),
+    $("multiplePO")
+  )
+);
+
+
+$("otherExcelInput").addEventListener(
+  "change",
+  ()=>readExcel(
+    $("otherExcelInput"),
+    $("otherExcelPreview"),
+    $("otherMultiplePO")
+  )
+);
+
+
+$("isbnExcelInput").addEventListener(
+  "change",
+  ()=>readExcel(
+    $("isbnExcelInput"),
+    $("isbnExcelPreview"),
+    $("multipleISBN")
+  )
+);
+
+
+$("addressExcelInput").addEventListener(
+  "change",
+  ()=>readExcel(
+    $("addressExcelInput"),
+    $("addressExcelPreview"),
+    $("multipleAddress")
+  )
+);
+
+
+/* =========================================================
+   ESCAPE
+========================================================= */
+
+function escapeHTML(value){
+
+  return String(value??"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+let historyTimer;
+
+function snapshot(){
+
+  const data={};
+
+  $$("input,select,textarea")
+    .forEach(el=>{
+
+      if(
+        !el.id ||
+        el.type==="file"
+      )return;
+
+      data[el.id]=
+        el.type==="checkbox"
+          ?el.checked
+          :el.value;
+
+    });
+
+  return data;
+}
+
+
+function restore(data){
+
+  Object.keys(data).forEach(id=>{
+
+    const el=$(id);
+
+    if(!el)return;
+
+    if(el.type==="checkbox"){
+      el.checked=data[id];
+    }else{
+      el.value=data[id];
+    }
+
+  });
+
+  updatePreview();
+}
+
+
+function saveHistory(){
+
+  const current=
+    JSON.stringify(snapshot());
+
+  if(
+    history[history.length-1]===current
+  )return;
+
+  history=
+    history.slice(
+      0,
+      historyIndex+1
+    );
+
+  history.push(current);
+
+  if(history.length>50){
+    history.shift();
+  }
+
+  historyIndex=
+    history.length-1;
+}
+
+
+function scheduleHistory(){
+
+  clearTimeout(historyTimer);
+
+  historyTimer=
+    setTimeout(
+      saveHistory,
+      500
+    );
+}
+
+
+$("undoBtn").addEventListener(
+  "click",
+  ()=>{
+
+    if(historyIndex<=0){
+
+      toast(
+        "Nothing to undo",
+        "orange"
+      );
+
+      return;
+    }
+
+    historyIndex--;
+
+    restore(
+      JSON.parse(
+        history[historyIndex]
+      )
+    );
+
+    toast(
+      "Undo applied",
+      "green"
+    );
+
+  }
+);
+
+
+$("redoBtn").addEventListener(
+  "click",
+  ()=>{
+
+    if(
+      historyIndex>=history.length-1
+    ){
+
+      toast(
+        "Nothing to redo",
+        "orange"
+      );
+
+      return;
+    }
+
+    historyIndex++;
+
+    restore(
+      JSON.parse(
+        history[historyIndex]
+      )
+    );
+
+    toast(
+      "Redo applied",
+      "green"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   DEFAULT
+========================================================= */
+
+$("defaultBtn").addEventListener(
+  "click",
+  ()=>{
+
+    localStorage.removeItem(
+      "AshishVermaLabelStudio"
+    );
+
+    location.reload();
+
+  }
+);
+
+
+$("saveDefaultBtn").addEventListener(
+  "click",
+  ()=>{
+
+    localStorage.setItem(
+      "AshishVermaLabelStudio",
+      JSON.stringify(snapshot())
+    );
+
+    toast(
+      "Current settings saved",
+      "green"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   PDF
+========================================================= */
+
+function getPDFSize(){
+
+  const size=$("pageSize").value;
+
+  if(size==="4x6"){
+    return [101.6,152.4];
+  }
+
+  if(size==="70x35"){
+    return [70,35];
+  }
+
+  if(size==="a4"){
+    return "a4";
+  }
+
+  return [
+    Number($("customWidth").value)||101.6,
+    Number($("customHeight").value)||152.4
+  ];
+}
+
+
+function getPDFBorderStyle(style){
+
+  const map={
+    none:"none",
+    solid:"solid",
+    double:"double",
+    dashed:"dashed",
+    dotted:"dotted",
+    groove:"solid",
+    ridge:"solid",
+    inset:"solid",
+    outset:"solid",
+    thin:"solid",
+    medium:"solid",
+    thick:"solid",
+    "double-thin":"double",
+    "double-medium":"double",
+    "double-thick":"double",
+    shadow:"solid",
+    "soft-shadow":"solid",
+    rounded:"solid",
+    "double-rounded":"double",
+    blue:"solid",
+    red:"solid",
+    green:"solid",
+    gray:"solid",
+    navy:"solid",
+    purple:"solid",
+    orange:"solid",
+    teal:"solid",
+    gold:"solid",
+    silver:"solid"
+  };
+
+  return map[style]||"solid";
+}
+
+
+async function generatePDF(){
+
+  if(
+    !window.jspdf ||
+    !window.jspdf.jsPDF
+  ){
+
+    toast(
+      "PDF library is not loaded. Check internet connection.",
+      "red"
+    );
+
+    return;
+  }
+
+
+  try{
+
+    let format=
+      getPDFSize();
+
+    let orientation=
+      $("orientation").value;
+
+    if(
+      Array.isArray(format) &&
+      orientation==="landscape"
+    ){
+
+      format=[
+        format[1],
+        format[0]
+      ];
+
+    }
+
+
+    const doc=
+      new jspdf.jsPDF({
+        orientation,
+        unit:"mm",
+        format
+      });
+
+
+    const pageW=
+      doc.internal.pageSize.getWidth();
+
+    const pageH=
+      doc.internal.pageSize.getHeight();
+
+
+    const count=
+      Number(
+        $("labelsPerPage").value
+      )||1;
+
+
+    let columns=1;
+
+    if(count>=2 && count<=6)
+      columns=2;
+
+    if(count>6)
+      columns=3;
+
+
+    const rows=
+      Math.ceil(
+        count/columns
+      );
+
+
+    const margin=6;
+
+    const gap=
+      Number(
+        $("labelGap").value
+      )||3;
+
+
+    const cellW=
+      (
+        pageW-
+        margin*2-
+        gap*(columns-1)
+      )/columns;
+
+
+    const cellH=
+      (
+        pageH-
+        margin*2-
+        gap*(rows-1)
+      )/rows;
+
+
+    let values=[];
+
+
+    if(activeSection==="coco"){
+
+      if(activeMode==="multiple"){
+
+        values=
+          $("multiplePO")
+            .value
+            .split(",")
+            .map(x=>x.trim())
+            .filter(Boolean);
+
+      }
+      else if(activeMode==="excel"){
+
+        values=
+          $("multiplePO")
+            .value
+            .split(",")
+            .map(x=>x.trim())
+            .filter(Boolean);
+
+      }
+      else{
+
+        values=[
+          $("poInput").value.trim()||
+          "ABC123"
+        ];
+
+      }
+
+    }
+
+
+    else if(activeSection==="other"){
+
+      if(otherMode==="multiple"||
+         otherMode==="excel"){
+
+        values=
+          $("otherMultiplePO")
+            .value
+            .split(",")
+            .map(x=>x.trim())
+            .filter(Boolean);
+
+      }else{
+
+        values=[
+          $("otherPO").value.trim()||
+          "ABC123"
+        ];
+
+      }
+
+    }
+
+
+    else if(activeSection==="isbn"){
+
+      if(isbnMode==="multiple"||
+         isbnMode==="excel"){
+
+        values=
+          $("multipleISBN")
+            .value
+            .split(",")
+            .map(x=>x.trim())
+            .filter(Boolean);
+
+      }else{
+
+        values=[
+          $("isbn").value.trim()||
+          "9781234567890"
+        ];
+
+      }
+
+    }
+
+
+    else if(activeSection==="address"){
+
+      values=[
+        $("toAddress").value||
+        "ADDRESS"
+      ];
+
+    }
+
+
+    if(!values.length){
+      values=["ABC123"];
+    }
+
+
+    const pages=
+      Math.ceil(
+        values.length/count
+      );
+
+
+    for(let page=0;page<pages;page++){
+
+      if(page>0){
+        doc.addPage(
+          format,
+          orientation
+        );
+      }
+
+
+      for(
+        let slot=0;
+        slot<count;
+        slot++
+      ){
+
+        const index=
+          page*count+slot;
+
+        if(index>=values.length)
+          break;
+
+
+        const row=
+          Math.floor(slot/columns);
+
+        const col=
+          slot%columns;
+
+
+        const x=
+          margin+
+          col*(cellW+gap);
+
+        const y=
+          margin+
+          row*(cellH+gap);
+
+
+        /* BORDER */
+
+        let border="solid";
+
+        if(activeSection==="coco"){
+
+          border=
+            $("mergePOBox").checked
+              ?$("combinedBorder").value
+              :$("poBorder").value;
+
+        }
+
+        if(activeSection==="other")
+          border=$("otherBorder").value;
+
+        if(activeSection==="isbn")
+          border=$("isbnBorder").value;
+
+        if(activeSection==="address")
+          border=$("addressBorder").value;
+
+
+        if(border!=="none"){
+
+          doc.setDrawColor(
+            30,30,30
+          );
+
+          let width=0.5;
+
+          if(border==="thin")
+            width=.25;
+
+          if(border==="medium")
+            width=.75;
+
+          if(border==="thick")
+            width=1.2;
+
+          doc.setLineWidth(width);
+
+          if(
+            border==="dashed"||
+            border==="long-dash"
+          ){
+
+            doc.setLineDashPattern(
+              [3,2],
+              0
+            );
+
+          }
+          else if(
+            border==="dotted"||
+            border==="short-dot"
+          ){
+
+            doc.setLineDashPattern(
+              [1,2],
+              0
+            );
+
+          }
+          else{
+
+            doc.setLineDashPattern(
+              [],
+              0
+            );
+
+          }
+
+          doc.rect(
+            x,
+            y,
+            cellW,
+            cellH
+          );
+
+          doc.setLineDashPattern(
+            [],
+            0
+          );
+
+        }
+
+
+        /* COCO */
+
+        if(activeSection==="coco"){
+
+          const po=
+            values[
+              index%values.length
+            ];
+
+          const box=
+            Number(
+              $("boxInput").value
+            )||1;
+
+          doc.setTextColor(
+            20,20,20
+          );
+
+
+          if(
+            $("mergePOBox").checked
+          ){
+
+            doc.setFont(
+              "helvetica",
+              $("poBold").checked
+                ?"bold":"normal"
+            );
+
+            doc.setFontSize(
+              Number(
+                $("poFontSize").value
+              )*.72
+            );
+
+
+            let text="";
+
+            const fmt=
+              $("combinedFormat").value;
+
+            if(fmt==="po-box")
+              text=
+                `${po} — BOX NO. ${box+index}`;
+
+            if(fmt==="box-po")
+              text=
+                `BOX NO. ${box+index} — ${po}`;
+
+            if(fmt==="po-slash-box")
+              text=
+                `${po} / BOX NO. ${box+index}`;
+
+            if(fmt==="po-newline-box")
+              text=
+                `${po}\nBOX NO. ${box+index}`;
+
+
+            const lines=
+              doc.splitTextToSize(
+                text,
+                cellW-8
+              );
+
+
+            doc.text(
+              lines,
+              x+cellW/2,
+              y+cellH/2,
+              {
+                align:"center",
+                baseline:"middle"
+              }
+            );
+
+          }
+          else{
+
+            if($("showPO").checked){
+
+              doc.setFont(
+                "helvetica",
+                $("poBold").checked
+                  ?"bold":"normal"
+              );
+
+              doc.setFontSize(
+                Number(
+                  $("poFontSize").value
+                )*.72
+              );
+
+              doc.text(
+                po,
+                x+cellW/2,
+                y+cellH*.42,
+                {
+                  align:"center"
+                }
+              );
+
+            }
+
+
+            if($("showBox").checked){
+
+              doc.setFont(
+                "helvetica",
+                $("boxBold").checked
+                  ?"bold":"normal"
+              );
+
+              doc.setFontSize(
+                Number(
+                  $("boxFontSize").value
+                )*.72
+              );
+
+              doc.text(
+                `BOX NO. ${box+index}`,
+                x+cellW/2,
+                y+cellH*.62,
+                {
+                  align:"center"
+                }
+              );
+
+            }
+
+          }
+
+        }
+
+
+        /* OTHER */
+
+        if(activeSection==="other"){
+
+          doc.setFont(
+            "helvetica",
+            $("otherBold").checked
+              ?"bold":"normal"
+          );
+
+          doc.setFontSize(
+            Number(
+              $("otherFontSize").value
+            )*.72
+          );
+
+          doc.text(
+            values[index],
+            x+cellW/2,
+            y+cellH/2,
+            {
+              align:"center"
+            }
+          );
+
+        }
+
+
+        /* ISBN */
+
+        if(activeSection==="isbn"){
+
+          const title=
+            $("bookTitle").value||
+            "Book Title";
+
+          const isbn=
+            values[index];
+
+          doc.setFont(
+            "helvetica",
+            "bold"
+          );
+
+          doc.setFontSize(10);
+
+          doc.text(
+            title,
+            x+cellW/2,
+            y+20,
+            {
+              align:"center",
+              maxWidth:cellW-8
+            }
+          );
+
+
+          doc.setFont(
+            "helvetica",
+            "normal"
+          );
+
+          doc.setFontSize(9);
+
+          doc.text(
+            isbn,
+            x+cellW/2,
+            y+cellH-15,
+            {
+              align:"center"
+            }
+          );
+
+        }
+
+
+        /* ADDRESS */
+
+        if(activeSection==="address"){
+
+          doc.setFont(
+            "helvetica",
+            "bold"
+          );
+
+          doc.setFontSize(9);
+
+          doc.text(
+            "FROM",
+            x+6,
+            y+14
+          );
+
+
+          doc.setFont(
+            "helvetica",
+            "normal"
+          );
+
+          const fromLines=
+            doc.splitTextToSize(
+              $("fromAddress").value||
+              "",
+              cellW-12
+            );
+
+
+          doc.text(
+            fromLines,
+            x+6,
+            y+20
+          );
+
+
+          const toY=
+            Math.min(
+              y+65,
+              y+28+
+              fromLines.length*4
+            );
+
+
+          doc.setFont(
+            "helvetica",
+            "bold"
+          );
+
+          doc.text(
+            "TO",
+            x+6,
+            toY
+          );
+
+
+          doc.setFont(
+            "helvetica",
+            "normal"
+          );
+
+
+          const toLines=
+            doc.splitTextToSize(
+              $("toAddress").value||
+              "",
+              cellW-12
+            );
+
+
+          doc.text(
+            toLines,
+            x+6,
+            toY+6
+          );
+
+
+          if($("email").value){
+
+            doc.setFontSize(7);
+
+            doc.text(
+              "Email: "+
+              $("email").value,
+              x+6,
+              y+cellH-8,
+              {
+                maxWidth:cellW-12
+              }
+            );
+
+          }
+
+        }
+
+      }
+
+    }
+
+
+    doc.save(
+      "Ashish-Verma-Label-Studio.pdf"
+    );
+
+
+    toast(
+      "PDF generated successfully",
+      "green"
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      "PDF generation failed: "+
+      error.message,
+      "red"
+    );
+
+  }
+
+}
+
+
+$("generatePDF").addEventListener(
+  "click",
+  generatePDF
+);
+
+$("generateOtherPDF").addEventListener(
+  "click",
+  generatePDF
+);
+
+$("generateISBNPDF").addEventListener(
+  "click",
+  generatePDF
+);
+
+$("generateAddressPDF").addEventListener(
+  "click",
+  generatePDF
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+  "keydown",
+  event=>{
+
+    if(
+      event.ctrlKey &&
+      event.key.toLowerCase()==="z"
+    ){
+
+      event.preventDefault();
+
+      $("undoBtn").click();
+
+    }
+
+
+    if(
+      event.ctrlKey &&
+      event.key.toLowerCase()==="y"
+    ){
+
+      event.preventDefault();
+
+      $("redoBtn").click();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   INITIAL STATE
+========================================================= */
+
+const saved=
+  localStorage.getItem(
+    "AshishVermaLabelStudio"
+  );
+
+
+if(saved){
+
+  try{
+
+    const data=
+      JSON.parse(saved);
+
+    Object.keys(data).forEach(id=>{
+
+      const el=$(id);
+
+      if(!el)return;
+
+      if(el.type==="checkbox")
+        el.checked=data[id];
+      else
+        el.value=data[id];
+
+    });
+
+  }catch(e){
+    console.warn(e);
+  }
+
+}
+
+
+updatePaper();
+applyMergeState();
+updatePreview();
+saveHistory();
+
+
+/* =========================================================
+   LIBRARY CHECK
+========================================================= */
+
+setTimeout(()=>{
+
+  if(
+    !window.jspdf ||
+    !window.jspdf.jsPDF
+  ){
+
+    console.warn(
+      "jsPDF library was not loaded."
+    );
+
+  }
+
+},1200);
+
+</script>
+
+</body>
+</html>
