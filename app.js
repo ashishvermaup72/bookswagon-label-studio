@@ -1,63 +1,119 @@
 "use strict";
 
 /* =========================================================
-   BOOKS LABEL STUDIO — FINAL APP.JS
+   BOOKS LABEL STUDIO
+   FINAL APP.JS
+   Matching:
+   index.html + style.css
+========================================================= */
+
+
+/* =========================================================
+   GLOBAL STATE
 ========================================================= */
 
 const AppState = {
+
     category: "cocoBlue",
+
     cocoMode: "individual",
+
     otherMode: "individual",
+
     addressMode: "manual",
 
     cocoExcelRows: [],
+
     otherExcelRows: [],
+
     addressExcelRows: [],
 
     toastTimer: null
+
 };
 
 
 /* =========================================================
-   HELPERS
+   DOM HELPERS
 ========================================================= */
 
-const $ = id => document.getElementById(id);
+const $ = (id) =>
+    document.getElementById(id);
 
-const $$ = selector =>
-    Array.from(document.querySelectorAll(selector));
+const $$ = (selector) =>
+    Array.from(
+        document.querySelectorAll(selector)
+    );
 
-function value(id, fallback = "") {
-    return $(id)?.value?.trim() || fallback;
+function getValue(id, fallback = "") {
+
+    const element = $(id);
+
+    if (!element) {
+        return fallback;
+    }
+
+    return String(
+        element.value ?? ""
+    ).trim();
+
 }
 
-function numberValue(id, fallback = 0) {
-    const n = Number($(id)?.value);
-    return Number.isFinite(n) ? n : fallback;
-}
+function getNumber(id, fallback = 0) {
 
-function checked(id, fallback = false) {
-    return $(id)
-        ? Boolean($(id).checked)
+    const value =
+        Number(
+            getValue(id)
+        );
+
+    return Number.isFinite(value)
+        ? value
         : fallback;
+}
+
+function isChecked(
+    id,
+    fallback = false
+) {
+
+    const element = $(id);
+
+    if (!element) {
+        return fallback;
+    }
+
+    return Boolean(
+        element.checked
+    );
+
 }
 
 
 /* =========================================================
    TOAST
-   GREEN = ENABLE
-   RED   = DISABLE
 ========================================================= */
 
-function showToast(message, type = "success") {
+function showToast(
+    message,
+    type = "success"
+) {
 
-    const toast = $("toast");
-    const icon = $("toastIcon");
-    const text = $("toastMessage");
+    const toast =
+        $("toast");
 
-    if (!toast || !text) return;
+    const icon =
+        $("toastIcon");
 
-    clearTimeout(AppState.toastTimer);
+    const text =
+        $("toastMessage");
+
+    if (!toast || !text) {
+        return;
+    }
+
+    clearTimeout(
+        AppState.toastTimer
+    );
 
     toast.classList.remove(
         "show",
@@ -66,28 +122,88 @@ function showToast(message, type = "success") {
         "warning"
     );
 
-    toast.classList.add(
+    const toastType =
         type === "success"
             ? "success"
-            : "error"
+            : "error";
+
+    toast.classList.add(
+        toastType
     );
 
     if (icon) {
+
         icon.textContent =
-            type === "success"
+            toastType === "success"
                 ? "✓"
                 : "!";
+
     }
 
-    text.textContent = message;
+    text.textContent =
+        message;
 
     requestAnimationFrame(() => {
-        toast.classList.add("show");
+
+        toast.classList.add(
+            "show"
+        );
+
     });
 
-    AppState.toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-    }, 2500);
+    AppState.toastTimer =
+        setTimeout(() => {
+
+            toast.classList.remove(
+                "show"
+            );
+
+        }, 2800);
+
+}
+
+
+/* =========================================================
+   PDF LIBRARY
+========================================================= */
+
+function getJsPDF() {
+
+    if (
+        window.jspdf &&
+        typeof window.jspdf.jsPDF ===
+        "function"
+    ) {
+
+        return window.jspdf.jsPDF;
+
+    }
+
+    return null;
+
+}
+
+function checkPDFLibrary() {
+
+    const jsPDF =
+        getJsPDF();
+
+    if (!jsPDF) {
+
+        showToast(
+            "PDF library load नहीं हुई। Internet/CDN connection check करें।",
+            "error"
+        );
+
+        console.error(
+            "jsPDF is not available."
+        );
+
+        return false;
+    }
+
+    return true;
+
 }
 
 
@@ -97,39 +213,58 @@ function showToast(message, type = "success") {
 
 function initCategoryNavigation() {
 
-    $$(".category-btn").forEach(button => {
+    $$(".category-btn")
+        .forEach(button => {
 
-        button.addEventListener("click", () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-            const category =
-                button.dataset.category;
+                    const category =
+                        button.dataset.category;
 
-            AppState.category = category;
+                    if (!category) {
+                        return;
+                    }
 
-            $$(".category-btn").forEach(btn => {
-                btn.classList.toggle(
-                    "active",
-                    btn === button
-                );
-            });
+                    AppState.category =
+                        category;
 
-            $$(".tool-section").forEach(section => {
-                section.classList.toggle(
-                    "active",
-                    section.dataset.tool === category
-                );
-            });
+                    $$(".category-btn")
+                        .forEach(btn => {
 
-            updateLivePreview();
+                            btn.classList.toggle(
+                                "active",
+                                btn === button
+                            );
+
+                        });
+
+
+                    $$(".tool-section")
+                        .forEach(section => {
+
+                            section.classList.toggle(
+                                "active",
+                                section.dataset.tool ===
+                                category
+                            );
+
+                        });
+
+
+                    updateLivePreview();
+
+                }
+            );
 
         });
 
-    });
 }
 
 
 /* =========================================================
-   COCO MODES
+   COCO MODE NAVIGATION
 ========================================================= */
 
 function initCocoModes() {
@@ -137,51 +272,69 @@ function initCocoModes() {
     $$(".sub-category-btn[data-coco-mode]")
         .forEach(button => {
 
-            button.addEventListener("click", () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                const mode =
-                    button.dataset.cocoMode;
+                    const mode =
+                        button.dataset.cocoMode;
 
-                AppState.cocoMode = mode;
+                    AppState.cocoMode =
+                        mode;
 
-                $$(".sub-category-btn[data-coco-mode]")
-                    .forEach(btn => {
 
-                        btn.classList.toggle(
-                            "active",
-                            btn === button
-                        );
+                    $$(".sub-category-btn[data-coco-mode]")
+                        .forEach(btn => {
 
-                    });
+                            btn.classList.toggle(
+                                "active",
+                                btn === button
+                            );
 
-                const panels = {
-                    individual:
-                        "cocoIndividualPanel",
+                        });
 
-                    multiple:
-                        "cocoMultiplePanel",
 
-                    excel:
-                        "cocoExcelPanel",
+                    const panels = {
 
-                    address:
-                        "cocoAddressPanel"
-                };
+                        individual:
+                            "cocoIndividualPanel",
 
-                Object.entries(panels).forEach(
-                    ([key, id]) => {
+                        multiple:
+                            "cocoMultiplePanel",
 
-                        $(id)?.classList.toggle(
-                            "active",
-                            key === mode
-                        );
+                        excel:
+                            "cocoExcelPanel",
 
-                    }
-                );
+                        address:
+                            "cocoAddressPanel"
 
-                updateLivePreview();
+                    };
 
-            });
+
+                    Object.entries(
+                        panels
+                    ).forEach(
+                        ([key, id]) => {
+
+                            $(id)
+                                ?.classList.toggle(
+                                    "active",
+                                    key === mode
+                                );
+
+                        }
+                    );
+
+
+                    showToast(
+                        `${button.textContent.trim()} selected.`,
+                        "success"
+                    );
+
+                    updateLivePreview();
+
+                }
+            );
 
         });
 
@@ -197,49 +350,67 @@ function initOtherModes() {
     $$(".sub-category-btn[data-other-mode]")
         .forEach(button => {
 
-            button.addEventListener("click", () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                const mode =
-                    button.dataset.otherMode;
+                    const mode =
+                        button.dataset.otherMode;
 
-                AppState.otherMode = mode;
+                    AppState.otherMode =
+                        mode;
 
-                $$(".sub-category-btn[data-other-mode]")
-                    .forEach(btn => {
 
-                        btn.classList.toggle(
-                            "active",
-                            btn === button
-                        );
+                    $$(".sub-category-btn[data-other-mode]")
+                        .forEach(btn => {
 
-                    });
+                            btn.classList.toggle(
+                                "active",
+                                btn === button
+                            );
 
-                const panels = {
-                    individual:
-                        "otherIndividualPanel",
+                        });
 
-                    multiple:
-                        "otherMultiplePanel",
 
-                    excel:
-                        "otherExcelPanel",
+                    const panels = {
 
-                    address:
-                        "otherAddressPanel"
-                };
+                        individual:
+                            "otherIndividualPanel",
 
-                Object.entries(panels).forEach(
-                    ([key, id]) => {
+                        multiple:
+                            "otherMultiplePanel",
 
-                        $(id)?.classList.toggle(
-                            "active",
-                            key === mode
-                        );
+                        excel:
+                            "otherExcelPanel",
 
-                    }
-                );
+                        address:
+                            "otherAddressPanel"
 
-            });
+                    };
+
+
+                    Object.entries(
+                        panels
+                    ).forEach(
+                        ([key, id]) => {
+
+                            $(id)
+                                ?.classList.toggle(
+                                    "active",
+                                    key === mode
+                                );
+
+                        }
+                    );
+
+
+                    showToast(
+                        `${button.textContent.trim()} selected.`,
+                        "success"
+                    );
+
+                }
+            );
 
         });
 
@@ -255,36 +426,49 @@ function initAddressModes() {
     $$(".sub-category-btn[data-address-mode]")
         .forEach(button => {
 
-            button.addEventListener("click", () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                const mode =
-                    button.dataset.addressMode;
+                    const mode =
+                        button.dataset.addressMode;
 
-                AppState.addressMode = mode;
+                    AppState.addressMode =
+                        mode;
 
-                $$(".sub-category-btn[data-address-mode]")
-                    .forEach(btn => {
 
-                        btn.classList.toggle(
+                    $$(".sub-category-btn[data-address-mode]")
+                        .forEach(btn => {
+
+                            btn.classList.toggle(
+                                "active",
+                                btn === button
+                            );
+
+                        });
+
+
+                    $("addressManualPanel")
+                        ?.classList.toggle(
                             "active",
-                            btn === button
+                            mode === "manual"
                         );
 
-                    });
 
-                $("addressManualPanel")
-                    ?.classList.toggle(
-                        "active",
-                        mode === "manual"
+                    $("addressExcelPanel")
+                        ?.classList.toggle(
+                            "active",
+                            mode === "excel"
+                        );
+
+
+                    showToast(
+                        `${button.textContent.trim()} selected.`,
+                        "success"
                     );
 
-                $("addressExcelPanel")
-                    ?.classList.toggle(
-                        "active",
-                        mode === "excel"
-                    );
-
-            });
+                }
+            );
 
         });
 
@@ -303,28 +487,46 @@ function createPOInputs(
     const container =
         $(containerId);
 
-    if (!container) return;
+    if (!container) {
+        return;
+    }
 
     container.innerHTML = "";
 
-    for (let i = 1; i <= 40; i++) {
+    for (
+        let i = 1;
+        i <= 40;
+        i++
+    ) {
 
         const wrapper =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         wrapper.className =
             "po-input-wrapper";
 
+
         const label =
-            document.createElement("label");
+            document.createElement(
+                "label"
+            );
+
+        label.htmlFor =
+            `${prefix}${i}`;
 
         label.textContent =
             `PO ${i}`;
 
-        const input =
-            document.createElement("input");
 
-        input.type = "text";
+        const input =
+            document.createElement(
+                "input"
+            );
+
+        input.type =
+            "text";
 
         input.id =
             `${prefix}${i}`;
@@ -335,16 +537,27 @@ function createPOInputs(
         input.autocomplete =
             "off";
 
+
         input.addEventListener(
             "input",
             updateLivePreview
         );
 
-        wrapper.appendChild(label);
-        wrapper.appendChild(input);
 
-        container.appendChild(wrapper);
+        wrapper.appendChild(
+            label
+        );
+
+        wrapper.appendChild(
+            input
+        );
+
+        container.appendChild(
+            wrapper
+        );
+
     }
+
 }
 
 
@@ -364,39 +577,68 @@ function initPOInputs() {
 
 
 /* =========================================================
-   GET PO VALUES
+   PO PARSER
 ========================================================= */
 
-function getManualPOValues(prefix) {
+function splitPOText(text) {
+
+    return String(
+        text || ""
+    )
+        .split(
+            /[\n,;]+/
+        )
+        .map(
+            value =>
+                value.trim()
+        )
+        .filter(
+            Boolean
+        );
+
+}
+
+
+function getManualPOValues(
+    prefix
+) {
 
     const result = [];
 
-    for (let i = 1; i <= 40; i++) {
+    for (
+        let i = 1;
+        i <= 40;
+        i++
+    ) {
 
         const input =
             $(`${prefix}${i}`);
 
+        if (!input) {
+            continue;
+        }
+
         const text =
-            input?.value?.trim();
+            input.value.trim();
 
         if (text) {
-            result.push(text);
+
+            result.push(
+                text
+            );
+
         }
 
     }
 
     return result;
+
 }
 
 
-function splitPOText(text) {
-
-    return String(text || "")
-        .split(/[\n,;]+/)
-        .map(x => x.trim())
-        .filter(Boolean);
-}
-
+/* =========================================================
+   COCO PO VALUES
+========================================================= */
 
 function getCocoPOValues() {
 
@@ -418,7 +660,9 @@ function getCocoPOValues() {
     ) {
 
         return splitPOText(
-            value("cocoMultiplePO")
+            getValue(
+                "cocoMultiplePO"
+            )
         );
 
     }
@@ -432,22 +676,39 @@ function getCocoPOValues() {
         return AppState.cocoExcelRows
             .map(row => {
 
-                if (Array.isArray(row)) {
+                if (
+                    Array.isArray(row)
+                ) {
+
                     return row[0];
+
                 }
 
-                return Object.values(row)[0];
+                return Object.values(
+                    row
+                )[0];
 
             })
-            .map(x => String(x ?? "").trim())
-            .filter(Boolean);
+            .map(
+                value =>
+                    String(
+                        value ?? ""
+                    ).trim()
+            )
+            .filter(
+                Boolean
+            );
 
     }
 
-
     return [];
+
 }
 
+
+/* =========================================================
+   OTHER PO VALUES
+========================================================= */
 
 function getOtherPOValues() {
 
@@ -469,7 +730,9 @@ function getOtherPOValues() {
     ) {
 
         return splitPOText(
-            value("otherMultiplePO")
+            getValue(
+                "otherMultiplePO"
+            )
         );
 
     }
@@ -483,138 +746,179 @@ function getOtherPOValues() {
         return AppState.otherExcelRows
             .map(row => {
 
-                if (Array.isArray(row)) {
+                if (
+                    Array.isArray(row)
+                ) {
+
                     return row[0];
+
                 }
 
-                return Object.values(row)[0];
+                return Object.values(
+                    row
+                )[0];
 
             })
-            .map(x => String(x ?? "").trim())
-            .filter(Boolean);
+            .map(
+                value =>
+                    String(
+                        value ?? ""
+                    ).trim()
+            )
+            .filter(
+                Boolean
+            );
 
     }
 
-
     return [];
+
 }
 
 
 /* =========================================================
    EXCEL
    FIRST ROW = HEADER
-   FIRST ROW IS IGNORED FOR DATA
+   DATA STARTS FROM ROW 2
 ========================================================= */
 
-function readExcel(
+function readExcelFile(
     file,
-    callback,
+    onData,
     previewId,
     fileNameId
 ) {
 
-    if (!file) return;
+    if (!file) {
+        return;
+    }
 
-    if (typeof XLSX === "undefined") {
+    if (
+        typeof window.XLSX ===
+        "undefined"
+    ) {
 
         showToast(
-            "Excel library is not loaded.",
+            "Excel library load नहीं हुई।",
             "error"
         );
 
         return;
     }
 
-    if ($(fileNameId)) {
+
+    if (fileNameId && $(fileNameId)) {
+
         $(fileNameId).textContent =
             file.name;
+
     }
+
 
     const reader =
         new FileReader();
 
-    reader.onload = event => {
 
-        try {
+    reader.onload =
+        event => {
 
-            const workbook =
-                XLSX.read(
-                    new Uint8Array(
-                        event.target.result
-                    ),
-                    {
-                        type: "array"
-                    }
+            try {
+
+                const workbook =
+                    XLSX.read(
+                        new Uint8Array(
+                            event.target.result
+                        ),
+                        {
+                            type: "array"
+                        }
+                    );
+
+
+                const sheet =
+                    workbook.Sheets[
+                        workbook.SheetNames[0]
+                    ];
+
+
+                const rows =
+                    XLSX.utils.sheet_to_json(
+                        sheet,
+                        {
+                            header: 1,
+                            defval: ""
+                        }
+                    );
+
+
+                /*
+                 * IMPORTANT:
+                 *
+                 * ROW 1 = HEADER
+                 *
+                 * We intentionally remove it.
+                 */
+
+                const header =
+                    rows.length
+                        ? rows[0]
+                        : [];
+
+
+                const dataRows =
+                    rows.slice(1);
+
+
+                onData(
+                    dataRows,
+                    header
                 );
 
-            const sheet =
-                workbook.Sheets[
-                    workbook.SheetNames[0]
-                ];
 
-            const rows =
-                XLSX.utils.sheet_to_json(
-                    sheet,
-                    {
-                        header: 1,
-                        defval: ""
-                    }
+                renderExcelPreview(
+                    previewId,
+                    header,
+                    dataRows
                 );
 
-            /*
-             * FIRST ROW IS HEADER.
-             * DO NOT PROCESS IT.
-             */
-            const header =
-                rows.length
-                    ? rows[0]
-                    : [];
 
-            const dataRows =
-                rows.slice(1);
+                showToast(
+                    `Excel loaded: header ignored, ${dataRows.length} data row(s) found.`,
+                    "success"
+                );
 
-            callback(
-                dataRows,
-                header
-            );
 
-            renderExcelPreview(
-                previewId,
-                header,
-                dataRows
-            );
+            } catch (error) {
 
-            showToast(
-                `Excel loaded. Header ignored. ${dataRows.length} data rows found.`,
-                "success"
-            );
+                console.error(
+                    error
+                );
 
-        } catch (error) {
+                showToast(
+                    "Excel file पढ़ने में error आया।",
+                    "error"
+                );
 
-            console.error(
-                "Excel error:",
-                error
-            );
+            }
+
+        };
+
+
+    reader.onerror =
+        () => {
 
             showToast(
-                "Could not read Excel file.",
+                "Excel file open नहीं हो सकी।",
                 "error"
             );
 
-        }
+        };
 
-    };
 
-    reader.onerror = () => {
+    reader.readAsArrayBuffer(
+        file
+    );
 
-        showToast(
-            "Could not open Excel file.",
-            "error"
-        );
-
-    };
-
-    reader.readAsArrayBuffer(file);
 }
 
 
@@ -631,65 +935,125 @@ function renderExcelPreview(
     const container =
         $(containerId);
 
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    if (!header.length && !rows.length) {
+    if (!container) {
         return;
     }
 
+    container.innerHTML = "";
+
+
+    if (
+        !header.length &&
+        !rows.length
+    ) {
+
+        return;
+
+    }
+
+
     const table =
-        document.createElement("table");
+        document.createElement(
+            "table"
+        );
+
 
     const thead =
-        document.createElement("thead");
+        document.createElement(
+            "thead"
+        );
+
 
     const headRow =
-        document.createElement("tr");
+        document.createElement(
+            "tr"
+        );
 
-    header.forEach(cell => {
 
-        const th =
-            document.createElement("th");
+    header.forEach(
+        cell => {
 
-        th.textContent =
-            String(cell ?? "");
+            const th =
+                document.createElement(
+                    "th"
+                );
 
-        headRow.appendChild(th);
+            th.textContent =
+                String(
+                    cell ?? ""
+                );
 
-    });
+            headRow.appendChild(
+                th
+            );
 
-    thead.appendChild(headRow);
+        }
+    );
+
+
+    thead.appendChild(
+        headRow
+    );
+
 
     const tbody =
-        document.createElement("tbody");
+        document.createElement(
+            "tbody"
+        );
 
-    rows.slice(0, 50).forEach(row => {
 
-        const tr =
-            document.createElement("tr");
+    rows
+        .slice(0, 100)
+        .forEach(
+            row => {
 
-        row.forEach(cell => {
+                const tr =
+                    document.createElement(
+                        "tr"
+                    );
 
-            const td =
-                document.createElement("td");
 
-            td.textContent =
-                String(cell ?? "");
+                row.forEach(
+                    cell => {
 
-            tr.appendChild(td);
+                        const td =
+                            document.createElement(
+                                "td"
+                            );
 
-        });
+                        td.textContent =
+                            String(
+                                cell ?? ""
+                            );
 
-        tbody.appendChild(tr);
+                        tr.appendChild(
+                            td
+                        );
 
-    });
+                    }
+                );
 
-    table.appendChild(thead);
-    table.appendChild(tbody);
 
-    container.appendChild(table);
+                tbody.appendChild(
+                    tr
+                );
+
+            }
+        );
+
+
+    table.appendChild(
+        thead
+    );
+
+    table.appendChild(
+        tbody
+    );
+
+    container.appendChild(
+        table
+    );
+
 }
 
 
@@ -704,7 +1068,8 @@ function initExcelUploads() {
             "change",
             event => {
 
-                readExcel(
+                readExcelFile(
+
                     event.target.files[0],
 
                     rows => {
@@ -719,6 +1084,7 @@ function initExcelUploads() {
                     "cocoExcelPreview",
 
                     "cocoExcelFileName"
+
                 );
 
             }
@@ -730,7 +1096,8 @@ function initExcelUploads() {
             "change",
             event => {
 
-                readExcel(
+                readExcelFile(
+
                     event.target.files[0],
 
                     rows => {
@@ -743,6 +1110,7 @@ function initExcelUploads() {
                     "otherExcelPreview",
 
                     "otherExcelFileName"
+
                 );
 
             }
@@ -754,7 +1122,8 @@ function initExcelUploads() {
             "change",
             event => {
 
-                readExcel(
+                readExcelFile(
+
                     event.target.files[0],
 
                     rows => {
@@ -767,6 +1136,7 @@ function initExcelUploads() {
                     "addressExcelPreview",
 
                     null
+
                 );
 
             }
@@ -776,7 +1146,7 @@ function initExcelUploads() {
 
 
 /* =========================================================
-   PAGE DIMENSIONS
+   PAGE SIZE
 ========================================================= */
 
 function getPageSize(
@@ -794,12 +1164,14 @@ function getPageSize(
                 height: 152.4
             };
 
+
         case "70x35":
 
             return {
                 width: 70,
                 height: 35
             };
+
 
         case "a4":
 
@@ -808,21 +1180,23 @@ function getPageSize(
                 height: 297
             };
 
+
         case "custom":
 
             return {
                 width:
-                    numberValue(
+                    getNumber(
                         widthId,
                         70
                     ),
 
                 height:
-                    numberValue(
+                    getNumber(
                         heightId,
                         35
                     )
             };
+
 
         default:
 
@@ -830,7 +1204,9 @@ function getPageSize(
                 width: 101.6,
                 height: 152.4
             };
+
     }
+
 }
 
 
@@ -839,35 +1215,52 @@ function applyOrientation(
     orientation
 ) {
 
-    let {
-        width,
-        height
-    } = dimensions;
+    let width =
+        dimensions.width;
+
+    let height =
+        dimensions.height;
+
 
     if (
-        orientation === "landscape" &&
+        orientation ===
+        "landscape" &&
         height > width
     ) {
 
-        [width, height] =
-            [height, width];
+        [
+            width,
+            height
+        ] = [
+            height,
+            width
+        ];
 
     }
 
+
     if (
-        orientation === "portrait" &&
+        orientation ===
+        "portrait" &&
         width > height
     ) {
 
-        [width, height] =
-            [height, width];
+        [
+            width,
+            height
+        ] = [
+            height,
+            width
+        ];
 
     }
+
 
     return {
         width,
         height
     };
+
 }
 
 
@@ -881,212 +1274,277 @@ function initPageSettings() {
 
         {
             size: "pageSize",
-            orientation: "orientation",
-            panel: "customSizePanel",
-            width: "customWidth",
-            height: "customHeight",
-            info: "selectedPageInfo"
+
+            orientation:
+                "orientation",
+
+            panel:
+                "customSizePanel",
+
+            width:
+                "customWidth",
+
+            height:
+                "customHeight",
+
+            info:
+                "selectedPageInfo"
         },
 
-        {
-            size: "otherPageSize",
-            orientation: "otherOrientation",
-            panel: "otherCustomSizePanel",
-            width: "otherCustomWidth",
-            height: "otherCustomHeight"
-        },
 
         {
-            size: "isbnPageSize",
-            orientation: "isbnOrientation",
-            panel: "isbnCustomSizePanel",
-            width: "isbnCustomWidth",
-            height: "isbnCustomHeight"
+            size:
+                "otherPageSize",
+
+            orientation:
+                "otherOrientation",
+
+            panel:
+                "otherCustomSizePanel",
+
+            width:
+                "otherCustomWidth",
+
+            height:
+                "otherCustomHeight"
         },
 
+
         {
-            size: "addressPageSize",
-            orientation: "addressOrientation",
-            panel: "addressCustomSizePanel",
-            width: "addressCustomWidth",
-            height: "addressCustomHeight"
+            size:
+                "isbnPageSize",
+
+            orientation:
+                "isbnOrientation",
+
+            panel:
+                "isbnCustomSizePanel",
+
+            width:
+                "isbnCustomWidth",
+
+            height:
+                "isbnCustomHeight"
+        },
+
+
+        {
+            size:
+                "addressPageSize",
+
+            orientation:
+                "addressOrientation",
+
+            panel:
+                "addressCustomSizePanel",
+
+            width:
+                "addressCustomWidth",
+
+            height:
+                "addressCustomHeight"
         }
 
     ];
 
 
-    configs.forEach(config => {
+    configs.forEach(
+        config => {
 
-        const update =
-            () => {
+            const update =
+                () => {
 
-                const isCustom =
-                    value(config.size) ===
-                    "custom";
+                    const isCustom =
+                        getValue(
+                            config.size
+                        ) ===
+                        "custom";
 
-                $(config.panel)
-                    ?.classList.toggle(
-                        "hidden",
-                        !isCustom
-                    );
 
-                if ($(config.width)) {
-                    $(config.width).disabled =
-                        !isCustom;
-                }
-
-                if ($(config.height)) {
-                    $(config.height).disabled =
-                        !isCustom;
-                }
-
-                if (config.info) {
-
-                    const dimensions =
-                        applyOrientation(
-
-                            getPageSize(
-                                value(
-                                    config.size,
-                                    "4x6"
-                                ),
-                                config.width,
-                                config.height
-                            ),
-
-                            value(
-                                config.orientation,
-                                "portrait"
-                            )
-
+                    $(config.panel)
+                        ?.classList.toggle(
+                            "hidden",
+                            !isCustom
                         );
 
-                    $(config.info).textContent =
-                        `${dimensions.width.toFixed(1)} × ${dimensions.height.toFixed(1)} mm`;
-                }
 
-                updateLivePreview();
-            };
+                    if ($(config.width)) {
+
+                        $(config.width)
+                            .disabled =
+                            !isCustom;
+
+                    }
 
 
-        $(config.size)
-            ?.addEventListener(
-                "change",
-                update
-            );
+                    if ($(config.height)) {
 
-        $(config.orientation)
-            ?.addEventListener(
-                "change",
-                update
-            );
+                        $(config.height)
+                            .disabled =
+                            !isCustom;
 
-        $(config.width)
-            ?.addEventListener(
-                "input",
-                update
-            );
+                    }
 
-        $(config.height)
-            ?.addEventListener(
-                "input",
-                update
-            );
 
-        update();
+                    if (config.info) {
 
-    });
+                        const dimensions =
+                            applyOrientation(
+
+                                getPageSize(
+
+                                    getValue(
+                                        config.size,
+                                        "4x6"
+                                    ),
+
+                                    config.width,
+
+                                    config.height
+
+                                ),
+
+                                getValue(
+                                    config.orientation,
+                                    "portrait"
+                                )
+
+                            );
+
+
+                        $(config.info)
+                            .textContent =
+                            `${dimensions.width.toFixed(1)} × ${dimensions.height.toFixed(1)} mm`;
+
+                    }
+
+
+                    updateLivePreview();
+
+                };
+
+
+            $(config.size)
+                ?.addEventListener(
+                    "change",
+                    update
+                );
+
+
+            $(config.orientation)
+                ?.addEventListener(
+                    "change",
+                    update
+                );
+
+
+            $(config.width)
+                ?.addEventListener(
+                    "input",
+                    update
+                );
+
+
+            $(config.height)
+                ?.addEventListener(
+                    "input",
+                    update
+                );
+
+
+            update();
+
+        }
+    );
 
 }
 
 
 /* =========================================================
-   FEATURE LOGIC
+   FEATURE LOCKING
 ========================================================= */
 
-function setLocked(
+function setFeatureLocked(
     id,
     locked
 ) {
 
-    const input =
+    const element =
         $(id);
 
-    if (!input) return;
+    if (!element) {
+        return;
+    }
 
-    input.disabled =
+    element.disabled =
         locked;
 
-    input.closest(
-        ".feature-check"
-    )?.classList.toggle(
-        "locked",
-        locked
-    );
+
+    element
+        .closest(
+            ".feature-check"
+        )
+        ?.classList.toggle(
+            "locked",
+            locked
+        );
+
 }
 
 
-function applyFeatureRules(
-    announce = false
-) {
+/* =========================================================
+   FEATURE RULES
+========================================================= */
 
-    const combined =
-        checked(
+function applyFeatureRules() {
+
+    const poPlusBox =
+        isChecked(
             "poPlusBoxCheck"
         );
 
+
     const combinedBorder =
-        checked(
+        isChecked(
             "combinedBorderCheck"
         );
 
 
     /*
-     * PO + BOX MODE
-     *
-     * Individual PO and Box options
-     * are locked.
+     * PO + BOX
      */
 
-    if (combined) {
+    if (poPlusBox) {
 
         if ($("poNumberCheck")) {
-            $("poNumberCheck").checked =
-                false;
+            $("poNumberCheck")
+                .checked = false;
         }
 
         if ($("boxNumberCheck")) {
-            $("boxNumberCheck").checked =
-                false;
+            $("boxNumberCheck")
+                .checked = false;
         }
 
-        setLocked(
+
+        setFeatureLocked(
             "poNumberCheck",
             true
         );
 
-        setLocked(
+        setFeatureLocked(
             "boxNumberCheck",
             true
         );
 
-        if (announce) {
-
-            showToast(
-                "PO + Box enabled.",
-                "success"
-            );
-
-        }
-
     } else {
 
-        setLocked(
+        setFeatureLocked(
             "poNumberCheck",
             false
         );
 
-        setLocked(
+        setFeatureLocked(
             "boxNumberCheck",
             false
         );
@@ -1095,63 +1553,54 @@ function applyFeatureRules(
 
 
     /*
-     * COMBINED BORDER MODE
-     *
-     * Individual borders are locked.
+     * COMBINED BORDER
      */
 
     if (combinedBorder) {
 
         if ($("poBorderCheck")) {
-            $("poBorderCheck").checked =
-                false;
+            $("poBorderCheck")
+                .checked = false;
         }
 
         if ($("boxBorderCheck")) {
-            $("boxBorderCheck").checked =
-                false;
+            $("boxBorderCheck")
+                .checked = false;
         }
 
-        setLocked(
+
+        setFeatureLocked(
             "poBorderCheck",
             true
         );
 
-        setLocked(
+        setFeatureLocked(
             "boxBorderCheck",
             true
         );
 
-        if (announce) {
-
-            showToast(
-                "Combined Border enabled.",
-                "success"
-            );
-
-        }
-
     } else {
 
-        setLocked(
+        setFeatureLocked(
             "poBorderCheck",
             false
         );
 
-        setLocked(
+        setFeatureLocked(
             "boxBorderCheck",
             false
         );
 
     }
+
 }
 
 
 /* =========================================================
-   FEATURE EVENTS
+   FEATURE NAMES
 ========================================================= */
 
-function readableName(id) {
+function featureName(id) {
 
     const names = {
 
@@ -1229,103 +1678,142 @@ function readableName(id) {
 
     };
 
-    return names[id] || "Function";
+
+    return (
+        names[id] ||
+        "Function"
+    );
+
 }
 
+
+/* =========================================================
+   FEATURE EVENTS
+========================================================= */
 
 function initFeatureCheckboxes() {
 
     const ids = [
 
         "poNumberCheck",
+
         "boxNumberCheck",
+
         "poPlusBoxCheck",
 
         "combinedBorderCheck",
+
         "poBorderCheck",
+
         "boxBorderCheck",
 
         "cutLineCheck",
+
         "pageBorderCheck",
 
         "samePOPageFlow",
+
         "halfPageFlowCheck",
 
         "poBoldCheck",
+
         "poItalicCheck",
+
         "poUnderlineCheck",
 
         "boxBoldCheck",
+
         "boxItalicCheck",
+
         "boxUnderlineCheck",
 
         "fromBold",
+
         "fromItalic",
+
         "fromUnderline",
+
         "fromBorder",
 
         "toBold",
+
         "toItalic",
+
         "toUnderline",
+
         "toBorder"
 
     ];
 
 
-    ids.forEach(id => {
+    ids.forEach(
+        id => {
 
-        $(id)?.addEventListener(
-            "change",
-            () => {
+            $(id)?.addEventListener(
+                "change",
+                () => {
 
-                const isChecked =
-                    checked(id);
+                    const enabled =
+                        isChecked(id);
 
-                showToast(
-                    `${readableName(id)} ${isChecked ? "enabled" : "disabled"}.`,
-                    isChecked
-                        ? "success"
-                        : "error"
-                );
 
-                if (
-                    id ===
-                    "poPlusBoxCheck"
-                ) {
+                    /*
+                     * User explicitly requested:
+                     *
+                     * ENABLE  = GREEN
+                     * DISABLE = RED
+                     */
 
-                    applyFeatureRules(
-                        false
+                    showToast(
+
+                        `${featureName(id)} ${enabled ? "enabled" : "disabled"}.`,
+
+                        enabled
+                            ? "success"
+                            : "error"
+
                     );
 
+
+                    if (
+                        id ===
+                        "poPlusBoxCheck"
+                    ) {
+
+                        applyFeatureRules();
+
+                    }
+
+
+                    if (
+                        id ===
+                        "combinedBorderCheck"
+                    ) {
+
+                        applyFeatureRules();
+
+                    }
+
+
+                    updateLivePreview();
+
                 }
+            );
 
-                if (
-                    id ===
-                    "combinedBorderCheck"
-                ) {
+        }
+    );
 
-                    applyFeatureRules(
-                        false
-                    );
 
-                }
+    applyFeatureRules();
 
-                updateLivePreview();
-
-            }
-        );
-
-    });
-
-    applyFeatureRules(false);
 }
 
 
 /* =========================================================
-   FONT STYLE
+   FONT HELPERS
 ========================================================= */
 
-function getFont(
+function getFontSettings(
     familyId,
     sizeId,
     boldId,
@@ -1336,63 +1824,72 @@ function getFont(
     return {
 
         family:
-            value(
+            getValue(
                 familyId,
                 "Arial"
             ),
 
         size:
-            numberValue(
+            getNumber(
                 sizeId,
                 20
             ),
 
         bold:
-            checked(
+            isChecked(
                 boldId
             ),
 
         italic:
-            checked(
+            isChecked(
                 italicId
             ),
 
         underline:
-            checked(
+            isChecked(
                 underlineId
             )
 
     };
+
 }
 
 
-function applyFont(
+function applyPreviewFont(
     element,
     font
 ) {
 
-    if (!element) return;
+    if (!element) {
+        return;
+    }
+
 
     element.style.fontFamily =
         `"${font.family}"`;
 
+
     element.style.fontSize =
         `${font.size}px`;
+
 
     element.style.fontWeight =
         font.bold
             ? "700"
             : "400";
 
+
     element.style.fontStyle =
         font.italic
             ? "italic"
             : "normal";
 
+
     element.style.textDecoration =
         font.underline
             ? "underline"
             : "none";
+
 }
 
 
@@ -1405,22 +1902,28 @@ function updatePreviewPage() {
     const page =
         $("previewPage");
 
-    if (!page) return;
+    if (!page) {
+        return;
+    }
+
 
     const dimensions =
         applyOrientation(
 
             getPageSize(
-                value(
+
+                getValue(
                     "pageSize",
                     "4x6"
                 ),
 
                 "customWidth",
+
                 "customHeight"
+
             ),
 
-            value(
+            getValue(
                 "orientation",
                 "portrait"
             )
@@ -1449,7 +1952,7 @@ function updatePreviewPage() {
         width =
             Math.min(
                 maxWidth,
-                dimensions.width * 2.7
+                dimensions.width * 2.8
             );
 
         height =
@@ -1460,7 +1963,7 @@ function updatePreviewPage() {
         height =
             Math.min(
                 maxHeight,
-                dimensions.height * 2.7
+                dimensions.height * 2.8
             );
 
         width =
@@ -1470,16 +1973,24 @@ function updatePreviewPage() {
 
 
     page.style.width =
-        `${Math.max(100, width)}px`;
+        `${Math.max(
+            90,
+            width
+        )}px`;
+
 
     page.style.height =
-        `${Math.max(100, height)}px`;
+        `${Math.max(
+            90,
+            height
+        )}px`;
 
 
     const pageBorder =
-        checked(
+        isChecked(
             "pageBorderCheck"
         );
+
 
     page.style.border =
         pageBorder
@@ -1487,37 +1998,71 @@ function updatePreviewPage() {
             : "1px solid #cbd5e1";
 
 
-    const info =
+    const sizeText =
         $("previewPageSize");
 
-    if (info) {
 
-        const size =
-            value(
+    if (sizeText) {
+
+        const selected =
+            getValue(
                 "pageSize",
                 "4x6"
             );
 
-        if (size === "70x35") {
-            info.textContent =
+
+        const orientation =
+            getValue(
+                "orientation",
+                "portrait"
+            );
+
+
+        let text;
+
+
+        if (
+            selected ===
+            "70x35"
+        ) {
+
+            text =
                 "70 × 35 mm";
-        } else if (size === "a4") {
-            info.textContent =
+
+        } else if (
+            selected ===
+            "a4"
+        ) {
+
+            text =
                 "A4";
-        } else if (size === "custom") {
-            info.textContent =
-                "Custom Size";
+
+        } else if (
+            selected ===
+            "custom"
+        ) {
+
+            text =
+                `${dimensions.width.toFixed(1)} × ${dimensions.height.toFixed(1)} mm`;
+
         } else {
-            info.textContent =
+
+            text =
                 "4 × 6 Inches";
+
         }
 
+
+        sizeText.textContent =
+            `${text} • ${orientation}`;
+
     }
+
 }
 
 
 /* =========================================================
-   CRITICAL PO PREVIEW
+   LIVE PO PREVIEW
 ========================================================= */
 
 function updatePOPreview() {
@@ -1531,85 +2076,88 @@ function updatePOPreview() {
     const label =
         $("previewLabel");
 
+
     if (
         !poElement ||
         !boxElement ||
         !label
     ) {
+
         return;
+
     }
 
 
-    const poList =
+    const poValues =
         getCocoPOValues();
 
 
     /*
      * IMPORTANT:
      *
-     * PO VALUE ONLY.
+     * Only actual PO value.
      *
-     * NO "PO NUMBER" prefix.
-     *
-     * Example:
-     * ABC123
-     *
-     * NOT:
-     * PO NUMBER ABC123
+     * NO "PO NUMBER".
      */
 
     const po =
-        poList[0] ||
+        poValues[0] ||
         "ABC123";
 
 
     const box =
-        numberValue(
+        getNumber(
             "startBoxNumber",
             1
         );
 
 
     const poEnabled =
-        checked(
+        isChecked(
             "poNumberCheck",
             true
         );
 
+
     const boxEnabled =
-        checked(
+        isChecked(
             "boxNumberCheck",
             true
         );
 
+
     const poPlusBox =
-        checked(
+        isChecked(
             "poPlusBoxCheck"
         );
 
+
     const combinedBorder =
-        checked(
+        isChecked(
             "combinedBorderCheck"
         );
 
+
     const poBorder =
-        checked(
+        isChecked(
             "poBorderCheck"
         );
 
+
     const boxBorder =
-        checked(
+        isChecked(
             "boxBorderCheck"
         );
 
+
     const cutLine =
-        checked(
+        isChecked(
             "cutLineCheck"
         );
 
 
     /*
-     * PO text
+     * ACTUAL PO VALUE
      */
 
     poElement.textContent =
@@ -1617,11 +2165,7 @@ function updatePOPreview() {
 
 
     /*
-     * BOX text
-     *
-     * Exact format:
-     *
-     * BOX NO. 123
+     * BOX FORMAT
      */
 
     boxElement.textContent =
@@ -1647,6 +2191,7 @@ function updatePOPreview() {
                 ? "block"
                 : "none";
 
+
         boxElement.style.display =
             boxEnabled
                 ? "block"
@@ -1656,7 +2201,23 @@ function updatePOPreview() {
 
 
     /*
-     * Combined border
+     * Always vertical:
+     *
+     * PO
+     *
+     * BOX NO. 123
+     */
+
+    label.style.flexDirection =
+        "column";
+
+
+    label.style.gap =
+        "10px";
+
+
+    /*
+     * Borders
      */
 
     label.classList.toggle(
@@ -1665,15 +2226,12 @@ function updatePOPreview() {
     );
 
 
-    /*
-     * Individual borders
-     */
-
     poElement.classList.toggle(
         "with-border",
         poBorder &&
         !combinedBorder
     );
+
 
     boxElement.classList.toggle(
         "with-border",
@@ -1693,53 +2251,50 @@ function updatePOPreview() {
 
 
     /*
-     * ALWAYS STACK:
-     *
-     * PO
-     * BOX NO. 123
-     *
-     * vertically.
+     * Fonts
      */
 
-    label.style.flexDirection =
-        "column";
+    applyPreviewFont(
 
-    label.style.gap =
-        "10px";
-
-
-    /*
-     * PO font
-     */
-
-    applyFont(
         poElement,
 
-        getFont(
+        getFontSettings(
+
             "poFontFamily",
+
             "poFontSize",
+
             "poBoldCheck",
+
             "poItalicCheck",
+
             "poUnderlineCheck"
+
         )
+
     );
 
 
-    /*
-     * BOX font
-     */
+    applyPreviewFont(
 
-    applyFont(
         boxElement,
 
-        getFont(
+        getFontSettings(
+
             "boxFontFamily",
+
             "boxFontSize",
+
             "boxBoldCheck",
+
             "boxItalicCheck",
+
             "boxUnderlineCheck"
+
         )
+
     );
+
 }
 
 
@@ -1752,6 +2307,7 @@ function updateLivePreview() {
     updatePreviewPage();
 
     updatePOPreview();
+
 }
 
 
@@ -1761,22 +2317,24 @@ function updateLivePreview() {
 
 function initISBN() {
 
-    const inputs = [
+    [
         "isbnValue",
         "isbnBookTitle",
         "isbnEdition"
-    ];
+    ].forEach(
+        id => {
 
-    inputs.forEach(id => {
+            $(id)?.addEventListener(
+                "input",
+                generateISBNBarcode
+            );
 
-        $(id)?.addEventListener(
-            "input",
-            generateISBNBarcode
-        );
+        }
+    );
 
-    });
 
     generateISBNBarcode();
+
 }
 
 
@@ -1785,43 +2343,51 @@ function generateISBNBarcode() {
     const svg =
         $("isbnBarcodeSvg");
 
-    const text =
-        value(
-            "isbnValue"
-        );
-
-
-    if (!svg) return;
-
-    svg.innerHTML = "";
-
-
-    if (!text) {
-
-        $("isbnBarcodeText")
-            && (
-                $("isbnBarcodeText")
-                    .textContent =
-                    "Enter ISBN to preview"
-            );
-
+    if (!svg) {
         return;
     }
 
 
-    if (
-        typeof JsBarcode ===
-        "undefined"
-    ) {
+    svg.innerHTML =
+        "";
 
-        $("isbnBarcodeText")
-            && (
-                $("isbnBarcodeText")
-                    .textContent =
-                    "Barcode library not loaded."
-            );
+
+    const text =
+        getValue(
+            "isbnValue"
+        );
+
+
+    if (!text) {
+
+        if ($("isbnBarcodeText")) {
+
+            $("isbnBarcodeText")
+                .textContent =
+                "Enter ISBN to preview";
+
+        }
 
         return;
+
+    }
+
+
+    if (
+        typeof window.JsBarcode !==
+        "function"
+    ) {
+
+        if ($("isbnBarcodeText")) {
+
+            $("isbnBarcodeText")
+                .textContent =
+                "Barcode library not loaded.";
+
+        }
+
+        return;
+
     }
 
 
@@ -1831,15 +2397,27 @@ function generateISBNBarcode() {
             svg,
             text,
             {
-                format: "EAN13",
-                displayValue: true,
-                width: 2,
-                height: 70,
-                margin: 10
+
+                format:
+                    "EAN13",
+
+                displayValue:
+                    true,
+
+                width:
+                    2,
+
+                height:
+                    70,
+
+                margin:
+                    10
+
             }
         );
 
-    } catch {
+
+    } catch (error) {
 
         try {
 
@@ -1847,34 +2425,47 @@ function generateISBNBarcode() {
                 svg,
                 text,
                 {
-                    format: "CODE128",
-                    displayValue: true,
-                    width: 2,
-                    height: 70,
-                    margin: 10
+
+                    format:
+                        "CODE128",
+
+                    displayValue:
+                        true,
+
+                    width:
+                        2,
+
+                    height:
+                        70,
+
+                    margin:
+                        10
+
                 }
             );
 
         } catch {
 
-            $("isbnBarcodeText")
-                && (
-                    $("isbnBarcodeText")
-                        .textContent =
-                        "Invalid barcode value."
-                );
+            if ($("isbnBarcodeText")) {
+
+                $("isbnBarcodeText")
+                    .textContent =
+                    "Invalid barcode value.";
+
+            }
 
         }
 
     }
+
 }
 
 
 /* =========================================================
-   QR CODE
+   QR GENERATOR
 ========================================================= */
 
-function createQR(
+function createQRCode(
     elementId,
     text
 ) {
@@ -1882,35 +2473,61 @@ function createQR(
     const container =
         $(elementId);
 
-    if (!container) return;
+    if (!container) {
+        return;
+    }
 
-    container.innerHTML = "";
+
+    container.innerHTML =
+        "";
+
 
     if (
-        typeof QRCode ===
-        "undefined"
+        typeof window.QRCode !==
+        "object" &&
+        typeof window.QRCode !==
+        "function"
     ) {
 
         container.textContent =
             "QR library not loaded.";
 
         return;
+
     }
 
 
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
+
+
     QRCode.toCanvas(
+
+        canvas,
+
         text,
+
         {
-            width: 170,
-            margin: 2,
-            errorCorrectionLevel: "M"
+
+            width:
+                170,
+
+            margin:
+                2,
+
+            errorCorrectionLevel:
+                "M"
+
         },
+
         error => {
 
             if (error) {
 
                 console.error(
-                    "QR error:",
+                    "QR Error:",
                     error
                 );
 
@@ -1918,56 +2535,52 @@ function createQR(
                     "QR generation failed.";
 
                 return;
+
             }
 
-        }
-    );
 
-
-    /*
-     * qrcode library can return canvas
-     * only through callback depending
-     * on version.
-     */
-
-    QRCode.toCanvas(
-        document.createElement("canvas"),
-        text,
-        {
-            width: 170,
-            margin: 2
-        },
-        (error, canvas) => {
-
-            if (error) return;
-
-            container.innerHTML = "";
+            container.innerHTML =
+                "";
 
             container.appendChild(
                 canvas
             );
 
         }
-    );
-}
 
-
-function initQRCodes() {
-
-    createQR(
-        "addressQRPreview",
-        "https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
     );
 
-    createQR(
-        "emailQRPreview",
-        "mailto:ashish.verma@bookswagon.in"
-    );
 }
 
 
 /* =========================================================
-   PDF HELPERS
+   QR INIT
+========================================================= */
+
+function initQRCodes() {
+
+    createQRCode(
+
+        "addressQRPreview",
+
+        "https://maps.google.com/"
+
+    );
+
+
+    createQRCode(
+
+        "emailQRPreview",
+
+        "mailto:ashish.verma@bookswagon.in"
+
+    );
+
+}
+
+
+/* =========================================================
+   PDF DIMENSIONS
 ========================================================= */
 
 function getPDFDimensions(
@@ -1977,41 +2590,51 @@ function getPDFDimensions(
     heightId
 ) {
 
-    let dimensions =
+    return applyOrientation(
+
         getPageSize(
             size,
             widthId,
             heightId
-        );
+        ),
 
-    dimensions =
-        applyOrientation(
-            dimensions,
-            orientation
-        );
+        orientation
 
-    return dimensions;
+    );
+
 }
 
 
-function getPDFStyle(font) {
+/* =========================================================
+   PDF FONT STYLE
+========================================================= */
+
+function getPDFFontStyle(
+    font
+) {
 
     if (
         font.bold &&
         font.italic
     ) {
+
         return "bolditalic";
+
     }
+
 
     if (font.bold) {
         return "bold";
     }
 
+
     if (font.italic) {
         return "italic";
     }
 
+
     return "normal";
+
 }
 
 
@@ -2030,45 +2653,51 @@ function drawCocoLabel(
 ) {
 
     const poEnabled =
-        checked(
+        isChecked(
             "poNumberCheck",
             true
         );
 
+
     const boxEnabled =
-        checked(
+        isChecked(
             "boxNumberCheck",
             true
         );
 
+
     const poPlusBox =
-        checked(
+        isChecked(
             "poPlusBoxCheck"
         );
 
+
     const combinedBorder =
-        checked(
+        isChecked(
             "combinedBorderCheck"
         );
 
+
     const poBorder =
-        checked(
+        isChecked(
             "poBorderCheck"
         );
 
+
     const boxBorder =
-        checked(
+        isChecked(
             "boxBorderCheck"
         );
 
+
     const cutLine =
-        checked(
+        isChecked(
             "cutLineCheck"
         );
 
 
     /*
-     * Label border
+     * Combined border
      */
 
     if (combinedBorder) {
@@ -2080,7 +2709,7 @@ function drawCocoLabel(
         );
 
         doc.setLineWidth(
-            .7
+            0.7
         );
 
         doc.rect(
@@ -2092,6 +2721,10 @@ function drawCocoLabel(
 
     }
 
+
+    /*
+     * Cut line
+     */
 
     if (cutLine) {
 
@@ -2125,50 +2758,61 @@ function drawCocoLabel(
         poPlusBox ||
         poEnabled;
 
+
     const showBox =
         poPlusBox ||
         boxEnabled;
 
 
     let centerY =
-        y + height / 2;
+        y +
+        height / 2;
 
 
     if (
         showPO &&
         showBox
     ) {
+
         centerY -= 7;
+
     }
 
 
     /*
      * PO
      *
-     * ONLY ACTUAL PO VALUE.
+     * ONLY ACTUAL VALUE.
      */
 
     if (showPO) {
 
-        const poFont =
-            getFont(
+        const font =
+            getFontSettings(
+
                 "poFontFamily",
+
                 "poFontSize",
+
                 "poBoldCheck",
+
                 "poItalicCheck",
+
                 "poUnderlineCheck"
+
             );
 
 
         doc.setFont(
-            poFont.family,
-            getPDFStyle(
-                poFont
+            font.family,
+            getPDFFontStyle(
+                font
             )
         );
 
+
         doc.setFontSize(
-            poFont.size
+            font.size
         );
 
 
@@ -2181,10 +2825,12 @@ function drawCocoLabel(
 
         doc.text(
             lines,
-            x + width / 2,
+            x +
+                width / 2,
             centerY,
             {
-                align: "center"
+                align:
+                    "center"
             }
         );
 
@@ -2196,52 +2842,60 @@ function drawCocoLabel(
 
             doc.rect(
                 x + 4,
+
                 centerY -
-                    poFont.size / 2 -
+                    font.size / 2 -
                     2,
 
                 width - 8,
 
-                poFont.size + 5
+                font.size + 5
             );
 
         }
 
 
         centerY +=
-            poFont.size + 10;
+            font.size +
+            10;
+
     }
 
 
     /*
      * BOX
      *
-     * EXACT FORMAT:
-     *
      * BOX NO. 123
      */
 
     if (showBox) {
 
-        const boxFont =
-            getFont(
+        const font =
+            getFontSettings(
+
                 "boxFontFamily",
+
                 "boxFontSize",
+
                 "boxBoldCheck",
+
                 "boxItalicCheck",
+
                 "boxUnderlineCheck"
+
             );
 
 
         doc.setFont(
-            boxFont.family,
-            getPDFStyle(
-                boxFont
+            font.family,
+            getPDFFontStyle(
+                font
             )
         );
 
+
         doc.setFontSize(
-            boxFont.size
+            font.size
         );
 
 
@@ -2251,10 +2905,15 @@ function drawCocoLabel(
 
         doc.text(
             boxText,
-            x + width / 2,
+
+            x +
+                width / 2,
+
             centerY,
+
             {
-                align: "center"
+                align:
+                    "center"
             }
         );
 
@@ -2265,18 +2924,23 @@ function drawCocoLabel(
         ) {
 
             doc.rect(
+
                 x + 4,
+
                 centerY -
-                    boxFont.size / 2 -
+                    font.size / 2 -
                     2,
 
                 width - 8,
 
-                boxFont.size + 5
+                font.size + 5
+
             );
 
         }
+
     }
+
 }
 
 
@@ -2286,48 +2950,44 @@ function drawCocoLabel(
 
 function generateCocoPDF() {
 
-    if (
-        typeof window.jspdf ===
-        "undefined"
-    ) {
+    /*
+     * IMPORTANT:
+     *
+     * Correct jsPDF access:
+     *
+     * window.jspdf.jsPDF
+     */
 
-        showToast(
-            "PDF library is not loaded.",
-            "error"
-        );
-
+    if (!checkPDFLibrary()) {
         return;
     }
 
 
-    const {
-        jsPDF
-    } = window.jspdf;
-
-
-    const size =
-        value(
-            "pageSize",
-            "4x6"
-        );
-
-    const orientation =
-        value(
-            "orientation",
-            "portrait"
-        );
+    const jsPDF =
+        getJsPDF();
 
 
     const dimensions =
         getPDFDimensions(
-            size,
-            orientation,
+
+            getValue(
+                "pageSize",
+                "4x6"
+            ),
+
+            getValue(
+                "orientation",
+                "portrait"
+            ),
+
             "customWidth",
+
             "customHeight"
+
         );
 
 
-    const pdfOrientation =
+    const orientation =
         dimensions.width >
         dimensions.height
             ? "landscape"
@@ -2338,7 +2998,7 @@ function generateCocoPDF() {
         new jsPDF({
 
             orientation:
-                pdfOrientation,
+                orientation,
 
             unit:
                 "mm",
@@ -2351,25 +3011,28 @@ function generateCocoPDF() {
         });
 
 
-    const poValues =
+    let poValues =
         getCocoPOValues();
 
 
     /*
-     * If user has not entered a PO,
-     * keep one preview/label.
+     * If nothing is entered,
+     * keep a useful preview/sample.
      */
 
-    const pos =
-        poValues.length
-            ? poValues
-            : ["ABC123"];
+    if (!poValues.length) {
+
+        poValues = [
+            "ABC123"
+        ];
+
+    }
 
 
     const startBox =
         Math.max(
             1,
-            numberValue(
+            getNumber(
                 "startBoxNumber",
                 1
             )
@@ -2379,7 +3042,7 @@ function generateCocoPDF() {
     const endBox =
         Math.max(
             startBox,
-            numberValue(
+            getNumber(
                 "endBoxNumber",
                 startBox
             )
@@ -2389,7 +3052,7 @@ function generateCocoPDF() {
     const repeat =
         Math.max(
             1,
-            numberValue(
+            getNumber(
                 "boxRepeatCount",
                 1
             )
@@ -2399,7 +3062,7 @@ function generateCocoPDF() {
     const labelsPerPage =
         Math.max(
             1,
-            numberValue(
+            getNumber(
                 "labelsPerPage",
                 2
             )
@@ -2409,7 +3072,7 @@ function generateCocoPDF() {
     const gap =
         Math.max(
             1,
-            numberValue(
+            getNumber(
                 "labelGap",
                 2
             )
@@ -2419,37 +3082,49 @@ function generateCocoPDF() {
     const labels = [];
 
 
-    pos.forEach(po => {
-
-        for (
-            let r = 0;
-            r < repeat;
-            r++
-        ) {
+    poValues.forEach(
+        po => {
 
             for (
-                let box = startBox;
-                box <= endBox;
-                box++
+                let repeatIndex = 0;
+                repeatIndex < repeat;
+                repeatIndex++
             ) {
 
-                labels.push({
-                    po,
-                    box
-                });
+                for (
+                    let box = startBox;
+                    box <= endBox;
+                    box++
+                ) {
+
+                    labels.push({
+
+                        po:
+                            po,
+
+                        box:
+                            box
+
+                    });
+
+                }
 
             }
 
         }
-
-    });
+    );
 
 
     if (!labels.length) {
 
         labels.push({
-            po: "ABC123",
-            box: startBox
+
+            po:
+                "ABC123",
+
+            box:
+                startBox
+
         });
 
     }
@@ -2457,18 +3132,27 @@ function generateCocoPDF() {
 
     for (
         let pageStart = 0;
-        pageStart < labels.length;
-        pageStart += labelsPerPage
+
+        pageStart <
+        labels.length;
+
+        pageStart +=
+            labelsPerPage
+
     ) {
+
 
         if (pageStart > 0) {
 
             doc.addPage(
+
                 [
                     dimensions.width,
                     dimensions.height
                 ],
-                pdfOrientation
+
+                orientation
+
             );
 
         }
@@ -2476,10 +3160,41 @@ function generateCocoPDF() {
 
         const pageLabels =
             labels.slice(
+
                 pageStart,
+
                 pageStart +
-                labelsPerPage
+                    labelsPerPage
+
             );
+
+
+        const pageBorder =
+            isChecked(
+                "pageBorderCheck"
+            );
+
+
+        if (pageBorder) {
+
+            doc.setDrawColor(
+                17,
+                24,
+                39
+            );
+
+            doc.setLineWidth(
+                0.6
+            );
+
+            doc.rect(
+                2,
+                2,
+                dimensions.width - 4,
+                dimensions.height - 4
+            );
+
+        }
 
 
         const totalGap =
@@ -2497,39 +3212,15 @@ function generateCocoPDF() {
             pageLabels.length;
 
 
-        const pageBorder =
-            checked(
-                "pageBorderCheck"
-            );
-
-
-        if (pageBorder) {
-
-            doc.setDrawColor(
-                17,
-                24,
-                39
-            );
-
-            doc.setLineWidth(
-                .6
-            );
-
-            doc.rect(
-                2,
-                2,
-                dimensions.width - 4,
-                dimensions.height - 4
-            );
-
-        }
-
-
         pageLabels.forEach(
-            (item, index) => {
+            (
+                item,
+                index
+            ) => {
 
                 const x =
                     gap;
+
 
                 const y =
                     gap +
@@ -2546,13 +3237,21 @@ function generateCocoPDF() {
 
 
                 drawCocoLabel(
+
                     doc,
+
                     x,
+
                     y,
+
                     width,
+
                     labelHeight,
+
                     item.po,
+
                     item.box
+
                 );
 
             }
@@ -2570,6 +3269,7 @@ function generateCocoPDF() {
         "Coco Blue PDF generated successfully.",
         "success"
     );
+
 }
 
 
@@ -2579,39 +3279,32 @@ function generateCocoPDF() {
 
 function generateOtherPDF() {
 
-    if (
-        typeof window.jspdf ===
-        "undefined"
-    ) {
-
-        showToast(
-            "PDF library is not loaded.",
-            "error"
-        );
-
+    if (!checkPDFLibrary()) {
         return;
     }
 
 
-    const {
-        jsPDF
-    } = window.jspdf;
+    const jsPDF =
+        getJsPDF();
 
 
     const dimensions =
         getPDFDimensions(
-            value(
+
+            getValue(
                 "otherPageSize",
                 "4x6"
             ),
 
-            value(
+            getValue(
                 "otherOrientation",
                 "portrait"
             ),
 
             "otherCustomWidth",
+
             "otherCustomHeight"
+
         );
 
 
@@ -2627,7 +3320,8 @@ function generateOtherPDF() {
 
             orientation,
 
-            unit: "mm",
+            unit:
+                "mm",
 
             format: [
                 dimensions.width,
@@ -2637,27 +3331,30 @@ function generateOtherPDF() {
         });
 
 
-    const pos =
+    const values =
         getOtherPOValues();
 
 
-    const list =
-        pos.length
-            ? pos
+    const poValues =
+        values.length
+            ? values
             : ["ABC123"];
 
 
-    list.forEach(
+    poValues.forEach(
         (po, index) => {
 
             if (index > 0) {
 
                 doc.addPage(
+
                     [
                         dimensions.width,
                         dimensions.height
                     ],
+
                     orientation
+
                 );
 
             }
@@ -2668,18 +3365,25 @@ function generateOtherPDF() {
                 "bold"
             );
 
+
             doc.setFontSize(
                 26
             );
 
 
             doc.text(
+
                 String(po),
+
                 dimensions.width / 2,
+
                 dimensions.height / 2,
+
                 {
-                    align: "center"
+                    align:
+                        "center"
                 }
+
             );
 
         }
@@ -2695,6 +3399,7 @@ function generateOtherPDF() {
         "Other PO PDF generated successfully.",
         "success"
     );
+
 }
 
 
@@ -2704,39 +3409,32 @@ function generateOtherPDF() {
 
 function generateISBNPDF() {
 
-    if (
-        typeof window.jspdf ===
-        "undefined"
-    ) {
-
-        showToast(
-            "PDF library is not loaded.",
-            "error"
-        );
-
+    if (!checkPDFLibrary()) {
         return;
     }
 
 
-    const {
-        jsPDF
-    } = window.jspdf;
+    const jsPDF =
+        getJsPDF();
 
 
     const dimensions =
         getPDFDimensions(
-            value(
+
+            getValue(
                 "isbnPageSize",
                 "4x6"
             ),
 
-            value(
+            getValue(
                 "isbnOrientation",
                 "portrait"
             ),
 
             "isbnCustomWidth",
+
             "isbnCustomHeight"
+
         );
 
 
@@ -2752,7 +3450,8 @@ function generateISBNPDF() {
 
             orientation,
 
-            unit: "mm",
+            unit:
+                "mm",
 
             format: [
                 dimensions.width,
@@ -2763,21 +3462,21 @@ function generateISBNPDF() {
 
 
     const isbn =
-        value(
+        getValue(
             "isbnValue",
             "ISBN"
         );
 
 
     const title =
-        value(
+        getValue(
             "isbnBookTitle",
             "ISBN BARCODE"
         );
 
 
     const edition =
-        value(
+        getValue(
             "isbnEdition"
         );
 
@@ -2787,18 +3486,25 @@ function generateISBNPDF() {
         "bold"
     );
 
+
     doc.setFontSize(
         18
     );
 
 
     doc.text(
+
         title,
+
         dimensions.width / 2,
+
         20,
+
         {
-            align: "center"
+            align:
+                "center"
         }
+
     );
 
 
@@ -2807,42 +3513,62 @@ function generateISBNPDF() {
         "normal"
     );
 
+
     doc.setFontSize(
         11
     );
 
 
     doc.text(
+
         isbn,
+
         dimensions.width / 2,
+
         28,
+
         {
-            align: "center"
+            align:
+                "center"
         }
+
     );
 
 
     if (edition) {
 
         doc.text(
+
             edition,
+
             dimensions.width / 2,
+
             35,
+
             {
-                align: "center"
+                align:
+                    "center"
             }
+
         );
 
     }
 
 
     drawSimpleBarcode(
+
         doc,
+
         isbn,
+
         10,
+
         dimensions.height / 2,
+
         dimensions.width - 20,
+
         30
+
     );
 
 
@@ -2855,11 +3581,12 @@ function generateISBNPDF() {
         "ISBN PDF generated successfully.",
         "success"
     );
+
 }
 
 
 /* =========================================================
-   SIMPLE BARCODE FALLBACK
+   SIMPLE PDF BARCODE
 ========================================================= */
 
 function drawSimpleBarcode(
@@ -2871,15 +3598,17 @@ function drawSimpleBarcode(
     height
 ) {
 
-    const string =
-        String(text);
+    const value =
+        String(
+            text
+        );
 
 
     const unit =
         width /
         Math.max(
             1,
-            string.length * 11
+            value.length * 12
         );
 
 
@@ -2887,55 +3616,69 @@ function drawSimpleBarcode(
         x;
 
 
-    string.split("")
-        .forEach(char => {
+    value.split("")
+        .forEach(
+            char => {
 
-            const code =
-                char.charCodeAt(0);
+                const code =
+                    char.charCodeAt(0);
 
 
-            for (
-                let bit = 0;
-                bit < 8;
-                bit++
-            ) {
-
-                if (
-                    (code >> bit) & 1
+                for (
+                    let bit = 0;
+                    bit < 8;
+                    bit++
                 ) {
 
-                    doc.setFillColor(
-                        0,
-                        0,
-                        0
-                    );
+                    if (
+                        (code >> bit) &
+                        1
+                    ) {
 
-                    doc.rect(
-                        cursor,
-                        y,
-                        Math.max(
-                            .25,
-                            unit
-                        ),
-                        height,
-                        "F"
-                    );
+                        doc.setFillColor(
+                            0,
+                            0,
+                            0
+                        );
+
+
+                        doc.rect(
+
+                            cursor,
+
+                            y,
+
+                            Math.max(
+                                0.25,
+                                unit
+                            ),
+
+                            height,
+
+                            "F"
+
+                        );
+
+                    }
+
+
+                    cursor +=
+                        unit;
 
                 }
 
-                cursor += unit;
+
+                cursor +=
+                    unit * 3;
 
             }
-
-            cursor +=
-                unit * 3;
-
-        });
+        );
 
 
     doc.setFontSize(
         8
     );
+
 
     doc.setTextColor(
         0,
@@ -2943,14 +3686,25 @@ function drawSimpleBarcode(
         0
     );
 
+
     doc.text(
-        string,
-        x + width / 2,
-        y + height + 5,
+
+        value,
+
+        x +
+            width / 2,
+
+        y +
+            height +
+            5,
+
         {
-            align: "center"
+            align:
+                "center"
         }
+
     );
+
 }
 
 
@@ -2958,41 +3712,97 @@ function drawSimpleBarcode(
    ADDRESS PDF
 ========================================================= */
 
-function generateAddressPDF() {
+function getAddressValues() {
 
-    if (
-        typeof window.jspdf ===
-        "undefined"
-    ) {
-
-        showToast(
-            "PDF library is not loaded.",
-            "error"
+    let from =
+        getValue(
+            "addressFrom",
+            "FROM ADDRESS"
         );
 
+
+    let to =
+        getValue(
+            "addressTo",
+            "TO ADDRESS"
+        );
+
+
+    /*
+     * Excel:
+     *
+     * first row already removed.
+     */
+
+    if (
+        AppState.addressMode ===
+        "excel" &&
+
+        AppState.addressExcelRows.length
+    ) {
+
+        const row =
+            AppState.addressExcelRows[0];
+
+
+        if (
+            Array.isArray(row)
+        ) {
+
+            from =
+                String(
+                    row[0] ||
+                    from
+                );
+
+
+            to =
+                String(
+                    row[1] ||
+                    to
+                );
+
+        }
+
+    }
+
+
+    return {
+        from,
+        to
+    };
+
+}
+
+
+function generateAddressPDF() {
+
+    if (!checkPDFLibrary()) {
         return;
     }
 
 
-    const {
-        jsPDF
-    } = window.jspdf;
+    const jsPDF =
+        getJsPDF();
 
 
     const dimensions =
         getPDFDimensions(
-            value(
+
+            getValue(
                 "addressPageSize",
                 "4x6"
             ),
 
-            value(
+            getValue(
                 "addressOrientation",
                 "portrait"
             ),
 
             "addressCustomWidth",
+
             "addressCustomHeight"
+
         );
 
 
@@ -3008,7 +3818,8 @@ function generateAddressPDF() {
 
             orientation,
 
-            unit: "mm",
+            unit:
+                "mm",
 
             format: [
                 dimensions.width,
@@ -3018,138 +3829,135 @@ function generateAddressPDF() {
         });
 
 
-    let from =
-        value(
-            "addressFrom",
-            "FROM ADDRESS"
-        );
+    const addresses =
+        getAddressValues();
 
 
-    let to =
-        value(
-            "addressTo",
-            "TO ADDRESS"
-        );
+    const margin =
+        8;
+
+    const gap =
+        5;
 
 
-    /*
-     * Excel:
-     * FIRST ROW ALREADY REMOVED.
-     */
-
-    if (
-        AppState.addressMode ===
-        "excel" &&
-        AppState.addressExcelRows.length
-    ) {
-
-        const row =
-            AppState.addressExcelRows[0];
-
-
-        if (Array.isArray(row)) {
-
-            from =
-                String(
-                    row[0] ||
-                    from
-                );
-
-            to =
-                String(
-                    row[1] ||
-                    to
-                );
-
-        }
-
-    }
-
-
-    const margin = 8;
-    const gap = 5;
-
-    const width =
+    const boxWidth =
         (
             dimensions.width -
             margin * 2 -
             gap
         ) / 2;
 
-    const height =
+
+    const boxHeight =
         dimensions.height -
         margin * 2;
 
 
     drawAddressBox(
+
         doc,
-        from,
+
+        addresses.from,
+
         margin,
+
         margin,
-        width,
-        height,
+
+        boxWidth,
+
+        boxHeight,
+
         {
+
             family:
-                value(
+                getValue(
                     "fromFontFamily",
                     "Arial"
                 ),
 
             size:
-                numberValue(
+                getNumber(
                     "fromFontSize",
                     14
                 ),
 
             bold:
-                checked("fromBold"),
+                isChecked(
+                    "fromBold"
+                ),
 
             italic:
-                checked("fromItalic"),
+                isChecked(
+                    "fromItalic"
+                ),
 
             underline:
-                checked("fromUnderline"),
+                isChecked(
+                    "fromUnderline"
+                ),
 
             border:
-                checked("fromBorder")
+                isChecked(
+                    "fromBorder"
+                )
+
         }
+
     );
 
 
     drawAddressBox(
+
         doc,
-        to,
+
+        addresses.to,
+
         margin +
-            width +
+            boxWidth +
             gap,
+
         margin,
-        width,
-        height,
+
+        boxWidth,
+
+        boxHeight,
+
         {
+
             family:
-                value(
+                getValue(
                     "toFontFamily",
                     "Arial"
                 ),
 
             size:
-                numberValue(
+                getNumber(
                     "toFontSize",
                     14
                 ),
 
             bold:
-                checked("toBold"),
+                isChecked(
+                    "toBold"
+                ),
 
             italic:
-                checked("toItalic"),
+                isChecked(
+                    "toItalic"
+                ),
 
             underline:
-                checked("toUnderline"),
+                isChecked(
+                    "toUnderline"
+                ),
 
             border:
-                checked("toBorder")
+                isChecked(
+                    "toBorder"
+                )
+
         }
+
     );
 
 
@@ -3162,11 +3970,12 @@ function generateAddressPDF() {
         "Address PDF generated successfully.",
         "success"
     );
+
 }
 
 
 /* =========================================================
-   ADDRESS BOX
+   DRAW ADDRESS BOX
 ========================================================= */
 
 function drawAddressBox(
@@ -3185,6 +3994,10 @@ function drawAddressBox(
             17,
             24,
             39
+        );
+
+        doc.setLineWidth(
+            0.5
         );
 
         doc.rect(
@@ -3239,16 +4052,21 @@ function drawAddressBox(
 
     const lines =
         doc.splitTextToSize(
-            text,
+            String(text),
             width - 8
         );
 
 
     doc.text(
+
         lines,
+
         x + 4,
+
         y + 9
+
     );
+
 }
 
 
@@ -3265,105 +4083,132 @@ function resetCoco() {
     ) {
 
         if ($(`cocoPO${i}`)) {
-            $(`cocoPO${i}`).value = "";
+
+            $(`cocoPO${i}`)
+                .value = "";
+
         }
 
     }
 
 
     if ($("cocoMultiplePO")) {
-        $("cocoMultiplePO").value = "";
+
+        $("cocoMultiplePO")
+            .value = "";
+
     }
 
 
-    $("startBoxNumber")
-        && (
-            $("startBoxNumber").value =
-            "1"
-        );
+    if ($("startBoxNumber")) {
+
+        $("startBoxNumber")
+            .value = "1";
+
+    }
 
 
-    $("endBoxNumber")
-        && (
-            $("endBoxNumber").value =
-            "10"
-        );
+    if ($("endBoxNumber")) {
+
+        $("endBoxNumber")
+            .value = "10";
+
+    }
 
 
-    $("boxRepeatCount")
-        && (
-            $("boxRepeatCount").value =
-            "1"
-        );
+    if ($("boxRepeatCount")) {
+
+        $("boxRepeatCount")
+            .value = "1";
+
+    }
 
 
-    $("labelsPerPage")
-        && (
-            $("labelsPerPage").value =
-            "2"
-        );
+    if ($("labelsPerPage")) {
+
+        $("labelsPerPage")
+            .value = "2";
+
+    }
 
 
-    $("pageSize")
-        && (
-            $("pageSize").value =
-            "4x6"
-        );
+    if ($("pageSize")) {
+
+        $("pageSize")
+            .value = "4x6";
+
+    }
 
 
-    $("orientation")
-        && (
-            $("orientation").value =
-            "portrait"
-        );
+    if ($("orientation")) {
+
+        $("orientation")
+            .value = "portrait";
+
+    }
 
 
     const defaults = {
 
-        poNumberCheck: true,
+        poNumberCheck:
+            true,
 
-        boxNumberCheck: true,
+        boxNumberCheck:
+            true,
 
-        poPlusBoxCheck: false,
+        poPlusBoxCheck:
+            false,
 
-        combinedBorderCheck: false,
+        combinedBorderCheck:
+            false,
 
-        poBorderCheck: false,
+        poBorderCheck:
+            false,
 
-        boxBorderCheck: false,
+        boxBorderCheck:
+            false,
 
-        cutLineCheck: false,
+        cutLineCheck:
+            false,
 
-        pageBorderCheck: false,
+        pageBorderCheck:
+            false,
 
-        samePOPageFlow: false,
+        samePOPageFlow:
+            false,
 
-        halfPageFlowCheck: false
+        halfPageFlowCheck:
+            false
 
     };
 
 
-    Object.entries(defaults)
-        .forEach(
-            ([id, state]) => {
+    Object.entries(
+        defaults
+    ).forEach(
+        ([id, state]) => {
 
-                if ($(id)) {
-                    $(id).checked =
-                        state;
-                }
+            if ($(id)) {
+
+                $(id).checked =
+                    state;
 
             }
-        );
+
+        }
+    );
 
 
-    applyFeatureRules(false);
+    applyFeatureRules();
 
     updateLivePreview();
+
 
     showToast(
         "Coco Blue reset successfully.",
         "success"
     );
+
 }
 
 
@@ -3380,14 +4225,20 @@ function resetOther() {
     ) {
 
         if ($(`otherPO${i}`)) {
-            $(`otherPO${i}`).value = "";
+
+            $(`otherPO${i}`)
+                .value = "";
+
         }
 
     }
 
 
     if ($("otherMultiplePO")) {
-        $("otherMultiplePO").value = "";
+
+        $("otherMultiplePO")
+            .value = "";
+
     }
 
 
@@ -3395,6 +4246,7 @@ function resetOther() {
         "Other PO reset successfully.",
         "success"
     );
+
 }
 
 
@@ -3408,24 +4260,34 @@ function resetISBN() {
         "isbnValue",
         "isbnBookTitle",
         "isbnEdition"
-    ].forEach(id => {
+    ].forEach(
+        id => {
 
-        if ($(id)) {
-            $(id).value = "";
+            if ($(id)) {
+
+                $(id).value =
+                    "";
+
+            }
+
         }
-
-    });
+    );
 
 
     if ($("isbnBarcodeSvg")) {
-        $("isbnBarcodeSvg").innerHTML =
-            "";
+
+        $("isbnBarcodeSvg")
+            .innerHTML = "";
+
     }
 
 
     if ($("isbnBarcodeText")) {
-        $("isbnBarcodeText").textContent =
+
+        $("isbnBarcodeText")
+            .textContent =
             "Enter ISBN to preview";
+
     }
 
 
@@ -3433,6 +4295,7 @@ function resetISBN() {
         "ISBN reset successfully.",
         "success"
     );
+
 }
 
 
@@ -3445,19 +4308,25 @@ function resetAddress() {
     [
         "addressFrom",
         "addressTo"
-    ].forEach(id => {
+    ].forEach(
+        id => {
 
-        if ($(id)) {
-            $(id).value = "";
+            if ($(id)) {
+
+                $(id).value =
+                    "";
+
+            }
+
         }
-
-    });
+    );
 
 
     showToast(
         "Address reset successfully.",
         "success"
     );
+
 }
 
 
@@ -3473,6 +4342,7 @@ function initActionButtons() {
             resetCoco
         );
 
+
     $("cocoGenerateButton")
         ?.addEventListener(
             "click",
@@ -3485,6 +4355,7 @@ function initActionButtons() {
             "click",
             resetOther
         );
+
 
     $("otherGenerateButton")
         ?.addEventListener(
@@ -3499,6 +4370,7 @@ function initActionButtons() {
             resetISBN
         );
 
+
     $("isbnGenerateButton")
         ?.addEventListener(
             "click",
@@ -3512,35 +4384,49 @@ function initActionButtons() {
             resetAddress
         );
 
+
     $("addressGenerateButton")
         ?.addEventListener(
             "click",
             generateAddressPDF
         );
+
 }
 
 
 /* =========================================================
-   LIVE CONTROLS
+   ALL LIVE INPUTS
 ========================================================= */
 
 function initLiveControls() {
 
     $$(
         "input:not([type='file']), textarea, select"
-    ).forEach(element => {
+    ).forEach(
+        element => {
 
-        element.addEventListener(
-            "input",
-            updateLivePreview
-        );
+            element.addEventListener(
+                "input",
+                () => {
 
-        element.addEventListener(
-            "change",
-            updateLivePreview
-        );
+                    updateLivePreview();
 
-    });
+                }
+            );
+
+
+            element.addEventListener(
+                "change",
+                () => {
+
+                    updateLivePreview();
+
+                }
+            );
+
+        }
+    );
+
 }
 
 
@@ -3560,6 +4446,7 @@ function initLanguage() {
                         ".brand-text h1"
                     );
 
+
                 const subtitle =
                     document.querySelector(
                         ".brand-text p"
@@ -3572,36 +4459,120 @@ function initLanguage() {
                 ) {
 
                     if (title) {
+
                         title.textContent =
                             "बुक्स लेबल स्टूडियो";
+
                     }
 
+
                     if (subtitle) {
+
                         subtitle.textContent =
                             "प्रोफेशनल लेबल और बारकोड जनरेटर";
+
                     }
+
+
+                    showToast(
+                        "Hindi enabled.",
+                        "success"
+                    );
+
 
                 } else {
 
                     if (title) {
+
                         title.textContent =
                             "Books Label Studio";
+
                     }
 
+
                     if (subtitle) {
+
                         subtitle.textContent =
                             "Professional Label & Barcode Generator";
+
                     }
+
+
+                    showToast(
+                        "English enabled.",
+                        "success"
+                    );
 
                 }
 
             }
         );
+
 }
 
 
 /* =========================================================
-   INITIALIZE
+   MODAL
+========================================================= */
+
+function initModal() {
+
+    const modal =
+        $("confirmationModal");
+
+
+    const close =
+        () => {
+
+            modal
+                ?.classList.remove(
+                    "show"
+                );
+
+            modal
+                ?.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+
+        };
+
+
+    $("modalCloseButton")
+        ?.addEventListener(
+            "click",
+            close
+        );
+
+
+    $("modalCancelButton")
+        ?.addEventListener(
+            "click",
+            close
+        );
+
+
+    modal?.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                modal
+            ) {
+
+                close();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   STARTUP
 ========================================================= */
 
 function initApp() {
@@ -3632,13 +4603,74 @@ function initApp() {
 
     initLanguage();
 
+    initModal();
+
     updateLivePreview();
 
+
     console.log(
-        "Books Label Studio loaded successfully."
+        "===================================="
     );
+
+    console.log(
+        "Books Label Studio loaded."
+    );
+
+    console.log(
+        "jsPDF:",
+        getJsPDF()
+            ? "READY"
+            : "NOT LOADED"
+    );
+
+    console.log(
+        "XLSX:",
+        typeof window.XLSX ===
+        "undefined"
+            ? "NOT LOADED"
+            : "READY"
+    );
+
+    console.log(
+        "QRCode:",
+        typeof window.QRCode ===
+        "undefined"
+            ? "NOT LOADED"
+            : "READY"
+    );
+
+    console.log(
+        "JsBarcode:",
+        typeof window.JsBarcode ===
+        "undefined"
+            ? "NOT LOADED"
+            : "READY"
+    );
+
+    console.log(
+        "===================================="
+    );
+
+
+    /*
+     * Only warn here.
+     * Don't block the website.
+     */
+
+    if (!getJsPDF()) {
+
+        console.warn(
+            "PDF library is not available."
+        );
+
+    }
+
 }
 
+
+/* =========================================================
+   DOM READY
+========================================================= */
 
 if (
     document.readyState ===
