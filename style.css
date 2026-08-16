@@ -1,1636 +1,1159 @@
-/* =========================================================
-   BWG BOOKS WAGON LABEL STUDIO
-   FINAL CSS
-========================================================= */
-
-:root{
-    --blue:#1264d8;
-    --blue-dark:#073b82;
-    --gold:#e3a92f;
-    --green:#16a34a;
-    --red:#dc2626;
-    --text:#172033;
-    --muted:#667085;
-    --border:#d8e0ea;
-    --bg:#f3f6fa;
-    --white:#ffffff;
-}
-
-*{
-    box-sizing:border-box;
-}
-
-html{
-    scroll-behavior:smooth;
-}
-
-body{
-    margin:0;
-    padding:0;
-    font-family:
-        Inter,
-        "Segoe UI",
-        Arial,
-        sans-serif;
-
-    color:var(--text);
-
-    background:
-        radial-gradient(
-            circle at top left,
-            rgba(18,100,216,.10),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at top right,
-            rgba(227,169,47,.08),
-            transparent 28%
-        ),
-        linear-gradient(
-            135deg,
-            #f8fafc,
-            #eef2f7
-        );
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
 
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-/* =========================================================
-   MAIN APP
-========================================================= */
+    <title>
+        BooksWagon Label Studio
+    </title>
 
-.app{
-    width:min(1500px,100%);
-    margin:0 auto;
-    padding:16px;
-}
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
+    <!-- Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-/* =========================================================
-   HEADER
-========================================================= */
+    <!-- PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.2.5.1.min.js"></script>
 
-.header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    <!-- Screenshot / PDF rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
 
-    gap:20px;
+<body>
 
-    padding:20px;
+<div id="toastContainer"></div>
 
-    margin-bottom:15px;
+<header class="topbar">
 
-    background:var(--white);
+    <div class="brand">
 
-    border:1px solid var(--border);
+        <div class="brand-mark">
+            BWG
+        </div>
 
-    border-radius:22px;
+        <div>
+            <h1>
+                BooksWagon Label Studio
+            </h1>
 
-    box-shadow:
-        0 12px 35px rgba(15,23,42,.08);
-}
+            <div class="live-status">
+                <span class="live-dot"></span>
+                <span>Website is Live</span>
+            </div>
+        </div>
 
-.brand{
-    display:flex;
-    align-items:center;
-    gap:14px;
-}
+    </div>
 
-.logo{
-    width:62px;
-    height:62px;
+</header>
 
-    display:grid;
-    place-items:center;
 
-    flex-shrink:0;
+<main class="app">
 
-    border-radius:17px;
+    <!-- =====================================================
+         TOOL NAVIGATION
+    ====================================================== -->
 
-    color:#fff;
+    <section class="tools">
 
-    font-size:17px;
-    font-weight:1000;
+        <button
+            class="tool active"
+            data-tool="coco"
+        >
+            <span>🔵</span>
+            <strong>Coco Blue</strong>
+            <small>PO + Box Labels</small>
+        </button>
 
-    background:
-        linear-gradient(
-            135deg,
-            var(--blue-dark),
-            var(--blue)
-        );
 
-    box-shadow:
-        0 10px 25px rgba(18,100,216,.25);
-}
+        <button
+            class="tool"
+            data-tool="other"
+        >
+            <span>📦</span>
+            <strong>Other PO</strong>
+            <small>PO Labels</small>
+        </button>
 
-.brand h1{
-    margin:0;
 
-    font-size:24px;
+        <button
+            class="tool"
+            data-tool="isbn"
+        >
+            <span>📚</span>
+            <strong>ISBN Barcode</strong>
+            <small>Barcode Labels</small>
+        </button>
 
-    line-height:1.15;
 
-    font-weight:1000;
+        <button
+            class="tool"
+            data-tool="address"
+        >
+            <span>🚚</span>
+            <strong>Address Label</strong>
+            <small>From + To</small>
+        </button>
 
-    letter-spacing:-.6px;
-}
+    </section>
 
-.brand h1 span{
-    color:var(--gold);
-}
 
-.brand p{
-    margin:5px 0 0;
+    <!-- =====================================================
+         COCO BLUE
+    ====================================================== -->
 
-    color:var(--muted);
+    <section
+        id="cocoPanel"
+        class="panel active"
+    >
 
-    font-size:10px;
-    font-weight:600;
-}
+        <div class="panel-title">
 
+            <div>
+                <h2>🔵 Coco Blue</h2>
+                <p>PO and Box label generator</p>
+            </div>
 
-/* =========================================================
-   LIVE INDICATOR
-========================================================= */
+        </div>
 
-.live{
-    display:flex;
-    align-items:center;
-    gap:8px;
 
-    padding:8px 13px;
+        <!-- MODE -->
 
-    border-radius:30px;
+        <div class="section">
 
-    color:var(--green);
+            <h3>Input Method</h3>
 
-    background:#effdf4;
+            <div class="segmented">
 
-    border:1px solid #bbf7d0;
+                <button
+                    class="mode-btn active"
+                    data-coco-mode="manual"
+                >
+                    ✍️ Manual
+                </button>
 
-    font-size:9px;
-    font-weight:1000;
+                <button
+                    class="mode-btn"
+                    data-coco-mode="bulk"
+                >
+                    🚚 Bulk
+                </button>
 
-    white-space:nowrap;
-}
+                <button
+                    class="mode-btn"
+                    data-coco-mode="excel"
+                >
+                    📊 Excel
+                </button>
 
-.live-dot{
-    width:9px;
-    height:9px;
+            </div>
 
-    border-radius:50%;
 
-    background:#22c55e;
+            <div
+                id="cocoManual"
+                class="mode-content active"
+            >
 
-    animation:
-        livePulse 1.4s infinite ease-in-out;
-}
+                <div
+                    id="cocoManualInputs"
+                    class="input-grid"
+                ></div>
 
-@keyframes livePulse{
+            </div>
 
-    0%,
-    100%{
-        transform:scale(.75);
-        opacity:.55;
-    }
 
-    50%{
-        transform:scale(1.2);
-        opacity:1;
+            <div
+                id="cocoBulk"
+                class="mode-content"
+            >
 
-        box-shadow:
-            0 0 0 7px
-            rgba(34,197,94,.08);
-    }
-}
+                <label>Bulk PO Numbers</label>
 
+                <textarea
+                    id="cocoBulkInput"
+                    rows="5"
+                    placeholder="PO001, PO002, PO003, PO004..."
+                ></textarea>
 
-/* =========================================================
-   TOOL MODULES
-   IMPORTANT:
-   TOP -> BOTTOM
-   NOT LEFT -> RIGHT
-========================================================= */
+                <small>
+                    Separate PO numbers using commas.
+                </small>
 
-.modules{
+            </div>
 
-    /* THIS FIXES YOUR SCREENSHOT */
-    display:flex;
 
-    flex-direction:column;
+            <div
+                id="cocoExcel"
+                class="mode-content"
+            >
 
-    width:100%;
+                <label class="upload">
 
-    gap:12px;
+                    📊
+                    Upload Excel
 
-    margin-bottom:15px;
-}
+                    <input
+                        id="cocoExcelFile"
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                    >
 
+                </label>
 
-/* =========================================================
-   TOOL CARD
-========================================================= */
+                <div
+                    id="cocoExcelStatus"
+                    class="excel-status"
+                ></div>
 
-.module{
+                <div
+                    id="cocoExcelPreview"
+                    class="excel-preview"
+                >
 
-    width:100%;
+                    <table>
 
-    min-height:96px;
+                        <thead
+                            id="cocoExcelHead"
+                        ></thead>
 
-    display:flex;
+                        <tbody
+                            id="cocoExcelBody"
+                        ></tbody>
 
-    align-items:center;
+                    </table>
 
-    justify-content:flex-start;
+                </div>
 
-    gap:16px;
+            </div>
 
-    padding:18px 20px;
+        </div>
 
-    border:1px solid var(--border);
 
-    border-radius:19px;
+        <!-- BOX SETTINGS -->
 
-    background:#fff;
+        <div class="section">
 
-    box-shadow:
-        0 7px 22px
-        rgba(15,23,42,.06);
+            <h3>PO & Box Settings</h3>
 
-    transition:
-        transform .28s cubic-bezier(.16,1,.3,1),
-        box-shadow .28s ease,
-        border-color .28s ease,
-        background .28s ease;
+            <div class="form-grid">
 
-    text-align:left;
+                <div>
+                    <label>PO Prefix</label>
+                    <input
+                        id="cocoPoPrefix"
+                        placeholder="PO-"
+                    >
+                </div>
 
-    cursor:pointer;
+                <div>
+                    <label>Box Prefix</label>
+                    <input
+                        id="cocoBoxPrefix"
+                        value="BOX-"
+                    >
+                </div>
 
-    position:relative;
+                <div>
+                    <label>Start Box Number</label>
+                    <input
+                        id="cocoStartBox"
+                        type="number"
+                        value="1"
+                    >
+                </div>
 
-    overflow:hidden;
-}
+                <div>
+                    <label>End Box Number</label>
+                    <input
+                        id="cocoEndBox"
+                        type="number"
+                        value="10"
+                    >
+                </div>
 
+            </div>
 
-/* blue/gold hover glow */
+            <div
+                id="cocoRangeWarning"
+                class="warning"
+            ></div>
 
-.module::before{
+        </div>
 
-    content:"";
 
-    position:absolute;
+        <!-- LABEL CONTENT -->
 
-    left:0;
-    top:0;
+        <div class="section">
 
-    width:5px;
-    height:100%;
+            <h3>Label Content</h3>
 
-    background:
-        linear-gradient(
-            180deg,
-            var(--blue),
-            var(--gold)
-        );
+            <div class="choice-row">
 
-    transform:scaleY(0);
+                <label>
+                    <input
+                        type="radio"
+                        name="cocoContent"
+                        value="po"
+                    >
+                    PO Number Only
+                </label>
 
-    transform-origin:center;
+                <label>
+                    <input
+                        type="radio"
+                        name="cocoContent"
+                        value="box"
+                    >
+                    Box Number Only
+                </label>
 
-    transition:
-        transform .3s ease;
-}
+                <label>
+                    <input
+                        type="radio"
+                        name="cocoContent"
+                        value="combined"
+                        checked
+                    >
+                    Combined PO + Box
+                </label>
 
-.module:hover::before{
-    transform:scaleY(1);
-}
+            </div>
 
-.module:hover{
+            <div
+                id="cocoFreeze"
+                class="freeze-message"
+            >
+                🔒 Combined PO + Box selected.
+            </div>
 
-    transform:
-        translateY(-4px)
-        scale(1.01);
+        </div>
 
-    border-color:#9cc4ef;
 
-    box-shadow:
-        0 16px 35px
-        rgba(15,23,42,.13);
-}
+        <!-- LAYOUT -->
 
-.module:active{
+        <div class="section">
 
-    transform:
-        translateY(-1px)
-        scale(.985);
-}
+            <h3>PO & Box Layout</h3>
 
+            <div class="choice-row">
 
-/* ACTIVE TOOL */
+                <label>
+                    <input
+                        type="radio"
+                        name="cocoLayout"
+                        value="separate"
+                        checked
+                    >
+                    Separate Line
+                </label>
 
-.module.active{
+                <label>
+                    <input
+                        type="radio"
+                        name="cocoLayout"
+                        value="same"
+                    >
+                    Same Line
+                </label>
 
-    border-color:#78aee8;
+            </div>
 
-    background:
-        linear-gradient(
-            135deg,
-            #eef7ff,
-            #e8f1ff
-        );
+        </div>
 
-    box-shadow:
-        0 14px 35px
-        rgba(18,100,216,.14);
-}
 
-.module.active::before{
-    transform:scaleY(1);
-}
+        <!-- PAGE -->
 
+        <div class="section">
 
-/* =========================================================
-   MODULE ICON
-========================================================= */
+            <h3>Page Setting</h3>
 
-.module-icon{
+            <div class="choice-row wrap">
 
-    width:58px;
-    height:58px;
+                <label>
+                    <input
+                        type="radio"
+                        name="cocoPage"
+                        value="4x6"
+                        checked
+                    >
+                    4 × 6"
+                </label>
 
-    min-width:58px;
+                <label>
+                    <input
+                        type="radio"
+                        name="cocoPage"
+                        value="70x35"
+                    >
+                    70 × 35 mm
+                </label>
 
-    display:grid;
+                <label>
+                    <input
+                        type="radio"
+                        name="cocoPage"
+                        value="a4"
+                    >
+                    A4
+                </label>
 
-    place-items:center;
+            </div>
 
-    border-radius:16px;
+        </div>
 
-    background:#f1f5f9;
 
-    font-size:27px;
+        <!-- PREVIEW -->
 
-    transition:
-        transform .3s ease,
-        background .3s ease;
-}
+        <div class="preview-section">
 
-.module:hover .module-icon{
+            <div class="preview-header">
 
-    transform:
-        scale(1.08)
-        rotate(-2deg);
+                <div>
+                    <h3>Live Preview</h3>
 
-    background:#eaf4ff;
-}
+                    <span>
+                        Maximum 5 preview pages shown
+                    </span>
+                </div>
 
-.module.active .module-icon{
+                <span
+                    id="cocoPreviewCount"
+                    class="page-count"
+                >
+                    0
+                </span>
 
-    color:#fff;
+            </div>
 
-    background:
-        linear-gradient(
-            135deg,
-            var(--blue-dark),
-            var(--blue)
-        );
+            <div
+                id="cocoPreview"
+                class="preview-area"
+            ></div>
 
-    box-shadow:
-        0 8px 18px
-        rgba(18,100,216,.20);
-}
+        </div>
 
 
-/* =========================================================
-   MODULE TEXT
-========================================================= */
+        <!-- ACTIONS -->
 
-.module strong{
+        <div class="actions">
 
-    display:block;
+            <button
+                id="cocoDownload"
+                class="btn download"
+            >
+                ⬇️ Download PDF
+            </button>
 
-    margin:0;
+            <button
+                id="cocoPrint"
+                class="btn print"
+            >
+                🖨️ Print PDF
+            </button>
 
-    font-size:14px;
+        </div>
 
-    font-weight:1000;
+    </section>
 
-    letter-spacing:.2px;
-}
 
-.module small{
+    <!-- =====================================================
+         OTHER PO
+    ====================================================== -->
 
-    display:block;
+    <section
+        id="otherPanel"
+        class="panel"
+    >
 
-    margin-top:5px;
+        <div class="panel-title">
 
-    color:var(--muted);
+            <div>
+                <h2>📦 Other PO</h2>
+                <p>Professional PO label generator</p>
+            </div>
 
-    font-size:9px;
+        </div>
 
-    font-weight:600;
-}
 
+        <div class="section">
 
-/* =========================================================
-   WORKSPACE
-========================================================= */
+            <h3>Input Method</h3>
 
-.workspace{
+            <div class="segmented">
 
-    width:100%;
+                <button
+                    class="mode-btn active"
+                    data-other-mode="manual"
+                >
+                    ✍️ Manual
+                </button>
 
-    overflow:hidden;
+                <button
+                    class="mode-btn"
+                    data-other-mode="bulk"
+                >
+                    🚚 Bulk
+                </button>
 
-    background:#fff;
+                <button
+                    class="mode-btn"
+                    data-other-mode="excel"
+                >
+                    📊 Excel
+                </button>
 
-    border:1px solid var(--border);
+            </div>
 
-    border-radius:22px;
 
-    box-shadow:
-        0 15px 45px
-        rgba(15,23,42,.08);
-}
+            <div
+                id="otherManual"
+                class="mode-content active"
+            >
 
+                <div
+                    id="otherManualInputs"
+                    class="input-grid"
+                ></div>
 
-/* =========================================================
-   PANELS
-========================================================= */
+            </div>
 
-.panel{
-    display:none;
-}
 
-.panel.active{
+            <div
+                id="otherBulk"
+                class="mode-content"
+            >
 
-    display:block;
+                <label>Bulk PO Numbers</label>
 
-    animation:
-        panelSlide .42s
-        cubic-bezier(.16,1,.3,1);
-}
+                <textarea
+                    id="otherBulkInput"
+                    rows="6"
+                    placeholder="PO001, PO002, PO003..."
+                ></textarea>
 
-@keyframes panelSlide{
+            </div>
 
-    from{
-        opacity:0;
 
-        transform:
-            translateY(25px)
-            scale(.97);
-    }
+            <div
+                id="otherExcel"
+                class="mode-content"
+            >
 
-    to{
-        opacity:1;
+                <label class="upload">
 
-        transform:
-            translateY(0)
-            scale(1);
-    }
-}
+                    📊 Upload Excel
 
+                    <input
+                        id="otherExcelFile"
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                    >
 
-/* =========================================================
-   PANEL HEADER
-========================================================= */
+                </label>
 
-.panel-head{
+                <div
+                    id="otherExcelStatus"
+                    class="excel-status"
+                ></div>
 
-    display:flex;
+                <div
+                    id="otherExcelPreview"
+                    class="excel-preview"
+                >
 
-    align-items:center;
+                    <table>
 
-    justify-content:space-between;
+                        <thead
+                            id="otherExcelHead"
+                        ></thead>
 
-    padding:20px;
+                        <tbody
+                            id="otherExcelBody"
+                        ></tbody>
 
-    border-bottom:
-        1px solid var(--border);
-}
+                    </table>
 
-.panel-head h2{
+                </div>
 
-    margin:0;
+            </div>
 
-    font-size:20px;
+        </div>
 
-    font-weight:1000;
-}
 
-.panel-head p{
+        <div class="section">
 
-    margin:5px 0 0;
+            <h3>Box Settings</h3>
 
-    color:var(--muted);
+            <div class="form-grid">
 
-    font-size:9px;
-}
+                <div>
+                    <label>PO Prefix</label>
+                    <input
+                        id="otherPoPrefix"
+                        placeholder="PO-"
+                    >
+                </div>
 
+                <div>
+                    <label>Box Prefix</label>
+                    <input
+                        id="otherBoxPrefix"
+                        value="BOX-"
+                    >
+                </div>
 
-/* =========================================================
-   SECTION
-========================================================= */
+                <div>
+                    <label>Start Box</label>
+                    <input
+                        id="otherStartBox"
+                        type="number"
+                        value="1"
+                    >
+                </div>
 
-.section{
+                <div>
+                    <label>End Box</label>
+                    <input
+                        id="otherEndBox"
+                        type="number"
+                        value="10"
+                    >
+                </div>
 
-    padding:19px 21px;
+            </div>
 
-    border-bottom:
-        1px solid var(--border);
-}
+        </div>
 
-.section h3{
 
-    margin:0 0 5px;
+        <div class="preview-section">
 
-    font-size:13px;
+            <div class="preview-header">
 
-    font-weight:1000;
-}
+                <div>
+                    <h3>Live Preview</h3>
+                    <span>Maximum 5 pages</span>
+                </div>
 
-.desc{
+            </div>
 
-    margin:0 0 13px;
+            <div
+                id="otherPreview"
+                class="preview-area"
+            ></div>
 
-    color:var(--muted);
+        </div>
 
-    font-size:9px;
-}
 
+        <div class="actions">
 
-/* =========================================================
-   FORM GRID
-========================================================= */
+            <button
+                id="otherDownload"
+                class="btn download"
+            >
+                ⬇️ Download PDF
+            </button>
 
-.grid{
+            <button
+                id="otherPrint"
+                class="btn print"
+            >
+                🖨️ Print PDF
+            </button>
 
-    display:grid;
+        </div>
 
-    grid-template-columns:
-        repeat(2,minmax(0,1fr));
+    </section>
 
-    gap:11px;
-}
 
-.grid3{
+    <!-- =====================================================
+         ISBN
+    ====================================================== -->
 
-    grid-template-columns:
-        repeat(3,minmax(0,1fr));
-}
+    <section
+        id="isbnPanel"
+        class="panel"
+    >
 
-.grid4{
+        <div class="panel-title">
 
-    grid-template-columns:
-        repeat(4,minmax(0,1fr));
-}
+            <div>
+                <h2>📚 ISBN Barcode Maker</h2>
+                <p>ISBN barcode label generator</p>
+            </div>
 
-.field label{
+        </div>
 
-    display:block;
 
-    margin-bottom:5px;
+        <div class="section">
 
-    color:#475467;
+            <h3>Input Method</h3>
 
-    font-size:9px;
+            <div class="segmented">
 
-    font-weight:900;
-}
+                <button
+                    class="mode-btn active"
+                    data-isbn-mode="manual"
+                >
+                    ✍️ Manual
+                </button>
 
-input,
-select,
-textarea{
+                <button
+                    class="mode-btn"
+                    data-isbn-mode="bulk"
+                >
+                    🚚 Bulk
+                </button>
 
-    width:100%;
+                <button
+                    class="mode-btn"
+                    data-isbn-mode="excel"
+                >
+                    📊 Excel
+                </button>
 
-    padding:10px;
+            </div>
 
-    color:var(--text);
 
-    background:#fff;
+            <div
+                id="isbnManual"
+                class="mode-content active"
+            >
 
-    border:
-        1px solid var(--border);
+                <div
+                    id="isbnManualInputs"
+                    class="input-grid"
+                ></div>
 
-    border-radius:9px;
+            </div>
 
-    outline:none;
 
-    transition:
-        border-color .2s ease,
-        box-shadow .2s ease,
-        background .2s ease;
-}
+            <div
+                id="isbnBulk"
+                class="mode-content"
+            >
 
-textarea{
+                <label>Bulk ISBN</label>
 
-    min-height:110px;
+                <textarea
+                    id="isbnBulkInput"
+                    rows="6"
+                    placeholder="9780000000001, 9780000000002..."
+                ></textarea>
 
-    resize:vertical;
-}
+            </div>
 
-input:focus,
-select:focus,
-textarea:focus{
 
-    border-color:
-        var(--blue);
+            <div
+                id="isbnExcel"
+                class="mode-content"
+            >
 
-    box-shadow:
-        0 0 0 3px
-        rgba(18,100,216,.10);
-}
+                <label class="upload">
 
-input:disabled,
-select:disabled,
-textarea:disabled{
+                    📊 Upload Excel
 
-    background:#f0f2f5;
+                    <input
+                        id="isbnExcelFile"
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                    >
 
-    color:#98a2b3;
+                </label>
 
-    cursor:not-allowed;
-}
+                <div
+                    id="isbnExcelStatus"
+                    class="excel-status"
+                ></div>
 
+                <div
+                    id="isbnExcelPreview"
+                    class="excel-preview"
+                >
 
-/* =========================================================
-   MANUAL / BULK / EXCEL MODE
-========================================================= */
+                    <table>
 
-.mode-grid{
+                        <thead
+                            id="isbnExcelHead"
+                        ></thead>
 
-    display:grid;
+                        <tbody
+                            id="isbnExcelBody"
+                        ></tbody>
 
-    grid-template-columns:
-        repeat(3,1fr);
+                    </table>
 
-    gap:9px;
-}
+                </div>
 
-.mode{
+            </div>
 
-    padding:14px;
+        </div>
 
-    text-align:left;
 
-    border:
-        1px solid var(--border);
+        <div class="section">
 
-    border-radius:11px;
+            <h3>Barcode Settings</h3>
 
-    background:#fff;
+            <div class="form-grid">
 
-    transition:
-        .22s ease;
+                <div>
 
-    cursor:pointer;
-}
+                    <label>
+                        Barcode Type
+                    </label>
 
-.mode:hover{
+                    <select id="isbnBarcodeType">
 
-    transform:
-        translateY(-2px);
+                        <option>
+                            EAN-13
+                        </option>
 
-    border-color:
-        #8bb9ed;
-}
+                        <option>
+                            ISBN
+                        </option>
 
-.mode.active{
+                    </select>
 
-    color:var(--blue);
+                </div>
 
-    border-color:
-        var(--blue);
+            </div>
 
-    background:
-        #edf6ff;
+        </div>
 
-    box-shadow:
-        0 7px 18px
-        rgba(18,100,216,.08);
-}
 
-.mode-icon{
+        <div class="preview-section">
 
-    margin-bottom:6px;
+            <div class="preview-header">
 
-    font-size:22px;
-}
+                <div>
+                    <h3>Live Preview</h3>
+                    <span>Maximum 5 pages</span>
+                </div>
 
-.mode strong{
+            </div>
 
-    display:block;
+            <div
+                id="isbnPreview"
+                class="preview-area"
+            ></div>
 
-    font-size:10px;
-}
+        </div>
 
-.mode small{
 
-    display:block;
+        <div class="actions">
 
-    margin-top:4px;
+            <button
+                id="isbnDownload"
+                class="btn download"
+            >
+                ⬇️ Download PDF
+            </button>
 
-    color:var(--muted);
+            <button
+                id="isbnPrint"
+                class="btn print"
+            >
+                🖨️ Print PDF
+            </button>
 
-    font-size:8px;
-}
+        </div>
 
+    </section>
 
-/* =========================================================
-   EXCEL UPLOAD
-   AVAILABLE FOR ALL TOOLS
-========================================================= */
 
-.excel-upload{
+    <!-- =====================================================
+         ADDRESS
+    ====================================================== -->
 
-    padding:25px;
+    <section
+        id="addressPanel"
+        class="panel"
+    >
 
-    text-align:center;
+        <div class="panel-title">
 
-    border:
-        2px dashed #8db9ed;
+            <div>
+                <h2>🚚 Address Label</h2>
+                <p>Professional From & To address labels</p>
+            </div>
 
-    border-radius:13px;
+        </div>
 
-    background:
-        linear-gradient(
-            135deg,
-            #f5faff,
-            #eef7ff
-        );
 
-    transition:.25s ease;
-}
+        <div class="section">
 
-.excel-upload:hover{
+            <h3>Input Method</h3>
 
-    border-color:
-        var(--blue);
+            <div class="segmented">
 
-    background:#edf6ff;
+                <button
+                    class="mode-btn active"
+                    data-address-mode="manual"
+                >
+                    ✍️ Manual
+                </button>
 
-    transform:
-        translateY(-2px);
-}
+                <button
+                    class="mode-btn"
+                    data-address-mode="bulk"
+                >
+                    🚚 Bulk
+                </button>
 
-.excel-upload input{
+                <button
+                    class="mode-btn"
+                    data-address-mode="excel"
+                >
+                    📊 Excel
+                </button>
 
-    max-width:400px;
+            </div>
 
-    margin:10px auto 0;
 
-    cursor:pointer;
-}
+            <div
+                id="addressManual"
+                class="mode-content active"
+            >
 
-.excel-success{
+                <div class="address-grid">
 
-    display:none;
+                    <div class="address-card">
 
-    margin-top:11px;
+                        <h3>
+                            📤 From
+                        </h3>
 
-    padding:11px;
+                        <input
+                            id="fromName"
+                            placeholder="Sender Name"
+                        >
 
-    border:
-        1px solid #bbf7d0;
+                        <input
+                            id="fromPhone"
+                            placeholder="Sender Phone"
+                        >
 
-    border-radius:9px;
+                        <textarea
+                            id="fromAddress"
+                            rows="5"
+                            placeholder="Sender Address"
+                        ></textarea>
 
-    color:#166534;
+                    </div>
 
-    background:#effdf4;
 
-    font-size:9px;
+                    <div class="address-card">
 
-    font-weight:900;
-}
+                        <h3>
+                            📥 To
+                        </h3>
 
-.excel-success.show{
+                        <input
+                            id="toName"
+                            placeholder="Receiver Name"
+                        >
 
-    display:block;
+                        <input
+                            id="toPhone"
+                            placeholder="Receiver Phone"
+                        >
 
-    animation:
-        smallPop .35s ease;
-}
+                        <textarea
+                            id="toAddress"
+                            rows="5"
+                            placeholder="Receiver Address"
+                        ></textarea>
 
-@keyframes smallPop{
+                    </div>
 
-    from{
-        opacity:0;
-        transform:scale(.94);
-    }
+                </div>
 
-    to{
-        opacity:1;
-        transform:scale(1);
-    }
-}
+            </div>
 
 
-/* =========================================================
-   EXCEL TABLE
-========================================================= */
+            <div
+                id="addressBulk"
+                class="mode-content"
+            >
 
-.excel-preview-wrap{
+                <label>
+                    Bulk Address
+                </label>
 
-    display:none;
+                <textarea
+                    id="addressBulkInput"
+                    rows="8"
+                    placeholder="FROM ADDRESS | TO ADDRESS"
+                ></textarea>
 
-    max-height:300px;
+                <small>
+                    One label per line. Use | between From and To.
+                </small>
 
-    overflow:auto;
+            </div>
 
-    margin-top:13px;
 
-    border:
-        1px solid var(--border);
+            <div
+                id="addressExcel"
+                class="mode-content"
+            >
 
-    border-radius:10px;
-}
+                <label class="upload">
 
-.excel-preview-wrap.show{
-    display:block;
-}
+                    📊 Upload Address Excel
 
-.excel-preview{
+                    <input
+                        id="addressExcelFile"
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                    >
 
-    width:100%;
+                </label>
 
-    border-collapse:collapse;
+                <div
+                    id="addressExcelStatus"
+                    class="excel-status"
+                ></div>
 
-    font-size:9px;
-}
+                <div
+                    id="addressExcelPreview"
+                    class="excel-preview"
+                >
 
-.excel-preview th,
-.excel-preview td{
+                    <table>
 
-    padding:8px;
+                        <thead
+                            id="addressExcelHead"
+                        ></thead>
 
-    text-align:left;
+                        <tbody
+                            id="addressExcelBody"
+                        ></tbody>
 
-    white-space:nowrap;
+                    </table>
 
-    border-right:
-        1px solid var(--border);
+                </div>
 
-    border-bottom:
-        1px solid var(--border);
-}
+            </div>
 
-.excel-preview th{
+        </div>
 
-    position:sticky;
 
-    top:0;
+        <div class="section">
 
-    z-index:2;
+            <h3>Address Border</h3>
 
-    color:var(--blue-dark);
+            <div class="choice-row wrap">
 
-    background:#eaf4ff;
-}
+                <label>
+                    <input
+                        id="addressPageBorder"
+                        type="checkbox"
+                        checked
+                    >
+                    Page Border
+                </label>
 
+                <label>
+                    <input
+                        id="addressFromBorder"
+                        type="checkbox"
+                        checked
+                    >
+                    From Border
+                </label>
 
-/* =========================================================
-   CHOICES
-========================================================= */
+                <label>
+                    <input
+                        id="addressToBorder"
+                        type="checkbox"
+                        checked
+                    >
+                    To Border
+                </label>
 
-.choice-grid{
+                <label>
+                    <input
+                        id="addressAllBorder"
+                        type="checkbox"
+                    >
+                    All Border
+                </label>
 
-    display:grid;
+            </div>
 
-    grid-template-columns:
-        repeat(3,1fr);
+        </div>
 
-    gap:9px;
-}
 
-.choice{
+        <div class="preview-section">
 
-    display:flex;
+            <div class="preview-header">
 
-    align-items:center;
+                <div>
+                    <h3>Live Preview</h3>
+                    <span>Maximum 5 pages</span>
+                </div>
 
-    gap:8px;
+                <span
+                    id="addressPreviewCount"
+                    class="page-count"
+                >
+                    0
+                </span>
 
-    padding:11px;
+            </div>
 
-    border:
-        1px solid var(--border);
+            <div
+                id="addressPreview"
+                class="preview-area"
+            ></div>
 
-    border-radius:10px;
+        </div>
 
-    background:#fff;
 
-    transition:.2s ease;
+        <div class="actions">
 
-    cursor:pointer;
-}
+            <button
+                id="addressDownload"
+                class="btn download"
+            >
+                ⬇️ Download PDF
+            </button>
 
-.choice:hover{
+            <button
+                id="addressPrint"
+                class="btn print"
+            >
+                🖨️ Print PDF
+            </button>
 
-    transform:
-        translateY(-2px);
+        </div>
 
-    background:#f5faff;
+    </section>
 
-    border-color:
-        #8bb9ed;
-}
+</main>
 
-.choice.active{
 
-    color:var(--blue);
+<footer>
 
-    background:#edf6ff;
+    <strong>
+        Created by Ashish Verma · 2026
+    </strong>
 
-    border-color:
-        var(--blue);
-}
+    <span>
+        All Rights Reserved by Ashish Verma
+    </span>
 
-.choice input{
+</footer>
 
-    width:auto;
 
-    cursor:pointer;
-}
+<script src="app.js"></script>
 
-
-/* =========================================================
-   BORDER
-========================================================= */
-
-.border-grid{
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(4,1fr);
-
-    gap:9px;
-}
-
-.border-card{
-
-    padding:12px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius:10px;
-
-    background:#fff;
-}
-
-.border-card strong{
-
-    display:block;
-
-    margin-bottom:7px;
-
-    font-size:10px;
-}
-
-.border-card input{
-
-    width:auto;
-}
-
-
-/* =========================================================
-   FONT SETTINGS
-========================================================= */
-
-.font-card{
-
-    padding:13px;
-
-    margin-bottom:10px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius:11px;
-
-    background:#f9fbfd;
-}
-
-.font-card:last-child{
-    margin-bottom:0;
-}
-
-.font-card h4{
-
-    margin:0 0 10px;
-
-    font-size:10px;
-}
-
-.font-controls{
-
-    display:grid;
-
-    grid-template-columns:
-        1.5fr
-        .6fr
-        .6fr
-        42px
-        42px
-        42px;
-
-    gap:7px;
-}
-
-.format{
-
-    border:
-        1px solid var(--border);
-
-    border-radius:8px;
-
-    background:#fff;
-
-    font-weight:1000;
-
-    cursor:pointer;
-}
-
-.format:hover{
-
-    border-color:
-        var(--blue);
-}
-
-.format.active{
-
-    color:#fff;
-
-    background:
-        var(--blue);
-
-    border-color:
-        var(--blue);
-}
-
-
-/* =========================================================
-   PREVIEW
-========================================================= */
-
-.preview-section{
-
-    padding:20px;
-
-    background:#f8fafc;
-}
-
-.preview-title{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    margin-bottom:11px;
-}
-
-.preview-title h3{
-
-    margin:0;
-
-    font-size:13px;
-}
-
-.page-count{
-
-    padding:6px 10px;
-
-    border-radius:20px;
-
-    color:var(--blue);
-
-    background:#eaf4ff;
-
-    font-size:9px;
-
-    font-weight:900;
-}
-
-.preview-stage{
-
-    padding:25px;
-
-    overflow:auto;
-
-    border:
-        1px solid var(--border);
-
-    border-radius:12px;
-
-    background:#e8edf3;
-}
-
-.preview-pages{
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:center;
-
-    gap:28px;
-}
-
-.preview-page{
-
-    flex:0 0 auto;
-
-    position:relative;
-
-    display:grid;
-
-    align-content:start;
-
-    overflow:hidden;
-
-    background:#fff;
-
-    box-shadow:
-        0 16px 45px
-        rgba(0,0,0,.18);
-}
-
-
-/* =========================================================
-   PAGE SIZES
-========================================================= */
-
-.preview-page.a4{
-
-    width:794px;
-    height:1123px;
-}
-
-.preview-page.four-six{
-
-    width:384px;
-    height:576px;
-}
-
-.preview-page.seventy-thirtyfive{
-
-    width:265px;
-    height:132px;
-}
-
-.preview-page.custom{
-
-    width:794px;
-    height:1123px;
-}
-
-
-/* =========================================================
-   LABEL
-========================================================= */
-
-.label{
-
-    min-width:0;
-    min-height:0;
-
-    overflow:hidden;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    padding:7px;
-
-    background:#fff;
-
-    text-align:center;
-
-    break-inside:avoid;
-
-    page-break-inside:avoid;
-}
-
-.same-line{
-
-    width:100%;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:9px;
-}
-
-.separate-line{
-
-    width:100%;
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:7px;
-}
-
-.po-value,
-.box-value{
-
-    max-width:100%;
-
-    word-break:break-word;
-
-    overflow-wrap:anywhere;
-
-    line-height:1.08;
-}
-
-
-/* =========================================================
-   ACTION BUTTONS
-========================================================= */
-
-.actions{
-
-    display:flex;
-
-    justify-content:flex-end;
-
-    gap:9px;
-
-    padding:16px 20px;
-
-    border-top:
-        1px solid var(--border);
-}
-
-.btn{
-
-    padding:11px 18px;
-
-    border:0;
-
-    border-radius:9px;
-
-    color:#fff;
-
-    font-size:10px;
-
-    font-weight:1000;
-
-    transition:.2s ease;
-
-    cursor:pointer;
-}
-
-.btn:hover{
-
-    transform:
-        translateY(-2px)
-        scale(1.02);
-}
-
-.btn-download{
-
-    background:
-        linear-gradient(
-            135deg,
-            #0754b8,
-            #1264d8
-        );
-}
-
-.btn-print{
-
-    background:
-        linear-gradient(
-            135deg,
-            #111827,
-            #374151
-        );
-}
-
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-#toastContainer{
-
-    position:fixed;
-
-    top:18px;
-    right:18px;
-
-    z-index:99999;
-
-    width:
-        min(
-            390px,
-            calc(100vw - 36px)
-        );
-}
-
-.toast{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    padding:13px;
-
-    margin-bottom:8px;
-
-    border-radius:12px;
-
-    background:#fff;
-
-    box-shadow:
-        0 20px 45px
-        rgba(0,0,0,.18);
-
-    animation:
-        toastIn .4s
-        cubic-bezier(.16,1,.3,1);
-}
-
-.toast.green{
-
-    border-right:
-        5px solid var(--green);
-}
-
-.toast.red{
-
-    border-right:
-        5px solid var(--red);
-}
-
-.toast-icon{
-
-    font-size:19px;
-}
-
-.toast strong{
-
-    display:block;
-
-    font-size:10px;
-}
-
-.toast span{
-
-    display:block;
-
-    margin-top:3px;
-
-    color:var(--muted);
-
-    font-size:8px;
-}
-
-@keyframes toastIn{
-
-    from{
-        opacity:0;
-        transform:
-            translateX(120%)
-            scale(.75);
-    }
-
-    to{
-        opacity:1;
-        transform:
-            translateX(0)
-            scale(1);
-    }
-}
-
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-footer{
-
-    padding:18px;
-
-    text-align:center;
-
-    color:var(--muted);
-
-    font-size:8px;
-}
-
-
-/* =========================================================
-   PRINT FIX
-   TOP ALIGNED
-   NO HUGE EMPTY SPACE
-========================================================= */
-
-@media print{
-
-    @page{
-        margin:0;
-    }
-
-    html,
-    body{
-
-        margin:0 !important;
-        padding:0 !important;
-
-        background:#fff !important;
-    }
-
-    body *{
-
-        visibility:hidden !important;
-    }
-
-    #printAreaHidden,
-    #printAreaHidden *{
-
-        visibility:visible !important;
-    }
-
-    #printAreaHidden{
-
-        position:absolute !important;
-
-        left:0 !important;
-        top:0 !important;
-
-        width:100% !important;
-
-        margin:0 !important;
-        padding:0 !important;
-    }
-
-    #printAreaHidden
-    .preview-page{
-
-        margin:0 !important;
-
-        padding:10px !important;
-
-        box-shadow:none !important;
-
-        break-after:page !important;
-
-        page-break-after:always !important;
-
-        break-inside:avoid !important;
-
-        page-break-inside:avoid !important;
-
-        /* VERY IMPORTANT */
-        align-content:start !important;
-
-        transform:none !important;
-    }
-
-    #printAreaHidden
-    .preview-page:last-child{
-
-        break-after:auto !important;
-
-        page-break-after:auto !important;
-    }
-
-    #printAreaHidden
-    .label{
-
-        break-inside:avoid !important;
-
-        page-break-inside:avoid !important;
-    }
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media(max-width:900px){
-
-    .grid4{
-
-        grid-template-columns:
-            repeat(2,1fr);
-    }
-
-    .grid3{
-
-        grid-template-columns:
-            repeat(2,1fr);
-    }
-
-    .border-grid{
-
-        grid-template-columns:
-            repeat(2,1fr);
-    }
-}
-
-
-@media(max-width:650px){
-
-    .app{
-        padding:9px;
-    }
-
-    .header{
-
-        flex-direction:column;
-
-        align-items:flex-start;
-    }
-
-    /*
-       TOOL MODULES REMAIN
-       TOP -> BOTTOM
-    */
-
-    .modules{
-
-        flex-direction:column;
-
-        gap:9px;
-    }
-
-    .module{
-
-        width:100%;
-
-        min-height:82px;
-
-        padding:14px;
-    }
-
-    .module-icon{
-
-        width:50px;
-        height:50px;
-
-        min-width:50px;
-
-        font-size:23px;
-    }
-
-    .grid,
-    .grid3,
-    .grid4{
-
-        grid-template-columns:1fr;
-    }
-
-    .mode-grid{
-
-        grid-template-columns:1fr;
-    }
-
-    .choice-grid{
-
-        grid-template-columns:1fr;
-    }
-
-    .border-grid{
-
-        grid-template-columns:1fr;
-    }
-
-    .font-controls{
-
-        grid-template-columns:
-            1fr 1fr;
-    }
-
-    .actions{
-
-        flex-direction:column;
-    }
-
-    .btn{
-
-        width:100%;
-    }
-
-}
+</body>
+</html>
