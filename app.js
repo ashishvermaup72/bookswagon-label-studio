@@ -585,7 +585,7 @@ function readExcel(
             );
 
             showToast(
-                `Excel uploaded. Header ignored. ${dataRows.length} data rows found.`,
+                `Excel loaded. Header ignored. ${dataRows.length} data rows found.`,
                 "success"
             );
 
