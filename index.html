@@ -9,14 +9,19 @@
     >
 
     <meta
-        name="description"
-        content="Books Label Studio - PO, Barcode and Address Label Generator"
+        name="theme-color"
+        content="#2563eb"
     >
 
     <title>Books Label Studio</title>
 
-    <!-- FINAL CSS -->
-    <link rel="stylesheet" href="style.css">
+    <!-- =====================================================
+         CSS
+    ====================================================== -->
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
 
 <body>
@@ -32,7 +37,7 @@
         <div class="brand-area">
 
             <div class="brand-logo">
-                BL
+                📚
             </div>
 
             <div class="brand-text">
@@ -57,15 +62,13 @@
             </label>
 
             <select id="languageSelect">
-
                 <option value="en">
                     English
                 </option>
 
                 <option value="hi">
-                    हिंदी
+                    हिन्दी
                 </option>
-
             </select>
 
         </div>
@@ -74,17 +77,21 @@
 
 
     <!-- =====================================================
-         MAIN CATEGORY NAVIGATION
+         MAIN TOOL NAVIGATION
     ====================================================== -->
 
-    <nav class="category-nav">
+    <nav
+        class="category-nav"
+        aria-label="Main tools"
+    >
 
         <button
             type="button"
             class="category-btn active"
             data-category="cocoBlue"
         >
-            Coco Blue PO
+            📘
+            <span>Coco Blue</span>
         </button>
 
 
@@ -93,415 +100,262 @@
             class="category-btn"
             data-category="otherPO"
         >
-            Other PO
+            📦
+            <span>Other PO</span>
         </button>
 
 
         <button
             type="button"
             class="category-btn"
-            data-category="isbnBarcode"
+            data-category="isbn"
         >
-            ISBN Barcode
+            🏷️
+            <span>ISBN / Barcode</span>
         </button>
 
 
         <button
             type="button"
             class="category-btn"
-            data-category="addressSticker"
+            data-category="address"
         >
-            Address Sticker
+            📍
+            <span>Address / QR</span>
         </button>
 
     </nav>
 
 
     <!-- =====================================================
-         MAIN CONTENT
+         COCO BLUE
     ====================================================== -->
 
-    <main class="main-content">
+    <main
+        id="cocoblueWorkspace"
+        class="tool-section active"
+        data-tool="cocoBlue"
+    >
+
+        <div class="section-heading">
+
+            <span class="section-label">
+                📘 COCO BLUE
+            </span>
+
+            <h2>
+                Coco Blue PO Labels
+            </h2>
+
+            <p>
+                Create PO and Box labels with live page preview.
+            </p>
+
+        </div>
+
+
+        <!-- SUB NAV -->
+
+        <div class="sub-navigation">
+
+            <button
+                type="button"
+                class="sub-category-btn active"
+                data-coco-mode="individual"
+            >
+                ✏️ Individual
+            </button>
+
+
+            <button
+                type="button"
+                class="sub-category-btn"
+                data-coco-mode="multiple"
+            >
+                📋 Multiple PO
+            </button>
+
+
+            <button
+                type="button"
+                class="sub-category-btn"
+                data-coco-mode="excel"
+            >
+                📊 Excel Upload
+            </button>
+
+
+            <button
+                type="button"
+                class="sub-category-btn"
+                data-coco-mode="address"
+            >
+                📍 Address
+            </button>
+
+        </div>
 
 
         <!-- =================================================
-             COCO BLUE
+             INDIVIDUAL PO
         ================================================== -->
 
         <section
-            class="tool-section active"
-            data-tool="cocoBlue"
+            id="cocoIndividualPanel"
+            class="mode-panel active"
         >
-
-            <div class="section-heading">
-
-                <span class="section-label">
-                    TOOL
-                </span>
-
-                <h2>
-                    Coco Blue PO Labels
-                </h2>
-
-                <p>
-                    Create professional PO and box labels.
-                </p>
-
-            </div>
-
-
-            <!-- SUB CATEGORY -->
-
-            <div class="sub-navigation">
-
-                <button
-                    type="button"
-                    class="sub-category-btn active"
-                    data-coco-mode="individual"
-                >
-                    Individual
-                </button>
-
-
-                <button
-                    type="button"
-                    class="sub-category-btn"
-                    data-coco-mode="multiple"
-                >
-                    Multiple
-                </button>
-
-
-                <button
-                    type="button"
-                    class="sub-category-btn"
-                    data-coco-mode="excel"
-                >
-                    Excel Upload
-                </button>
-
-
-                <button
-                    type="button"
-                    class="sub-category-btn"
-                    data-coco-mode="address"
-                >
-                    From / To Address
-                </button>
-
-            </div>
-
-
-            <!-- =============================================
-                 INDIVIDUAL
-            ============================================== -->
-
-            <div
-                id="cocoIndividualPanel"
-                class="mode-panel active"
-            >
-
-                <div class="panel-card">
-
-                    <div class="panel-title">
-
-                        <div>
-
-                            <h3>
-                                Individual PO Numbers
-                            </h3>
-
-                            <p>
-                                Enter up to 40 PO numbers manually.
-                            </p>
-
-                        </div>
-
-                        <span class="limit-badge">
-                            MAX 40
-                        </span>
-
-                    </div>
-
-
-                    <div
-                        id="individualPOGrid"
-                        class="po-input-grid"
-                    ></div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =============================================
-                 MULTIPLE
-            ============================================== -->
-
-            <div
-                id="cocoMultiplePanel"
-                class="mode-panel"
-            >
-
-                <div class="panel-card">
-
-                    <div class="panel-title">
-
-                        <div>
-
-                            <h3>
-                                Multiple PO Numbers
-                            </h3>
-
-                            <p>
-                                Separate PO numbers with comma or new line.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="cocoMultiplePO">
-                            PO Numbers
-                        </label>
-
-                        <textarea
-                            id="cocoMultiplePO"
-                            placeholder="PO1001, PO1002, PO1003"
-                        ></textarea>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =============================================
-                 EXCEL
-            ============================================== -->
-
-            <div
-                id="cocoExcelPanel"
-                class="mode-panel"
-            >
-
-                <div class="panel-card">
-
-                    <div class="panel-title">
-
-                        <div>
-
-                            <h3>
-                                Excel PO Upload
-                            </h3>
-
-                            <p>
-                                First row is treated as header and ignored.
-                                PO data starts from the second row.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="upload-area">
-
-                        <strong>
-                            Upload Excel File
-                        </strong>
-
-                        <p>
-                            First row = Header
-                        </p>
-
-                        <input
-                            id="cocoExcelFile"
-                            type="file"
-                            accept=".xlsx,.xls,.csv"
-                        >
-
-                        <span id="cocoExcelFileName">
-                            No file selected
-                        </span>
-
-                    </div>
-
-
-                    <div
-                        id="cocoExcelPreview"
-                        class="excel-preview"
-                    ></div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =============================================
-                 COCO ADDRESS
-            ============================================== -->
-
-            <div
-                id="cocoAddressPanel"
-                class="mode-panel"
-            >
-
-                <div class="panel-card">
-
-                    <div class="panel-title">
-
-                        <div>
-
-                            <h3>
-                                From / To Address
-                            </h3>
-
-                            <p>
-                                Print From and To addresses inside Coco Blue.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="address-two-column">
-
-                        <div class="address-editor">
-
-                            <div class="panel-title">
-
-                                <div>
-
-                                    <h3>
-                                        From Address
-                                    </h3>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <textarea
-                                    id="cocoFromAddress"
-                                    placeholder="Company Name&#10;Customer Name&#10;Full Address"
-                                ></textarea>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="address-editor">
-
-                            <div class="panel-title">
-
-                                <div>
-
-                                    <h3>
-                                        To Address
-                                    </h3>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <textarea
-                                    id="cocoToAddress"
-                                    placeholder="Customer Name&#10;Address&#10;City / State / PIN"
-                                ></textarea>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =============================================
-                 BOX REPEAT SETTINGS
-            ============================================== -->
 
             <div class="panel-card">
 
                 <div class="panel-title">
 
                     <div>
-
                         <h3>
-                            Box Repeat Settings
+                            ✏️ Enter PO Numbers
                         </h3>
 
                         <p>
-                            No artificial limit on repeat count.
+                            Enter individual PO values.
                         </p>
+                    </div>
 
+                    <span class="limit-badge">
+                        MAX 40
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="individualPOGrid"
+                    class="po-input-grid"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             MULTIPLE PO
+        ================================================== -->
+
+        <section
+            id="cocoMultiplePanel"
+            class="mode-panel"
+        >
+
+            <div class="panel-card">
+
+                <div class="panel-title">
+
+                    <div>
+                        <h3>
+                            📋 Multiple PO
+                        </h3>
+
+                        <p>
+                            Enter one PO per line, comma or semicolon.
+                        </p>
                     </div>
 
                 </div>
 
 
-                <div class="three-column-fields">
+                <div class="field">
 
-                    <div class="field">
+                    <label for="cocoMultiplePO">
+                        PO Values
+                    </label>
 
-                        <label for="startBoxNumber">
-                            Start Box Number
-                        </label>
+                    <textarea
+                        id="cocoMultiplePO"
+                        placeholder="ABC123&#10;DEF456&#10;GHI789"
+                    ></textarea>
 
-                        <input
-                            id="startBoxNumber"
-                            type="number"
-                            min="1"
-                            value="1"
-                        >
+                </div>
 
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             EXCEL PO
+        ================================================== -->
+
+        <section
+            id="cocoExcelPanel"
+            class="mode-panel"
+        >
+
+            <div class="panel-card">
+
+                <div class="panel-title">
+
+                    <div>
+                        <h3>
+                            📊 Upload PO Excel
+                        </h3>
+
+                        <p>
+                            First row is treated as the header and ignored during processing.
+                        </p>
                     </div>
 
-
-                    <div class="field">
-
-                        <label for="endBoxNumber">
-                            End Box Number
-                        </label>
-
-                        <input
-                            id="endBoxNumber"
-                            type="number"
-                            min="1"
-                            value="10"
-                        >
-
-                    </div>
+                </div>
 
 
-                    <div class="field">
+                <div class="upload-area">
 
-                        <label for="boxRepeatCount">
-                            Repeat Count
-                        </label>
+                    <strong>
+                        📁 Upload Excel File
+                    </strong>
 
-                        <input
-                            id="boxRepeatCount"
-                            type="number"
-                            min="1"
-                            value="1"
-                        >
+                    <p>
+                        XLSX / XLS / CSV
+                    </p>
 
+                    <input
+                        id="cocoExcelFile"
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                    >
+
+                    <span id="cocoExcelFileName">
+                        No file selected
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="cocoExcelPreview"
+                    class="excel-preview"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             COCO ADDRESS
+        ================================================== -->
+
+        <section
+            id="cocoAddressPanel"
+            class="mode-panel"
+        >
+
+            <div class="panel-card">
+
+                <div class="panel-title">
+
+                    <div>
+                        <h3>
+                            📍 Address
+                        </h3>
                     </div>
 
                 </div>
@@ -511,435 +365,507 @@
 
                     <div class="field">
 
-                        <label for="labelsPerPage">
-                            Labels Per Page
+                        <label for="cocoFromAddress">
+                            From Address
                         </label>
 
-                        <select id="labelsPerPage">
-
-                            <option value="1">
-                                1 Label
-                            </option>
-
-                            <option
-                                value="2"
-                                selected
-                            >
-                                2 Labels
-                            </option>
-
-                            <option value="4">
-                                4 Labels
-                            </option>
-
-                        </select>
+                        <textarea
+                            id="cocoFromAddress"
+                            placeholder="Enter from address"
+                        ></textarea>
 
                     </div>
 
 
                     <div class="field">
 
-                        <label for="labelGap">
-                            Label Gap (mm)
+                        <label for="cocoToAddress">
+                            To Address
                         </label>
 
-                        <input
-                            id="labelGap"
-                            type="number"
-                            min="0"
-                            value="2"
-                        >
+                        <textarea
+                            id="cocoToAddress"
+                            placeholder="Enter to address"
+                        ></textarea>
 
                     </div>
-
-                </div>
-
-
-                <div class="feature-checkbox-list">
-
-                    <label class="feature-check">
-
-                        <input
-                            id="samePOPageFlow"
-                            type="checkbox"
-                        >
-
-                        <span class="checkmark"></span>
-
-                        Same PO Page Flow
-
-                    </label>
-
-
-                    <label class="feature-check">
-
-                        <input
-                            id="halfPageFlowCheck"
-                            type="checkbox"
-                            checked
-                        >
-
-                        <span class="checkmark"></span>
-
-                        Half Page Label Flow
-
-                    </label>
 
                 </div>
 
             </div>
 
+        </section>
 
-            <!-- =============================================
-                 PAGE SETTINGS
-            ============================================== -->
 
-            <div class="panel-card">
+        <!-- =================================================
+             COCO BOX SETTINGS
+        ================================================== -->
 
-                <div class="panel-title">
+        <section class="panel-card">
 
-                    <div>
+            <div class="panel-title">
 
-                        <h3>
-                            Page Settings
-                        </h3>
+                <div>
+                    <h3>
+                        📦 Box Settings
+                    </h3>
 
-                        <p>
-                            Preview updates live with page settings.
-                        </p>
-
-                    </div>
-
+                    <p>
+                        Configure Box Number sequence.
+                    </p>
                 </div>
 
-
-                <div class="three-column-fields">
-
-                    <div class="field">
-
-                        <label for="pageSize">
-                            Page Size
-                        </label>
-
-                        <select id="pageSize">
-
-                            <option value="4x6">
-                                4 × 6 Inches
-                            </option>
-
-                            <option value="70x35">
-                                70 × 35 mm
-                            </option>
-
-                            <option value="a4">
-                                A4
-                            </option>
-
-                            <option value="custom">
-                                Custom Size
-                            </option>
-
-                        </select>
-
-                    </div>
+            </div>
 
 
-                    <div class="field">
+            <div class="three-column-fields">
 
-                        <label for="orientation">
-                            Orientation
-                        </label>
+                <div class="field">
 
-                        <select id="orientation">
+                    <label for="startBoxNumber">
+                        Start Box
+                    </label>
 
-                            <option value="portrait">
-                                Portrait
-                            </option>
-
-                            <option value="landscape">
-                                Landscape
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div
-                        id="selectedPageInfo"
-                        class="selected-page-info"
+                    <input
+                        id="startBoxNumber"
+                        type="number"
+                        min="1"
+                        value="1"
                     >
-                        4 × 6 Inches
-                    </div>
 
                 </div>
 
 
-                <div
-                    id="customSizePanel"
-                    class="custom-size-panel hidden"
-                >
+                <div class="field">
 
-                    <div class="two-column-fields">
+                    <label for="endBoxNumber">
+                        End Box
+                    </label>
 
-                        <div class="field">
+                    <input
+                        id="endBoxNumber"
+                        type="number"
+                        min="1"
+                        value="10"
+                    >
 
-                            <label for="customWidth">
-                                Custom Width (mm)
-                            </label>
-
-                            <input
-                                id="customWidth"
-                                type="number"
-                                min="1"
-                                placeholder="Width"
-                                disabled
-                            >
-
-                        </div>
+                </div>
 
 
-                        <div class="field">
+                <div class="field">
 
-                            <label for="customHeight">
-                                Custom Height (mm)
-                            </label>
+                    <label for="boxRepeatCount">
+                        Repeat
+                    </label>
 
-                            <input
-                                id="customHeight"
-                                type="number"
-                                min="1"
-                                placeholder="Height"
-                                disabled
-                            >
+                    <input
+                        id="boxRepeatCount"
+                        type="number"
+                        min="1"
+                        value="1"
+                    >
 
-                        </div>
+                </div>
 
-                    </div>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PAGE SETTINGS
+        ================================================== -->
+
+        <section class="panel-card">
+
+            <div class="panel-title">
+
+                <div>
+                    <h3>
+                        📄 Page & Label Settings
+                    </h3>
+
+                    <p>
+                        Preview changes live.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="three-column-fields">
+
+                <div class="field">
+
+                    <label for="pageSize">
+                        Page Size
+                    </label>
+
+                    <select id="pageSize">
+
+                        <option value="4x6">
+                            4 × 6 Inches
+                        </option>
+
+                        <option value="70x35">
+                            70 × 35 mm
+                        </option>
+
+                        <option value="a4">
+                            A4
+                        </option>
+
+                        <option value="custom">
+                            Custom
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="orientation">
+                        Orientation
+                    </label>
+
+                    <select id="orientation">
+
+                        <option value="portrait">
+                            Portrait
+                        </option>
+
+                        <option value="landscape">
+                            Landscape
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="labelsPerPage">
+                        Labels Per Page
+                    </label>
+
+                    <select id="labelsPerPage">
+
+                        <option value="1">
+                            1
+                        </option>
+
+                        <option
+                            value="2"
+                            selected
+                        >
+                            2
+                        </option>
+
+                        <option value="4">
+                            4
+                        </option>
+
+                        <option value="6">
+                            6
+                        </option>
+
+                        <option value="8">
+                            8
+                        </option>
+
+                    </select>
 
                 </div>
 
             </div>
 
 
-            <!-- =============================================
-                 LABEL FEATURES
-            ============================================== -->
-
-            <div class="panel-card">
-
-                <div class="panel-title">
-
-                    <div>
-
-                        <h3>
-                            Label Features
-                        </h3>
-
-                        <p>
-                            All options update the preview instantly.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="feature-checkbox-list">
-
-                    <label class="feature-check">
-
-                        <input
-                            id="poNumberCheck"
-                            type="checkbox"
-                            checked
-                        >
-
-                        <span class="checkmark"></span>
-
-                        PO Number
-
-                    </label>
-
-
-                    <label class="feature-check">
-
-                        <input
-                            id="boxNumberCheck"
-                            type="checkbox"
-                            checked
-                        >
-
-                        <span class="checkmark"></span>
-
-                        Box Number
-
-                    </label>
-
-
-                    <label class="feature-check">
-
-                        <input
-                            id="poPlusBoxCheck"
-                            type="checkbox"
-                        >
-
-                        <span class="checkmark"></span>
-
-                        PO Number + Box Number
-
-                    </label>
-
-
-                    <label class="feature-check">
-
-                        <input
-                            id="combinedBorderCheck"
-                            type="checkbox"
-                        >
-
-                        <span class="checkmark"></span>
-
-                        Combined Border
-
-                    </label>
-
-
-                    <label class="feature-check">
-
-                        <input
-                            id="poBorderCheck"
-                            type="checkbox"
-                        >
-
-                        <span class="checkmark"></span>
-
-                        PO Border
-
-                    </label>
-
-
-                    <label class="feature-check">
-
-                        <input
-                            id="boxBorderCheck"
-                            type="checkbox"
-                        >
-
-                        <span class="checkmark"></span>
-
-                        Box Border
-
-                    </label>
-
-
-                    <label class="feature-check">
-
-                        <input
-                            id="cutLineCheck"
-                            type="checkbox"
-                        >
-
-                        <span class="checkmark"></span>
-
-                        Cut Line / Scissor Mark
-
-                    </label>
-
-
-                    <label class="feature-check">
-
-                        <input
-                            id="pageBorderCheck"
-                            type="checkbox"
-                        >
-
-                        <span class="checkmark"></span>
-
-                        Page Border
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <!-- =============================================
-                 PO FONT SETTINGS
-            ============================================== -->
-
-            <div class="panel-card">
-
-                <div class="panel-title">
-
-                    <div>
-
-                        <h3>
-                            PO Number Font Settings
-                        </h3>
-
-                    </div>
-
-                </div>
-
-
-                <div class="settings-grid">
+            <div
+                id="customSizePanel"
+                class="custom-size-panel hidden"
+            >
+
+                <div class="two-column-fields">
 
                     <div class="field">
 
-                        <label for="poFontFamily">
-                            Font
-                        </label>
-
-                        <select id="poFontFamily">
-
-                            <option>Arial</option>
-                            <option>Calibri</option>
-                            <option>Times New Roman</option>
-                            <option>Georgia</option>
-                            <option>Verdana</option>
-                            <option>Tahoma</option>
-                            <option>Trebuchet MS</option>
-                            <option>Courier New</option>
-                            <option>Consolas</option>
-                            <option>Cambria</option>
-                            <option>Garamond</option>
-                            <option>Palatino Linotype</option>
-                            <option>Century Gothic</option>
-                            <option>Segoe UI</option>
-                            <option>Segoe UI Semibold</option>
-                            <option>Franklin Gothic</option>
-                            <option>Impact</option>
-                            <option>Lucida Sans</option>
-                            <option>Book Antiqua</option>
-                            <option>Arial Narrow</option>
-                            <option>Arial Black</option>
-                            <option>Microsoft Sans Serif</option>
-                            <option>Rockwell</option>
-                            <option>Courier</option>
-                            <option>Helvetica</option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="poFontSize">
-                            Font Size
+                        <label for="customWidth">
+                            Width (mm)
                         </label>
 
                         <input
-                            id="poFontSize"
+                            id="customWidth"
                             type="number"
                             min="1"
-                            max="48"
-                            value="24"
+                            value="70"
                         >
 
                     </div>
+
+
+                    <div class="field">
+
+                        <label for="customHeight">
+                            Height (mm)
+                        </label>
+
+                        <input
+                            id="customHeight"
+                            type="number"
+                            min="1"
+                            value="35"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="selectedPageInfo"
+                class="selected-page-info"
+            >
+                101.6 × 152.4 mm
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FEATURES
+        ================================================== -->
+
+        <section class="panel-card">
+
+            <div class="panel-title">
+
+                <div>
+                    <h3>
+                        ⚙️ Label Features
+                    </h3>
+
+                    <p>
+                        Enable or disable label elements.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="feature-checkbox-list">
+
+                <label class="feature-check">
+
+                    <input
+                        id="poNumberCheck"
+                        type="checkbox"
+                        checked
+                    >
+
+                    <span>
+                        PO Value
+                    </span>
+
+                </label>
+
+
+                <label class="feature-check">
+
+                    <input
+                        id="boxNumberCheck"
+                        type="checkbox"
+                        checked
+                    >
+
+                    <span>
+                        Box Number
+                    </span>
+
+                </label>
+
+
+                <label class="feature-check">
+
+                    <input
+                        id="poPlusBoxCheck"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        PO + Box
+                    </span>
+
+                </label>
+
+
+                <label class="feature-check">
+
+                    <input
+                        id="combinedBorderCheck"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        Combined Border
+                    </span>
+
+                </label>
+
+
+                <label class="feature-check">
+
+                    <input
+                        id="poBorderCheck"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        PO Border
+                    </span>
+
+                </label>
+
+
+                <label class="feature-check">
+
+                    <input
+                        id="boxBorderCheck"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        Box Border
+                    </span>
+
+                </label>
+
+
+                <label class="feature-check">
+
+                    <input
+                        id="cutLineCheck"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        Cut Line
+                    </span>
+
+                </label>
+
+
+                <label class="feature-check">
+
+                    <input
+                        id="pageBorderCheck"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        Page Border
+                    </span>
+
+                </label>
+
+
+                <label class="feature-check">
+
+                    <input
+                        id="samePOPageFlow"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        Same PO Flow
+                    </span>
+
+                </label>
+
+
+                <label class="feature-check">
+
+                    <input
+                        id="halfPageFlowCheck"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        Half Page Flow
+                    </span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FONT SETTINGS
+        ================================================== -->
+
+        <section class="panel-card">
+
+            <div class="panel-title">
+
+                <div>
+                    <h3>
+                        🔤 PO Text Style
+                    </h3>
+                </div>
+
+            </div>
+
+
+            <div class="three-column-fields">
+
+                <div class="field">
+
+                    <label for="poFontFamily">
+                        Font
+                    </label>
+
+                    <select id="poFontFamily">
+
+                        <option value="Arial">
+                            Arial
+                        </option>
+
+                        <option value="Verdana">
+                            Verdana
+                        </option>
+
+                        <option value="Georgia">
+                            Georgia
+                        </option>
+
+                        <option value="Tahoma">
+                            Tahoma
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="poFontSize">
+                        Size
+                    </label>
+
+                    <input
+                        id="poFontSize"
+                        type="number"
+                        min="6"
+                        max="100"
+                        value="24"
+                    >
 
                 </div>
 
@@ -985,82 +911,66 @@
 
             </div>
 
+        </section>
 
-            <!-- =============================================
-                 BOX FONT SETTINGS
-            ============================================== -->
 
-            <div class="panel-card">
+        <section class="panel-card">
 
-                <div class="panel-title">
+            <div class="panel-title">
 
-                    <div>
+                <div>
+                    <h3>
+                        🔤 Box Text Style
+                    </h3>
+                </div>
 
-                        <h3>
-                            Box Number Font Settings
-                        </h3>
+            </div>
 
-                    </div>
+
+            <div class="three-column-fields">
+
+                <div class="field">
+
+                    <label for="boxFontFamily">
+                        Font
+                    </label>
+
+                    <select id="boxFontFamily">
+
+                        <option value="Arial">
+                            Arial
+                        </option>
+
+                        <option value="Verdana">
+                            Verdana
+                        </option>
+
+                        <option value="Georgia">
+                            Georgia
+                        </option>
+
+                        <option value="Tahoma">
+                            Tahoma
+                        </option>
+
+                    </select>
 
                 </div>
 
 
-                <div class="settings-grid">
+                <div class="field">
 
-                    <div class="field">
+                    <label for="boxFontSize">
+                        Size
+                    </label>
 
-                        <label for="boxFontFamily">
-                            Font
-                        </label>
-
-                        <select id="boxFontFamily">
-
-                            <option>Arial</option>
-                            <option>Calibri</option>
-                            <option>Times New Roman</option>
-                            <option>Georgia</option>
-                            <option>Verdana</option>
-                            <option>Tahoma</option>
-                            <option>Trebuchet MS</option>
-                            <option>Courier New</option>
-                            <option>Consolas</option>
-                            <option>Cambria</option>
-                            <option>Garamond</option>
-                            <option>Palatino Linotype</option>
-                            <option>Century Gothic</option>
-                            <option>Segoe UI</option>
-                            <option>Segoe UI Semibold</option>
-                            <option>Franklin Gothic</option>
-                            <option>Impact</option>
-                            <option>Lucida Sans</option>
-                            <option>Book Antiqua</option>
-                            <option>Arial Narrow</option>
-                            <option>Arial Black</option>
-                            <option>Microsoft Sans Serif</option>
-                            <option>Rockwell</option>
-                            <option>Courier</option>
-                            <option>Helvetica</option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="boxFontSize">
-                            Font Size
-                        </label>
-
-                        <input
-                            id="boxFontSize"
-                            type="number"
-                            min="1"
-                            max="48"
-                            value="20"
-                        >
-
-                    </div>
+                    <input
+                        id="boxFontSize"
+                        type="number"
+                        min="6"
+                        max="100"
+                        value="20"
+                    >
 
                 </div>
 
@@ -1106,93 +1016,69 @@
 
             </div>
 
+        </section>
 
-            <!-- =============================================
-                 LIVE PREVIEW
-            ============================================== -->
 
-            <div class="panel-card preview-card">
+        <!-- =================================================
+             LIVE PREVIEW
+        ================================================== -->
 
-                <div class="panel-title">
+        <section class="panel-card preview-card">
 
-                    <div>
+            <div class="panel-title">
 
-                        <h3>
-                            Live Preview
-                        </h3>
+                <div>
 
-                        <p>
-                            Preview changes instantly.
-                        </p>
+                    <h3>
+                        👁️ Live Page Preview
+                    </h3>
 
-                    </div>
-
-                    <span
-                        id="previewPageSize"
-                        class="limit-badge"
-                    >
-                        4 × 6 Inches
-                    </span>
+                    <p>
+                        Changes appear here instantly.
+                    </p>
 
                 </div>
 
+                <span
+                    id="previewPageSize"
+                    class="limit-badge"
+                >
+                    4 × 6 Inches
+                </span>
 
-                <div class="preview-container">
+            </div>
+
+
+            <div class="preview-container">
+
+                <div
+                    id="previewPage"
+                    class="preview-page"
+                >
 
                     <div
-                        id="previewPage"
-                        class="preview-page"
+                        id="previewLabel"
+                        class="preview-label"
                     >
 
                         <div
-                            id="previewLabel"
-                            class="preview-label"
+                            id="previewPO"
+                            class="preview-po"
                         >
-
-                            <div
-                                id="previewPO"
-                                class="preview-po"
-                            >
-                                PO NUMBER
-                            </div>
+                            ABC123
+                        </div>
 
 
-                            <div
-                                id="previewBox"
-                                class="preview-box"
-                            >
-                                BOX NO. 1
-                            </div>
-
+                        <div
+                            id="previewBox"
+                            class="preview-box"
+                        >
+                            BOX NO. 1
                         </div>
 
                     </div>
 
                 </div>
-
-            </div>
-
-
-            <!-- ACTIONS -->
-
-            <div class="action-bar">
-
-                <button
-                    id="cocoResetButton"
-                    type="button"
-                    class="secondary-btn"
-                >
-                    Reset
-                </button>
-
-
-                <button
-                    id="cocoGenerateButton"
-                    type="button"
-                    class="primary-btn"
-                >
-                    Generate PDF
-                </button>
 
             </div>
 
@@ -1200,129 +1086,220 @@
 
 
         <!-- =================================================
-             OTHER PO
+             ACTIONS
         ================================================== -->
 
+        <div class="action-bar">
+
+            <button
+                id="cocoResetButton"
+                type="button"
+                class="secondary-btn"
+            >
+                ↺ Reset
+            </button>
+
+
+            <button
+                id="cocoGenerateButton"
+                type="button"
+                class="primary-btn"
+            >
+                📄 Generate PDF
+            </button>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         OTHER PO
+    ====================================================== -->
+
+    <main
+        id="otherpoWorkspace"
+        class="tool-section"
+        data-tool="otherPO"
+    >
+
+        <div class="section-heading">
+
+            <span class="section-label">
+                📦 OTHER PO
+            </span>
+
+            <h2>
+                Other PO Labels
+            </h2>
+
+            <p>
+                Create labels for other purchase orders.
+            </p>
+
+        </div>
+
+
+        <div class="sub-navigation">
+
+            <button
+                type="button"
+                class="sub-category-btn active"
+                data-other-mode="individual"
+            >
+                ✏️ Individual
+            </button>
+
+
+            <button
+                type="button"
+                class="sub-category-btn"
+                data-other-mode="multiple"
+            >
+                📋 Multiple
+            </button>
+
+
+            <button
+                type="button"
+                class="sub-category-btn"
+                data-other-mode="excel"
+            >
+                📊 Excel
+            </button>
+
+
+            <button
+                type="button"
+                class="sub-category-btn"
+                data-other-mode="address"
+            >
+                📍 Address
+            </button>
+
+        </div>
+
+
         <section
-            class="tool-section"
-            data-tool="otherPO"
+            id="otherIndividualPanel"
+            class="mode-panel active"
         >
 
-            <div class="section-heading">
+            <div class="panel-card">
 
-                <span class="section-label">
-                    TOOL
-                </span>
+                <div class="panel-title">
 
-                <h2>
-                    Other PO
-                </h2>
+                    <h3>
+                        ✏️ PO Numbers
+                    </h3>
 
-                <p>
-                    Generate labels for other purchase orders.
-                </p>
+                </div>
 
-            </div>
-
-
-            <div class="sub-navigation">
-
-                <button
-                    type="button"
-                    class="sub-category-btn active"
-                    data-other-mode="individual"
-                >
-                    Individual
-                </button>
-
-
-                <button
-                    type="button"
-                    class="sub-category-btn"
-                    data-other-mode="multiple"
-                >
-                    Multiple
-                </button>
-
-
-                <button
-                    type="button"
-                    class="sub-category-btn"
-                    data-other-mode="excel"
-                >
-                    Excel Upload
-                </button>
-
-
-                <button
-                    type="button"
-                    class="sub-category-btn"
-                    data-other-mode="address"
-                >
-                    From / To Address
-                </button>
+                <div
+                    id="otherIndividualPOGrid"
+                    class="po-input-grid"
+                ></div>
 
             </div>
 
-
-            <!-- INDIVIDUAL -->
-
-            <div
-                id="otherIndividualPanel"
-                class="mode-panel active"
-            >
-
-                <div class="panel-card">
-
-                    <div class="panel-title">
-
-                        <div>
-
-                            <h3>
-                                Individual Other PO
-                            </h3>
-
-                            <p>
-                                Enter up to 40 PO numbers.
-                            </p>
-
-                        </div>
-
-                        <span class="limit-badge">
-                            MAX 40
-                        </span>
-
-                    </div>
+        </section>
 
 
-                    <div
-                        id="otherIndividualPOGrid"
-                        class="po-input-grid"
-                    ></div>
+        <section
+            id="otherMultiplePanel"
+            class="mode-panel"
+        >
+
+            <div class="panel-card">
+
+                <div class="field">
+
+                    <label for="otherMultiplePO">
+                        Multiple PO Values
+                    </label>
+
+                    <textarea
+                        id="otherMultiplePO"
+                        placeholder="ABC123&#10;DEF456"
+                    ></textarea>
 
                 </div>
 
             </div>
 
+        </section>
 
-            <!-- MULTIPLE -->
 
-            <div
-                id="otherMultiplePanel"
-                class="mode-panel"
-            >
+        <section
+            id="otherExcelPanel"
+            class="mode-panel"
+        >
 
-                <div class="panel-card">
+            <div class="panel-card">
+
+                <div class="upload-area">
+
+                    <strong>
+                        📊 Upload Excel
+                    </strong>
+
+                    <p>
+                        First row is treated as header and ignored.
+                    </p>
+
+                    <input
+                        id="otherExcelFile"
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                    >
+
+                    <span id="otherExcelFileName">
+                        No file selected
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="otherExcelPreview"
+                    class="excel-preview"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <section
+            id="otherAddressPanel"
+            class="mode-panel"
+        >
+
+            <div class="panel-card">
+
+                <div class="two-column-fields">
 
                     <div class="field">
 
-                        <label for="otherMultiplePO">
-                            Multiple PO Numbers
+                        <label>
+                            From
                         </label>
 
                         <textarea
-                            id="otherMultiplePO"
-                            placeholder="PO1001, PO1002, PO1003"
+                            placeholder="From address"
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>
+                            To
+                        </label>
+
+                        <textarea
+                            placeholder="To address"
                         ></textarea>
 
                     </div>
@@ -1331,332 +1308,189 @@
 
             </div>
 
+        </section>
 
-            <!-- EXCEL -->
+
+        <section class="panel-card">
+
+            <div class="three-column-fields">
+
+                <div class="field">
+
+                    <label for="otherPageSize">
+                        Page Size
+                    </label>
+
+                    <select id="otherPageSize">
+
+                        <option value="4x6">
+                            4 × 6 Inches
+                        </option>
+
+                        <option value="70x35">
+                            70 × 35 mm
+                        </option>
+
+                        <option value="a4">
+                            A4
+                        </option>
+
+                        <option value="custom">
+                            Custom
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="otherOrientation">
+                        Orientation
+                    </label>
+
+                    <select id="otherOrientation">
+
+                        <option value="portrait">
+                            Portrait
+                        </option>
+
+                        <option value="landscape">
+                            Landscape
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
 
             <div
-                id="otherExcelPanel"
-                class="mode-panel"
+                id="otherCustomSizePanel"
+                class="custom-size-panel hidden"
             >
 
-                <div class="panel-card">
+                <div class="two-column-fields">
 
-                    <div class="upload-area">
+                    <div class="field">
 
-                        <strong>
-                            Upload Excel File
-                        </strong>
-
-                        <p>
-                            First row = Header and will be ignored.
-                        </p>
+                        <label for="otherCustomWidth">
+                            Width
+                        </label>
 
                         <input
-                            id="otherExcelFile"
-                            type="file"
-                            accept=".xlsx,.xls,.csv"
+                            id="otherCustomWidth"
+                            type="number"
+                            value="70"
                         >
-
-                        <span id="otherExcelFileName">
-                            No file selected
-                        </span>
-
-                    </div>
-
-
-                    <div
-                        id="otherExcelPreview"
-                        class="excel-preview"
-                    ></div>
-
-                </div>
-
-            </div>
-
-
-            <!-- ADDRESS -->
-
-            <div
-                id="otherAddressPanel"
-                class="mode-panel"
-            >
-
-                <div class="panel-card">
-
-                    <div class="address-two-column">
-
-                        <div class="address-editor">
-
-                            <h3>
-                                From Address
-                            </h3>
-
-                            <textarea
-                                id="otherFromAddress"
-                                placeholder="From Address"
-                            ></textarea>
-
-                        </div>
-
-
-                        <div class="address-editor">
-
-                            <h3>
-                                To Address
-                            </h3>
-
-                            <textarea
-                                id="otherToAddress"
-                                placeholder="To Address"
-                            ></textarea>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- PAGE SETTINGS -->
-
-            <div class="panel-card">
-
-                <div class="panel-title">
-
-                    <div>
-
-                        <h3>
-                            Page Settings
-                        </h3>
-
-                    </div>
-
-                </div>
-
-
-                <div class="three-column-fields">
-
-                    <div class="field">
-
-                        <label for="otherPageSize">
-                            Page Size
-                        </label>
-
-                        <select id="otherPageSize">
-
-                            <option value="4x6">
-                                4 × 6 Inches
-                            </option>
-
-                            <option value="70x35">
-                                70 × 35 mm
-                            </option>
-
-                            <option value="a4">
-                                A4
-                            </option>
-
-                            <option value="custom">
-                                Custom Size
-                            </option>
-
-                        </select>
 
                     </div>
 
 
                     <div class="field">
 
-                        <label for="otherOrientation">
-                            Orientation
+                        <label for="otherCustomHeight">
+                            Height
                         </label>
 
-                        <select id="otherOrientation">
-
-                            <option value="portrait">
-                                Portrait
-                            </option>
-
-                            <option value="landscape">
-                                Landscape
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-
-                <div
-                    id="otherCustomSizePanel"
-                    class="custom-size-panel hidden"
-                >
-
-                    <div class="two-column-fields">
-
-                        <div class="field">
-
-                            <label for="otherCustomWidth">
-                                Width (mm)
-                            </label>
-
-                            <input
-                                id="otherCustomWidth"
-                                type="number"
-                                disabled
-                            >
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="otherCustomHeight">
-                                Height (mm)
-                            </label>
-
-                            <input
-                                id="otherCustomHeight"
-                                type="number"
-                                disabled
-                            >
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="panel-card preview-card">
-
-                <div class="panel-title">
-
-                    <h3>
-                        Live Preview
-                    </h3>
-
-                </div>
-
-
-                <div class="preview-container">
-
-                    <div
-                        class="preview-page"
-                    >
-
-                        <div
-                            class="preview-label"
+                        <input
+                            id="otherCustomHeight"
+                            type="number"
+                            value="35"
                         >
 
-                            <div
-                                class="preview-po"
-                            >
-                                PO NUMBER
-                            </div>
-
-                            <div
-                                class="preview-box"
-                            >
-                                BOX NO. 1
-                            </div>
-
-                        </div>
-
                     </div>
 
                 </div>
-
-            </div>
-
-
-            <div class="action-bar">
-
-                <button
-                    id="otherResetButton"
-                    type="button"
-                    class="secondary-btn"
-                >
-                    Reset
-                </button>
-
-
-                <button
-                    id="otherGenerateButton"
-                    type="button"
-                    class="primary-btn"
-                >
-                    Generate PDF
-                </button>
 
             </div>
 
         </section>
 
 
-        <!-- =================================================
-             ISBN BARCODE
-        ================================================== -->
+        <div class="action-bar">
 
-        <section
-            class="tool-section"
-            data-tool="isbnBarcode"
-        >
-
-            <div class="section-heading">
-
-                <span class="section-label">
-                    TOOL
-                </span>
-
-                <h2>
-                    ISBN Barcode Generator
-                </h2>
-
-                <p>
-                    Generate printable ISBN barcode labels.
-                </p>
-
-            </div>
+            <button
+                id="otherResetButton"
+                type="button"
+                class="secondary-btn"
+            >
+                ↺ Reset
+            </button>
 
 
-            <div class="panel-card">
+            <button
+                id="otherGenerateButton"
+                type="button"
+                class="primary-btn"
+            >
+                📄 Generate PDF
+            </button>
 
-                <div class="two-column-fields">
+        </div>
 
-                    <div class="field">
-
-                        <label for="isbnValue">
-                            ISBN
-                        </label>
-
-                        <input
-                            id="isbnValue"
-                            type="text"
-                            placeholder="Enter ISBN"
-                        >
-
-                    </div>
+    </main>
 
 
-                    <div class="field">
+    <!-- =====================================================
+         ISBN
+    ====================================================== -->
 
-                        <label for="isbnBookTitle">
-                            Book Title
-                        </label>
+    <main
+        id="isbnWorkspace"
+        class="tool-section"
+        data-tool="isbn"
+    >
 
-                        <input
-                            id="isbnBookTitle"
-                            type="text"
-                            placeholder="Book Title"
-                        >
+        <div class="section-heading">
 
-                    </div>
+            <span class="section-label">
+                🏷️ ISBN
+            </span>
+
+            <h2>
+                ISBN / Barcode Generator
+            </h2>
+
+            <p>
+                Generate ISBN barcode labels.
+            </p>
+
+        </div>
+
+
+        <section class="panel-card">
+
+            <div class="three-column-fields">
+
+                <div class="field">
+
+                    <label for="isbnValue">
+                        ISBN
+                    </label>
+
+                    <input
+                        id="isbnValue"
+                        type="text"
+                        placeholder="978XXXXXXXXXX"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="isbnBookTitle">
+                        Book Title
+                    </label>
+
+                    <input
+                        id="isbnBookTitle"
+                        type="text"
+                        placeholder="Book title"
+                    >
 
                 </div>
 
@@ -1677,162 +1511,305 @@
 
             </div>
 
+        </section>
 
-            <div class="panel-card">
 
-                <div class="panel-title">
+        <section class="panel-card">
 
-                    <h3>
-                        Page Settings
-                    </h3>
+            <div class="three-column-fields">
+
+                <div class="field">
+
+                    <label for="isbnPageSize">
+                        Page Size
+                    </label>
+
+                    <select id="isbnPageSize">
+
+                        <option value="4x6">
+                            4 × 6 Inches
+                        </option>
+
+                        <option value="70x35">
+                            70 × 35 mm
+                        </option>
+
+                        <option value="a4">
+                            A4
+                        </option>
+
+                        <option value="custom">
+                            Custom
+                        </option>
+
+                    </select>
 
                 </div>
 
 
-                <div class="three-column-fields">
+                <div class="field">
+
+                    <label for="isbnOrientation">
+                        Orientation
+                    </label>
+
+                    <select id="isbnOrientation">
+
+                        <option value="portrait">
+                            Portrait
+                        </option>
+
+                        <option value="landscape">
+                            Landscape
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="isbnCustomSizePanel"
+                class="custom-size-panel hidden"
+            >
+
+                <div class="two-column-fields">
 
                     <div class="field">
 
-                        <label for="isbnPageSize">
-                            Page Size
+                        <label for="isbnCustomWidth">
+                            Width
                         </label>
 
-                        <select id="isbnPageSize">
-
-                            <option value="4x6">
-                                4 × 6 Inches
-                            </option>
-
-                            <option value="70x35">
-                                70 × 35 mm
-                            </option>
-
-                            <option value="a4">
-                                A4
-                            </option>
-
-                            <option value="custom">
-                                Custom Size
-                            </option>
-
-                        </select>
+                        <input
+                            id="isbnCustomWidth"
+                            type="number"
+                            value="70"
+                        >
 
                     </div>
 
 
                     <div class="field">
 
-                        <label for="isbnOrientation">
-                            Orientation
+                        <label for="isbnCustomHeight">
+                            Height
                         </label>
 
-                        <select id="isbnOrientation">
-
-                            <option value="portrait">
-                                Portrait
-                            </option>
-
-                            <option value="landscape">
-                                Landscape
-                            </option>
-
-                        </select>
+                        <input
+                            id="isbnCustomHeight"
+                            type="number"
+                            value="35"
+                        >
 
                     </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="panel-card">
+
+            <div class="panel-title">
+
+                <div>
+
+                    <h3>
+                        🔢 Barcode Preview
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="barcodePreview"
+                class="barcode-preview"
+            >
+
+                <svg
+                    id="isbnBarcodeSvg"
+                ></svg>
+
+                <div id="isbnBarcodeText">
+                    Enter ISBN to preview
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div class="action-bar">
+
+            <button
+                id="isbnResetButton"
+                type="button"
+                class="secondary-btn"
+            >
+                ↺ Reset
+            </button>
+
+
+            <button
+                id="isbnGenerateButton"
+                type="button"
+                class="primary-btn"
+            >
+                🏷️ Generate PDF
+            </button>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         ADDRESS / QR
+    ====================================================== -->
+
+    <main
+        id="addressWorkspace"
+        class="tool-section"
+        data-tool="address"
+    >
+
+        <div class="section-heading">
+
+            <span class="section-label">
+                📍 ADDRESS + QR
+            </span>
+
+            <h2>
+                Address & QR Labels
+            </h2>
+
+            <p>
+                Generate address labels with location and email QR codes.
+            </p>
+
+        </div>
+
+
+        <div class="sub-navigation">
+
+            <button
+                type="button"
+                class="sub-category-btn active"
+                data-address-mode="manual"
+            >
+                ✏️ Manual
+            </button>
+
+
+            <button
+                type="button"
+                class="sub-category-btn"
+                data-address-mode="excel"
+            >
+                📊 Excel
+            </button>
+
+        </div>
+
+
+        <section
+            id="addressManualPanel"
+            class="address-mode-panel active"
+        >
+
+            <div class="panel-card">
+
+                <div class="address-two-column">
+
+                    <div class="address-editor">
+
+                        <h3>
+                            📤 From Address
+                        </h3>
+
+
+                        <div class="field">
+
+                            <label for="addressFrom">
+                                From
+                            </label>
+
+                            <textarea
+                                id="addressFrom"
+                                placeholder="Enter sender address"
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="address-editor">
+
+                        <h3>
+                            📥 To Address
+                        </h3>
+
+
+                        <div class="field">
+
+                            <label for="addressTo">
+                                To
+                            </label>
+
+                            <textarea
+                                id="addressTo"
+                                placeholder="Enter receiver address"
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section
+            id="addressExcelPanel"
+            class="address-mode-panel"
+        >
+
+            <div class="panel-card">
+
+                <div class="upload-area">
+
+                    <strong>
+                        📊 Upload Address Excel
+                    </strong>
+
+                    <p>
+                        First row is the header and will be ignored.
+                    </p>
+
+                    <input
+                        id="addressExcelFile"
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                    >
 
                 </div>
 
 
                 <div
-                    id="isbnCustomSizePanel"
-                    class="custom-size-panel hidden"
-                >
-
-                    <div class="two-column-fields">
-
-                        <div class="field">
-
-                            <label for="isbnCustomWidth">
-                                Width (mm)
-                            </label>
-
-                            <input
-                                id="isbnCustomWidth"
-                                type="number"
-                                disabled
-                            >
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="isbnCustomHeight">
-                                Height (mm)
-                            </label>
-
-                            <input
-                                id="isbnCustomHeight"
-                                type="number"
-                                disabled
-                            >
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="panel-card">
-
-                <div class="panel-title">
-
-                    <h3>
-                        Barcode Preview
-                    </h3>
-
-                </div>
-
-
-                <div class="barcode-preview">
-
-                    <svg
-                        id="isbnBarcodeSvg"
-                    ></svg>
-
-
-                    <div
-                        id="isbnBarcodeText"
-                    >
-                        Enter ISBN to preview
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="action-bar">
-
-                <button
-                    id="isbnResetButton"
-                    type="button"
-                    class="secondary-btn"
-                >
-                    Reset
-                </button>
-
-
-                <button
-                    id="isbnGenerateButton"
-                    type="button"
-                    class="primary-btn"
-                >
-                    Generate PDF
-                </button>
+                    id="addressExcelPreview"
+                    class="excel-preview"
+                ></div>
 
             </div>
 
@@ -1840,130 +1817,98 @@
 
 
         <!-- =================================================
-             ADDRESS STICKER
+             ADDRESS PAGE
         ================================================== -->
 
-        <section
-            class="tool-section"
-            data-tool="addressSticker"
-        >
+        <section class="panel-card">
 
-            <div class="section-heading">
+            <div class="three-column-fields">
 
-                <span class="section-label">
-                    TOOL
-                </span>
+                <div class="field">
 
-                <h2>
-                    Address Sticker
-                </h2>
+                    <label for="addressPageSize">
+                        Page Size
+                    </label>
 
-                <p>
-                    Generate From and To address stickers.
-                </p>
+                    <select id="addressPageSize">
+
+                        <option value="4x6">
+                            4 × 6 Inches
+                        </option>
+
+                        <option value="70x35">
+                            70 × 35 mm
+                        </option>
+
+                        <option value="a4">
+                            A4
+                        </option>
+
+                        <option value="custom">
+                            Custom
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="addressOrientation">
+                        Orientation
+                    </label>
+
+                    <select id="addressOrientation">
+
+                        <option value="portrait">
+                            Portrait
+                        </option>
+
+                        <option value="landscape">
+                            Landscape
+                        </option>
+
+                    </select>
+
+                </div>
 
             </div>
 
-
-            <div class="sub-navigation">
-
-                <button
-                    type="button"
-                    class="sub-category-btn active"
-                    data-address-mode="manual"
-                >
-                    Manual
-                </button>
-
-
-                <button
-                    type="button"
-                    class="sub-category-btn"
-                    data-address-mode="excel"
-                >
-                    Excel Upload
-                </button>
-
-            </div>
-
-
-            <!-- MANUAL -->
 
             <div
-                id="addressManualPanel"
-                class="address-mode-panel active"
+                id="addressCustomSizePanel"
+                class="custom-size-panel hidden"
             >
 
-                <div class="panel-card">
+                <div class="two-column-fields">
 
-                    <div class="address-two-column">
+                    <div class="field">
 
-                        <div class="address-editor">
+                        <label for="addressCustomWidth">
+                            Width
+                        </label>
 
-                            <div class="panel-title">
+                        <input
+                            id="addressCustomWidth"
+                            type="number"
+                            value="70"
+                        >
 
-                                <div>
-
-                                    <h3>
-                                        From Address
-                                    </h3>
-
-                                    <p>
-                                        Example:
-                                        Company Name,
-                                        Customer Name,
-                                        Full Address
-                                    </p>
-
-                                </div>
-
-                            </div>
+                    </div>
 
 
-                            <div class="field">
+                    <div class="field">
 
-                                <textarea
-                                    id="addressFrom"
-                                    placeholder="Company Name&#10;Customer Name&#10;Full Address"
-                                ></textarea>
+                        <label for="addressCustomHeight">
+                            Height
+                        </label>
 
-                            </div>
-
-                        </div>
-
-
-                        <div class="address-editor">
-
-                            <div class="panel-title">
-
-                                <div>
-
-                                    <h3>
-                                        To Address
-                                    </h3>
-
-                                    <p>
-                                        Example:
-                                        Customer Name,
-                                        Address,
-                                        City / State / PIN
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="field">
-
-                                <textarea
-                                    id="addressTo"
-                                    placeholder="Customer Name&#10;Address&#10;City / State / PIN"
-                                ></textarea>
-
-                            </div>
-
-                        </div>
+                        <input
+                            id="addressCustomHeight"
+                            type="number"
+                            value="35"
+                        >
 
                     </div>
 
@@ -1971,540 +1916,365 @@
 
             </div>
 
+        </section>
 
-            <!-- EXCEL -->
 
-            <div
-                id="addressExcelPanel"
-                class="address-mode-panel"
-            >
+        <!-- =================================================
+             QR CODES
+        ================================================== -->
 
-                <div class="panel-card">
+        <section class="panel-card">
 
-                    <div class="upload-area">
+            <div class="panel-title">
 
-                        <strong>
-                            Upload Address Excel
-                        </strong>
+                <div>
 
-                        <p>
-                            First row = Header.
-                            Data starts from second row.
-                        </p>
+                    <h3>
+                        📱 QR Codes
+                    </h3>
 
-                        <input
-                            id="addressExcelFile"
-                            type="file"
-                            accept=".xlsx,.xls,.csv"
-                        >
+                    <p>
+                        Location and email QR codes.
+                    </p>
 
-                        <span>
-                            Upload From / To address data
-                        </span>
+                </div>
 
-                    </div>
+            </div>
 
+
+            <div class="address-two-column">
+
+                <div class="address-editor">
+
+                    <h3>
+                        📍 Address / Location QR
+                    </h3>
 
                     <div
-                        id="addressExcelPreview"
-                        class="excel-preview"
+                        id="addressQRPreview"
+                        class="qr-preview"
+                    ></div>
+
+                </div>
+
+
+                <div class="address-editor">
+
+                    <h3>
+                        ✉️ Email QR
+                    </h3>
+
+                    <div
+                        id="emailQRPreview"
+                        class="qr-preview"
                     ></div>
 
                 </div>
 
             </div>
 
+        </section>
 
-            <!-- ADDRESS FONT SETTINGS -->
 
-            <div class="panel-card">
+        <!-- =================================================
+             FROM FONT
+        ================================================== -->
 
-                <div class="panel-title">
+        <section class="panel-card">
 
-                    <div>
+            <div class="panel-title">
 
-                        <h3>
-                            From / To Font Settings
-                        </h3>
-
-                        <p>
-                            From and To settings are completely separate.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="address-two-column">
-
-
-                    <!-- FROM -->
-
-                    <div class="address-editor">
-
-                        <h3>
-                            From Settings
-                        </h3>
-
-
-                        <div class="field">
-
-                            <label for="fromFontFamily">
-                                Font
-                            </label>
-
-                            <select id="fromFontFamily">
-
-                                <option>Arial</option>
-                                <option>Calibri</option>
-                                <option>Times New Roman</option>
-                                <option>Georgia</option>
-                                <option>Verdana</option>
-                                <option>Tahoma</option>
-                                <option>Trebuchet MS</option>
-                                <option>Courier New</option>
-                                <option>Consolas</option>
-                                <option>Cambria</option>
-                                <option>Garamond</option>
-                                <option>Palatino Linotype</option>
-                                <option>Century Gothic</option>
-                                <option>Segoe UI</option>
-                                <option>Franklin Gothic</option>
-                                <option>Impact</option>
-                                <option>Lucida Sans</option>
-                                <option>Book Antiqua</option>
-                                <option>Arial Narrow</option>
-                                <option>Arial Black</option>
-                                <option>Rockwell</option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="fromFontSize">
-                                Font Size
-                            </label>
-
-                            <input
-                                id="fromFontSize"
-                                type="number"
-                                min="1"
-                                max="48"
-                                value="14"
-                            >
-
-                        </div>
-
-
-                        <div class="text-style-controls">
-
-                            <label>
-
-                                <input
-                                    id="fromBold"
-                                    type="checkbox"
-                                >
-
-                                Bold
-
-                            </label>
-
-
-                            <label>
-
-                                <input
-                                    id="fromItalic"
-                                    type="checkbox"
-                                >
-
-                                Italic
-
-                            </label>
-
-
-                            <label>
-
-                                <input
-                                    id="fromUnderline"
-                                    type="checkbox"
-                                >
-
-                                Underline
-
-                            </label>
-
-
-                            <label>
-
-                                <input
-                                    id="fromBorder"
-                                    type="checkbox"
-                                >
-
-                                Border
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- TO -->
-
-                    <div class="address-editor">
-
-                        <h3>
-                            To Settings
-                        </h3>
-
-
-                        <div class="field">
-
-                            <label for="toFontFamily">
-                                Font
-                            </label>
-
-                            <select id="toFontFamily">
-
-                                <option>Arial</option>
-                                <option>Calibri</option>
-                                <option>Times New Roman</option>
-                                <option>Georgia</option>
-                                <option>Verdana</option>
-                                <option>Tahoma</option>
-                                <option>Trebuchet MS</option>
-                                <option>Courier New</option>
-                                <option>Consolas</option>
-                                <option>Cambria</option>
-                                <option>Garamond</option>
-                                <option>Palatino Linotype</option>
-                                <option>Century Gothic</option>
-                                <option>Segoe UI</option>
-                                <option>Franklin Gothic</option>
-                                <option>Impact</option>
-                                <option>Lucida Sans</option>
-                                <option>Book Antiqua</option>
-                                <option>Arial Narrow</option>
-                                <option>Arial Black</option>
-                                <option>Rockwell</option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="toFontSize">
-                                Font Size
-                            </label>
-
-                            <input
-                                id="toFontSize"
-                                type="number"
-                                min="1"
-                                max="48"
-                                value="14"
-                            >
-
-                        </div>
-
-
-                        <div class="text-style-controls">
-
-                            <label>
-
-                                <input
-                                    id="toBold"
-                                    type="checkbox"
-                                >
-
-                                Bold
-
-                            </label>
-
-
-                            <label>
-
-                                <input
-                                    id="toItalic"
-                                    type="checkbox"
-                                >
-
-                                Italic
-
-                            </label>
-
-
-                            <label>
-
-                                <input
-                                    id="toUnderline"
-                                    type="checkbox"
-                                >
-
-                                Underline
-
-                            </label>
-
-
-                            <label>
-
-                                <input
-                                    id="toBorder"
-                                    type="checkbox"
-                                >
-
-                                Border
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
+                <div>
+                    <h3>
+                        📤 From Text Style
+                    </h3>
                 </div>
 
             </div>
 
 
-            <!-- ADDRESS PAGE -->
+            <div class="three-column-fields">
 
-            <div class="panel-card">
+                <div class="field">
 
-                <div class="panel-title">
+                    <label for="fromFontFamily">
+                        Font
+                    </label>
 
-                    <div>
+                    <select id="fromFontFamily">
 
-                        <h3>
-                            Page Settings
-                        </h3>
+                        <option value="Arial">
+                            Arial
+                        </option>
 
-                    </div>
+                        <option value="Verdana">
+                            Verdana
+                        </option>
 
-                </div>
+                        <option value="Georgia">
+                            Georgia
+                        </option>
 
-
-                <div class="three-column-fields">
-
-                    <div class="field">
-
-                        <label for="addressPageSize">
-                            Page Size
-                        </label>
-
-                        <select id="addressPageSize">
-
-                            <option value="4x6">
-                                4 × 6 Inches
-                            </option>
-
-                            <option value="70x35">
-                                70 × 35 mm
-                            </option>
-
-                            <option value="a4">
-                                A4
-                            </option>
-
-                            <option value="custom">
-                                Custom Size
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="addressOrientation">
-                            Orientation
-                        </label>
-
-                        <select id="addressOrientation">
-
-                            <option value="portrait">
-                                Portrait
-                            </option>
-
-                            <option value="landscape">
-                                Landscape
-                            </option>
-
-                        </select>
-
-                    </div>
+                    </select>
 
                 </div>
 
 
-                <div
-                    id="addressCustomSizePanel"
-                    class="custom-size-panel hidden"
-                >
+                <div class="field">
 
-                    <div class="two-column-fields">
+                    <label for="fromFontSize">
+                        Size
+                    </label>
 
-                        <div class="field">
-
-                            <label for="addressCustomWidth">
-                                Width (mm)
-                            </label>
-
-                            <input
-                                id="addressCustomWidth"
-                                type="number"
-                                disabled
-                            >
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="addressCustomHeight">
-                                Height (mm)
-                            </label>
-
-                            <input
-                                id="addressCustomHeight"
-                                type="number"
-                                disabled
-                            >
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 QR CODES
-            ================================================== -->
-
-            <div class="panel-card">
-
-                <div class="panel-title">
-
-                    <div>
-
-                        <h3>
-                            QR Codes
-                        </h3>
-
-                        <p>
-                            Location and email QR codes.
-                        </p>
-
-                    </div>
+                    <input
+                        id="fromFontSize"
+                        type="number"
+                        value="14"
+                    >
 
                 </div>
 
 
-                <div class="address-two-column">
+                <div class="text-style-controls">
+
+                    <label>
+                        <input
+                            id="fromBold"
+                            type="checkbox"
+                        >
+                        Bold
+                    </label>
 
 
-                    <!-- MAP QR -->
-
-                    <div class="address-editor">
-
-                        <h3>
-                            Address / Location QR
-                        </h3>
-
-                        <div
-                            id="addressQRPreview"
-                            class="qr-preview"
-                        ></div>
-
-                        <div class="map-link-box">
-
-                            <span>
-                                Map Location
-                            </span>
-
-                            <a
-                                href="https://maps.app.goo.gl/7McYApm1u9x4QSj7A"
-                                target="_blank"
-                                rel="noopener"
-                            >
-                                Open Map
-                            </a>
-
-                        </div>
-
-                    </div>
+                    <label>
+                        <input
+                            id="fromItalic"
+                            type="checkbox"
+                        >
+                        Italic
+                    </label>
 
 
-                    <!-- EMAIL QR -->
+                    <label>
+                        <input
+                            id="fromUnderline"
+                            type="checkbox"
+                        >
+                        Underline
+                    </label>
 
-                    <div class="address-editor">
 
-                        <h3>
-                            Email QR
-                        </h3>
-
-                        <div
-                            id="emailQRPreview"
-                            class="qr-preview"
-                        ></div>
-
-                        <div class="map-link-box">
-
-                            <span>
-                                Email
-                            </span>
-
-                            <a
-                                href="mailto:ashish.verma@bookswagon.in"
-                            >
-                                ashish.verma@bookswagon.in
-                            </a>
-
-                        </div>
-
-                    </div>
+                    <label>
+                        <input
+                            id="fromBorder"
+                            type="checkbox"
+                        >
+                        Border
+                    </label>
 
                 </div>
-
-            </div>
-
-
-            <!-- ADDRESS ACTIONS -->
-
-            <div class="action-bar">
-
-                <button
-                    id="addressResetButton"
-                    type="button"
-                    class="secondary-btn"
-                >
-                    Reset
-                </button>
-
-
-                <button
-                    id="addressGenerateButton"
-                    type="button"
-                    class="primary-btn"
-                >
-                    Generate PDF
-                </button>
 
             </div>
 
         </section>
 
+
+        <!-- =================================================
+             TO FONT
+        ================================================== -->
+
+        <section class="panel-card">
+
+            <div class="panel-title">
+
+                <div>
+                    <h3>
+                        📥 To Text Style
+                    </h3>
+                </div>
+
+            </div>
+
+
+            <div class="three-column-fields">
+
+                <div class="field">
+
+                    <label for="toFontFamily">
+                        Font
+                    </label>
+
+                    <select id="toFontFamily">
+
+                        <option value="Arial">
+                            Arial
+                        </option>
+
+                        <option value="Verdana">
+                            Verdana
+                        </option>
+
+                        <option value="Georgia">
+                            Georgia
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="toFontSize">
+                        Size
+                    </label>
+
+                    <input
+                        id="toFontSize"
+                        type="number"
+                        value="14"
+                    >
+
+                </div>
+
+
+                <div class="text-style-controls">
+
+                    <label>
+                        <input
+                            id="toBold"
+                            type="checkbox"
+                        >
+                        Bold
+                    </label>
+
+
+                    <label>
+                        <input
+                            id="toItalic"
+                            type="checkbox"
+                        >
+                        Italic
+                    </label>
+
+
+                    <label>
+                        <input
+                            id="toUnderline"
+                            type="checkbox"
+                        >
+                        Underline
+                    </label>
+
+
+                    <label>
+                        <input
+                            id="toBorder"
+                            type="checkbox"
+                        >
+                        Border
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div class="action-bar">
+
+            <button
+                id="addressResetButton"
+                type="button"
+                class="secondary-btn"
+            >
+                ↺ Reset
+            </button>
+
+
+            <button
+                id="addressGenerateButton"
+                type="button"
+                class="primary-btn"
+            >
+                📄 Generate PDF
+            </button>
+
+        </div>
+
     </main>
+
+
+    <!-- =====================================================
+         TOAST
+    ====================================================== -->
+
+    <div
+        id="toast"
+        class="toast"
+        role="status"
+        aria-live="polite"
+    >
+
+        <span id="toastIcon">
+            ✓
+        </span>
+
+        <span id="toastMessage">
+            Done
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         OPTIONAL MODAL
+    ====================================================== -->
+
+    <div
+        id="confirmationModal"
+        class="modal"
+        aria-hidden="true"
+    >
+
+        <div class="modal-box">
+
+            <button
+                id="modalCloseButton"
+                type="button"
+                class="modal-close"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+
+            <h3>
+                Confirmation
+            </h3>
+
+
+            <p>
+                Please confirm this action.
+            </p>
+
+
+            <div class="modal-actions">
+
+                <button
+                    id="modalCancelButton"
+                    type="button"
+                    class="secondary-btn"
+                >
+                    Cancel
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
 
 
     <!-- =====================================================
@@ -2516,20 +2286,16 @@
         <div>
 
             <strong>
-                Books Label Studio
+                Created & Developed by Ashish Verma
             </strong>
-
-            <span>
-                Created &amp; Developed by Ashish Verma
-            </span>
 
             <span>
                 © 2026 Ashish Verma. All Rights Reserved.
             </span>
 
             <span>
-                All rights reserved. Unauthorized copying,
-                modification or redistribution is prohibited.
+                This software, design, UI, workflow and source code
+                are protected and remain the property of Ashish Verma.
             </span>
 
         </div>
@@ -2538,14 +2304,12 @@
         <div class="contact-area">
 
             <strong>
-                Contact
+                📚 Books Label Studio
             </strong>
 
-            <a
-                href="mailto:ashish.verma@bookswagon.in"
-            >
-                ashish.verma@bookswagon.in
-            </a>
+            <span>
+                Professional Label Generation Tool
+            </span>
 
         </div>
 
@@ -2555,89 +2319,8 @@
 
 
 <!-- =========================================================
-     ENABLE / DISABLE TOAST
-========================================================= -->
-
-<div
-    id="toast"
-    class="toast"
-    role="status"
-    aria-live="polite"
->
-
-    <span id="toastIcon">
-        ✓
-    </span>
-
-    <span id="toastMessage">
-        Done
-    </span>
-
-</div>
-
-
-<!-- =========================================================
-     CONFIRMATION MODAL
-     Kept for compatibility.
-     Feature changes do NOT use confirmation.
-========================================================= -->
-
-<div
-    id="confirmationModal"
-    class="modal"
-    aria-hidden="true"
->
-
-    <div class="modal-box">
-
-        <button
-            id="modalCloseButton"
-            type="button"
-            class="modal-close"
-        >
-            ×
-        </button>
-
-
-        <h3 id="modalTitle">
-            Confirmation
-        </h3>
-
-
-        <p id="modalMessage">
-            Are you sure?
-        </p>
-
-
-        <div class="modal-actions">
-
-            <button
-                id="modalCancelButton"
-                type="button"
-                class="secondary-btn"
-            >
-                Cancel
-            </button>
-
-
-            <button
-                id="modalConfirmButton"
-                type="button"
-                class="primary-btn"
-            >
-                Confirm
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- =========================================================
-     LIBRARIES
-========================================================= -->
+     EXTERNAL LIBRARIES
+========================================================== -->
 
 <!-- Excel -->
 <script
@@ -2645,9 +2328,9 @@
 ></script>
 
 
-<!-- PDF -->
+<!-- QR Code -->
 <script
-    src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
+    src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"
 ></script>
 
 
@@ -2657,14 +2340,19 @@
 ></script>
 
 
-<!-- QR -->
+<!-- PDF -->
 <script
-    src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"
+    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"
 ></script>
 
 
-<!-- FINAL JAVASCRIPT -->
-<script src="app.js"></script>
+<!-- =========================================================
+     APP JS
+========================================================== -->
+
+<script
+    src="app.js"
+></script>
 
 </body>
 </html>
