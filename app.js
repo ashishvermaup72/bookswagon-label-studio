@@ -1,91 +1,116 @@
-"use strict";
-
 /* =========================================================
    BOOKS LABEL STUDIO
-   FINAL APP.JS
-   Matching:
-   index.html + style.css
+   FINAL app.js
 ========================================================= */
 
+"use strict";
 
 /* =========================================================
    GLOBAL STATE
 ========================================================= */
 
-const AppState = {
+const App = {
 
-    category: "cocoBlue",
+    activeTool: "cocoBlue",
+    activeCocoMode: "individual",
+    activeOtherMode: "individual",
+    activeAddressMode: "manual",
 
-    cocoMode: "individual",
+    history: [],
+    historyIndex: -1,
 
-    otherMode: "individual",
+    clipboardStyle: null,
 
-    addressMode: "manual",
+    borderStyles: {
+        coco: "solid",
+        other: "solid",
+        isbn: "solid",
+        address: "solid"
+    },
 
-    cocoExcelRows: [],
+    enabledState: {},
 
-    otherExcelRows: [],
-
-    addressExcelRows: [],
-
-    toastTimer: null
-
+    defaultStyle: null
 };
 
 
 /* =========================================================
-   DOM HELPERS
+   HELPERS
 ========================================================= */
 
-const $ = (id) =>
-    document.getElementById(id);
+const $ = (id) => document.getElementById(id);
 
 const $$ = (selector) =>
-    Array.from(
-        document.querySelectorAll(selector)
-    );
+    Array.from(document.querySelectorAll(selector));
 
-function getValue(id, fallback = "") {
 
-    const element = $(id);
+function exists(id) {
+    return !!$(id);
+}
 
-    if (!element) {
+
+function value(id, fallback = "") {
+    const el = $(id);
+
+    if (!el) {
         return fallback;
     }
 
-    return String(
-        element.value ?? ""
-    ).trim();
-
+    return el.value;
 }
 
-function getNumber(id, fallback = 0) {
 
-    const value =
-        Number(
-            getValue(id)
-        );
+function setValue(id, val) {
+    const el = $(id);
 
-    return Number.isFinite(value)
-        ? value
+    if (el) {
+        el.value = val;
+    }
+}
+
+
+function checked(id) {
+    const el = $(id);
+
+    return el ? el.checked : false;
+}
+
+
+function setChecked(id, state) {
+    const el = $(id);
+
+    if (el) {
+        el.checked = !!state;
+    }
+}
+
+
+function clamp(number, min, max) {
+    return Math.min(
+        Math.max(number, min),
+        max
+    );
+}
+
+
+function safeNumber(value, fallback = 0) {
+
+    const n = Number(value);
+
+    return Number.isFinite(n)
+        ? n
         : fallback;
 }
 
-function isChecked(
-    id,
-    fallback = false
-) {
 
-    const element = $(id);
+function escapeHTML(text) {
 
-    if (!element) {
-        return fallback;
-    }
-
-    return Boolean(
-        element.checked
-    );
-
+    return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
@@ -93,27 +118,24 @@ function isChecked(
    TOAST
 ========================================================= */
 
+let toastTimer = null;
+
+
 function showToast(
     message,
-    type = "success"
+    type = "success",
+    duration = 2800
 ) {
 
-    const toast =
-        $("toast");
+    const toast = $("toast");
+    const icon = $("toastIcon");
+    const msg = $("toastMessage");
 
-    const icon =
-        $("toastIcon");
-
-    const text =
-        $("toastMessage");
-
-    if (!toast || !text) {
+    if (!toast || !msg) {
         return;
     }
 
-    clearTimeout(
-        AppState.toastTimer
-    );
+    clearTimeout(toastTimer);
 
     toast.classList.remove(
         "show",
@@ -122,96 +144,709 @@ function showToast(
         "warning"
     );
 
-    const toastType =
-        type === "success"
-            ? "success"
-            : "error";
-
-    toast.classList.add(
-        toastType
-    );
+    toast.classList.add(type);
 
     if (icon) {
 
         icon.textContent =
-            toastType === "success"
-                ? "✓"
-                : "!";
-
+            type === "error"
+                ? "!"
+                : type === "warning"
+                    ? "!"
+                    : "✓";
     }
 
-    text.textContent =
-        message;
+    msg.textContent = message;
 
     requestAnimationFrame(() => {
 
-        toast.classList.add(
-            "show"
-        );
+        toast.classList.add("show");
 
     });
 
-    AppState.toastTimer =
-        setTimeout(() => {
+    toastTimer = setTimeout(() => {
 
-            toast.classList.remove(
-                "show"
-            );
+        toast.classList.remove("show");
 
-        }, 2800);
+    }, duration);
+}
 
+
+function notifyEnabled(name) {
+
+    showToast(
+        `${name} Enabled`,
+        "success"
+    );
+}
+
+
+function notifyDisabled(name) {
+
+    showToast(
+        `${name} Disabled`,
+        "error"
+    );
 }
 
 
 /* =========================================================
-   PDF LIBRARY
+   ENABLE / DISABLE TRACKING
 ========================================================= */
 
-function getJsPDF() {
+function trackToggle(id, name) {
+
+    const el = $(id);
+
+    if (!el) {
+        return;
+    }
+
+    App.enabledState[id] = el.checked;
+
+    el.addEventListener("change", () => {
+
+        App.enabledState[id] = el.checked;
+
+        if (el.checked) {
+            notifyEnabled(name);
+        } else {
+            notifyDisabled(name);
+        }
+
+        saveHistory();
+
+        liveRefresh();
+
+    });
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function collectFormState() {
+
+    const data = {};
+
+    $$("input, select, textarea").forEach(el => {
+
+        if (!el.id) {
+            return;
+        }
+
+        if (el.type === "file") {
+            return;
+        }
+
+        if (el.type === "checkbox") {
+
+            data[el.id] = {
+                type: "checkbox",
+                value: el.checked
+            };
+
+        } else if (el.type === "range") {
+
+            data[el.id] = {
+                type: "range",
+                value: el.value
+            };
+
+        } else {
+
+            data[el.id] = {
+                type: el.type || "text",
+                value: el.value
+            };
+        }
+
+    });
+
+    data.__borderStyles =
+        JSON.parse(
+            JSON.stringify(App.borderStyles)
+        );
+
+    data.__activeTool =
+        App.activeTool;
+
+    return data;
+}
+
+
+function restoreFormState(data) {
+
+    if (!data) {
+        return;
+    }
+
+    Object.keys(data).forEach(key => {
+
+        if (key.startsWith("__")) {
+            return;
+        }
+
+        const el = $(key);
+
+        if (!el) {
+            return;
+        }
+
+        const item = data[key];
+
+        if (item.type === "checkbox") {
+
+            el.checked = !!item.value;
+
+        } else {
+
+            el.value = item.value;
+        }
+
+    });
+
+    if (data.__borderStyles) {
+
+        App.borderStyles =
+            JSON.parse(
+                JSON.stringify(
+                    data.__borderStyles
+                )
+            );
+    }
+
+    if (data.__activeTool) {
+
+        App.activeTool =
+            data.__activeTool;
+    }
+
+    syncPresetInputs();
+
+    applyActiveTool();
+
+    liveRefresh();
+}
+
+
+function saveHistory() {
+
+    const state = collectFormState();
+
+    const last =
+        App.history[App.historyIndex];
 
     if (
-        window.jspdf &&
-        typeof window.jspdf.jsPDF ===
-        "function"
+        last &&
+        JSON.stringify(last) ===
+        JSON.stringify(state)
     ) {
+        return;
+    }
 
-        return window.jspdf.jsPDF;
+    App.history =
+        App.history.slice(
+            0,
+            App.historyIndex + 1
+        );
+
+    App.history.push(state);
+
+    if (App.history.length > 60) {
+
+        App.history.shift();
 
     }
 
-    return null;
+    App.historyIndex =
+        App.history.length - 1;
 
+    updateHistoryButtons();
 }
 
-function checkPDFLibrary() {
 
-    const jsPDF =
-        getJsPDF();
+function undo() {
 
-    if (!jsPDF) {
+    if (App.historyIndex <= 0) {
 
         showToast(
-            "PDF library load नहीं हुई। Internet/CDN connection check करें।",
-            "error"
+            "Nothing to undo",
+            "warning"
         );
 
-        console.error(
-            "jsPDF is not available."
-        );
-
-        return false;
+        return;
     }
 
-    return true;
+    App.historyIndex--;
 
+    restoreFormState(
+        App.history[
+            App.historyIndex
+        ]
+    );
+
+    showToast(
+        "Undo",
+        "success"
+    );
+
+    updateHistoryButtons();
+}
+
+
+function redo() {
+
+    if (
+        App.historyIndex >=
+        App.history.length - 1
+    ) {
+
+        showToast(
+            "Nothing to redo",
+            "warning"
+        );
+
+        return;
+    }
+
+    App.historyIndex++;
+
+    restoreFormState(
+        App.history[
+            App.historyIndex
+        ]
+    );
+
+    showToast(
+        "Redo",
+        "success"
+    );
+
+    updateHistoryButtons();
+}
+
+
+function updateHistoryButtons() {
+
+    const undoButton =
+        $("undoButton");
+
+    const redoButton =
+        $("redoButton");
+
+    if (undoButton) {
+
+        undoButton.disabled =
+            App.historyIndex <= 0;
+    }
+
+    if (redoButton) {
+
+        redoButton.disabled =
+            App.historyIndex >=
+            App.history.length - 1;
+    }
 }
 
 
 /* =========================================================
-   MAIN CATEGORY NAVIGATION
+   DEFAULT STYLE
 ========================================================= */
 
-function initCategoryNavigation() {
+function saveDefaultStyle() {
+
+    App.defaultStyle =
+        collectFormState();
+
+    try {
+
+        localStorage.setItem(
+            "booksLabelStudioDefaultStyle",
+            JSON.stringify(
+                App.defaultStyle
+            )
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Could not save default style",
+            error
+        );
+    }
+
+    showToast(
+        "Default style saved",
+        "success"
+    );
+}
+
+
+function loadDefaultStyle() {
+
+    let style =
+        App.defaultStyle;
+
+    try {
+
+        const stored =
+            localStorage.getItem(
+                "booksLabelStudioDefaultStyle"
+            );
+
+        if (stored) {
+
+            style =
+                JSON.parse(stored);
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "Could not load default style",
+            error
+        );
+    }
+
+    if (!style) {
+
+        showToast(
+            "No saved default style found",
+            "warning"
+        );
+
+        return;
+    }
+
+    restoreFormState(style);
+
+    saveHistory();
+
+    showToast(
+        "Default style loaded",
+        "success"
+    );
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetAll() {
+
+    const confirmed =
+        window.confirm(
+            "Reset all settings and styles?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    $$("input, select, textarea")
+        .forEach(el => {
+
+            if (
+                el.type === "file" ||
+                el.id === "languageSelect"
+            ) {
+                return;
+            }
+
+            if (el.type === "checkbox") {
+
+                el.checked =
+                    el.defaultChecked;
+
+            } else if (el.type === "range") {
+
+                el.value =
+                    el.defaultValue;
+
+            } else {
+
+                el.value =
+                    el.defaultValue;
+            }
+
+        });
+
+    App.borderStyles = {
+        coco: "solid",
+        other: "solid",
+        isbn: "solid",
+        address: "solid"
+    };
+
+    App.clipboardStyle = null;
+
+    syncPresetInputs();
+
+    applyActiveTool();
+
+    liveRefresh();
+
+    saveHistory();
+
+    showToast(
+        "All settings reset",
+        "success"
+    );
+}
+
+
+function resetCurrentStyle() {
+
+    const ids = [
+
+        "poFontFamily",
+        "poFontSize",
+        "poAlignment",
+        "poLineHeight",
+
+        "boxFontFamily",
+        "boxFontSize",
+        "boxAlignment",
+        "boxLineHeight",
+
+        "otherFontFamily",
+        "otherFontSize",
+        "otherAlignment",
+        "otherLineHeight",
+
+        "isbnFontFamily",
+        "isbnFontSize",
+        "isbnAlignment",
+        "isbnLineHeight",
+
+        "fromFontFamily",
+        "fromFontSize",
+        "fromAlignment",
+        "fromLineHeight",
+
+        "toFontFamily",
+        "toFontSize",
+        "toAlignment",
+        "toLineHeight"
+    ];
+
+    ids.forEach(id => {
+
+        const el = $(id);
+
+        if (el) {
+
+            el.value =
+                el.defaultValue ||
+                el.value;
+        }
+
+    });
+
+    syncPresetInputs();
+
+    liveRefresh();
+
+    saveHistory();
+
+    showToast(
+        "Current style reset",
+        "success"
+    );
+}
+
+
+/* =========================================================
+   COPY / PASTE STYLE
+========================================================= */
+
+function getStyleSnapshot() {
+
+    const ids = [
+
+        "poFontFamily",
+        "poFontSize",
+        "poAlignment",
+        "poLineHeight",
+        "poBoldCheck",
+        "poItalicCheck",
+        "poUnderlineCheck",
+        "poStrikeCheck",
+        "poUppercaseCheck",
+
+        "boxFontFamily",
+        "boxFontSize",
+        "boxAlignment",
+        "boxLineHeight",
+        "boxBoldCheck",
+        "boxItalicCheck",
+        "boxUnderlineCheck",
+        "boxStrikeCheck",
+
+        "otherFontFamily",
+        "otherFontSize",
+        "otherAlignment",
+        "otherLineHeight",
+        "otherBold",
+        "otherItalic",
+        "otherUnderline",
+        "otherStrike",
+
+        "isbnFontFamily",
+        "isbnFontSize",
+        "isbnAlignment",
+        "isbnLineHeight",
+        "isbnBold",
+        "isbnItalic",
+        "isbnUnderline",
+
+        "fromFontFamily",
+        "fromFontSize",
+        "fromAlignment",
+        "fromLineHeight",
+        "fromBold",
+        "fromItalic",
+        "fromUnderline",
+        "fromStrike",
+
+        "toFontFamily",
+        "toFontSize",
+        "toAlignment",
+        "toLineHeight",
+        "toBold",
+        "toItalic",
+        "toUnderline",
+        "toStrike"
+    ];
+
+    const result = {};
+
+    ids.forEach(id => {
+
+        const el = $(id);
+
+        if (!el) {
+            return;
+        }
+
+        if (el.type === "checkbox") {
+
+            result[id] = {
+                type: "checkbox",
+                value: el.checked
+            };
+
+        } else {
+
+            result[id] = {
+                type: "value",
+                value: el.value
+            };
+        }
+
+    });
+
+    return result;
+}
+
+
+function copyStyle() {
+
+    App.clipboardStyle =
+        getStyleSnapshot();
+
+    showToast(
+        "Style copied",
+        "success"
+    );
+}
+
+
+function pasteStyle() {
+
+    if (!App.clipboardStyle) {
+
+        showToast(
+            "No copied style available",
+            "warning"
+        );
+
+        return;
+    }
+
+    Object.keys(
+        App.clipboardStyle
+    ).forEach(id => {
+
+        const el = $(id);
+
+        if (!el) {
+            return;
+        }
+
+        const item =
+            App.clipboardStyle[id];
+
+        if (item.type === "checkbox") {
+
+            el.checked =
+                !!item.value;
+
+        } else {
+
+            el.value =
+                item.value;
+        }
+
+    });
+
+    syncPresetInputs();
+
+    liveRefresh();
+
+    saveHistory();
+
+    showToast(
+        "Style pasted",
+        "success"
+    );
+}
+
+
+/* =========================================================
+   CATEGORY NAVIGATION
+========================================================= */
+
+function applyActiveTool() {
+
+    $$(".category-btn")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.category ===
+                App.activeTool
+            );
+
+        });
+
+    $$(".tool-section")
+        .forEach(section => {
+
+            section.classList.toggle(
+                "active",
+                section.dataset.tool ===
+                App.activeTool
+            );
+
+        });
+}
+
+
+function setupCategoryNavigation() {
 
     $$(".category-btn")
         .forEach(button => {
@@ -220,70 +855,37 @@ function initCategoryNavigation() {
                 "click",
                 () => {
 
-                    const category =
+                    App.activeTool =
                         button.dataset.category;
 
-                    if (!category) {
-                        return;
-                    }
+                    applyActiveTool();
 
-                    AppState.category =
-                        category;
-
-                    $$(".category-btn")
-                        .forEach(btn => {
-
-                            btn.classList.toggle(
-                                "active",
-                                btn === button
-                            );
-
-                        });
-
-
-                    $$(".tool-section")
-                        .forEach(section => {
-
-                            section.classList.toggle(
-                                "active",
-                                section.dataset.tool ===
-                                category
-                            );
-
-                        });
-
-
-                    updateLivePreview();
+                    liveRefresh();
 
                 }
             );
 
         });
-
 }
 
 
 /* =========================================================
-   COCO MODE NAVIGATION
+   COCO MODES
 ========================================================= */
 
-function initCocoModes() {
+function setupCocoModes() {
 
-    $$(".sub-category-btn[data-coco-mode]")
+    $$("[data-coco-mode]")
         .forEach(button => {
 
             button.addEventListener(
                 "click",
                 () => {
 
-                    const mode =
+                    App.activeCocoMode =
                         button.dataset.cocoMode;
 
-                    AppState.cocoMode =
-                        mode;
-
-
-                    $$(".sub-category-btn[data-coco-mode]")
+                    $$("[data-coco-mode]")
                         .forEach(btn => {
 
                             btn.classList.toggle(
@@ -292,7 +894,6 @@ function initCocoModes() {
                             );
 
                         });
-
 
                     const panels = {
 
@@ -307,61 +908,49 @@ function initCocoModes() {
 
                         address:
                             "cocoAddressPanel"
-
                     };
 
+                    Object.keys(panels)
+                        .forEach(mode => {
 
-                    Object.entries(
-                        panels
-                    ).forEach(
-                        ([key, id]) => {
+                            const panel =
+                                $(panels[mode]);
 
-                            $(id)
-                                ?.classList.toggle(
+                            if (panel) {
+
+                                panel.classList.toggle(
                                     "active",
-                                    key === mode
+                                    mode ===
+                                    App.activeCocoMode
                                 );
+                            }
 
-                        }
-                    );
-
-
-                    showToast(
-                        `${button.textContent.trim()} selected.`,
-                        "success"
-                    );
-
-                    updateLivePreview();
+                        });
 
                 }
             );
 
         });
-
 }
 
 
 /* =========================================================
-   OTHER PO MODES
+   OTHER MODES
 ========================================================= */
 
-function initOtherModes() {
+function setupOtherModes() {
 
-    $$(".sub-category-btn[data-other-mode]")
+    $$("[data-other-mode]")
         .forEach(button => {
 
             button.addEventListener(
                 "click",
                 () => {
 
-                    const mode =
+                    App.activeOtherMode =
                         button.dataset.otherMode;
 
-                    AppState.otherMode =
-                        mode;
-
-
-                    $$(".sub-category-btn[data-other-mode]")
+                    $$("[data-other-mode]")
                         .forEach(btn => {
 
                             btn.classList.toggle(
@@ -370,7 +959,6 @@ function initOtherModes() {
                             );
 
                         });
-
 
                     const panels = {
 
@@ -385,35 +973,29 @@ function initOtherModes() {
 
                         address:
                             "otherAddressPanel"
-
                     };
 
+                    Object.keys(panels)
+                        .forEach(mode => {
 
-                    Object.entries(
-                        panels
-                    ).forEach(
-                        ([key, id]) => {
+                            const panel =
+                                $(panels[mode]);
 
-                            $(id)
-                                ?.classList.toggle(
+                            if (panel) {
+
+                                panel.classList.toggle(
                                     "active",
-                                    key === mode
+                                    mode ===
+                                    App.activeOtherMode
                                 );
+                            }
 
-                        }
-                    );
-
-
-                    showToast(
-                        `${button.textContent.trim()} selected.`,
-                        "success"
-                    );
+                        });
 
                 }
             );
 
         });
-
 }
 
 
@@ -421,23 +1003,19 @@ function initOtherModes() {
    ADDRESS MODES
 ========================================================= */
 
-function initAddressModes() {
+function setupAddressModes() {
 
-    $$(".sub-category-btn[data-address-mode]")
+    $$("[data-address-mode]")
         .forEach(button => {
 
             button.addEventListener(
                 "click",
                 () => {
 
-                    const mode =
+                    App.activeAddressMode =
                         button.dataset.addressMode;
 
-                    AppState.addressMode =
-                        mode;
-
-
-                    $$(".sub-category-btn[data-address-mode]")
+                    $$("[data-address-mode]")
                         .forEach(btn => {
 
                             btn.classList.toggle(
@@ -447,31 +1025,36 @@ function initAddressModes() {
 
                         });
 
+                    const panels = {
 
-                    $("addressManualPanel")
-                        ?.classList.toggle(
-                            "active",
-                            mode === "manual"
-                        );
+                        manual:
+                            "addressManualPanel",
 
+                        excel:
+                            "addressExcelPanel"
+                    };
 
-                    $("addressExcelPanel")
-                        ?.classList.toggle(
-                            "active",
-                            mode === "excel"
-                        );
+                    Object.keys(panels)
+                        .forEach(mode => {
 
+                            const panel =
+                                $(panels[mode]);
 
-                    showToast(
-                        `${button.textContent.trim()} selected.`,
-                        "success"
-                    );
+                            if (panel) {
+
+                                panel.classList.toggle(
+                                    "active",
+                                    mode ===
+                                    App.activeAddressMode
+                                );
+                            }
+
+                        });
 
                 }
             );
 
         });
-
 }
 
 
@@ -481,7 +1064,8 @@ function initAddressModes() {
 
 function createPOInputs(
     containerId,
-    prefix
+    prefix,
+    count = 12
 ) {
 
     const container =
@@ -495,38 +1079,14 @@ function createPOInputs(
 
     for (
         let i = 1;
-        i <= 40;
+        i <= count;
         i++
     ) {
 
-        const wrapper =
-            document.createElement(
-                "div"
-            );
-
-        wrapper.className =
-            "po-input-wrapper";
-
-
-        const label =
-            document.createElement(
-                "label"
-            );
-
-        label.htmlFor =
-            `${prefix}${i}`;
-
-        label.textContent =
-            `PO ${i}`;
-
-
         const input =
-            document.createElement(
-                "input"
-            );
+            document.createElement("input");
 
-        input.type =
-            "text";
+        input.type = "text";
 
         input.id =
             `${prefix}${i}`;
@@ -537,71 +1097,966 @@ function createPOInputs(
         input.autocomplete =
             "off";
 
-
         input.addEventListener(
             "input",
-            updateLivePreview
+            () => {
+
+                liveRefresh();
+
+            }
         );
 
-
-        wrapper.appendChild(
-            label
-        );
-
-        wrapper.appendChild(
-            input
-        );
-
-        container.appendChild(
-            wrapper
-        );
-
+        container.appendChild(input);
     }
-
-}
-
-
-function initPOInputs() {
-
-    createPOInputs(
-        "individualPOGrid",
-        "cocoPO"
-    );
-
-    createPOInputs(
-        "otherIndividualPOGrid",
-        "otherPO"
-    );
-
 }
 
 
 /* =========================================================
-   PO PARSER
+   BORDER STYLE
 ========================================================= */
 
-function splitPOText(text) {
+function setupBorderStyleButtons() {
 
-    return String(
-        text || ""
-    )
-        .split(
-            /[\n,;]+/
-        )
-        .map(
-            value =>
-                value.trim()
-        )
-        .filter(
-            Boolean
-        );
+    $$("[data-border-style]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const style =
+                        button.dataset.borderStyle;
+
+                    App.borderStyles.coco =
+                        style;
+
+                    markSelected(
+                        "[data-border-style]",
+                        button
+                    );
+
+                    applyCocoBorder();
+
+                    saveHistory();
+
+                }
+            );
+
+        });
+
+
+    $$("[data-other-border]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    App.borderStyles.other =
+                        button.dataset.otherBorder;
+
+                    markSelected(
+                        "[data-other-border]",
+                        button
+                    );
+
+                    applyOtherBorder();
+
+                    saveHistory();
+
+                }
+            );
+
+        });
+
+
+    $$("[data-isbn-border]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    App.borderStyles.isbn =
+                        button.dataset.isbnBorder;
+
+                    markSelected(
+                        "[data-isbn-border]",
+                        button
+                    );
+
+                    applyISBNBorder();
+
+                    saveHistory();
+
+                }
+            );
+
+        });
+
+
+    $$("[data-address-border]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    App.borderStyles.address =
+                        button.dataset.addressBorder;
+
+                    markSelected(
+                        "[data-address-border]",
+                        button
+                    );
+
+                    applyAddressBorder();
+
+                    saveHistory();
+
+                }
+            );
+
+        });
 
 }
 
 
-function getManualPOValues(
+function markSelected(
+    selector,
+    selected
+) {
+
+    $$(selector)
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button === selected
+            );
+
+        });
+}
+
+
+/* =========================================================
+   BORDER STYLE CONVERSION
+========================================================= */
+
+function cssBorderStyle(style) {
+
+    const styles = {
+
+        solid: "solid",
+        double: "double",
+        dashed: "dashed",
+        dotted: "dotted",
+        groove: "groove",
+        ridge: "ridge",
+        inset: "inset",
+        outset: "outset",
+
+        thin: "solid",
+        medium: "solid",
+        thick: "solid",
+
+        thinDouble: "double",
+        thickDouble: "double",
+
+        dashDot: "dashed",
+        dashDotDot: "dotted",
+        longDash: "dashed",
+        longDashDot: "dashed",
+        dotDash: "dotted",
+
+        triple: "double",
+        hairline: "solid",
+
+        wave: "double",
+        doubleWave: "double",
+
+        threeD: "outset",
+        shadow: "solid",
+
+        custom: "solid"
+    };
+
+    return styles[style] || "solid";
+}
+
+
+/* =========================================================
+   BORDER CONFIG
+========================================================= */
+
+function borderConfig(
     prefix
 ) {
+
+    const styleMap = {
+
+        coco: App.borderStyles.coco,
+        other: App.borderStyles.other,
+        isbn: App.borderStyles.isbn,
+        address: App.borderStyles.address
+    };
+
+    const style =
+        styleMap[prefix] || "solid";
+
+    const width =
+        prefix === "coco"
+            ? value("borderWidth", 2)
+            : prefix === "other"
+                ? value("otherBorderWidth", 2)
+                : prefix === "isbn"
+                    ? value("isbnBorderWidth", 2)
+                    : value("addressBorderWidth", 2);
+
+    const color =
+        prefix === "coco"
+            ? value("borderColor", "#111827")
+            : prefix === "other"
+                ? value("otherBorderColor", "#111827")
+                : prefix === "isbn"
+                    ? value("isbnBorderColor", "#111827")
+                    : value(
+                        "addressBorderColor",
+                        "#111827"
+                    );
+
+    const radius =
+        prefix === "coco"
+            ? value("borderRadius", 0)
+            : prefix === "other"
+                ? value(
+                    "otherBorderRadius",
+                    0
+                )
+                : prefix === "isbn"
+                    ? value(
+                        "isbnBorderRadius",
+                        0
+                    )
+                    : value(
+                        "addressBorderRadius",
+                        0
+                    );
+
+    const opacity =
+        prefix === "coco"
+            ? value("borderOpacity", 100)
+            : prefix === "other"
+                ? value(
+                    "otherBorderOpacity",
+                    100
+                )
+                : prefix === "isbn"
+                    ? value(
+                        "isbnBorderOpacity",
+                        100
+                    )
+                    : value(
+                        "addressBorderOpacity",
+                        100
+                    );
+
+    return {
+
+        style,
+        cssStyle:
+            cssBorderStyle(style),
+
+        width:
+            safeNumber(width, 2),
+
+        color,
+
+        radius:
+            safeNumber(radius, 0),
+
+        opacity:
+            clamp(
+                safeNumber(opacity, 100),
+                0,
+                100
+            )
+    };
+}
+
+
+function applyBorderToElement(
+    element,
+    config,
+    sides = {}
+) {
+
+    if (!element) {
+        return;
+    }
+
+    const alpha =
+        config.opacity / 100;
+
+    const color =
+        hexToRGBA(
+            config.color,
+            alpha
+        );
+
+    const width =
+        `${config.width}px`;
+
+    const style =
+        config.cssStyle;
+
+    const sideNames = [
+        "Top",
+        "Right",
+        "Bottom",
+        "Left"
+    ];
+
+    sideNames.forEach(side => {
+
+        const enabled =
+            sides[side] !== false;
+
+        element.style[
+            `border${side}`
+        ] =
+            enabled
+                ? `${width} ${style} ${color}`
+                : "none";
+    });
+
+    element.style.borderRadius =
+        `${config.radius}px`;
+
+    if (
+        App.activeTool === "cocoBlue" &&
+        App.borderStyles.coco === "shadow"
+    ) {
+
+        element.style.boxShadow =
+            `6px 6px 0 ${color}`;
+
+    } else {
+
+        element.style.boxShadow =
+            "none";
+    }
+}
+
+
+function hexToRGBA(
+    hex,
+    alpha
+) {
+
+    if (!hex) {
+        return `rgba(17,24,39,${alpha})`;
+    }
+
+    let h =
+        hex.replace("#", "");
+
+    if (h.length === 3) {
+
+        h =
+            h
+                .split("")
+                .map(x => x + x)
+                .join("");
+    }
+
+    const r =
+        parseInt(
+            h.substring(0, 2),
+            16
+        );
+
+    const g =
+        parseInt(
+            h.substring(2, 4),
+            16
+        );
+
+    const b =
+        parseInt(
+            h.substring(4, 6),
+            16
+        );
+
+    return `rgba(${r},${g},${b},${alpha})`;
+}
+
+
+/* =========================================================
+   COCO BORDER
+========================================================= */
+
+function applyCocoBorder() {
+
+    const label =
+        $("previewLabel");
+
+    if (!label) {
+        return;
+    }
+
+    const config =
+        borderConfig("coco");
+
+    applyBorderToElement(
+        label,
+        config,
+        {
+            Top:
+                checked(
+                    "borderTopEnabled"
+                ),
+
+            Right:
+                checked(
+                    "borderRightEnabled"
+                ),
+
+            Bottom:
+                checked(
+                    "borderBottomEnabled"
+                ),
+
+            Left:
+                checked(
+                    "borderLeftEnabled"
+                )
+        }
+    );
+
+    if (
+        App.borderStyles.coco ===
+        "shadow"
+    ) {
+
+        label.style.boxShadow =
+            `6px 6px 0 ${config.color}`;
+    }
+}
+
+
+function removeCocoBorder() {
+
+    const label =
+        $("previewLabel");
+
+    if (!label) {
+        return;
+    }
+
+    label.style.border =
+        "none";
+
+    label.style.boxShadow =
+        "none";
+}
+
+
+/* =========================================================
+   OTHER BORDER
+========================================================= */
+
+function applyOtherBorder() {
+
+    const label =
+        $("otherPreviewLabel");
+
+    if (!label) {
+        return;
+    }
+
+    const config =
+        borderConfig("other");
+
+    applyBorderToElement(
+        label,
+        config,
+        {
+            Top:
+                checked(
+                    "otherBorderTop"
+                ),
+
+            Right:
+                checked(
+                    "otherBorderRight"
+                ),
+
+            Bottom:
+                checked(
+                    "otherBorderBottom"
+                ),
+
+            Left:
+                checked(
+                    "otherBorderLeft"
+                )
+        }
+    );
+}
+
+
+function removeOtherBorder() {
+
+    const label =
+        $("otherPreviewLabel");
+
+    if (!label) {
+        return;
+    }
+
+    label.style.border =
+        "none";
+
+    label.style.boxShadow =
+        "none";
+}
+
+
+/* =========================================================
+   ISBN BORDER
+========================================================= */
+
+function applyISBNBorder() {
+
+    const preview =
+        $("barcodePreview");
+
+    if (!preview) {
+        return;
+    }
+
+    const config =
+        borderConfig("isbn");
+
+    applyBorderToElement(
+        preview,
+        config,
+        {
+            Top:
+                checked(
+                    "isbnBorderTop"
+                ),
+
+            Right:
+                checked(
+                    "isbnBorderRight"
+                ),
+
+            Bottom:
+                checked(
+                    "isbnBorderBottom"
+                ),
+
+            Left:
+                checked(
+                    "isbnBorderLeft"
+                )
+        }
+    );
+}
+
+
+/* =========================================================
+   ADDRESS BORDER
+========================================================= */
+
+function applyAddressBorder() {
+
+    const label =
+        $("addressPreviewLabel");
+
+    if (!label) {
+        return;
+    }
+
+    const config =
+        borderConfig("address");
+
+    applyBorderToElement(
+        label,
+        config,
+        {
+            Top:
+                checked(
+                    "addressBorderTop"
+                ),
+
+            Right:
+                checked(
+                    "addressBorderRight"
+                ),
+
+            Bottom:
+                checked(
+                    "addressBorderBottom"
+                ),
+
+            Left:
+                checked(
+                    "addressBorderLeft"
+                )
+        }
+    );
+}
+
+
+/* =========================================================
+   FONT SIZE PRESETS
+========================================================= */
+
+function connectFontPreset(
+    presetId,
+    inputId
+) {
+
+    const preset =
+        $(presetId);
+
+    const input =
+        $(inputId);
+
+    if (!preset || !input) {
+        return;
+    }
+
+    preset.addEventListener(
+        "change",
+        () => {
+
+            if (preset.value) {
+
+                input.value =
+                    preset.value;
+
+                liveRefresh();
+
+            }
+        }
+    );
+
+    input.addEventListener(
+        "input",
+        () => {
+
+            preset.value = "";
+
+            liveRefresh();
+
+        }
+    );
+}
+
+
+function syncPresetInputs() {
+
+    const pairs = [
+
+        [
+            "poFontSizePreset",
+            "poFontSize"
+        ],
+
+        [
+            "boxFontSizePreset",
+            "boxFontSize"
+        ],
+
+        [
+            "otherFontSizePreset",
+            "otherFontSize"
+        ],
+
+        [
+            "isbnFontSizePreset",
+            "isbnFontSize"
+        ],
+
+        [
+            "fromFontSizePreset",
+            "fromFontSize"
+        ],
+
+        [
+            "toFontSizePreset",
+            "toFontSize"
+        ],
+
+        [
+            "borderWidthPreset",
+            "borderWidth"
+        ],
+
+        [
+            "otherBorderWidthPreset",
+            "otherBorderWidth"
+        ],
+
+        [
+            "isbnBorderWidthPreset",
+            "isbnBorderWidth"
+        ],
+
+        [
+            "addressBorderWidthPreset",
+            "addressBorderWidth"
+        ]
+    ];
+
+    pairs.forEach(
+        ([presetId, inputId]) => {
+
+            const preset =
+                $(presetId);
+
+            const input =
+                $(inputId);
+
+            if (!preset || !input) {
+                return;
+            }
+
+            const matching =
+                Array.from(
+                    preset.options
+                )
+                    .some(
+                        option =>
+                            String(
+                                option.value
+                            ) ===
+                            String(
+                                input.value
+                            )
+                    );
+
+            preset.value =
+                matching
+                    ? input.value
+                    : "";
+
+        }
+    );
+}
+
+
+function setupFontPresets() {
+
+    const pairs = [
+
+        [
+            "poFontSizePreset",
+            "poFontSize"
+        ],
+
+        [
+            "boxFontSizePreset",
+            "boxFontSize"
+        ],
+
+        [
+            "otherFontSizePreset",
+            "otherFontSize"
+        ],
+
+        [
+            "isbnFontSizePreset",
+            "isbnFontSize"
+        ],
+
+        [
+            "fromFontSizePreset",
+            "fromFontSize"
+        ],
+
+        [
+            "toFontSizePreset",
+            "toFontSize"
+        ],
+
+        [
+            "borderWidthPreset",
+            "borderWidth"
+        ],
+
+        [
+            "otherBorderWidthPreset",
+            "otherBorderWidth"
+        ],
+
+        [
+            "isbnBorderWidthPreset",
+            "isbnBorderWidth"
+        ],
+
+        [
+            "addressBorderWidthPreset",
+            "addressBorderWidth"
+        ]
+    ];
+
+    pairs.forEach(
+        pair =>
+            connectFontPreset(
+                pair[0],
+                pair[1]
+            )
+    );
+
+    syncPresetInputs();
+}
+
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+function applyTextStyle(
+    element,
+    config
+) {
+
+    if (!element) {
+        return;
+    }
+
+    if (!config) {
+        return;
+    }
+
+    element.style.fontFamily =
+        config.fontFamily;
+
+    element.style.fontSize =
+        `${config.fontSize}px`;
+
+    element.style.textAlign =
+        config.alignment;
+
+    element.style.lineHeight =
+        config.lineHeight;
+
+    element.style.fontWeight =
+        config.bold
+            ? "800"
+            : "400";
+
+    element.style.fontStyle =
+        config.italic
+            ? "italic"
+            : "normal";
+
+    const decorations = [];
+
+    if (config.underline) {
+        decorations.push(
+            "underline"
+        );
+    }
+
+    if (config.strike) {
+        decorations.push(
+            "line-through"
+        );
+    }
+
+    element.style.textDecoration =
+        decorations.length
+            ? decorations.join(" ")
+            : "none";
+}
+
+
+function textConfig(
+    prefix
+) {
+
+    const config = {
+
+        fontFamily:
+            value(
+                `${prefix}FontFamily`,
+                "Arial"
+            ),
+
+        fontSize:
+            safeNumber(
+                value(
+                    `${prefix}FontSize`,
+                    16
+                ),
+                16
+            ),
+
+        alignment:
+            String(
+                value(
+                    `${prefix}Alignment`,
+                    "center"
+                )
+            ).toLowerCase(),
+
+        lineHeight:
+            safeNumber(
+                value(
+                    `${prefix}LineHeight`,
+                    1
+                ),
+                1
+            ),
+
+        bold:
+            checked(
+                `${prefix}BoldCheck`
+            ) ||
+            checked(
+                `${prefix}Bold`
+            ),
+
+        italic:
+            checked(
+                `${prefix}ItalicCheck`
+            ) ||
+            checked(
+                `${prefix}Italic`
+            ),
+
+        underline:
+            checked(
+                `${prefix}UnderlineCheck`
+            ) ||
+            checked(
+                `${prefix}Underline`
+            ),
+
+        strike:
+            checked(
+                `${prefix}StrikeCheck`
+            ) ||
+            checked(
+                `${prefix}Strike`
+            )
+    };
+
+    return config;
+}
+
+
+/* =========================================================
+   COCO PREVIEW
+========================================================= */
+
+function getPOValues() {
 
     const result = [];
 
@@ -611,325 +2066,885 @@ function getManualPOValues(
         i++
     ) {
 
-        const input =
-            $(`${prefix}${i}`);
+        const el =
+            $(`cocoPO${i}`);
 
-        if (!input) {
-            continue;
-        }
-
-        const text =
-            input.value.trim();
-
-        if (text) {
+        if (
+            el &&
+            el.value.trim()
+        ) {
 
             result.push(
-                text
+                el.value.trim()
             );
-
         }
-
     }
 
     return result;
+}
 
+
+function updateCocoPreview() {
+
+    const previewPO =
+        $("previewPO");
+
+    const previewBox =
+        $("previewBox");
+
+    if (!previewPO || !previewBox) {
+        return;
+    }
+
+    const values =
+        getPOValues();
+
+    previewPO.textContent =
+        values[0] ||
+        "ABC123";
+
+    const box =
+        safeNumber(
+            value(
+                "startBoxNumber",
+                1
+            ),
+            1
+        );
+
+    /*
+      IMPORTANT:
+      PO value is shown as actual value only.
+      We do NOT write "PO NUMBER".
+    */
+
+    previewBox.textContent =
+        `BOX NO. ${box}`;
+
+    applyTextStyle(
+        previewPO,
+        textConfig("po")
+    );
+
+    applyTextStyle(
+        previewBox,
+        textConfig("box")
+    );
+
+    applyCocoBorder();
+
+    updatePagePreview(
+        "previewPage",
+        "pageSize",
+        "orientation"
+    );
+
+    const badge =
+        $("previewPageSize");
+
+    if (badge) {
+
+        badge.textContent =
+            getPageSizeLabel(
+                value(
+                    "pageSize",
+                    "4x6"
+                )
+            );
+    }
 }
 
 
 /* =========================================================
-   COCO PO VALUES
+   OTHER PREVIEW
 ========================================================= */
 
-function getCocoPOValues() {
+function updateOtherPreview() {
 
-    if (
-        AppState.cocoMode ===
-        "individual"
-    ) {
+    const preview =
+        $("otherPreviewLabel");
 
-        return getManualPOValues(
-            "cocoPO"
-        );
-
+    if (!preview) {
+        return;
     }
 
+    let text = "ABC123";
+
+    const first =
+        $$(
+            "#otherIndividualPOGrid input"
+        )[0];
 
     if (
-        AppState.cocoMode ===
-        "multiple"
+        first &&
+        first.value.trim()
     ) {
 
-        return splitPOText(
-            getValue(
-                "cocoMultiplePO"
-            )
-        );
-
+        text =
+            first.value.trim();
     }
 
+    preview.textContent =
+        text;
 
-    if (
-        AppState.cocoMode ===
-        "excel"
-    ) {
+    applyTextStyle(
+        preview,
+        textConfig("other")
+    );
 
-        return AppState.cocoExcelRows
-            .map(row => {
+    applyOtherBorder();
 
-                if (
-                    Array.isArray(row)
-                ) {
-
-                    return row[0];
-
-                }
-
-                return Object.values(
-                    row
-                )[0];
-
-            })
-            .map(
-                value =>
-                    String(
-                        value ?? ""
-                    ).trim()
-            )
-            .filter(
-                Boolean
-            );
-
-    }
-
-    return [];
-
+    updatePagePreview(
+        "otherPreviewPage",
+        "pageSize",
+        "orientation"
+    );
 }
 
 
 /* =========================================================
-   OTHER PO VALUES
+   PAGE PREVIEW
 ========================================================= */
 
-function getOtherPOValues() {
+function getPageDimensions(
+    pageSize,
+    orientation
+) {
 
-    if (
-        AppState.otherMode ===
-        "individual"
-    ) {
+    let width = 420;
+    let height = 594;
 
-        return getManualPOValues(
-            "otherPO"
-        );
+    const sizes = {
+
+        "4x6": [
+            384,
+            576
+        ],
+
+        "70x35": [
+            397,
+            198
+        ],
+
+        "a4": [
+            420,
+            594
+        ],
+
+        "a5": [
+            420,
+            594
+        ],
+
+        "letter": [
+            459,
+            594
+        ],
+
+        "legal": [
+            459,
+            720
+        ]
+    };
+
+    if (sizes[pageSize]) {
+
+        [
+            width,
+            height
+        ] =
+            sizes[pageSize];
 
     }
 
-
     if (
-        AppState.otherMode ===
-        "multiple"
+        orientation ===
+        "landscape"
     ) {
 
-        return splitPOText(
-            getValue(
-                "otherMultiplePO"
-            )
-        );
-
+        [
+            width,
+            height
+        ] =
+            [
+                height,
+                width
+            ];
     }
 
+    return {
+        width,
+        height
+    };
+}
 
-    if (
-        AppState.otherMode ===
-        "excel"
-    ) {
 
-        return AppState.otherExcelRows
-            .map(row => {
+function updatePagePreview(
+    pageId,
+    pageSizeId,
+    orientationId
+) {
 
-                if (
-                    Array.isArray(row)
-                ) {
+    const page =
+        $(pageId);
 
-                    return row[0];
+    if (!page) {
+        return;
+    }
 
-                }
+    let pageSize =
+        value(
+            pageSizeId,
+            "4x6"
+        );
 
-                return Object.values(
-                    row
-                )[0];
+    let orientation =
+        value(
+            orientationId,
+            "portrait"
+        );
 
-            })
-            .map(
-                value =>
-                    String(
-                        value ?? ""
-                    ).trim()
-            )
-            .filter(
-                Boolean
+    if (pageSize === "custom") {
+
+        let width =
+            safeNumber(
+                value(
+                    "customWidth",
+                    70
+                ),
+                70
             );
 
+        let height =
+            safeNumber(
+                value(
+                    "customHeight",
+                    35
+                ),
+                35
+            );
+
+        const scale = 4.5;
+
+        if (
+            orientation ===
+            "landscape"
+        ) {
+
+            [
+                width,
+                height
+            ] =
+                [
+                    height,
+                    width
+                ];
+        }
+
+        page.style.width =
+            `${clamp(
+                width * scale,
+                180,
+                850
+            )}px`;
+
+        page.style.minHeight =
+            `${clamp(
+                height * scale,
+                120,
+                1000
+            )}px`;
+
+        return;
     }
 
-    return [];
+    const dimensions =
+        getPageDimensions(
+            pageSize,
+            orientation
+        );
 
+    page.style.width =
+        `${dimensions.width}px`;
+
+    page.style.minHeight =
+        `${dimensions.height}px`;
+}
+
+
+function getPageSizeLabel(
+    value
+) {
+
+    const labels = {
+
+        "4x6":
+            "4 × 6 Inches",
+
+        "70x35":
+            "70 × 35 mm",
+
+        "a4":
+            "A4",
+
+        "a5":
+            "A5",
+
+        "letter":
+            "Letter",
+
+        "legal":
+            "Legal",
+
+        "custom":
+            "Custom"
+    };
+
+    return labels[value] || value;
+}
+
+
+/* =========================================================
+   LABELS PER PAGE
+========================================================= */
+
+function setupLabelsPerPage() {
+
+    const input =
+        $("labelsPerPage");
+
+    if (!input) {
+        return;
+    }
+
+    input.addEventListener(
+        "change",
+        () => {
+
+            updatePreviewGrid();
+
+            saveHistory();
+
+        }
+    );
+}
+
+
+function updatePreviewGrid() {
+
+    const page =
+        $("previewPage");
+
+    if (!page) {
+        return;
+    }
+
+    const count =
+        safeNumber(
+            value(
+                "labelsPerPage",
+                2
+            ),
+            2
+        );
+
+    const label =
+        $("previewLabel");
+
+    if (!label) {
+        return;
+    }
+
+    if (count <= 1) {
+
+        page.style.display =
+            "flex";
+
+        label.style.width =
+            "90%";
+
+        label.style.minHeight =
+            "180px";
+
+        return;
+    }
+
+    const columns =
+        count === 2
+            ? 1
+            : count <= 4
+                ? 2
+                : count <= 6
+                    ? 2
+                    : 3;
+
+    page.style.display =
+        "grid";
+
+    page.style.gridTemplateColumns =
+        `repeat(${columns}, minmax(0, 1fr))`;
+
+    page.style.alignContent =
+        "center";
+
+    page.style.gap =
+        "8px";
+
+    label.style.width =
+        "100%";
+
+    label.style.minHeight =
+        count >= 8
+            ? "75px"
+            : "120px";
+}
+
+
+/* =========================================================
+   CUSTOM PAGE SIZE
+========================================================= */
+
+function setupCustomPageSizes() {
+
+    const pairs = [
+
+        [
+            "pageSize",
+            "customSizePanel"
+        ],
+
+        [
+            "isbnPageSize",
+            "isbnCustomSizePanel"
+        ],
+
+        [
+            "addressPageSize",
+            "addressCustomSizePanel"
+        ]
+    ];
+
+    pairs.forEach(
+        ([selectId, panelId]) => {
+
+            const select =
+                $(selectId);
+
+            const panel =
+                $(panelId);
+
+            if (!select || !panel) {
+                return;
+            }
+
+            const update = () => {
+
+                panel.classList.toggle(
+                    "hidden",
+                    select.value !==
+                    "custom"
+                );
+
+                liveRefresh();
+            };
+
+            select.addEventListener(
+                "change",
+                update
+            );
+
+            update();
+        }
+    );
 }
 
 
 /* =========================================================
    EXCEL
-   FIRST ROW = HEADER
-   DATA STARTS FROM ROW 2
 ========================================================= */
 
-function readExcelFile(
-    file,
-    onData,
-    previewId,
-    fileNameId
-) {
+function parseCSV(text) {
 
-    if (!file) {
-        return;
+    const rows = [];
+
+    let row = [];
+    let current = "";
+    let quoted = false;
+
+    for (
+        let i = 0;
+        i < text.length;
+        i++
+    ) {
+
+        const char =
+            text[i];
+
+        const next =
+            text[i + 1];
+
+        if (
+            char === '"' &&
+            quoted &&
+            next === '"'
+        ) {
+
+            current += '"';
+
+            i++;
+
+            continue;
+        }
+
+        if (char === '"') {
+
+            quoted =
+                !quoted;
+
+            continue;
+        }
+
+        if (
+            char === "," &&
+            !quoted
+        ) {
+
+            row.push(current);
+
+            current = "";
+
+            continue;
+        }
+
+        if (
+            (
+                char === "\n" ||
+                char === "\r"
+            ) &&
+            !quoted
+        ) {
+
+            if (
+                char === "\r" &&
+                next === "\n"
+            ) {
+
+                i++;
+            }
+
+            row.push(current);
+
+            rows.push(row);
+
+            row = [];
+
+            current = "";
+
+            continue;
+        }
+
+        current += char;
     }
 
     if (
-        typeof window.XLSX ===
+        current.length ||
+        row.length
+    ) {
+
+        row.push(current);
+
+        rows.push(row);
+    }
+
+    return rows;
+}
+
+
+async function readExcelFile(file) {
+
+    if (!file) {
+        return [];
+    }
+
+    const extension =
+        file.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+    if (
+        extension === "csv"
+    ) {
+
+        const text =
+            await file.text();
+
+        return parseCSV(text);
+    }
+
+    if (
+        typeof XLSX ===
         "undefined"
     ) {
 
-        showToast(
-            "Excel library load नहीं हुई।",
-            "error"
+        throw new Error(
+            "Excel library is not loaded."
         );
+    }
+
+    const buffer =
+        await file.arrayBuffer();
+
+    const workbook =
+        XLSX.read(
+            buffer,
+            {
+                type: "array"
+            }
+        );
+
+    const sheetName =
+        workbook.SheetNames[0];
+
+    const sheet =
+        workbook.Sheets[
+            sheetName
+        ];
+
+    return XLSX.utils.sheet_to_json(
+        sheet,
+        {
+            header: 1,
+            defval: ""
+        }
+    );
+}
+
+
+/*
+  User requirement:
+  First row is Header and MUST be ignored.
+*/
+
+function excelDataWithoutHeader(
+    rows
+) {
+
+    if (
+        !Array.isArray(rows) ||
+        rows.length <= 1
+    ) {
+
+        return [];
+    }
+
+    return rows.slice(1);
+}
+
+
+function renderExcelPreview(
+    containerId,
+    rows
+) {
+
+    const container =
+        $(containerId);
+
+    if (!container) {
+        return;
+    }
+
+    if (!rows.length) {
+
+        container.innerHTML =
+            "<p style='padding:15px'>No data found.</p>";
 
         return;
     }
 
+    const header =
+        rows[0] || [];
 
-    if (fileNameId && $(fileNameId)) {
+    const body =
+        rows.slice(1, 21);
 
-        $(fileNameId).textContent =
-            file.name;
+    let html =
+        "<table><thead><tr>";
 
-    }
+    header.forEach(
+        cell => {
 
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload =
-        event => {
-
-            try {
-
-                const workbook =
-                    XLSX.read(
-                        new Uint8Array(
-                            event.target.result
-                        ),
-                        {
-                            type: "array"
-                        }
-                    );
-
-
-                const sheet =
-                    workbook.Sheets[
-                        workbook.SheetNames[0]
-                    ];
-
-
-                const rows =
-                    XLSX.utils.sheet_to_json(
-                        sheet,
-                        {
-                            header: 1,
-                            defval: ""
-                        }
-                    );
-
-
-                /*
-                 * IMPORTANT:
-                 *
-                 * ROW 1 = HEADER
-                 *
-                 * We intentionally remove it.
-                 */
-
-                const header =
-                    rows.length
-                        ? rows[0]
-                        : [];
-
-
-                const dataRows =
-                    rows.slice(1);
-
-
-                onData(
-                    dataRows,
-                    header
-                );
-
-
-                renderExcelPreview(
-                    previewId,
-                    header,
-                    dataRows
-                );
-
-
-                showToast(
-                    `Excel loaded: header ignored, ${dataRows.length} data row(s) found.`,
-                    "success"
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    error
-                );
-
-                showToast(
-                    "Excel file पढ़ने में error आया।",
-                    "error"
-                );
-
-            }
-
-        };
-
-
-    reader.onerror =
-        () => {
-
-            showToast(
-                "Excel file open नहीं हो सकी।",
-                "error"
-            );
-
-        };
-
-
-    reader.readAsArrayBuffer(
-        file
+            html +=
+                `<th>${escapeHTML(
+                    cell
+                )}</th>`;
+        }
     );
 
+    html +=
+        "</tr></thead><tbody>";
+
+    body.forEach(
+        row => {
+
+            html += "<tr>";
+
+            header.forEach(
+                (_, index) => {
+
+                    html +=
+                        `<td>${escapeHTML(
+                            row[index] ?? ""
+                        )}</td>`;
+                }
+            );
+
+            html += "</tr>";
+        }
+    );
+
+    html +=
+        "</tbody></table>";
+
+    container.innerHTML =
+        html;
+}
+
+
+async function handleExcel(
+    inputId,
+    previewId,
+    nameId,
+    targetInputPrefix
+) {
+
+    const input =
+        $(inputId);
+
+    if (!input || !input.files[0]) {
+        return;
+    }
+
+    const file =
+        input.files[0];
+
+    const name =
+        $(nameId);
+
+    if (name) {
+        name.textContent =
+            file.name;
+    }
+
+    try {
+
+        const rows =
+            await readExcelFile(file);
+
+        renderExcelPreview(
+            previewId,
+            rows
+        );
+
+        /*
+          HEADER IS ROW 1.
+          It is deliberately NOT imported
+          into PO values.
+        */
+
+        const data =
+            excelDataWithoutHeader(
+                rows
+            );
+
+        if (
+            targetInputPrefix ===
+            "cocoPO"
+        ) {
+
+            const inputs =
+                $$(
+                    "#individualPOGrid input"
+                );
+
+            inputs.forEach(
+                (inputEl, index) => {
+
+                    const row =
+                        data[index];
+
+                    if (
+                        Array.isArray(row)
+                    ) {
+
+                        inputEl.value =
+                            String(
+                                row[0] ?? ""
+                            ).trim();
+                    }
+
+                }
+            );
+        }
+
+        if (
+            targetInputPrefix ===
+            "otherPO"
+        ) {
+
+            const inputEl =
+                $("otherMultiplePO");
+
+            if (inputEl) {
+
+                inputEl.value =
+                    data
+                        .map(
+                            row =>
+                                Array.isArray(row)
+                                    ? row[0]
+                                    : ""
+                        )
+                        .filter(
+                            x =>
+                                String(x)
+                                    .trim()
+                                    .length
+                        )
+                        .join("\n");
+            }
+        }
+
+        liveRefresh();
+
+        showToast(
+            `Excel loaded. Header row ignored.`,
+            "success"
+        );
+
+        saveHistory();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message ||
+            "Could not read Excel file.",
+            "error",
+            4000
+        );
+    }
 }
 
 
 /* =========================================================
-   EXCEL PREVIEW
+   QR CODE
 ========================================================= */
 
-function renderExcelPreview(
+function generateQRCode(
     containerId,
-    header,
-    rows
+    text
 ) {
 
     const container =
@@ -941,3064 +2956,437 @@ function renderExcelPreview(
 
     container.innerHTML = "";
 
-
-    if (
-        !header.length &&
-        !rows.length
-    ) {
-
-        return;
-
-    }
-
-
-    const table =
-        document.createElement(
-            "table"
-        );
-
-
-    const thead =
-        document.createElement(
-            "thead"
-        );
-
-
-    const headRow =
-        document.createElement(
-            "tr"
-        );
-
-
-    header.forEach(
-        cell => {
-
-            const th =
-                document.createElement(
-                    "th"
-                );
-
-            th.textContent =
-                String(
-                    cell ?? ""
-                );
-
-            headRow.appendChild(
-                th
-            );
-
-        }
-    );
-
-
-    thead.appendChild(
-        headRow
-    );
-
-
-    const tbody =
-        document.createElement(
-            "tbody"
-        );
-
-
-    rows
-        .slice(0, 100)
-        .forEach(
-            row => {
-
-                const tr =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                row.forEach(
-                    cell => {
-
-                        const td =
-                            document.createElement(
-                                "td"
-                            );
-
-                        td.textContent =
-                            String(
-                                cell ?? ""
-                            );
-
-                        tr.appendChild(
-                            td
-                        );
-
-                    }
-                );
-
-
-                tbody.appendChild(
-                    tr
-                );
-
-            }
-        );
-
-
-    table.appendChild(
-        thead
-    );
-
-    table.appendChild(
-        tbody
-    );
-
-    container.appendChild(
-        table
-    );
-
-}
-
-
-/* =========================================================
-   EXCEL UPLOADS
-========================================================= */
-
-function initExcelUploads() {
-
-    $("cocoExcelFile")
-        ?.addEventListener(
-            "change",
-            event => {
-
-                readExcelFile(
-
-                    event.target.files[0],
-
-                    rows => {
-
-                        AppState.cocoExcelRows =
-                            rows;
-
-                        updateLivePreview();
-
-                    },
-
-                    "cocoExcelPreview",
-
-                    "cocoExcelFileName"
-
-                );
-
-            }
-        );
-
-
-    $("otherExcelFile")
-        ?.addEventListener(
-            "change",
-            event => {
-
-                readExcelFile(
-
-                    event.target.files[0],
-
-                    rows => {
-
-                        AppState.otherExcelRows =
-                            rows;
-
-                    },
-
-                    "otherExcelPreview",
-
-                    "otherExcelFileName"
-
-                );
-
-            }
-        );
-
-
-    $("addressExcelFile")
-        ?.addEventListener(
-            "change",
-            event => {
-
-                readExcelFile(
-
-                    event.target.files[0],
-
-                    rows => {
-
-                        AppState.addressExcelRows =
-                            rows;
-
-                    },
-
-                    "addressExcelPreview",
-
-                    null
-
-                );
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   PAGE SIZE
-========================================================= */
-
-function getPageSize(
-    size,
-    widthId,
-    heightId
-) {
-
-    switch (size) {
-
-        case "4x6":
-
-            return {
-                width: 101.6,
-                height: 152.4
-            };
-
-
-        case "70x35":
-
-            return {
-                width: 70,
-                height: 35
-            };
-
-
-        case "a4":
-
-            return {
-                width: 210,
-                height: 297
-            };
-
-
-        case "custom":
-
-            return {
-                width:
-                    getNumber(
-                        widthId,
-                        70
-                    ),
-
-                height:
-                    getNumber(
-                        heightId,
-                        35
-                    )
-            };
-
-
-        default:
-
-            return {
-                width: 101.6,
-                height: 152.4
-            };
-
-    }
-
-}
-
-
-function applyOrientation(
-    dimensions,
-    orientation
-) {
-
-    let width =
-        dimensions.width;
-
-    let height =
-        dimensions.height;
-
-
-    if (
-        orientation ===
-        "landscape" &&
-        height > width
-    ) {
-
-        [
-            width,
-            height
-        ] = [
-            height,
-            width
-        ];
-
-    }
-
-
-    if (
-        orientation ===
-        "portrait" &&
-        width > height
-    ) {
-
-        [
-            width,
-            height
-        ] = [
-            height,
-            width
-        ];
-
-    }
-
-
-    return {
-        width,
-        height
-    };
-
-}
-
-
-/* =========================================================
-   PAGE SETTINGS
-========================================================= */
-
-function initPageSettings() {
-
-    const configs = [
-
-        {
-            size: "pageSize",
-
-            orientation:
-                "orientation",
-
-            panel:
-                "customSizePanel",
-
-            width:
-                "customWidth",
-
-            height:
-                "customHeight",
-
-            info:
-                "selectedPageInfo"
-        },
-
-
-        {
-            size:
-                "otherPageSize",
-
-            orientation:
-                "otherOrientation",
-
-            panel:
-                "otherCustomSizePanel",
-
-            width:
-                "otherCustomWidth",
-
-            height:
-                "otherCustomHeight"
-        },
-
-
-        {
-            size:
-                "isbnPageSize",
-
-            orientation:
-                "isbnOrientation",
-
-            panel:
-                "isbnCustomSizePanel",
-
-            width:
-                "isbnCustomWidth",
-
-            height:
-                "isbnCustomHeight"
-        },
-
-
-        {
-            size:
-                "addressPageSize",
-
-            orientation:
-                "addressOrientation",
-
-            panel:
-                "addressCustomSizePanel",
-
-            width:
-                "addressCustomWidth",
-
-            height:
-                "addressCustomHeight"
-        }
-
-    ];
-
-
-    configs.forEach(
-        config => {
-
-            const update =
-                () => {
-
-                    const isCustom =
-                        getValue(
-                            config.size
-                        ) ===
-                        "custom";
-
-
-                    $(config.panel)
-                        ?.classList.toggle(
-                            "hidden",
-                            !isCustom
-                        );
-
-
-                    if ($(config.width)) {
-
-                        $(config.width)
-                            .disabled =
-                            !isCustom;
-
-                    }
-
-
-                    if ($(config.height)) {
-
-                        $(config.height)
-                            .disabled =
-                            !isCustom;
-
-                    }
-
-
-                    if (config.info) {
-
-                        const dimensions =
-                            applyOrientation(
-
-                                getPageSize(
-
-                                    getValue(
-                                        config.size,
-                                        "4x6"
-                                    ),
-
-                                    config.width,
-
-                                    config.height
-
-                                ),
-
-                                getValue(
-                                    config.orientation,
-                                    "portrait"
-                                )
-
-                            );
-
-
-                        $(config.info)
-                            .textContent =
-                            `${dimensions.width.toFixed(1)} × ${dimensions.height.toFixed(1)} mm`;
-
-                    }
-
-
-                    updateLivePreview();
-
-                };
-
-
-            $(config.size)
-                ?.addEventListener(
-                    "change",
-                    update
-                );
-
-
-            $(config.orientation)
-                ?.addEventListener(
-                    "change",
-                    update
-                );
-
-
-            $(config.width)
-                ?.addEventListener(
-                    "input",
-                    update
-                );
-
-
-            $(config.height)
-                ?.addEventListener(
-                    "input",
-                    update
-                );
-
-
-            update();
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   FEATURE LOCKING
-========================================================= */
-
-function setFeatureLocked(
-    id,
-    locked
-) {
-
-    const element =
-        $(id);
-
-    if (!element) {
-        return;
-    }
-
-    element.disabled =
-        locked;
-
-
-    element
-        .closest(
-            ".feature-check"
-        )
-        ?.classList.toggle(
-            "locked",
-            locked
-        );
-
-}
-
-
-/* =========================================================
-   FEATURE RULES
-========================================================= */
-
-function applyFeatureRules() {
-
-    const poPlusBox =
-        isChecked(
-            "poPlusBoxCheck"
-        );
-
-
-    const combinedBorder =
-        isChecked(
-            "combinedBorderCheck"
-        );
-
-
-    /*
-     * PO + BOX
-     */
-
-    if (poPlusBox) {
-
-        if ($("poNumberCheck")) {
-            $("poNumberCheck")
-                .checked = false;
-        }
-
-        if ($("boxNumberCheck")) {
-            $("boxNumberCheck")
-                .checked = false;
-        }
-
-
-        setFeatureLocked(
-            "poNumberCheck",
-            true
-        );
-
-        setFeatureLocked(
-            "boxNumberCheck",
-            true
-        );
-
-    } else {
-
-        setFeatureLocked(
-            "poNumberCheck",
-            false
-        );
-
-        setFeatureLocked(
-            "boxNumberCheck",
-            false
-        );
-
-    }
-
-
-    /*
-     * COMBINED BORDER
-     */
-
-    if (combinedBorder) {
-
-        if ($("poBorderCheck")) {
-            $("poBorderCheck")
-                .checked = false;
-        }
-
-        if ($("boxBorderCheck")) {
-            $("boxBorderCheck")
-                .checked = false;
-        }
-
-
-        setFeatureLocked(
-            "poBorderCheck",
-            true
-        );
-
-        setFeatureLocked(
-            "boxBorderCheck",
-            true
-        );
-
-    } else {
-
-        setFeatureLocked(
-            "poBorderCheck",
-            false
-        );
-
-        setFeatureLocked(
-            "boxBorderCheck",
-            false
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   FEATURE NAMES
-========================================================= */
-
-function featureName(id) {
-
-    const names = {
-
-        poNumberCheck:
-            "PO Value",
-
-        boxNumberCheck:
-            "Box Number",
-
-        poPlusBoxCheck:
-            "PO + Box",
-
-        combinedBorderCheck:
-            "Combined Border",
-
-        poBorderCheck:
-            "PO Border",
-
-        boxBorderCheck:
-            "Box Border",
-
-        cutLineCheck:
-            "Cut Line",
-
-        pageBorderCheck:
-            "Page Border",
-
-        samePOPageFlow:
-            "Same PO Flow",
-
-        halfPageFlowCheck:
-            "Half Page Flow",
-
-        poBoldCheck:
-            "PO Bold",
-
-        poItalicCheck:
-            "PO Italic",
-
-        poUnderlineCheck:
-            "PO Underline",
-
-        boxBoldCheck:
-            "Box Bold",
-
-        boxItalicCheck:
-            "Box Italic",
-
-        boxUnderlineCheck:
-            "Box Underline",
-
-        fromBold:
-            "From Bold",
-
-        fromItalic:
-            "From Italic",
-
-        fromUnderline:
-            "From Underline",
-
-        fromBorder:
-            "From Border",
-
-        toBold:
-            "To Bold",
-
-        toItalic:
-            "To Italic",
-
-        toUnderline:
-            "To Underline",
-
-        toBorder:
-            "To Border"
-
-    };
-
-
-    return (
-        names[id] ||
-        "Function"
-    );
-
-}
-
-
-/* =========================================================
-   FEATURE EVENTS
-========================================================= */
-
-function initFeatureCheckboxes() {
-
-    const ids = [
-
-        "poNumberCheck",
-
-        "boxNumberCheck",
-
-        "poPlusBoxCheck",
-
-        "combinedBorderCheck",
-
-        "poBorderCheck",
-
-        "boxBorderCheck",
-
-        "cutLineCheck",
-
-        "pageBorderCheck",
-
-        "samePOPageFlow",
-
-        "halfPageFlowCheck",
-
-        "poBoldCheck",
-
-        "poItalicCheck",
-
-        "poUnderlineCheck",
-
-        "boxBoldCheck",
-
-        "boxItalicCheck",
-
-        "boxUnderlineCheck",
-
-        "fromBold",
-
-        "fromItalic",
-
-        "fromUnderline",
-
-        "fromBorder",
-
-        "toBold",
-
-        "toItalic",
-
-        "toUnderline",
-
-        "toBorder"
-
-    ];
-
-
-    ids.forEach(
-        id => {
-
-            $(id)?.addEventListener(
-                "change",
-                () => {
-
-                    const enabled =
-                        isChecked(id);
-
-
-                    /*
-                     * User explicitly requested:
-                     *
-                     * ENABLE  = GREEN
-                     * DISABLE = RED
-                     */
-
-                    showToast(
-
-                        `${featureName(id)} ${enabled ? "enabled" : "disabled"}.`,
-
-                        enabled
-                            ? "success"
-                            : "error"
-
-                    );
-
-
-                    if (
-                        id ===
-                        "poPlusBoxCheck"
-                    ) {
-
-                        applyFeatureRules();
-
-                    }
-
-
-                    if (
-                        id ===
-                        "combinedBorderCheck"
-                    ) {
-
-                        applyFeatureRules();
-
-                    }
-
-
-                    updateLivePreview();
-
-                }
-            );
-
-        }
-    );
-
-
-    applyFeatureRules();
-
-}
-
-
-/* =========================================================
-   FONT HELPERS
-========================================================= */
-
-function getFontSettings(
-    familyId,
-    sizeId,
-    boldId,
-    italicId,
-    underlineId
-) {
-
-    return {
-
-        family:
-            getValue(
-                familyId,
-                "Arial"
-            ),
-
-        size:
-            getNumber(
-                sizeId,
-                20
-            ),
-
-        bold:
-            isChecked(
-                boldId
-            ),
-
-        italic:
-            isChecked(
-                italicId
-            ),
-
-        underline:
-            isChecked(
-                underlineId
-            )
-
-    };
-
-}
-
-
-function applyPreviewFont(
-    element,
-    font
-) {
-
-    if (!element) {
-        return;
-    }
-
-
-    element.style.fontFamily =
-        `"${font.family}"`;
-
-
-    element.style.fontSize =
-        `${font.size}px`;
-
-
-    element.style.fontWeight =
-        font.bold
-            ? "700"
-            : "400";
-
-
-    element.style.fontStyle =
-        font.italic
-            ? "italic"
-            : "normal";
-
-
-    element.style.textDecoration =
-        font.underline
-            ? "underline"
-            : "none";
-
-}
-
-
-/* =========================================================
-   LIVE PAGE PREVIEW
-========================================================= */
-
-function updatePreviewPage() {
-
-    const page =
-        $("previewPage");
-
-    if (!page) {
-        return;
-    }
-
-
-    const dimensions =
-        applyOrientation(
-
-            getPageSize(
-
-                getValue(
-                    "pageSize",
-                    "4x6"
-                ),
-
-                "customWidth",
-
-                "customHeight"
-
-            ),
-
-            getValue(
-                "orientation",
-                "portrait"
-            )
-
-        );
-
-
-    const ratio =
-        dimensions.width /
-        dimensions.height;
-
-
-    const maxWidth =
-        600;
-
-    const maxHeight =
-        520;
-
-
-    let width;
-    let height;
-
-
-    if (ratio >= 1) {
-
-        width =
-            Math.min(
-                maxWidth,
-                dimensions.width * 2.8
-            );
-
-        height =
-            width / ratio;
-
-    } else {
-
-        height =
-            Math.min(
-                maxHeight,
-                dimensions.height * 2.8
-            );
-
-        width =
-            height * ratio;
-
-    }
-
-
-    page.style.width =
-        `${Math.max(
-            90,
-            width
-        )}px`;
-
-
-    page.style.height =
-        `${Math.max(
-            90,
-            height
-        )}px`;
-
-
-    const pageBorder =
-        isChecked(
-            "pageBorderCheck"
-        );
-
-
-    page.style.border =
-        pageBorder
-            ? "2px solid #111827"
-            : "1px solid #cbd5e1";
-
-
-    const sizeText =
-        $("previewPageSize");
-
-
-    if (sizeText) {
-
-        const selected =
-            getValue(
-                "pageSize",
-                "4x6"
-            );
-
-
-        const orientation =
-            getValue(
-                "orientation",
-                "portrait"
-            );
-
-
-        let text;
-
-
-        if (
-            selected ===
-            "70x35"
-        ) {
-
-            text =
-                "70 × 35 mm";
-
-        } else if (
-            selected ===
-            "a4"
-        ) {
-
-            text =
-                "A4";
-
-        } else if (
-            selected ===
-            "custom"
-        ) {
-
-            text =
-                `${dimensions.width.toFixed(1)} × ${dimensions.height.toFixed(1)} mm`;
-
-        } else {
-
-            text =
-                "4 × 6 Inches";
-
-        }
-
-
-        sizeText.textContent =
-            `${text} • ${orientation}`;
-
-    }
-
-}
-
-
-/* =========================================================
-   LIVE PO PREVIEW
-========================================================= */
-
-function updatePOPreview() {
-
-    const poElement =
-        $("previewPO");
-
-    const boxElement =
-        $("previewBox");
-
-    const label =
-        $("previewLabel");
-
-
-    if (
-        !poElement ||
-        !boxElement ||
-        !label
-    ) {
-
-        return;
-
-    }
-
-
-    const poValues =
-        getCocoPOValues();
-
-
-    /*
-     * IMPORTANT:
-     *
-     * Only actual PO value.
-     *
-     * NO "PO NUMBER".
-     */
-
-    const po =
-        poValues[0] ||
-        "ABC123";
-
-
-    const box =
-        getNumber(
-            "startBoxNumber",
-            1
-        );
-
-
-    const poEnabled =
-        isChecked(
-            "poNumberCheck",
-            true
-        );
-
-
-    const boxEnabled =
-        isChecked(
-            "boxNumberCheck",
-            true
-        );
-
-
-    const poPlusBox =
-        isChecked(
-            "poPlusBoxCheck"
-        );
-
-
-    const combinedBorder =
-        isChecked(
-            "combinedBorderCheck"
-        );
-
-
-    const poBorder =
-        isChecked(
-            "poBorderCheck"
-        );
-
-
-    const boxBorder =
-        isChecked(
-            "boxBorderCheck"
-        );
-
-
-    const cutLine =
-        isChecked(
-            "cutLineCheck"
-        );
-
-
-    /*
-     * ACTUAL PO VALUE
-     */
-
-    poElement.textContent =
-        po;
-
-
-    /*
-     * BOX FORMAT
-     */
-
-    boxElement.textContent =
-        `BOX NO. ${box}`;
-
-
-    /*
-     * Visibility
-     */
-
-    if (poPlusBox) {
-
-        poElement.style.display =
-            "block";
-
-        boxElement.style.display =
-            "block";
-
-    } else {
-
-        poElement.style.display =
-            poEnabled
-                ? "block"
-                : "none";
-
-
-        boxElement.style.display =
-            boxEnabled
-                ? "block"
-                : "none";
-
-    }
-
-
-    /*
-     * Always vertical:
-     *
-     * PO
-     *
-     * BOX NO. 123
-     */
-
-    label.style.flexDirection =
-        "column";
-
-
-    label.style.gap =
-        "10px";
-
-
-    /*
-     * Borders
-     */
-
-    label.classList.toggle(
-        "combined-border",
-        combinedBorder
-    );
-
-
-    poElement.classList.toggle(
-        "with-border",
-        poBorder &&
-        !combinedBorder
-    );
-
-
-    boxElement.classList.toggle(
-        "with-border",
-        boxBorder &&
-        !combinedBorder
-    );
-
-
-    /*
-     * Cut line
-     */
-
-    label.style.outline =
-        cutLine
-            ? "1px dashed #64748b"
-            : "none";
-
-
-    /*
-     * Fonts
-     */
-
-    applyPreviewFont(
-
-        poElement,
-
-        getFontSettings(
-
-            "poFontFamily",
-
-            "poFontSize",
-
-            "poBoldCheck",
-
-            "poItalicCheck",
-
-            "poUnderlineCheck"
-
-        )
-
-    );
-
-
-    applyPreviewFont(
-
-        boxElement,
-
-        getFontSettings(
-
-            "boxFontFamily",
-
-            "boxFontSize",
-
-            "boxBoldCheck",
-
-            "boxItalicCheck",
-
-            "boxUnderlineCheck"
-
-        )
-
-    );
-
-}
-
-
-/* =========================================================
-   LIVE PREVIEW
-========================================================= */
-
-function updateLivePreview() {
-
-    updatePreviewPage();
-
-    updatePOPreview();
-
-}
-
-
-/* =========================================================
-   ISBN BARCODE
-========================================================= */
-
-function initISBN() {
-
-    [
-        "isbnValue",
-        "isbnBookTitle",
-        "isbnEdition"
-    ].forEach(
-        id => {
-
-            $(id)?.addEventListener(
-                "input",
-                generateISBNBarcode
-            );
-
-        }
-    );
-
-
-    generateISBNBarcode();
-
-}
-
-
-function generateISBNBarcode() {
-
-    const svg =
-        $("isbnBarcodeSvg");
-
-    if (!svg) {
-        return;
-    }
-
-
-    svg.innerHTML =
-        "";
-
-
-    const text =
-        getValue(
-            "isbnValue"
-        );
-
-
     if (!text) {
 
-        if ($("isbnBarcodeText")) {
-
-            $("isbnBarcodeText")
-                .textContent =
-                "Enter ISBN to preview";
-
-        }
+        container.innerHTML =
+            "<span style='color:#94a3b8;font-size:12px'>No QR data</span>";
 
         return;
-
     }
-
 
     if (
-        typeof window.JsBarcode !==
-        "function"
+        typeof QRCode ===
+        "undefined"
     ) {
 
-        if ($("isbnBarcodeText")) {
-
-            $("isbnBarcodeText")
-                .textContent =
-                "Barcode library not loaded.";
-
-        }
+        container.innerHTML =
+            "<span style='color:#dc2626;font-size:12px'>QR library not loaded</span>";
 
         return;
-
     }
-
-
-    try {
-
-        JsBarcode(
-            svg,
-            text,
-            {
-
-                format:
-                    "EAN13",
-
-                displayValue:
-                    true,
-
-                width:
-                    2,
-
-                height:
-                    70,
-
-                margin:
-                    10
-
-            }
-        );
-
-
-    } catch (error) {
-
-        try {
-
-            JsBarcode(
-                svg,
-                text,
-                {
-
-                    format:
-                        "CODE128",
-
-                    displayValue:
-                        true,
-
-                    width:
-                        2,
-
-                    height:
-                        70,
-
-                    margin:
-                        10
-
-                }
-            );
-
-        } catch {
-
-            if ($("isbnBarcodeText")) {
-
-                $("isbnBarcodeText")
-                    .textContent =
-                    "Invalid barcode value.";
-
-            }
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   QR GENERATOR
-========================================================= */
-
-function createQRCode(
-    elementId,
-    text
-) {
-
-    const container =
-        $(elementId);
-
-    if (!container) {
-        return;
-    }
-
-
-    container.innerHTML =
-        "";
-
-
-    if (
-        typeof window.QRCode !==
-        "object" &&
-        typeof window.QRCode !==
-        "function"
-    ) {
-
-        container.textContent =
-            "QR library not loaded.";
-
-        return;
-
-    }
-
 
     const canvas =
         document.createElement(
             "canvas"
         );
 
+    container.appendChild(
+        canvas
+    );
 
-    QRCode.toCanvas(
+    try {
 
-        canvas,
+        QRCode.toCanvas(
+            canvas,
+            text,
+            {
+                width: 160,
+                margin: 2,
+                errorCorrectionLevel: "M"
+            },
+            error => {
 
-        text,
+                if (error) {
 
-        {
+                    console.error(
+                        "QR Error:",
+                        error
+                    );
 
-            width:
-                170,
-
-            margin:
-                2,
-
-            errorCorrectionLevel:
-                "M"
-
-        },
-
-        error => {
-
-            if (error) {
-
-                console.error(
-                    "QR Error:",
-                    error
-                );
-
-                container.textContent =
-                    "QR generation failed.";
-
-                return;
+                    container.innerHTML =
+                        "<span style='color:#dc2626'>QR generation failed</span>";
+                }
 
             }
+        );
 
+    } catch (error) {
 
-            container.innerHTML =
-                "";
+        console.error(error);
 
-            container.appendChild(
-                canvas
-            );
-
-        }
-
-    );
-
+        container.innerHTML =
+            "<span style='color:#dc2626'>QR generation failed</span>";
+    }
 }
 
 
-/* =========================================================
-   QR INIT
-========================================================= */
+function updateAddressQR() {
 
-function initQRCodes() {
+    const address =
+        [
+            value(
+                "addressFrom"
+            ),
 
-    createQRCode(
+            value(
+                "addressTo"
+            )
+        ]
+            .filter(Boolean)
+            .join("\n");
 
+    generateQRCode(
         "addressQRPreview",
-
-        "https://maps.google.com/"
-
+        address
     );
 
 
-    createQRCode(
-
-        "emailQRPreview",
-
-        "mailto:ashish.verma@bookswagon.in"
-
-    );
-
-}
-
-
-/* =========================================================
-   PDF DIMENSIONS
-========================================================= */
-
-function getPDFDimensions(
-    size,
-    orientation,
-    widthId,
-    heightId
-) {
-
-    return applyOrientation(
-
-        getPageSize(
-            size,
-            widthId,
-            heightId
-        ),
-
-        orientation
-
-    );
-
-}
-
-
-/* =========================================================
-   PDF FONT STYLE
-========================================================= */
-
-function getPDFFontStyle(
-    font
-) {
+    const email =
+        value(
+            "emailAddress",
+            ""
+        );
 
     if (
-        font.bold &&
-        font.italic
+        email
     ) {
 
-        return "bolditalic";
+        generateQRCode(
+            "emailQRPreview",
+            `mailto:${email}`
+        );
 
+    } else {
+
+        const container =
+            $("emailQRPreview");
+
+        if (container) {
+
+            container.innerHTML =
+                "<span style='color:#94a3b8;font-size:12px'>Enter email to generate Email QR</span>";
+        }
     }
-
-
-    if (font.bold) {
-        return "bold";
-    }
-
-
-    if (font.italic) {
-        return "italic";
-    }
-
-
-    return "normal";
-
 }
 
 
 /* =========================================================
-   DRAW COCO LABEL
+   BARCODE
 ========================================================= */
 
-function drawCocoLabel(
+function updateBarcode() {
+
+    const svg =
+        $("isbnBarcodeSvg");
+
+    const text =
+        $("isbnBarcodeText");
+
+    if (!svg || !text) {
+        return;
+    }
+
+    const isbn =
+        value(
+            "isbnValue",
+            ""
+        ).trim();
+
+    text.textContent =
+        isbn ||
+        "Enter ISBN to preview";
+
+    if (!isbn) {
+
+        svg.innerHTML = "";
+
+        return;
+    }
+
+    if (
+        typeof JsBarcode ===
+        "undefined"
+    ) {
+
+        svg.innerHTML = "";
+
+        text.textContent =
+            "Barcode library not loaded";
+
+        return;
+    }
+
+    try {
+
+        JsBarcode(
+            svg,
+            isbn,
+            {
+                format: "auto",
+                lineColor: "#111827",
+                background: "#ffffff",
+                width: 2,
+                height: 75,
+                displayValue: true,
+                fontSize: 13,
+                margin: 10
+            }
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        svg.innerHTML = "";
+
+        text.textContent =
+            "Invalid barcode value";
+    }
+}
+
+
+/* =========================================================
+   PDF LIBRARY CHECK
+========================================================= */
+
+function getPDFLibrary() {
+
+    /*
+      jsPDF CDN exposes:
+      window.jspdf.jsPDF
+
+      Older builds sometimes expose:
+      window.jsPDF
+    */
+
+    if (
+        window.jspdf &&
+        typeof window.jspdf.jsPDF ===
+        "function"
+    ) {
+
+        return window.jspdf.jsPDF;
+    }
+
+    if (
+        typeof window.jsPDF ===
+        "function"
+    ) {
+
+        return window.jsPDF;
+    }
+
+    return null;
+}
+
+
+function ensurePDFLibrary() {
+
+    const jsPDF =
+        getPDFLibrary();
+
+    if (!jsPDF) {
+
+        showToast(
+            "PDF library is not loaded. Check internet/CDN connection and reload the page.",
+            "error",
+            5000
+        );
+
+        return null;
+    }
+
+    return jsPDF;
+}
+
+
+/* =========================================================
+   PDF PAGE SIZE
+========================================================= */
+
+function getPDFPageConfig(
+    pageSize,
+    orientation,
+    customWidth,
+    customHeight
+) {
+
+    let format =
+        "a4";
+
+    let unit =
+        "mm";
+
+    let width =
+        210;
+
+    let height =
+        297;
+
+    if (
+        pageSize ===
+        "4x6"
+    ) {
+
+        width = 101.6;
+        height = 152.4;
+
+    } else if (
+        pageSize ===
+        "70x35"
+    ) {
+
+        width = 70;
+        height = 35;
+
+    } else if (
+        pageSize ===
+        "a5"
+    ) {
+
+        width = 148;
+        height = 210;
+
+    } else if (
+        pageSize ===
+        "letter"
+    ) {
+
+        width = 215.9;
+        height = 279.4;
+
+    } else if (
+        pageSize ===
+        "legal"
+    ) {
+
+        width = 215.9;
+        height = 355.6;
+
+    } else if (
+        pageSize ===
+        "custom"
+    ) {
+
+        width =
+            safeNumber(
+                customWidth,
+                70
+            );
+
+        height =
+            safeNumber(
+                customHeight,
+                35
+            );
+    }
+
+    if (
+        orientation ===
+        "landscape"
+    ) {
+
+        [
+            width,
+            height
+        ] =
+            [
+                height,
+                width
+            ];
+    }
+
+    return {
+        orientation:
+            width > height
+                ? "landscape"
+                : "portrait",
+
+        unit,
+
+        format:
+            [
+                width,
+                height
+            ]
+    };
+}
+
+
+/* =========================================================
+   PDF BORDER
+========================================================= */
+
+function drawPDFBorder(
     doc,
     x,
     y,
     width,
     height,
-    po,
-    box
+    config
 ) {
 
-    const poEnabled =
-        isChecked(
-            "poNumberCheck",
-            true
-        );
-
-
-    const boxEnabled =
-        isChecked(
-            "boxNumberCheck",
-            true
-        );
-
-
-    const poPlusBox =
-        isChecked(
-            "poPlusBoxCheck"
-        );
-
-
-    const combinedBorder =
-        isChecked(
-            "combinedBorderCheck"
-        );
-
-
-    const poBorder =
-        isChecked(
-            "poBorderCheck"
-        );
-
-
-    const boxBorder =
-        isChecked(
-            "boxBorderCheck"
-        );
-
-
-    const cutLine =
-        isChecked(
-            "cutLineCheck"
-        );
-
-
-    /*
-     * Combined border
-     */
-
-    if (combinedBorder) {
-
-        doc.setDrawColor(
-            17,
-            24,
-            39
-        );
-
-        doc.setLineWidth(
-            0.7
-        );
-
-        doc.rect(
-            x,
-            y,
-            width,
-            height
-        );
-
+    if (!config) {
+        return;
     }
 
-
-    /*
-     * Cut line
-     */
-
-    if (cutLine) {
-
-        doc.setDrawColor(
-            100,
-            116,
-            139
+    const color =
+        hexToRGB(
+            config.color
         );
 
+    doc.setDrawColor(
+        color[0],
+        color[1],
+        color[2]
+    );
+
+    doc.setLineWidth(
+        Math.max(
+            0.1,
+            config.width
+        )
+    );
+
+    const style =
+        config.style;
+
+    if (
+        style ===
+        "dashed"
+    ) {
+
         doc.setLineDashPattern(
-            [2, 2],
+            [3, 2],
             0
         );
 
-        doc.rect(
-            x,
-            y,
-            width,
-            height
+    } else if (
+        style ===
+        "dotted"
+    ) {
+
+        doc.setLineDashPattern(
+            [0.8, 1.8],
+            0
         );
+
+    } else {
 
         doc.setLineDashPattern(
             [],
             0
         );
-
     }
-
-
-    const showPO =
-        poPlusBox ||
-        poEnabled;
-
-
-    const showBox =
-        poPlusBox ||
-        boxEnabled;
-
-
-    let centerY =
-        y +
-        height / 2;
-
 
     if (
-        showPO &&
-        showBox
+        style ===
+        "double" ||
+        style ===
+        "thinDouble" ||
+        style ===
+        "thickDouble"
     ) {
-
-        centerY -= 7;
-
-    }
-
-
-    /*
-     * PO
-     *
-     * ONLY ACTUAL VALUE.
-     */
-
-    if (showPO) {
-
-        const font =
-            getFontSettings(
-
-                "poFontFamily",
-
-                "poFontSize",
-
-                "poBoldCheck",
-
-                "poItalicCheck",
-
-                "poUnderlineCheck"
-
-            );
-
-
-        doc.setFont(
-            font.family,
-            getPDFFontStyle(
-                font
-            )
-        );
-
-
-        doc.setFontSize(
-            font.size
-        );
-
-
-        const lines =
-            doc.splitTextToSize(
-                String(po),
-                width - 10
-            );
-
-
-        doc.text(
-            lines,
-            x +
-                width / 2,
-            centerY,
-            {
-                align:
-                    "center"
-            }
-        );
-
-
-        if (
-            poBorder &&
-            !combinedBorder
-        ) {
-
-            doc.rect(
-                x + 4,
-
-                centerY -
-                    font.size / 2 -
-                    2,
-
-                width - 8,
-
-                font.size + 5
-            );
-
-        }
-
-
-        centerY +=
-            font.size +
-            10;
-
-    }
-
-
-    /*
-     * BOX
-     *
-     * BOX NO. 123
-     */
-
-    if (showBox) {
-
-        const font =
-            getFontSettings(
-
-                "boxFontFamily",
-
-                "boxFontSize",
-
-                "boxBoldCheck",
-
-                "boxItalicCheck",
-
-                "boxUnderlineCheck"
-
-            );
-
-
-        doc.setFont(
-            font.family,
-            getPDFFontStyle(
-                font
-            )
-        );
-
-
-        doc.setFontSize(
-            font.size
-        );
-
-
-        const boxText =
-            `BOX NO. ${box}`;
-
-
-        doc.text(
-            boxText,
-
-            x +
-                width / 2,
-
-            centerY,
-
-            {
-                align:
-                    "center"
-            }
-        );
-
-
-        if (
-            boxBorder &&
-            !combinedBorder
-        ) {
-
-            doc.rect(
-
-                x + 4,
-
-                centerY -
-                    font.size / 2 -
-                    2,
-
-                width - 8,
-
-                font.size + 5
-
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   COCO PDF
-========================================================= */
-
-function generateCocoPDF() {
-
-    /*
-     * IMPORTANT:
-     *
-     * Correct jsPDF access:
-     *
-     * window.jspdf.jsPDF
-     */
-
-    if (!checkPDFLibrary()) {
-        return;
-    }
-
-
-    const jsPDF =
-        getJsPDF();
-
-
-    const dimensions =
-        getPDFDimensions(
-
-            getValue(
-                "pageSize",
-                "4x6"
-            ),
-
-            getValue(
-                "orientation",
-                "portrait"
-            ),
-
-            "customWidth",
-
-            "customHeight"
-
-        );
-
-
-    const orientation =
-        dimensions.width >
-        dimensions.height
-            ? "landscape"
-            : "portrait";
-
-
-    const doc =
-        new jsPDF({
-
-            orientation:
-                orientation,
-
-            unit:
-                "mm",
-
-            format: [
-                dimensions.width,
-                dimensions.height
-            ]
-
-        });
-
-
-    let poValues =
-        getCocoPOValues();
-
-
-    /*
-     * If nothing is entered,
-     * keep a useful preview/sample.
-     */
-
-    if (!poValues.length) {
-
-        poValues = [
-            "ABC123"
-        ];
-
-    }
-
-
-    const startBox =
-        Math.max(
-            1,
-            getNumber(
-                "startBoxNumber",
-                1
-            )
-        );
-
-
-    const endBox =
-        Math.max(
-            startBox,
-            getNumber(
-                "endBoxNumber",
-                startBox
-            )
-        );
-
-
-    const repeat =
-        Math.max(
-            1,
-            getNumber(
-                "boxRepeatCount",
-                1
-            )
-        );
-
-
-    const labelsPerPage =
-        Math.max(
-            1,
-            getNumber(
-                "labelsPerPage",
-                2
-            )
-        );
-
-
-    const gap =
-        Math.max(
-            1,
-            getNumber(
-                "labelGap",
-                2
-            )
-        );
-
-
-    const labels = [];
-
-
-    poValues.forEach(
-        po => {
-
-            for (
-                let repeatIndex = 0;
-                repeatIndex < repeat;
-                repeatIndex++
-            ) {
-
-                for (
-                    let box = startBox;
-                    box <= endBox;
-                    box++
-                ) {
-
-                    labels.push({
-
-                        po:
-                            po,
-
-                        box:
-                            box
-
-                    });
-
-                }
-
-            }
-
-        }
-    );
-
-
-    if (!labels.length) {
-
-        labels.push({
-
-            po:
-                "ABC123",
-
-            box:
-                startBox
-
-        });
-
-    }
-
-
-    for (
-        let pageStart = 0;
-
-        pageStart <
-        labels.length;
-
-        pageStart +=
-            labelsPerPage
-
-    ) {
-
-
-        if (pageStart > 0) {
-
-            doc.addPage(
-
-                [
-                    dimensions.width,
-                    dimensions.height
-                ],
-
-                orientation
-
-            );
-
-        }
-
-
-        const pageLabels =
-            labels.slice(
-
-                pageStart,
-
-                pageStart +
-                    labelsPerPage
-
-            );
-
-
-        const pageBorder =
-            isChecked(
-                "pageBorderCheck"
-            );
-
-
-        if (pageBorder) {
-
-            doc.setDrawColor(
-                17,
-                24,
-                39
-            );
-
-            doc.setLineWidth(
-                0.6
-            );
-
-            doc.rect(
-                2,
-                2,
-                dimensions.width - 4,
-                dimensions.height - 4
-            );
-
-        }
-
-
-        const totalGap =
-            gap *
-            (
-                pageLabels.length + 1
-            );
-
-
-        const labelHeight =
-            (
-                dimensions.height -
-                totalGap
-            ) /
-            pageLabels.length;
-
-
-        pageLabels.forEach(
-            (
-                item,
-                index
-            ) => {
-
-                const x =
-                    gap;
-
-
-                const y =
-                    gap +
-                    index *
-                    (
-                        labelHeight +
-                        gap
-                    );
-
-
-                const width =
-                    dimensions.width -
-                    gap * 2;
-
-
-                drawCocoLabel(
-
-                    doc,
-
-                    x,
-
-                    y,
-
-                    width,
-
-                    labelHeight,
-
-                    item.po,
-
-                    item.box
-
-                );
-
-            }
-        );
-
-    }
-
-
-    doc.save(
-        "books-label-studio-coco-blue.pdf"
-    );
-
-
-    showToast(
-        "Coco Blue PDF generated successfully.",
-        "success"
-    );
-
-}
-
-
-/* =========================================================
-   OTHER PO PDF
-========================================================= */
-
-function generateOtherPDF() {
-
-    if (!checkPDFLibrary()) {
-        return;
-    }
-
-
-    const jsPDF =
-        getJsPDF();
-
-
-    const dimensions =
-        getPDFDimensions(
-
-            getValue(
-                "otherPageSize",
-                "4x6"
-            ),
-
-            getValue(
-                "otherOrientation",
-                "portrait"
-            ),
-
-            "otherCustomWidth",
-
-            "otherCustomHeight"
-
-        );
-
-
-    const orientation =
-        dimensions.width >
-        dimensions.height
-            ? "landscape"
-            : "portrait";
-
-
-    const doc =
-        new jsPDF({
-
-            orientation,
-
-            unit:
-                "mm",
-
-            format: [
-                dimensions.width,
-                dimensions.height
-            ]
-
-        });
-
-
-    const values =
-        getOtherPOValues();
-
-
-    const poValues =
-        values.length
-            ? values
-            : ["ABC123"];
-
-
-    poValues.forEach(
-        (po, index) => {
-
-            if (index > 0) {
-
-                doc.addPage(
-
-                    [
-                        dimensions.width,
-                        dimensions.height
-                    ],
-
-                    orientation
-
-                );
-
-            }
-
-
-            doc.setFont(
-                "helvetica",
-                "bold"
-            );
-
-
-            doc.setFontSize(
-                26
-            );
-
-
-            doc.text(
-
-                String(po),
-
-                dimensions.width / 2,
-
-                dimensions.height / 2,
-
-                {
-                    align:
-                        "center"
-                }
-
-            );
-
-        }
-    );
-
-
-    doc.save(
-        "books-label-studio-other-po.pdf"
-    );
-
-
-    showToast(
-        "Other PO PDF generated successfully.",
-        "success"
-    );
-
-}
-
-
-/* =========================================================
-   ISBN PDF
-========================================================= */
-
-function generateISBNPDF() {
-
-    if (!checkPDFLibrary()) {
-        return;
-    }
-
-
-    const jsPDF =
-        getJsPDF();
-
-
-    const dimensions =
-        getPDFDimensions(
-
-            getValue(
-                "isbnPageSize",
-                "4x6"
-            ),
-
-            getValue(
-                "isbnOrientation",
-                "portrait"
-            ),
-
-            "isbnCustomWidth",
-
-            "isbnCustomHeight"
-
-        );
-
-
-    const orientation =
-        dimensions.width >
-        dimensions.height
-            ? "landscape"
-            : "portrait";
-
-
-    const doc =
-        new jsPDF({
-
-            orientation,
-
-            unit:
-                "mm",
-
-            format: [
-                dimensions.width,
-                dimensions.height
-            ]
-
-        });
-
-
-    const isbn =
-        getValue(
-            "isbnValue",
-            "ISBN"
-        );
-
-
-    const title =
-        getValue(
-            "isbnBookTitle",
-            "ISBN BARCODE"
-        );
-
-
-    const edition =
-        getValue(
-            "isbnEdition"
-        );
-
-
-    doc.setFont(
-        "helvetica",
-        "bold"
-    );
-
-
-    doc.setFontSize(
-        18
-    );
-
-
-    doc.text(
-
-        title,
-
-        dimensions.width / 2,
-
-        20,
-
-        {
-            align:
-                "center"
-        }
-
-    );
-
-
-    doc.setFont(
-        "helvetica",
-        "normal"
-    );
-
-
-    doc.setFontSize(
-        11
-    );
-
-
-    doc.text(
-
-        isbn,
-
-        dimensions.width / 2,
-
-        28,
-
-        {
-            align:
-                "center"
-        }
-
-    );
-
-
-    if (edition) {
-
-        doc.text(
-
-            edition,
-
-            dimensions.width / 2,
-
-            35,
-
-            {
-                align:
-                    "center"
-            }
-
-        );
-
-    }
-
-
-    drawSimpleBarcode(
-
-        doc,
-
-        isbn,
-
-        10,
-
-        dimensions.height / 2,
-
-        dimensions.width - 20,
-
-        30
-
-    );
-
-
-    doc.save(
-        "books-label-studio-isbn.pdf"
-    );
-
-
-    showToast(
-        "ISBN PDF generated successfully.",
-        "success"
-    );
-
-}
-
-
-/* =========================================================
-   SIMPLE PDF BARCODE
-========================================================= */
-
-function drawSimpleBarcode(
-    doc,
-    text,
-    x,
-    y,
-    width,
-    height
-) {
-
-    const value =
-        String(
-            text
-        );
-
-
-    const unit =
-        width /
-        Math.max(
-            1,
-            value.length * 12
-        );
-
-
-    let cursor =
-        x;
-
-
-    value.split("")
-        .forEach(
-            char => {
-
-                const code =
-                    char.charCodeAt(0);
-
-
-                for (
-                    let bit = 0;
-                    bit < 8;
-                    bit++
-                ) {
-
-                    if (
-                        (code >> bit) &
-                        1
-                    ) {
-
-                        doc.setFillColor(
-                            0,
-                            0,
-                            0
-                        );
-
-
-                        doc.rect(
-
-                            cursor,
-
-                            y,
-
-                            Math.max(
-                                0.25,
-                                unit
-                            ),
-
-                            height,
-
-                            "F"
-
-                        );
-
-                    }
-
-
-                    cursor +=
-                        unit;
-
-                }
-
-
-                cursor +=
-                    unit * 3;
-
-            }
-        );
-
-
-    doc.setFontSize(
-        8
-    );
-
-
-    doc.setTextColor(
-        0,
-        0,
-        0
-    );
-
-
-    doc.text(
-
-        value,
-
-        x +
-            width / 2,
-
-        y +
-            height +
-            5,
-
-        {
-            align:
-                "center"
-        }
-
-    );
-
-}
-
-
-/* =========================================================
-   ADDRESS PDF
-========================================================= */
-
-function getAddressValues() {
-
-    let from =
-        getValue(
-            "addressFrom",
-            "FROM ADDRESS"
-        );
-
-
-    let to =
-        getValue(
-            "addressTo",
-            "TO ADDRESS"
-        );
-
-
-    /*
-     * Excel:
-     *
-     * first row already removed.
-     */
-
-    if (
-        AppState.addressMode ===
-        "excel" &&
-
-        AppState.addressExcelRows.length
-    ) {
-
-        const row =
-            AppState.addressExcelRows[0];
-
-
-        if (
-            Array.isArray(row)
-        ) {
-
-            from =
-                String(
-                    row[0] ||
-                    from
-                );
-
-
-            to =
-                String(
-                    row[1] ||
-                    to
-                );
-
-        }
-
-    }
-
-
-    return {
-        from,
-        to
-    };
-
-}
-
-
-function generateAddressPDF() {
-
-    if (!checkPDFLibrary()) {
-        return;
-    }
-
-
-    const jsPDF =
-        getJsPDF();
-
-
-    const dimensions =
-        getPDFDimensions(
-
-            getValue(
-                "addressPageSize",
-                "4x6"
-            ),
-
-            getValue(
-                "addressOrientation",
-                "portrait"
-            ),
-
-            "addressCustomWidth",
-
-            "addressCustomHeight"
-
-        );
-
-
-    const orientation =
-        dimensions.width >
-        dimensions.height
-            ? "landscape"
-            : "portrait";
-
-
-    const doc =
-        new jsPDF({
-
-            orientation,
-
-            unit:
-                "mm",
-
-            format: [
-                dimensions.width,
-                dimensions.height
-            ]
-
-        });
-
-
-    const addresses =
-        getAddressValues();
-
-
-    const margin =
-        8;
-
-    const gap =
-        5;
-
-
-    const boxWidth =
-        (
-            dimensions.width -
-            margin * 2 -
-            gap
-        ) / 2;
-
-
-    const boxHeight =
-        dimensions.height -
-        margin * 2;
-
-
-    drawAddressBox(
-
-        doc,
-
-        addresses.from,
-
-        margin,
-
-        margin,
-
-        boxWidth,
-
-        boxHeight,
-
-        {
-
-            family:
-                getValue(
-                    "fromFontFamily",
-                    "Arial"
-                ),
-
-            size:
-                getNumber(
-                    "fromFontSize",
-                    14
-                ),
-
-            bold:
-                isChecked(
-                    "fromBold"
-                ),
-
-            italic:
-                isChecked(
-                    "fromItalic"
-                ),
-
-            underline:
-                isChecked(
-                    "fromUnderline"
-                ),
-
-            border:
-                isChecked(
-                    "fromBorder"
-                )
-
-        }
-
-    );
-
-
-    drawAddressBox(
-
-        doc,
-
-        addresses.to,
-
-        margin +
-            boxWidth +
-            gap,
-
-        margin,
-
-        boxWidth,
-
-        boxHeight,
-
-        {
-
-            family:
-                getValue(
-                    "toFontFamily",
-                    "Arial"
-                ),
-
-            size:
-                getNumber(
-                    "toFontSize",
-                    14
-                ),
-
-            bold:
-                isChecked(
-                    "toBold"
-                ),
-
-            italic:
-                isChecked(
-                    "toItalic"
-                ),
-
-            underline:
-                isChecked(
-                    "toUnderline"
-                ),
-
-            border:
-                isChecked(
-                    "toBorder"
-                )
-
-        }
-
-    );
-
-
-    doc.save(
-        "books-label-studio-address.pdf"
-    );
-
-
-    showToast(
-        "Address PDF generated successfully.",
-        "success"
-    );
-
-}
-
-
-/* =========================================================
-   DRAW ADDRESS BOX
-========================================================= */
-
-function drawAddressBox(
-    doc,
-    text,
-    x,
-    y,
-    width,
-    height,
-    settings
-) {
-
-    if (settings.border) {
-
-        doc.setDrawColor(
-            17,
-            24,
-            39
-        );
-
-        doc.setLineWidth(
-            0.5
-        );
 
         doc.rect(
             x,
@@ -4007,669 +3395,2363 @@ function drawAddressBox(
             height
         );
 
+        const gap =
+            style ===
+            "thickDouble"
+                ? 2.5
+                : 1.5;
+
+        doc.rect(
+            x + gap,
+            y + gap,
+            width - gap * 2,
+            height - gap * 2
+        );
+
+    } else {
+
+        doc.rect(
+            x,
+            y,
+            width,
+            height,
+            "S"
+        );
     }
 
+    doc.setLineDashPattern(
+        [],
+        0
+    );
+}
 
-    let style =
-        "normal";
 
+function hexToRGB(hex) {
+
+    if (!hex) {
+        return [
+            17,
+            24,
+            39
+        ];
+    }
+
+    let h =
+        hex.replace(
+            "#",
+            ""
+        );
+
+    if (h.length === 3) {
+
+        h =
+            h
+                .split("")
+                .map(
+                    x => x + x
+                )
+                .join("");
+    }
+
+    return [
+
+        parseInt(
+            h.substring(0, 2),
+            16
+        ),
+
+        parseInt(
+            h.substring(2, 4),
+            16
+        ),
+
+        parseInt(
+            h.substring(4, 6),
+            16
+        )
+    ];
+}
+
+
+/* =========================================================
+   PDF FONT
+========================================================= */
+
+function setPDFFont(
+    doc,
+    family,
+    bold = false,
+    italic = false
+) {
+
+    const supported = {
+
+        "Arial":
+            "helvetica",
+
+        "Calibri":
+            "helvetica",
+
+        "Cambria":
+            "times",
+
+        "Times New Roman":
+            "times",
+
+        "Georgia":
+            "times",
+
+        "Verdana":
+            "helvetica",
+
+        "Tahoma":
+            "helvetica",
+
+        "Trebuchet MS":
+            "helvetica",
+
+        "Courier New":
+            "courier",
+
+        "Impact":
+            "helvetica",
+
+        "Garamond":
+            "times",
+
+        "Book Antiqua":
+            "times"
+    };
+
+    const font =
+        supported[family] ||
+        "helvetica";
+
+    let style = "normal";
 
     if (
-        settings.bold &&
-        settings.italic
+        bold &&
+        italic
     ) {
 
         style =
             "bolditalic";
 
-    } else if (
-        settings.bold
-    ) {
+    } else if (bold) {
 
         style =
             "bold";
 
-    } else if (
-        settings.italic
-    ) {
+    } else if (italic) {
 
         style =
             "italic";
-
     }
-
 
     doc.setFont(
-        settings.family,
+        font,
         style
     );
+}
 
+
+/* =========================================================
+   PDF TEXT
+========================================================= */
+
+function addPDFText(
+    doc,
+    text,
+    x,
+    y,
+    pageWidth,
+    config
+) {
+
+    if (!text) {
+        return;
+    }
+
+    setPDFFont(
+        doc,
+        config.fontFamily,
+        config.bold,
+        config.italic
+    );
 
     doc.setFontSize(
-        settings.size
+        config.fontSize
     );
 
+    const align =
+        config.alignment === "left"
+            ? "left"
+            : config.alignment === "right"
+                ? "right"
+                : "center";
 
-    const lines =
-        doc.splitTextToSize(
-            String(text),
-            width - 8
-        );
+    let textX = x;
 
+    if (align === "center") {
+        textX =
+            x +
+            pageWidth / 2;
+
+    } else if (
+        align === "right"
+    ) {
+
+        textX =
+            x +
+            pageWidth;
+    }
+
+    let finalText =
+        String(text);
+
+    if (
+        config.uppercase
+    ) {
+
+        finalText =
+            finalText.toUpperCase();
+    }
 
     doc.text(
-
-        lines,
-
-        x + 4,
-
-        y + 9
-
-    );
-
-}
-
-
-/* =========================================================
-   RESET COCO
-========================================================= */
-
-function resetCoco() {
-
-    for (
-        let i = 1;
-        i <= 40;
-        i++
-    ) {
-
-        if ($(`cocoPO${i}`)) {
-
-            $(`cocoPO${i}`)
-                .value = "";
-
-        }
-
-    }
-
-
-    if ($("cocoMultiplePO")) {
-
-        $("cocoMultiplePO")
-            .value = "";
-
-    }
-
-
-    if ($("startBoxNumber")) {
-
-        $("startBoxNumber")
-            .value = "1";
-
-    }
-
-
-    if ($("endBoxNumber")) {
-
-        $("endBoxNumber")
-            .value = "10";
-
-    }
-
-
-    if ($("boxRepeatCount")) {
-
-        $("boxRepeatCount")
-            .value = "1";
-
-    }
-
-
-    if ($("labelsPerPage")) {
-
-        $("labelsPerPage")
-            .value = "2";
-
-    }
-
-
-    if ($("pageSize")) {
-
-        $("pageSize")
-            .value = "4x6";
-
-    }
-
-
-    if ($("orientation")) {
-
-        $("orientation")
-            .value = "portrait";
-
-    }
-
-
-    const defaults = {
-
-        poNumberCheck:
-            true,
-
-        boxNumberCheck:
-            true,
-
-        poPlusBoxCheck:
-            false,
-
-        combinedBorderCheck:
-            false,
-
-        poBorderCheck:
-            false,
-
-        boxBorderCheck:
-            false,
-
-        cutLineCheck:
-            false,
-
-        pageBorderCheck:
-            false,
-
-        samePOPageFlow:
-            false,
-
-        halfPageFlowCheck:
-            false
-
-    };
-
-
-    Object.entries(
-        defaults
-    ).forEach(
-        ([id, state]) => {
-
-            if ($(id)) {
-
-                $(id).checked =
-                    state;
-
-            }
-
+        finalText,
+        textX,
+        y,
+        {
+            align
         }
     );
-
-
-    applyFeatureRules();
-
-    updateLivePreview();
-
-
-    showToast(
-        "Coco Blue reset successfully.",
-        "success"
-    );
-
 }
 
 
 /* =========================================================
-   RESET OTHER
+   GENERATE COCO PDF
 ========================================================= */
 
-function resetOther() {
+function generateCocoPDF() {
 
-    for (
-        let i = 1;
-        i <= 40;
-        i++
-    ) {
+    const jsPDF =
+        ensurePDFLibrary();
 
-        if ($(`otherPO${i}`)) {
-
-            $(`otherPO${i}`)
-                .value = "";
-
-        }
-
+    if (!jsPDF) {
+        return;
     }
 
+    try {
 
-    if ($("otherMultiplePO")) {
-
-        $("otherMultiplePO")
-            .value = "";
-
-    }
-
-
-    showToast(
-        "Other PO reset successfully.",
-        "success"
-    );
-
-}
-
-
-/* =========================================================
-   RESET ISBN
-========================================================= */
-
-function resetISBN() {
-
-    [
-        "isbnValue",
-        "isbnBookTitle",
-        "isbnEdition"
-    ].forEach(
-        id => {
-
-            if ($(id)) {
-
-                $(id).value =
-                    "";
-
-            }
-
-        }
-    );
-
-
-    if ($("isbnBarcodeSvg")) {
-
-        $("isbnBarcodeSvg")
-            .innerHTML = "";
-
-    }
-
-
-    if ($("isbnBarcodeText")) {
-
-        $("isbnBarcodeText")
-            .textContent =
-            "Enter ISBN to preview";
-
-    }
-
-
-    showToast(
-        "ISBN reset successfully.",
-        "success"
-    );
-
-}
-
-
-/* =========================================================
-   RESET ADDRESS
-========================================================= */
-
-function resetAddress() {
-
-    [
-        "addressFrom",
-        "addressTo"
-    ].forEach(
-        id => {
-
-            if ($(id)) {
-
-                $(id).value =
-                    "";
-
-            }
-
-        }
-    );
-
-
-    showToast(
-        "Address reset successfully.",
-        "success"
-    );
-
-}
-
-
-/* =========================================================
-   ACTION BUTTONS
-========================================================= */
-
-function initActionButtons() {
-
-    $("cocoResetButton")
-        ?.addEventListener(
-            "click",
-            resetCoco
-        );
-
-
-    $("cocoGenerateButton")
-        ?.addEventListener(
-            "click",
-            generateCocoPDF
-        );
-
-
-    $("otherResetButton")
-        ?.addEventListener(
-            "click",
-            resetOther
-        );
-
-
-    $("otherGenerateButton")
-        ?.addEventListener(
-            "click",
-            generateOtherPDF
-        );
-
-
-    $("isbnResetButton")
-        ?.addEventListener(
-            "click",
-            resetISBN
-        );
-
-
-    $("isbnGenerateButton")
-        ?.addEventListener(
-            "click",
-            generateISBNPDF
-        );
-
-
-    $("addressResetButton")
-        ?.addEventListener(
-            "click",
-            resetAddress
-        );
-
-
-    $("addressGenerateButton")
-        ?.addEventListener(
-            "click",
-            generateAddressPDF
-        );
-
-}
-
-
-/* =========================================================
-   ALL LIVE INPUTS
-========================================================= */
-
-function initLiveControls() {
-
-    $$(
-        "input:not([type='file']), textarea, select"
-    ).forEach(
-        element => {
-
-            element.addEventListener(
-                "input",
-                () => {
-
-                    updateLivePreview();
-
-                }
+        const pageConfig =
+            getPDFPageConfig(
+                value(
+                    "pageSize",
+                    "4x6"
+                ),
+                value(
+                    "orientation",
+                    "portrait"
+                ),
+                value(
+                    "customWidth",
+                    70
+                ),
+                value(
+                    "customHeight",
+                    35
+                )
             );
 
+        const doc =
+            new jsPDF({
+                orientation:
+                    pageConfig.orientation,
 
-            element.addEventListener(
-                "change",
-                () => {
+                unit:
+                    "mm",
 
-                    updateLivePreview();
+                format:
+                    pageConfig.format
+            });
 
-                }
+        const pageWidth =
+            pageConfig.format[0];
+
+        const pageHeight =
+            pageConfig.format[1];
+
+        const labelsPerPage =
+            safeNumber(
+                value(
+                    "labelsPerPage",
+                    2
+                ),
+                2
             );
 
-        }
-    );
+        const poValues =
+            getPOValues();
 
-}
+        const values =
+            poValues.length
+                ? poValues
+                : ["ABC123"];
 
-
-/* =========================================================
-   LANGUAGE
-========================================================= */
-
-function initLanguage() {
-
-    $("languageSelect")
-        ?.addEventListener(
-            "change",
-            event => {
-
-                const title =
-                    document.querySelector(
-                        ".brand-text h1"
+        const rows =
+            labelsPerPage <= 1
+                ? 1
+                : labelsPerPage <= 4
+                    ? 2
+                    : Math.ceil(
+                        labelsPerPage / 2
                     );
 
+        const cols =
+            labelsPerPage <= 1
+                ? 1
+                : 2;
 
-                const subtitle =
-                    document.querySelector(
-                        ".brand-text p"
-                    );
+        const margin = 8;
 
+        const gap = 4;
+
+        const cellWidth =
+            (
+                pageWidth -
+                margin * 2 -
+                gap * (cols - 1)
+            ) / cols;
+
+        const cellHeight =
+            (
+                pageHeight -
+                margin * 2 -
+                gap * (rows - 1)
+            ) / rows;
+
+        const poConfig =
+            textConfig("po");
+
+        const boxConfig =
+            textConfig("box");
+
+        const border =
+            borderConfig("coco");
+
+        let labelIndex = 0;
+
+        values.forEach(
+            (poValue, index) => {
 
                 if (
-                    event.target.value ===
-                    "hi"
+                    labelIndex > 0 &&
+                    labelIndex %
+                    labelsPerPage === 0
                 ) {
 
-                    if (title) {
+                    doc.addPage();
+                }
 
-                        title.textContent =
-                            "बुक्स लेबल स्टूडियो";
+                const position =
+                    labelIndex %
+                    labelsPerPage;
 
+                const row =
+                    Math.floor(
+                        position / cols
+                    );
+
+                const col =
+                    position % cols;
+
+                const x =
+                    margin +
+                    col *
+                    (
+                        cellWidth +
+                        gap
+                    );
+
+                const y =
+                    margin +
+                    row *
+                    (
+                        cellHeight +
+                        gap
+                    );
+
+                drawPDFBorder(
+                    doc,
+                    x,
+                    y,
+                    cellWidth,
+                    cellHeight,
+                    border
+                );
+
+                const centerX =
+                    x +
+                    cellWidth / 2;
+
+                setPDFFont(
+                    doc,
+                    poConfig.fontFamily,
+                    poConfig.bold,
+                    poConfig.italic
+                );
+
+                doc.setFontSize(
+                    poConfig.fontSize
+                );
+
+                doc.text(
+                    String(
+                        poValue
+                    ),
+                    centerX,
+                    y +
+                    cellHeight * 0.42,
+                    {
+                        align: "center"
                     }
+                );
+
+                if (
+                    checked(
+                        "boxNumberCheck"
+                    )
+                ) {
+
+                    setPDFFont(
+                        doc,
+                        boxConfig.fontFamily,
+                        boxConfig.bold,
+                        boxConfig.italic
+                    );
+
+                    doc.setFontSize(
+                        boxConfig.fontSize
+                    );
+
+                    const boxNumber =
+                        safeNumber(
+                            value(
+                                "startBoxNumber",
+                                1
+                            ),
+                            1
+                        ) +
+                        index;
+
+                    doc.text(
+                        `BOX NO. ${boxNumber}`,
+                        centerX,
+                        y +
+                        cellHeight * 0.62,
+                        {
+                            align:
+                                "center"
+                        }
+                    );
+                }
+
+                labelIndex++;
+            }
+        );
+
+        doc.save(
+            "books-label-studio-coco-blue.pdf"
+        );
+
+        showToast(
+            "Coco Blue PDF generated",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Coco PDF error:",
+            error
+        );
+
+        showToast(
+            `PDF generation failed: ${error.message}`,
+            "error",
+            5000
+        );
+    }
+}
 
 
-                    if (subtitle) {
+/* =========================================================
+   GENERATE OTHER PO PDF
+========================================================= */
 
-                        subtitle.textContent =
-                            "प्रोफेशनल लेबल और बारकोड जनरेटर";
+function getOtherPOValues() {
 
+    const result = [];
+
+    const multiple =
+        value(
+            "otherMultiplePO",
+            ""
+        );
+
+    if (multiple.trim()) {
+
+        return multiple
+            .split(/\r?\n/)
+            .map(
+                x => x.trim()
+            )
+            .filter(Boolean);
+    }
+
+    $$(
+        "#otherIndividualPOGrid input"
+    )
+        .forEach(
+            input => {
+
+                if (
+                    input.value.trim()
+                ) {
+
+                    result.push(
+                        input.value.trim()
+                    );
+                }
+            }
+        );
+
+    return result;
+}
+
+
+function generateOtherPDF() {
+
+    const jsPDF =
+        ensurePDFLibrary();
+
+    if (!jsPDF) {
+        return;
+    }
+
+    try {
+
+        const pageConfig =
+            getPDFPageConfig(
+                value(
+                    "pageSize",
+                    "4x6"
+                ),
+                value(
+                    "orientation",
+                    "portrait"
+                ),
+                70,
+                35
+            );
+
+        const doc =
+            new jsPDF({
+                orientation:
+                    pageConfig.orientation,
+
+                unit:
+                    "mm",
+
+                format:
+                    pageConfig.format
+            });
+
+        const pageWidth =
+            pageConfig.format[0];
+
+        const pageHeight =
+            pageConfig.format[1];
+
+        const values =
+            getOtherPOValues();
+
+        const list =
+            values.length
+                ? values
+                : ["ABC123"];
+
+        const margin = 10;
+
+        const width =
+            pageWidth -
+            margin * 2;
+
+        const height = 40;
+
+        const font =
+            textConfig("other");
+
+        const border =
+            borderConfig("other");
+
+        list.forEach(
+            (po, index) => {
+
+                if (
+                    index > 0 &&
+                    index % 5 === 0
+                ) {
+
+                    doc.addPage();
+                }
+
+                const row =
+                    index % 5;
+
+                const y =
+                    margin +
+                    row *
+                    (
+                        height + 5
+                    );
+
+                drawPDFBorder(
+                    doc,
+                    margin,
+                    y,
+                    width,
+                    height,
+                    border
+                );
+
+                setPDFFont(
+                    doc,
+                    font.fontFamily,
+                    font.bold,
+                    font.italic
+                );
+
+                doc.setFontSize(
+                    font.fontSize
+                );
+
+                doc.text(
+                    po,
+                    pageWidth / 2,
+                    y + 24,
+                    {
+                        align: "center"
                     }
+                );
+            }
+        );
 
+        doc.save(
+            "books-label-studio-other-po.pdf"
+        );
+
+        showToast(
+            "Other PO PDF generated",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            `PDF generation failed: ${error.message}`,
+            "error",
+            5000
+        );
+    }
+}
+
+
+/* =========================================================
+   GENERATE ISBN PDF
+========================================================= */
+
+function generateISBNPDF() {
+
+    const jsPDF =
+        ensurePDFLibrary();
+
+    if (!jsPDF) {
+        return;
+    }
+
+    try {
+
+        const pageConfig =
+            getPDFPageConfig(
+                value(
+                    "isbnPageSize",
+                    "4x6"
+                ),
+                value(
+                    "isbnOrientation",
+                    "portrait"
+                ),
+                value(
+                    "isbnCustomWidth",
+                    70
+                ),
+                value(
+                    "isbnCustomHeight",
+                    35
+                )
+            );
+
+        const doc =
+            new jsPDF({
+                orientation:
+                    pageConfig.orientation,
+
+                unit:
+                    "mm",
+
+                format:
+                    pageConfig.format
+            });
+
+        const pageWidth =
+            pageConfig.format[0];
+
+        const pageHeight =
+            pageConfig.format[1];
+
+        const isbn =
+            value(
+                "isbnValue",
+                "ISBN"
+            );
+
+        const title =
+            value(
+                "isbnBookTitle",
+                ""
+            );
+
+        const edition =
+            value(
+                "isbnEdition",
+                ""
+            );
+
+        const font =
+            textConfig("isbn");
+
+        const border =
+            borderConfig("isbn");
+
+        drawPDFBorder(
+            doc,
+            8,
+            8,
+            pageWidth - 16,
+            pageHeight - 16,
+            border
+        );
+
+        setPDFFont(
+            doc,
+            font.fontFamily,
+            font.bold,
+            font.italic
+        );
+
+        doc.setFontSize(
+            font.fontSize
+        );
+
+        doc.text(
+            title || "Book",
+            pageWidth / 2,
+            25,
+            {
+                align: "center"
+            }
+        );
+
+        doc.setFontSize(
+            Math.max(
+                10,
+                font.fontSize
+            )
+        );
+
+        doc.text(
+            edition || "",
+            pageWidth / 2,
+            34,
+            {
+                align: "center"
+            }
+        );
+
+        /*
+          Barcode SVG cannot reliably be inserted into
+          jsPDF without additional SVG processing.
+          Therefore we create a simple barcode-like
+          representation when JsBarcode is available.
+        */
+
+        let x =
+            pageWidth / 2 -
+            35;
+
+        const y = 55;
+
+        const clean =
+            isbn.replace(
+                /\D/g,
+                ""
+            ) || "123456789";
+
+        for (
+            let i = 0;
+            i < clean.length;
+            i++
+        ) {
+
+            const digit =
+                Number(
+                    clean[i]
+                );
+
+            const barWidth =
+                digit % 3 === 0
+                    ? 1.2
+                    : 0.55;
+
+            const barHeight =
+                38;
+
+            doc.setFillColor(
+                17,
+                24,
+                39
+            );
+
+            doc.rect(
+                x,
+                y,
+                barWidth,
+                barHeight,
+                "F"
+            );
+
+            x +=
+                barWidth +
+                0.7;
+        }
+
+        doc.setFontSize(10);
+
+        doc.text(
+            isbn,
+            pageWidth / 2,
+            y + 46,
+            {
+                align: "center"
+            }
+        );
+
+        doc.save(
+            "books-label-studio-isbn.pdf"
+        );
+
+        showToast(
+            "ISBN PDF generated",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            `PDF generation failed: ${error.message}`,
+            "error",
+            5000
+        );
+    }
+}
+
+
+/* =========================================================
+   GENERATE ADDRESS PDF
+========================================================= */
+
+function generateAddressPDF() {
+
+    const jsPDF =
+        ensurePDFLibrary();
+
+    if (!jsPDF) {
+        return;
+    }
+
+    try {
+
+        const pageConfig =
+            getPDFPageConfig(
+                value(
+                    "addressPageSize",
+                    "4x6"
+                ),
+                value(
+                    "addressOrientation",
+                    "portrait"
+                ),
+                value(
+                    "addressCustomWidth",
+                    70
+                ),
+                value(
+                    "addressCustomHeight",
+                    35
+                )
+            );
+
+        const doc =
+            new jsPDF({
+                orientation:
+                    pageConfig.orientation,
+
+                unit:
+                    "mm",
+
+                format:
+                    pageConfig.format
+            });
+
+        const pageWidth =
+            pageConfig.format[0];
+
+        const pageHeight =
+            pageConfig.format[1];
+
+        const border =
+            borderConfig(
+                "address"
+            );
+
+        const from =
+            value(
+                "addressFrom",
+                ""
+            );
+
+        const to =
+            value(
+                "addressTo",
+                ""
+            );
+
+        drawPDFBorder(
+            doc,
+            8,
+            8,
+            pageWidth - 16,
+            pageHeight - 16,
+            border
+        );
+
+        const fromConfig = {
+            fontFamily:
+                value(
+                    "fromFontFamily",
+                    "Arial"
+                ),
+
+            fontSize:
+                safeNumber(
+                    value(
+                        "fromFontSize",
+                        14
+                    ),
+                    14
+                ),
+
+            alignment:
+                value(
+                    "fromAlignment",
+                    "center"
+                ).toLowerCase(),
+
+            lineHeight:
+                safeNumber(
+                    value(
+                        "fromLineHeight",
+                        1
+                    ),
+                    1
+                ),
+
+            bold:
+                checked(
+                    "fromBold"
+                ),
+
+            italic:
+                checked(
+                    "fromItalic"
+                ),
+
+            underline:
+                checked(
+                    "fromUnderline"
+                ),
+
+            strike:
+                checked(
+                    "fromStrike"
+                )
+        };
+
+        const toConfig = {
+            fontFamily:
+                value(
+                    "toFontFamily",
+                    "Arial"
+                ),
+
+            fontSize:
+                safeNumber(
+                    value(
+                        "toFontSize",
+                        14
+                    ),
+                    14
+                ),
+
+            alignment:
+                value(
+                    "toAlignment",
+                    "center"
+                ).toLowerCase(),
+
+            lineHeight:
+                safeNumber(
+                    value(
+                        "toLineHeight",
+                        1
+                    ),
+                    1
+                ),
+
+            bold:
+                checked(
+                    "toBold"
+                ),
+
+            italic:
+                checked(
+                    "toItalic"
+                ),
+
+            underline:
+                checked(
+                    "toUnderline"
+                ),
+
+            strike:
+                checked(
+                    "toStrike"
+                )
+        };
+
+        setPDFFont(
+            doc,
+            fromConfig.fontFamily,
+            fromConfig.bold,
+            fromConfig.italic
+        );
+
+        doc.setFontSize(
+            fromConfig.fontSize
+        );
+
+        doc.text(
+            "FROM",
+            pageWidth / 2,
+            25,
+            {
+                align: "center"
+            }
+        );
+
+        const fromLines =
+            doc.splitTextToSize(
+                from || "From Address",
+                pageWidth - 30
+            );
+
+        doc.text(
+            fromLines,
+            pageWidth / 2,
+            34,
+            {
+                align: "center"
+            }
+        );
+
+        setPDFFont(
+            doc,
+            toConfig.fontFamily,
+            toConfig.bold,
+            toConfig.italic
+        );
+
+        doc.setFontSize(
+            toConfig.fontSize
+        );
+
+        doc.text(
+            "TO",
+            pageWidth / 2,
+            pageHeight / 2,
+            {
+                align: "center"
+            }
+        );
+
+        const toLines =
+            doc.splitTextToSize(
+                to || "To Address",
+                pageWidth - 30
+            );
+
+        doc.text(
+            toLines,
+            pageWidth / 2,
+            pageHeight / 2 + 9,
+            {
+                align: "center"
+            }
+        );
+
+        doc.save(
+            "books-label-studio-address.pdf"
+        );
+
+        showToast(
+            "Address PDF generated",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            `PDF generation failed: ${error.message}`,
+            "error",
+            5000
+        );
+    }
+}
+
+
+/* =========================================================
+   GENERATE CURRENT PDF
+========================================================= */
+
+function generateCurrentPDF() {
+
+    switch (App.activeTool) {
+
+        case "cocoBlue":
+            generateCocoPDF();
+            break;
+
+        case "otherPO":
+            generateOtherPDF();
+            break;
+
+        case "isbn":
+            generateISBNPDF();
+            break;
+
+        case "address":
+            generateAddressPDF();
+            break;
+
+        default:
+
+            showToast(
+                "Select a module first",
+                "warning"
+            );
+    }
+}
+
+
+/* =========================================================
+   LIVE REFRESH
+========================================================= */
+
+function liveRefresh() {
+
+    updateCocoPreview();
+
+    updateOtherPreview();
+
+    updateBarcode();
+
+    updateAddressQR();
+
+    updateAddressPreview();
+
+    updatePreviewGrid();
+
+    applyCocoBorder();
+
+    applyOtherBorder();
+
+    applyISBNBorder();
+
+    applyAddressBorder();
+
+    updateCustomPagePanels();
+
+    flashPreview();
+}
+
+
+function flashPreview() {
+
+    $$(".preview-label, .preview-page, .barcode-preview")
+        .forEach(
+            element => {
+
+                element.classList.remove(
+                    "live-updated"
+                );
+
+                void element.offsetWidth;
+
+                element.classList.add(
+                    "live-updated"
+                );
+            }
+        );
+}
+
+
+/* =========================================================
+   ADDRESS PREVIEW
+========================================================= */
+
+function updateAddressPreview() {
+
+    const fromPreview =
+        $("addressPreviewFrom");
+
+    const toPreview =
+        $("addressPreviewTo");
+
+    if (
+        fromPreview
+    ) {
+
+        fromPreview.textContent =
+            value(
+                "addressFrom",
+                "FROM ADDRESS"
+            ) ||
+            "FROM ADDRESS";
+
+        applyTextStyle(
+            fromPreview,
+            {
+                fontFamily:
+                    value(
+                        "fromFontFamily",
+                        "Arial"
+                    ),
+
+                fontSize:
+                    safeNumber(
+                        value(
+                            "fromFontSize",
+                            14
+                        ),
+                        14
+                    ),
+
+                alignment:
+                    value(
+                        "fromAlignment",
+                        "center"
+                    ).toLowerCase(),
+
+                lineHeight:
+                    safeNumber(
+                        value(
+                            "fromLineHeight",
+                            1
+                        ),
+                        1
+                    ),
+
+                bold:
+                    checked(
+                        "fromBold"
+                    ),
+
+                italic:
+                    checked(
+                        "fromItalic"
+                    ),
+
+                underline:
+                    checked(
+                        "fromUnderline"
+                    ),
+
+                strike:
+                    checked(
+                        "fromStrike"
+                    )
+            }
+        );
+    }
+
+
+    if (
+        toPreview
+    ) {
+
+        toPreview.textContent =
+            value(
+                "addressTo",
+                "TO ADDRESS"
+            ) ||
+            "TO ADDRESS";
+
+        applyTextStyle(
+            toPreview,
+            {
+                fontFamily:
+                    value(
+                        "toFontFamily",
+                        "Arial"
+                    ),
+
+                fontSize:
+                    safeNumber(
+                        value(
+                            "toFontSize",
+                            14
+                        ),
+                        14
+                    ),
+
+                alignment:
+                    value(
+                        "toAlignment",
+                        "center"
+                    ).toLowerCase(),
+
+                lineHeight:
+                    safeNumber(
+                        value(
+                            "toLineHeight",
+                            1
+                        ),
+                        1
+                    ),
+
+                bold:
+                    checked(
+                        "toBold"
+                    ),
+
+                italic:
+                    checked(
+                        "toItalic"
+                    ),
+
+                underline:
+                    checked(
+                        "toUnderline"
+                    ),
+
+                strike:
+                    checked(
+                        "toStrike"
+                    )
+            }
+        );
+    }
+
+    updatePagePreview(
+        "addressPreviewPage",
+        "addressPageSize",
+        "addressOrientation"
+    );
+
+    applyAddressBorder();
+}
+
+
+/* =========================================================
+   CUSTOM PANEL REFRESH
+========================================================= */
+
+function updateCustomPagePanels() {
+
+    const pairs = [
+
+        [
+            "pageSize",
+            "customSizePanel"
+        ],
+
+        [
+            "isbnPageSize",
+            "isbnCustomSizePanel"
+        ],
+
+        [
+            "addressPageSize",
+            "addressCustomSizePanel"
+        ]
+    ];
+
+    pairs.forEach(
+        ([selectId, panelId]) => {
+
+            const select =
+                $(selectId);
+
+            const panel =
+                $(panelId);
+
+            if (!select || !panel) {
+                return;
+            }
+
+            panel.classList.toggle(
+                "hidden",
+                select.value !==
+                "custom"
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   CONNECT LIVE INPUTS
+========================================================= */
+
+function setupLiveInputs() {
+
+    $$(
+        "input:not([type='file']), select, textarea"
+    )
+        .forEach(
+            element => {
+
+                element.addEventListener(
+                    "input",
+                    () => {
+
+                        liveRefresh();
+                    }
+                );
+
+                element.addEventListener(
+                    "change",
+                    () => {
+
+                        liveRefresh();
+
+                        saveHistory();
+                    }
+                );
+            }
+        );
+}
+
+
+/* =========================================================
+   BORDER BUTTONS
+========================================================= */
+
+function setupBorderActions() {
+
+    const actions = [
+
+        [
+            "applyBorderButton",
+            () => {
+
+                applyCocoBorder();
+
+                showToast(
+                    "Coco Blue border applied",
+                    "success"
+                );
+
+                saveHistory();
+            }
+        ],
+
+        [
+            "clearBorderButton",
+            () => {
+
+                removeCocoBorder();
+
+                showToast(
+                    "Coco Blue border removed",
+                    "error"
+                );
+
+                saveHistory();
+            }
+        ],
+
+        [
+            "otherApplyBorderButton",
+            () => {
+
+                applyOtherBorder();
+
+                showToast(
+                    "Other PO border applied",
+                    "success"
+                );
+
+                saveHistory();
+            }
+        ],
+
+        [
+            "otherClearBorderButton",
+            () => {
+
+                removeOtherBorder();
+
+                showToast(
+                    "Other PO border removed",
+                    "error"
+                );
+
+                saveHistory();
+            }
+        ],
+
+        [
+            "isbnGenerateButton",
+            generateISBNPDF
+        ],
+
+        [
+            "addressApplyBorderButton",
+            () => {
+
+                applyAddressBorder();
+
+                showToast(
+                    "Address border applied",
+                    "success"
+                );
+
+                saveHistory();
+            }
+        ],
+
+        [
+            "addressClearBorderButton",
+            () => {
+
+                const label =
+                    $("addressPreviewLabel");
+
+                if (label) {
+
+                    label.style.border =
+                        "none";
+
+                    label.style.boxShadow =
+                        "none";
+                }
+
+                showToast(
+                    "Address border removed",
+                    "error"
+                );
+
+                saveHistory();
+            }
+        ]
+    ];
+
+    actions.forEach(
+        ([id, handler]) => {
+
+            const button =
+                $(id);
+
+            if (button) {
+
+                button.addEventListener(
+                    "click",
+                    handler
+                );
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   GENERATE PDF BUTTONS
+========================================================= */
+
+function setupGenerateButtons() {
+
+    const buttons = [
+
+        [
+            "cocoGenerateButton",
+            generateCocoPDF
+        ],
+
+        [
+            "otherGenerateButton",
+            generateOtherPDF
+        ],
+
+        [
+            "isbnGenerateButton",
+            generateISBNPDF
+        ],
+
+        [
+            "addressGenerateButton",
+            generateAddressPDF
+        ]
+    ];
+
+    buttons.forEach(
+        ([id, handler]) => {
+
+            const button =
+                $(id);
+
+            if (button) {
+
+                button.addEventListener(
+                    "click",
+                    handler
+                );
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   RESET BUTTONS
+========================================================= */
+
+function setupResetButtons() {
+
+    const buttons = [
+
+        "cocoResetButton",
+        "otherResetButton",
+        "isbnResetButton",
+        "addressResetButton"
+    ];
+
+    buttons.forEach(
+        id => {
+
+            const button =
+                $(id);
+
+            if (!button) {
+                return;
+            }
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    resetCurrentStyle();
+
+                }
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   EXCEL EVENTS
+========================================================= */
+
+function setupExcelEvents() {
+
+    const coco =
+        $("cocoExcelFile");
+
+    if (coco) {
+
+        coco.addEventListener(
+            "change",
+            () => {
+
+                handleExcel(
+                    "cocoExcelFile",
+                    "cocoExcelPreview",
+                    "cocoExcelFileName",
+                    "cocoPO"
+                );
+            }
+        );
+    }
+
+
+    const other =
+        $("otherExcelFile");
+
+    if (other) {
+
+        other.addEventListener(
+            "change",
+            () => {
+
+                handleExcel(
+                    "otherExcelFile",
+                    "otherExcelPreview",
+                    "otherExcelFileName",
+                    "otherPO"
+                );
+            }
+        );
+    }
+
+
+    const address =
+        $("addressExcelFile");
+
+    if (address) {
+
+        address.addEventListener(
+            "change",
+            async () => {
+
+                try {
+
+                    const rows =
+                        await readExcelFile(
+                            address.files[0]
+                        );
+
+                    renderExcelPreview(
+                        "addressExcelPreview",
+                        rows
+                    );
 
                     showToast(
-                        "Hindi enabled.",
+                        "Address Excel loaded. Header ignored.",
                         "success"
                     );
 
+                } catch (error) {
+
+                    showToast(
+                        error.message,
+                        "error"
+                    );
+                }
+            }
+        );
+    }
+}
+
+
+/* =========================================================
+   EMAIL QR SUPPORT
+========================================================= */
+
+function addEmailFieldIfMissing() {
+
+    /*
+      HTML version can optionally contain
+      #emailAddress.
+
+      If it doesn't, we create a small field
+      dynamically inside the Email QR card.
+    */
+
+    if (
+        $("emailAddress")
+    ) {
+        return;
+    }
+
+    const container =
+        $("emailQRPreview");
+
+    if (!container) {
+        return;
+    }
+
+    const parent =
+        container.parentElement;
+
+    if (!parent) {
+        return;
+    }
+
+    const field =
+        document.createElement(
+            "div"
+        );
+
+    field.className =
+        "field";
+
+    field.style.marginBottom =
+        "12px";
+
+    field.innerHTML = `
+
+        <label for="emailAddress">
+            ✉️ Email Address
+        </label>
+
+        <input
+            id="emailAddress"
+            type="email"
+            placeholder="name@example.com"
+        >
+
+    `;
+
+    parent.insertBefore(
+        field,
+        container
+    );
+
+    const input =
+        $("emailAddress");
+
+    if (input) {
+
+        input.addEventListener(
+            "input",
+            liveRefresh
+        );
+    }
+}
+
+
+/* =========================================================
+   TRACK REQUIRED TOGGLES
+========================================================= */
+
+function setupToggleNotifications() {
+
+    const toggles = [
+
+        [
+            "poNumberCheck",
+            "PO Value"
+        ],
+
+        [
+            "boxNumberCheck",
+            "Box Number"
+        ],
+
+        [
+            "poPlusBoxCheck",
+            "PO + Box"
+        ],
+
+        [
+            "cutLineCheck",
+            "Cut Line"
+        ],
+
+        [
+            "pageBorderCheck",
+            "Page Border"
+        ],
+
+        [
+            "samePOPageFlow",
+            "Same PO Flow"
+        ],
+
+        [
+            "halfPageFlowCheck",
+            "Half Page Flow"
+        ],
+
+        [
+            "borderTopEnabled",
+            "Top Border"
+        ],
+
+        [
+            "borderRightEnabled",
+            "Right Border"
+        ],
+
+        [
+            "borderBottomEnabled",
+            "Bottom Border"
+        ],
+
+        [
+            "borderLeftEnabled",
+            "Left Border"
+        ],
+
+        [
+            "borderInsideEnabled",
+            "Inside Border"
+        ],
+
+        [
+            "borderOutsideEnabled",
+            "Outside Border"
+        ],
+
+        [
+            "otherBorderTop",
+            "Other PO Top Border"
+        ],
+
+        [
+            "otherBorderRight",
+            "Other PO Right Border"
+        ],
+
+        [
+            "otherBorderBottom",
+            "Other PO Bottom Border"
+        ],
+
+        [
+            "otherBorderLeft",
+            "Other PO Left Border"
+        ],
+
+        [
+            "isbnBorderTop",
+            "ISBN Top Border"
+        ],
+
+        [
+            "isbnBorderRight",
+            "ISBN Right Border"
+        ],
+
+        [
+            "isbnBorderBottom",
+            "ISBN Bottom Border"
+        ],
+
+        [
+            "isbnBorderLeft",
+            "ISBN Left Border"
+        ],
+
+        [
+            "addressBorderTop",
+            "Address Top Border"
+        ],
+
+        [
+            "addressBorderRight",
+            "Address Right Border"
+        ],
+
+        [
+            "addressBorderBottom",
+            "Address Bottom Border"
+        ],
+
+        [
+            "addressBorderLeft",
+            "Address Left Border"
+        ],
+
+        [
+            "addressBorderInside",
+            "Address Inside Border"
+        ],
+
+        [
+            "addressBorderOutside",
+            "Address Outside Border"
+        ]
+    ];
+
+    toggles.forEach(
+        ([id, name]) =>
+            trackToggle(
+                id,
+                name
+            )
+    );
+}
+
+
+/* =========================================================
+   KEYBOARD SHORTCUTS
+========================================================= */
+
+function setupKeyboardShortcuts() {
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            const ctrl =
+                event.ctrlKey ||
+                event.metaKey;
+
+            if (!ctrl) {
+                return;
+            }
+
+            if (
+                event.key.toLowerCase() ===
+                "z"
+            ) {
+
+                event.preventDefault();
+
+                if (
+                    event.shiftKey
+                ) {
+
+                    redo();
 
                 } else {
 
-                    if (title) {
+                    undo();
+                }
+            }
 
-                        title.textContent =
-                            "Books Label Studio";
+            if (
+                event.key.toLowerCase() ===
+                "y"
+            ) {
 
-                    }
+                event.preventDefault();
+
+                redo();
+            }
+        }
+    );
+}
 
 
-                    if (subtitle) {
+/* =========================================================
+   PDF LIBRARY DIAGNOSTIC
+========================================================= */
 
-                        subtitle.textContent =
-                            "Professional Label & Barcode Generator";
+function checkLibraries() {
 
-                    }
+    const status = {
 
+        XLSX:
+            typeof window.XLSX !==
+            "undefined",
+
+        QRCode:
+            typeof window.QRCode !==
+            "undefined",
+
+        JsBarcode:
+            typeof window.JsBarcode !==
+            "undefined",
+
+        jsPDF:
+            !!getPDFLibrary()
+    };
+
+    console.table(status);
+
+    /*
+      Don't show a scary PDF error on page load.
+      Only notify when user actually clicks Generate PDF.
+    */
+
+    if (!status.XLSX) {
+
+        console.warn(
+            "XLSX library is not available."
+        );
+    }
+
+    if (!status.QRCode) {
+
+        console.warn(
+            "QRCode library is not available."
+        );
+    }
+
+    if (!status.JsBarcode) {
+
+        console.warn(
+            "JsBarcode library is not available."
+        );
+    }
+
+    if (!status.jsPDF) {
+
+        console.warn(
+            "jsPDF library is not available."
+        );
+    }
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+function initializeApp() {
+
+    createPOInputs(
+        "individualPOGrid",
+        "cocoPO",
+        40
+    );
+
+    createPOInputs(
+        "otherIndividualPOGrid",
+        "otherPO",
+        20
+    );
+
+    setupCategoryNavigation();
+
+    setupCocoModes();
+
+    setupOtherModes();
+
+    setupAddressModes();
+
+    setupBorderStyleButtons();
+
+    setupFontPresets();
+
+    setupCustomPageSizes();
+
+    setupLabelsPerPage();
+
+    setupLiveInputs();
+
+    setupExcelEvents();
+
+    setupGenerateButtons();
+
+    setupBorderActions();
+
+    setupResetButtons();
+
+    setupToggleNotifications();
+
+    setupKeyboardShortcuts();
+
+    addEmailFieldIfMissing();
+
+
+    const undoButton =
+        $("undoButton");
+
+    if (undoButton) {
+
+        undoButton.addEventListener(
+            "click",
+            undo
+        );
+    }
+
+
+    const redoButton =
+        $("redoButton");
+
+    if (redoButton) {
+
+        redoButton.addEventListener(
+            "click",
+            redo
+        );
+    }
+
+
+    const saveDefault =
+        $("saveDefaultButton");
+
+    if (saveDefault) {
+
+        saveDefault.addEventListener(
+            "click",
+            saveDefaultStyle
+        );
+    }
+
+
+    const loadDefault =
+        $("loadDefaultButton");
+
+    if (loadDefault) {
+
+        loadDefault.addEventListener(
+            "click",
+            loadDefaultStyle
+        );
+    }
+
+
+    const resetAllBtn =
+        $("resetAllButton");
+
+    if (resetAllBtn) {
+
+        resetAllBtn.addEventListener(
+            "click",
+            resetAll
+        );
+    }
+
+
+    const copyButton =
+        $("copyStyleButton");
+
+    if (copyButton) {
+
+        copyButton.addEventListener(
+            "click",
+            copyStyle
+        );
+    }
+
+
+    const pasteButton =
+        $("pasteStyleButton");
+
+    if (pasteButton) {
+
+        pasteButton.addEventListener(
+            "click",
+            pasteStyle
+        );
+    }
+
+
+    const resetStyleButton =
+        $("resetStyleButton");
+
+    if (resetStyleButton) {
+
+        resetStyleButton.addEventListener(
+            "click",
+            resetCurrentStyle
+        );
+    }
+
+
+    const saveBorderPreset =
+        $("saveBorderPresetButton");
+
+    if (saveBorderPreset) {
+
+        saveBorderPreset.addEventListener(
+            "click",
+            () => {
+
+                try {
+
+                    localStorage.setItem(
+                        "booksLabelStudioBorderPreset",
+                        JSON.stringify({
+                            coco:
+                                borderConfig(
+                                    "coco"
+                                ),
+
+                            other:
+                                borderConfig(
+                                    "other"
+                                ),
+
+                            isbn:
+                                borderConfig(
+                                    "isbn"
+                                ),
+
+                            address:
+                                borderConfig(
+                                    "address"
+                                )
+                        })
+                    );
 
                     showToast(
-                        "English enabled.",
+                        "Border preset saved",
                         "success"
                     );
 
+                } catch (error) {
+
+                    showToast(
+                        "Could not save border preset",
+                        "error"
+                    );
                 }
-
             }
         );
-
-}
-
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-function initModal() {
-
-    const modal =
-        $("confirmationModal");
-
-
-    const close =
-        () => {
-
-            modal
-                ?.classList.remove(
-                    "show"
-                );
-
-            modal
-                ?.setAttribute(
-                    "aria-hidden",
-                    "true"
-                );
-
-        };
-
-
-    $("modalCloseButton")
-        ?.addEventListener(
-            "click",
-            close
-        );
-
-
-    $("modalCancelButton")
-        ?.addEventListener(
-            "click",
-            close
-        );
-
-
-    modal?.addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target ===
-                modal
-            ) {
-
-                close();
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   STARTUP
-========================================================= */
-
-function initApp() {
-
-    initCategoryNavigation();
-
-    initCocoModes();
-
-    initOtherModes();
-
-    initAddressModes();
-
-    initPOInputs();
-
-    initExcelUploads();
-
-    initPageSettings();
-
-    initFeatureCheckboxes();
-
-    initISBN();
-
-    initQRCodes();
-
-    initActionButtons();
-
-    initLiveControls();
-
-    initLanguage();
-
-    initModal();
-
-    updateLivePreview();
-
-
-    console.log(
-        "===================================="
-    );
-
-    console.log(
-        "Books Label Studio loaded."
-    );
-
-    console.log(
-        "jsPDF:",
-        getJsPDF()
-            ? "READY"
-            : "NOT LOADED"
-    );
-
-    console.log(
-        "XLSX:",
-        typeof window.XLSX ===
-        "undefined"
-            ? "NOT LOADED"
-            : "READY"
-    );
-
-    console.log(
-        "QRCode:",
-        typeof window.QRCode ===
-        "undefined"
-            ? "NOT LOADED"
-            : "READY"
-    );
-
-    console.log(
-        "JsBarcode:",
-        typeof window.JsBarcode ===
-        "undefined"
-            ? "NOT LOADED"
-            : "READY"
-    );
-
-    console.log(
-        "===================================="
-    );
-
-
-    /*
-     * Only warn here.
-     * Don't block the website.
-     */
-
-    if (!getJsPDF()) {
-
-        console.warn(
-            "PDF library is not available."
-        );
-
     }
 
+
+    syncPresetInputs();
+
+    applyActiveTool();
+
+    liveRefresh();
+
+    checkLibraries();
+
+    /*
+      First history snapshot.
+    */
+
+    App.history = [];
+
+    App.historyIndex = -1;
+
+    saveHistory();
+
+    updateHistoryButtons();
+
+    console.log(
+        "Books Label Studio initialized successfully."
+    );
 }
 
 
 /* =========================================================
-   DOM READY
+   START
 ========================================================= */
 
 if (
@@ -4679,11 +5761,10 @@ if (
 
     document.addEventListener(
         "DOMContentLoaded",
-        initApp
+        initializeApp
     );
 
 } else {
 
-    initApp();
-
+    initializeApp();
 }
