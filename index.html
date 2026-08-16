@@ -2,1254 +2,5724 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>IRONMARK — Labels Built to Last</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Books Label Studio — Ashish Verma</title>
+
+<!-- External libraries -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
 <style>
-
 /* =========================================================
-   TOKENS
+   GLOBAL
 ========================================================= */
-:root{
-    --charcoal:#1a1a1c;
-    --charcoal-2:#232326;
-    --steel:#2e2e32;
-    --steel-line:#3d3d42;
-    --kraft:#e9ddc2;
-    --kraft-dark:#cdbd93;
-    --paper:#f4efe2;
-    --ink:#17171a;
-    --ink-soft:#5a564c;
-    --orange:#e35205;
-    --orange-dark:#b7420a;
-    --white:#faf8f3;
 
-    --display: "Oswald", sans-serif;
-    --body: "Inter", sans-serif;
-    --mono: "JetBrains Mono", monospace;
-
-    --stripe: repeating-linear-gradient(
-        135deg,
-        var(--orange) 0px, var(--orange) 22px,
-        var(--charcoal) 22px, var(--charcoal) 44px
-    );
+*{
+    box-sizing:border-box;
 }
 
-*{ box-sizing:border-box; margin:0; padding:0; }
+:root{
+    --blue:#2563eb;
+    --blue-dark:#1d4ed8;
+    --blue-soft:#eff6ff;
 
-html{ scroll-behavior:smooth; }
+    --green:#16a34a;
+    --red:#dc2626;
+    --orange:#f59e0b;
+
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --border:#d9dee7;
+    --text:#20252d;
+    --muted:#6b7280;
+
+    --radius:8px;
+    --shadow:0 2px 8px rgba(15,23,42,.06);
+}
+
+html{
+    scroll-behavior:smooth;
+}
 
 body{
-    font-family:var(--body);
-    background:var(--paper);
-    color:var(--ink);
-    line-height:1.5;
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+    font-size:14px;
 }
 
-img{ max-width:100%; display:block; }
-
-a{ color:inherit; text-decoration:none; }
-
-button{ font-family:inherit; cursor:pointer; }
-
-.eyebrow{
-    font-family:var(--mono);
-    font-size:12px;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:var(--orange);
-    font-weight:600;
+button,
+input,
+select,
+textarea{
+    font:inherit;
 }
 
-.wrap{
-    max-width:1240px;
-    margin:0 auto;
-    padding:0 24px;
+button{
+    cursor:pointer;
 }
 
-h1,h2,h3{
-    font-family:var(--display);
-    text-transform:uppercase;
-    letter-spacing:0.01em;
-    line-height:1.05;
+button:disabled,
+input:disabled,
+select:disabled{
+    cursor:not-allowed;
+    opacity:.5;
 }
 
-:focus-visible{
-    outline:3px solid var(--orange);
-    outline-offset:2px;
-}
-
-@media (prefers-reduced-motion: reduce){
-    *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
-}
-
-/* =========================================================
-   HAZARD STRIPE DIVIDER — signature element
-========================================================= */
-.hazard{
-    height:14px;
-    background:var(--stripe);
-}
 
 /* =========================================================
    HEADER
 ========================================================= */
-.site-header{
-    background:var(--charcoal);
-    border-bottom:3px solid var(--orange);
+
+.header{
     position:sticky;
     top:0;
-    z-index:100;
-}
+    z-index:1000;
 
-.header-top{
+    min-height:64px;
+
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:20px;
-    padding:14px 0;
+    gap:15px;
+
+    padding:10px 18px;
+
+    background:#fff;
+    border-bottom:1px solid var(--border);
 }
 
-.logo{
+.brand{
     display:flex;
     align-items:center;
     gap:10px;
-    font-family:var(--display);
-    font-size:24px;
-    font-weight:700;
-    color:var(--white);
-    letter-spacing:0.03em;
-    white-space:nowrap;
 }
 
-.logo .mark{
-    width:38px;
-    height:38px;
-    background:var(--orange);
+.brand-logo{
+    width:40px;
+    height:40px;
+
     display:flex;
     align-items:center;
     justify-content:center;
-    font-family:var(--display);
-    font-size:20px;
-    color:var(--charcoal);
-    transform:skew(-8deg);
-    flex-shrink:0;
+
+    background:var(--blue);
+    color:#fff;
+
+    border-radius:8px;
+
+    font-size:19px;
+    font-weight:bold;
 }
 
-.logo span{ color:var(--orange); }
-
-.search-bar{
-    flex:1;
-    max-width:520px;
-    display:flex;
-    background:var(--white);
+.brand h1{
+    margin:0;
+    font-size:18px;
 }
 
-.search-bar input{
-    flex:1;
-    border:none;
-    padding:11px 14px;
-    font-family:var(--body);
-    font-size:14px;
-    background:transparent;
-    color:var(--ink);
+.brand small{
+    display:block;
+    margin-top:2px;
+    color:var(--muted);
+    font-size:11px;
 }
-
-.search-bar input:focus{ outline:none; }
-
-.search-bar button{
-    background:var(--orange);
-    border:none;
-    color:var(--white);
-    padding:0 18px;
-    font-size:16px;
-}
-
-.search-bar button:hover{ background:var(--orange-dark); }
 
 .header-actions{
     display:flex;
-    align-items:center;
-    gap:22px;
-    color:var(--white);
-    font-size:13px;
-    white-space:nowrap;
-}
-
-.header-actions .action{
-    display:flex;
-    align-items:center;
     gap:6px;
-}
-
-.header-actions .badge{
-    background:var(--orange);
-    color:var(--white);
-    font-family:var(--mono);
-    font-size:11px;
-    font-weight:600;
-    padding:1px 6px;
-    border-radius:50%;
-}
-
-.nav-row{
-    background:var(--charcoal-2);
-    border-top:1px solid var(--steel-line);
-}
-
-.nav-row .wrap{
-    display:flex;
-    align-items:center;
-    gap:28px;
-    overflow-x:auto;
-}
-
-.nav-row a{
-    display:block;
-    padding:12px 0;
-    color:#cfcdc6;
-    font-family:var(--mono);
-    font-size:13px;
-    letter-spacing:0.03em;
-    text-transform:uppercase;
-    border-bottom:3px solid transparent;
-    white-space:nowrap;
-}
-
-.nav-row a:hover,
-.nav-row a.active{
-    color:var(--white);
-    border-color:var(--orange);
-}
-
-.nav-row .call{
-    margin-left:auto;
-    color:var(--orange);
-    font-weight:600;
-}
-
-.menu-toggle{
-    display:none;
-    background:none;
-    border:1px solid var(--steel-line);
-    color:var(--white);
-    padding:8px 12px;
-    font-size:13px;
-    font-family:var(--mono);
-}
-
-/* =========================================================
-   HERO
-========================================================= */
-.hero{
-    background:
-        linear-gradient(180deg, rgba(26,26,28,0.94), rgba(26,26,28,0.98)),
-        repeating-linear-gradient(45deg, #232326 0px, #232326 2px, #1a1a1c 2px, #1a1a1c 34px);
-    color:var(--white);
-    padding:72px 0 0;
-    position:relative;
-    overflow:hidden;
-}
-
-.hero-grid{
-    display:grid;
-    grid-template-columns:1.1fr 0.9fr;
-    gap:40px;
-    align-items:center;
-    padding-bottom:56px;
-}
-
-.hero h1{
-    font-size:clamp(38px,5.4vw,64px);
-    color:var(--white);
-    margin:14px 0 18px;
-}
-
-.hero h1 em{
-    font-style:normal;
-    color:var(--orange);
-}
-
-.hero p.lede{
-    font-size:17px;
-    color:#c7c4bb;
-    max-width:480px;
-    margin-bottom:28px;
-}
-
-.hero-ctas{
-    display:flex;
-    gap:14px;
     flex-wrap:wrap;
 }
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
 
 .btn{
+    min-height:34px;
+
     display:inline-flex;
     align-items:center;
-    gap:8px;
-    padding:14px 26px;
-    font-family:var(--display);
-    font-size:15px;
-    letter-spacing:0.04em;
-    text-transform:uppercase;
-    border:2px solid transparent;
-    transition:transform .12s ease, background .15s ease;
-}
-
-.btn:hover{ transform:translateY(-2px); }
-
-.btn-primary{
-    background:var(--orange);
-    color:var(--white);
-}
-.btn-primary:hover{ background:var(--orange-dark); }
-
-.btn-outline{
-    background:transparent;
-    border-color:var(--white);
-    color:var(--white);
-}
-.btn-outline:hover{ background:var(--white); color:var(--charcoal); }
-
-.hero-visual{
-    position:relative;
-    height:100%;
-    min-height:340px;
-    background:var(--kraft);
-    display:flex;
-    align-items:center;
     justify-content:center;
-    border:1px solid var(--steel-line);
-}
+    gap:6px;
 
-.roll-icon{
-    width:180px;
-    height:180px;
-    border-radius:50%;
-    background:conic-gradient(from 90deg, #cdbd93, #e9ddc2 40%, #b39f6a 70%, #e9ddc2);
-    border:10px solid var(--charcoal);
-    position:relative;
-    box-shadow:0 20px 40px rgba(0,0,0,0.35);
-}
+    padding:7px 11px;
 
-.roll-icon::after{
-    content:"";
-    position:absolute;
-    inset:40%;
-    background:var(--charcoal);
-    border-radius:50%;
-}
+    border:1px solid var(--border);
+    border-radius:6px;
 
-.hero-visual .tag{
-    position:absolute;
-    bottom:18px;
-    left:18px;
-    background:var(--charcoal);
-    color:var(--orange);
-    font-family:var(--mono);
+    background:#fff;
+    color:#333;
+
     font-size:12px;
-    padding:6px 10px;
-    letter-spacing:0.05em;
+
+    transition:
+        background .15s,
+        border-color .15s,
+        transform .15s;
 }
 
-/* Configure bar — spec-sheet styled quick finder */
-.configure{
-    background:var(--white);
-    border-top:4px solid var(--orange);
-    display:grid;
-    grid-template-columns:repeat(4,1fr) auto;
-    align-items:stretch;
+.btn:hover{
+    background:#f8fafc;
+    border-color:#bcc5d1;
 }
 
-.configure .field{
-    padding:16px 22px;
-    border-right:1px solid #e2ddd0;
+.btn:active{
+    transform:translateY(1px);
 }
 
-.configure .field:last-of-type{ border-right:none; }
-
-.configure label{
-    display:block;
-    font-family:var(--mono);
-    font-size:11px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-    margin-bottom:4px;
+.btn.primary{
+    background:var(--blue);
+    border-color:var(--blue);
+    color:#fff;
 }
 
-.configure select{
-    width:100%;
-    border:none;
-    background:transparent;
-    font-family:var(--body);
-    font-size:14px;
-    font-weight:600;
-    color:var(--ink);
+.btn.primary:hover{
+    background:var(--blue-dark);
 }
 
-.configure .go{
-    background:var(--charcoal);
-    color:var(--white);
-    border:none;
-    padding:0 30px;
-    font-family:var(--display);
-    font-size:14px;
-    letter-spacing:0.05em;
-    text-transform:uppercase;
-    white-space:nowrap;
+.btn.green{
+    background:var(--green);
+    border-color:var(--green);
+    color:#fff;
 }
 
-.configure .go:hover{ background:var(--orange); }
+.btn.red{
+    background:var(--red);
+    border-color:var(--red);
+    color:#fff;
+}
+
 
 /* =========================================================
-   TRUST BAR
+   APP
 ========================================================= */
-.trust-bar{
-    background:var(--kraft);
-    border-bottom:1px solid var(--kraft-dark);
+
+.app{
+    max-width:1550px;
+    margin:auto;
+    padding:15px;
 }
 
-.trust-bar .wrap{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:0;
-}
-
-.trust-item{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:20px 18px;
-    border-left:1px solid var(--kraft-dark);
-}
-
-.trust-item:first-child{ border-left:none; }
-
-.trust-item .icon{
-    width:36px;
-    height:36px;
-    flex-shrink:0;
-    background:var(--charcoal);
-    color:var(--orange);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:17px;
-    font-weight:700;
-}
-
-.trust-item strong{
-    display:block;
-    font-size:13.5px;
-    font-weight:700;
-}
-
-.trust-item span{
-    font-size:12px;
-    color:var(--ink-soft);
-}
 
 /* =========================================================
-   SECTION SHARED
+   MAIN NAV
 ========================================================= */
-.section{ padding:64px 0; }
 
-.section-head{
+.main-nav{
     display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:20px;
-    margin-bottom:32px;
     flex-wrap:wrap;
-}
-
-.section-head h2{
-    font-size:clamp(26px,3.4vw,38px);
-    margin-top:8px;
-}
-
-.section-head p{
-    color:var(--ink-soft);
-    max-width:460px;
-    font-size:14.5px;
-}
-
-.link-arrow{
-    font-family:var(--mono);
-    font-size:13px;
-    color:var(--orange);
-    font-weight:600;
-    white-space:nowrap;
-}
-
-/* =========================================================
-   CATEGORY CARDS
-========================================================= */
-.cat-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:20px;
-}
-
-.cat-card{
-    background:var(--white);
-    border:1px solid #e2ddd0;
-    position:relative;
-    overflow:hidden;
-    transition:box-shadow .15s ease, transform .15s ease;
-}
-
-.cat-card:hover{
-    box-shadow:0 14px 30px rgba(0,0,0,0.12);
-    transform:translateY(-4px);
-}
-
-.cat-card .thumb{
-    height:150px;
-    background:var(--kraft);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:var(--mono);
-    font-size:12px;
-    color:var(--ink-soft);
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    position:relative;
-    border-bottom:3px solid var(--charcoal);
-}
-
-.cat-card .thumb .swatch{
-    width:64px;
-    height:64px;
-    border-radius:50%;
-    border:8px solid var(--charcoal);
-}
-
-.cat-card .body{ padding:18px 18px 20px; }
-
-.cat-card h3{
-    font-size:17px;
-    margin-bottom:8px;
-}
-
-.cat-card p{
-    font-size:13.5px;
-    color:var(--ink-soft);
+    gap:6px;
     margin-bottom:14px;
 }
 
-.cat-card .links{
-    display:flex;
-    gap:16px;
-    font-family:var(--mono);
-    font-size:12px;
-    font-weight:600;
-}
-
-.cat-card .links a{ color:var(--orange); }
-.cat-card .links a:hover{ text-decoration:underline; }
-
-.cat-card .stock-tag{
-    position:absolute;
-    top:12px;
-    left:12px;
-    background:var(--orange);
-    color:var(--white);
-    font-family:var(--mono);
-    font-size:10px;
-    letter-spacing:0.06em;
-    padding:4px 8px;
-    text-transform:uppercase;
-}
-
-/* =========================================================
-   INDUSTRIES BAND (dark)
-========================================================= */
-.industries{
-    background:var(--charcoal);
-    color:var(--white);
-}
-
-.industries .eyebrow{ color:var(--orange); }
-
-.industries h2{ color:var(--white); }
-
-.ind-grid{
-    display:grid;
-    grid-template-columns:repeat(6,1fr);
-    gap:14px;
-    margin-top:32px;
-}
-
-.ind-card{
-    border:1px solid var(--steel-line);
-    background:var(--charcoal-2);
-    padding:20px 14px;
-    text-align:center;
-}
-
-.ind-card .icon{
-    width:44px;
-    height:44px;
-    margin:0 auto 12px;
-    background:var(--orange);
+.nav-btn{
     display:flex;
     align-items:center;
-    justify-content:center;
-    font-weight:700;
-    color:var(--charcoal);
-    transform:rotate(45deg);
-}
-.ind-card .icon span{ transform:rotate(-45deg); font-size:15px; }
+    gap:7px;
 
-.ind-card p{
-    font-size:12.5px;
-    color:#c7c4bb;
-    text-transform:uppercase;
-    letter-spacing:0.03em;
-    font-family:var(--mono);
-}
+    padding:9px 13px;
 
-/* =========================================================
-   STATS STRIP
-========================================================= */
-.stats-strip{
-    background:var(--orange);
-    color:var(--white);
-}
+    background:#fff;
+    color:#444;
 
-.stats-strip .wrap{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    padding:36px 24px;
-}
+    border:1px solid var(--border);
+    border-radius:7px;
 
-.stat{
-    text-align:center;
-    border-left:1px solid rgba(255,255,255,0.35);
-}
-.stat:first-child{ border-left:none; }
-
-.stat strong{
-    display:block;
-    font-family:var(--display);
-    font-size:clamp(28px,4vw,40px);
-}
-
-.stat span{
-    font-family:var(--mono);
-    font-size:11.5px;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    opacity:0.9;
-}
-
-/* =========================================================
-   PROCESS / HOW IT WORKS
-========================================================= */
-.process-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:0;
-}
-
-.process-step{
-    position:relative;
-    padding:0 20px 0 0;
-}
-
-.process-step .num{
-    font-family:var(--mono);
-    font-size:13px;
-    color:var(--orange);
-    font-weight:700;
-    margin-bottom:10px;
-}
-
-.process-step h3{
-    font-size:16px;
-    margin-bottom:8px;
-}
-
-.process-step p{
-    font-size:13.5px;
-    color:var(--ink-soft);
-}
-
-.process-step:not(:last-child)::after{
-    content:"";
-    position:absolute;
-    top:8px;
-    right:0;
-    width:16px;
-    height:2px;
-    background:var(--kraft-dark);
-}
-
-/* =========================================================
-   TESTIMONIALS
-========================================================= */
-.testimonials{ background:var(--kraft); }
-
-.test-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:20px;
-}
-
-.test-card{
-    background:var(--paper);
-    border-left:4px solid var(--orange);
-    padding:22px 22px 20px;
-}
-
-.test-card .stars{
-    color:var(--orange);
-    font-size:13px;
-    margin-bottom:12px;
-    letter-spacing:2px;
-}
-
-.test-card p{
-    font-size:14px;
-    margin-bottom:16px;
-    color:var(--ink);
-}
-
-.test-card .who{
-    font-family:var(--mono);
     font-size:12px;
-    color:var(--ink-soft);
-    text-transform:uppercase;
-    letter-spacing:0.04em;
+    font-weight:bold;
+
+    transition:.15s;
 }
+
+.nav-btn:hover{
+    transform:translateY(-1px);
+    background:#f8fafc;
+}
+
+.nav-btn.active{
+    background:var(--blue);
+    border-color:var(--blue);
+    color:#fff;
+}
+
 
 /* =========================================================
-   QUOTE / NEWSLETTER BAND
+   LAYOUT
 ========================================================= */
-.cta-band{
-    background:var(--charcoal);
-    color:var(--white);
-    position:relative;
-    overflow:hidden;
+
+.workspace{
+    display:grid;
+    grid-template-columns:430px minmax(0,1fr);
+    gap:14px;
+    align-items:start;
 }
 
-.cta-band .wrap{
+.controls{
+    min-width:0;
+}
+
+.preview-panel{
+    position:sticky;
+    top:78px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px;
+    margin-bottom:12px;
+    box-shadow:var(--shadow);
+}
+
+.card-title{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:30px;
-    flex-wrap:wrap;
-    padding:54px 24px;
-}
+    gap:10px;
 
-.cta-band h2{
-    color:var(--white);
-    font-size:clamp(24px,3.2vw,32px);
-    max-width:480px;
-}
+    margin-bottom:12px;
 
-.cta-band p{
-    color:#c7c4bb;
-    margin-top:8px;
     font-size:14px;
+    font-weight:bold;
 }
 
-.cta-form{
+.card-title small{
+    color:var(--muted);
+    font-size:10px;
+    font-weight:normal;
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.section{
+    display:none;
+}
+
+.section.active{
+    display:block;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.field{
+    margin-bottom:10px;
+}
+
+.field:last-child{
+    margin-bottom:0;
+}
+
+.field label{
+    display:block;
+    margin-bottom:5px;
+
+    font-size:11px;
+    font-weight:bold;
+    color:#4b5563;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select,
+textarea{
+    width:100%;
+
+    min-height:34px;
+
+    padding:7px 9px;
+
+    background:#fff;
+    color:#222;
+
+    border:1px solid var(--border);
+    border-radius:6px;
+
+    outline:none;
+
+    transition:
+        border-color .15s,
+        box-shadow .15s;
+}
+
+textarea{
+    min-height:80px;
+    resize:vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:var(--blue);
+    box-shadow:0 0 0 2px rgba(37,99,235,.08);
+}
+
+input[type="color"]{
+    width:100%;
+    height:34px;
+    padding:2px;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.grid-2{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+}
+
+.grid-3{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:9px;
+}
+
+
+/* =========================================================
+   MODE BUTTONS
+========================================================= */
+
+.mode-tabs{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+    margin-bottom:12px;
+}
+
+.mode-btn{
+    border:1px solid var(--border);
+    background:#fff;
+    color:#444;
+
+    border-radius:6px;
+
+    padding:9px 5px;
+
+    font-size:11px;
+    font-weight:bold;
+}
+
+.mode-btn.active{
+    background:var(--blue);
+    color:#fff;
+    border-color:var(--blue);
+}
+
+
+/* =========================================================
+   CHECKBOX
+========================================================= */
+
+.check-row{
     display:flex;
-    gap:0;
-    flex-shrink:0;
+    flex-wrap:wrap;
+    gap:6px;
 }
 
-.cta-form input{
-    border:2px solid var(--steel-line);
-    border-right:none;
-    background:var(--charcoal-2);
-    color:var(--white);
-    padding:14px 16px;
-    font-size:14px;
-    font-family:var(--body);
-    min-width:240px;
+.check{
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    padding:7px 8px;
+
+    background:#fafafa;
+
+    border:1px solid var(--border);
+    border-radius:6px;
+
+    font-size:11px;
 }
 
-.cta-form input::placeholder{ color:#8b877c; }
+.check input{
+    accent-color:var(--blue);
+}
 
-.cta-form input:focus{ outline:none; border-color:var(--orange); }
 
-.cta-form button{
+/* =========================================================
+   FREEZE STATE
+========================================================= */
+
+.frozen{
+    position:relative;
+    opacity:.45;
+}
+
+.frozen::after{
+    content:"🔒 Frozen by Combined Mode";
+
+    position:absolute;
+    right:6px;
+    top:6px;
+
+    padding:3px 5px;
+
+    background:#fff1f2;
+    color:var(--red);
+
+    border:1px solid #fecaca;
+    border-radius:4px;
+
+    font-size:9px;
+    font-weight:bold;
+}
+
+
+/* =========================================================
+   BORDER DESIGN
+========================================================= */
+
+.border-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:6px;
+}
+
+.border-option{
+    min-height:53px;
+
+    padding:5px;
+
+    border:1px solid var(--border);
+    border-radius:6px;
+
+    background:#fff;
+
+    color:#444;
+
+    font-size:9px;
+
+    transition:.15s;
+}
+
+.border-option:hover{
+    background:#f8fafc;
+    transform:translateY(-1px);
+}
+
+.border-option.active{
+    background:var(--blue-soft);
+    border-color:var(--blue);
+    color:var(--blue);
+}
+
+.border-sample{
+    height:22px;
+    margin-bottom:4px;
+    background:#fff;
+}
+
+
+/* =========================================================
+   BORDER TYPES
+========================================================= */
+
+.sample-solid{
+    border:2px solid #222;
+}
+
+.sample-double{
+    border:4px double #222;
+}
+
+.sample-dashed{
+    border:2px dashed #222;
+}
+
+.sample-dotted{
+    border:2px dotted #222;
+}
+
+.sample-groove{
+    border:4px groove #777;
+}
+
+.sample-ridge{
+    border:4px ridge #777;
+}
+
+.sample-inset{
+    border:4px inset #777;
+}
+
+.sample-outset{
+    border:4px outset #777;
+}
+
+.sample-thin{
+    border:1px solid #222;
+}
+
+.sample-medium{
+    border:3px solid #222;
+}
+
+.sample-thick{
+    border:5px solid #222;
+}
+
+.sample-doublethin{
+    border:3px double #222;
+}
+
+.sample-doublethick{
+    border:6px double #222;
+}
+
+.sample-blue{
+    border:2px solid #2563eb;
+}
+
+.sample-red{
+    border:2px solid #dc2626;
+}
+
+.sample-green{
+    border:2px solid #16a34a;
+}
+
+.sample-gray{
+    border:2px solid #64748b;
+}
+
+.sample-shadow{
+    border:2px solid #222;
+    box-shadow:4px 4px 0 #aaa;
+}
+
+.sample-softshadow{
+    border:1px solid #555;
+    box-shadow:0 3px 8px rgba(0,0,0,.25);
+}
+
+.sample-rounded{
+    border:2px solid #222;
+    border-radius:7px;
+}
+
+.sample-double-rounded{
+    border:4px double #222;
+    border-radius:7px;
+}
+
+.sample-groove-thick{
+    border:6px groove #777;
+}
+
+.sample-ridge-thick{
+    border:6px ridge #777;
+}
+
+.sample-inset-thick{
+    border:6px inset #777;
+}
+
+.sample-outset-thick{
+    border:6px outset #777;
+}
+
+
+/* =========================================================
+   UPLOAD
+========================================================= */
+
+.upload-box{
+    padding:15px;
+
+    text-align:center;
+
+    border:2px dashed #cbd5e1;
+    border-radius:7px;
+
+    background:#fafafa;
+}
+
+.upload-box strong{
+    display:block;
+    margin-bottom:5px;
+}
+
+.upload-box small{
+    color:var(--muted);
+    font-size:10px;
+}
+
+
+/* =========================================================
+   EXCEL PREVIEW
+========================================================= */
+
+.excel-preview{
+    max-height:230px;
+    overflow:auto;
+
+    margin-top:10px;
+
+    border:1px solid var(--border);
+    border-radius:6px;
+}
+
+.excel-preview table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:10px;
+}
+
+.excel-preview th,
+.excel-preview td{
+    padding:6px;
+    border:1px solid var(--border);
+    white-space:nowrap;
+}
+
+.excel-preview th{
+    position:sticky;
+    top:0;
+    background:#eef4ff;
+    z-index:2;
+}
+
+
+/* =========================================================
+   PREVIEW HEADER
+========================================================= */
+
+.preview-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+
+    margin-bottom:10px;
+}
+
+.live-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+
+    padding:5px 8px;
+
+    background:#ecfdf5;
+    color:var(--green);
+
+    border:1px solid #bbf7d0;
+    border-radius:20px;
+
+    font-size:10px;
+    font-weight:bold;
+}
+
+.live-dot{
+    width:6px;
+    height:6px;
+
+    border-radius:50%;
+
+    background:var(--green);
+}
+
+
+/* =========================================================
+   PREVIEW CANVAS
+========================================================= */
+
+.preview-canvas{
+    min-height:680px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:25px;
+
+    overflow:auto;
+
+    background:
+        linear-gradient(
+            45deg,
+            #edf0f4 25%,
+            transparent 25%
+        ),
+        linear-gradient(
+            -45deg,
+            #edf0f4 25%,
+            transparent 25%
+        ),
+        linear-gradient(
+            45deg,
+            transparent 75%,
+            #edf0f4 75%
+        ),
+        linear-gradient(
+            -45deg,
+            transparent 75%,
+            #edf0f4 75%
+        );
+
+    background-size:20px 20px;
+    background-position:0 0,0 10px,10px -10px,-10px 0;
+
+    border:1px solid var(--border);
+    border-radius:8px;
+}
+
+
+/* =========================================================
+   PAPER
+========================================================= */
+
+.paper{
+    position:relative;
+
+    width:380px;
+    min-height:540px;
+
+    padding:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#fff;
+
+    border:1px solid #aaa;
+
+    box-shadow:
+        0 8px 25px rgba(15,23,42,.14);
+
+    transition:
+        width .2s ease,
+        min-height .2s ease;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.label{
+    width:90%;
+    min-height:180px;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:12px;
+
+    padding:18px;
+
+    background:#fff;
+
+    border:2px solid #222;
+
+    overflow:hidden;
+
+    transition:
+        all .2s ease;
+}
+
+.preview-po{
+    display:block;
+
+    max-width:100%;
+
+    font-family:Arial,sans-serif;
+    font-size:26px;
+    font-weight:bold;
+
+    text-align:center;
+
+    word-break:break-word;
+}
+
+.preview-box{
+    display:block;
+
+    max-width:100%;
+
+    font-family:Arial,sans-serif;
+    font-size:20px;
+    font-weight:bold;
+
+    text-align:center;
+
+    word-break:break-word;
+}
+
+
+/* =========================================================
+   COMBINED PREVIEW
+========================================================= */
+
+.combined-preview{
+    display:none;
+
+    max-width:100%;
+
+    font-weight:bold;
+    text-align:center;
+
+    word-break:break-word;
+}
+
+.combined-preview.show{
+    display:block;
+}
+
+
+/* =========================================================
+   QR
+========================================================= */
+
+.qr-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+}
+
+.qr-card{
+    min-height:170px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    gap:7px;
+
+    padding:10px;
+
+    border:1px solid var(--border);
+    border-radius:7px;
+
+    background:#fafafa;
+}
+
+.qr-card canvas,
+.qr-card img{
+    max-width:140px;
+    max-height:140px;
+}
+
+
+/* =========================================================
+   ISBN
+========================================================= */
+
+.isbn-preview{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    gap:8px;
+
+    min-height:200px;
+
+    width:90%;
+
+    padding:15px;
+
+    background:#fff;
+
+    border:2px solid #222;
+}
+
+.isbn-title{
+    font-weight:bold;
+    text-align:center;
+}
+
+.isbn-number{
+    font-size:11px;
+}
+
+#isbnBarcode{
+    max-width:90%;
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast{
+    position:fixed;
+
+    top:75px;
+    right:18px;
+
+    z-index:99999;
+
+    min-width:250px;
+    max-width:380px;
+
+    padding:11px 14px;
+
+    border-radius:7px;
+
+    color:#fff;
+
+    font-size:12px;
+    font-weight:bold;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.18);
+
+    opacity:0;
+
+    transform:translateX(120%);
+
+    pointer-events:none;
+
+    transition:
+        opacity .25s,
+        transform .25s;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateX(0);
+}
+
+.toast.green{
+    background:var(--green);
+}
+
+.toast.red{
+    background:var(--red);
+}
+
+.toast.orange{
     background:var(--orange);
-    color:var(--white);
-    border:none;
-    padding:0 22px;
-    font-family:var(--display);
-    font-size:14px;
-    letter-spacing:0.04em;
-    text-transform:uppercase;
 }
-.cta-form button:hover{ background:var(--orange-dark); }
+
 
 /* =========================================================
    FOOTER
 ========================================================= */
-.site-footer{
-    background:var(--charcoal-2);
-    color:#c7c4bb;
-    padding:56px 0 0;
-    font-size:13.5px;
+
+.footer{
+    padding:20px 10px 10px;
+
+    text-align:center;
+
+    color:var(--muted);
+
+    font-size:11px;
+
+    line-height:1.7;
 }
 
-.footer-grid{
-    display:grid;
-    grid-template-columns:1.4fr repeat(4,1fr);
-    gap:30px;
-    padding-bottom:40px;
-    border-bottom:1px solid var(--steel-line);
+.footer strong{
+    color:#374151;
 }
 
-.footer-grid h4{
-    color:var(--white);
-    font-family:var(--mono);
-    font-size:12px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    margin-bottom:16px;
-}
-
-.footer-grid ul{ list-style:none; }
-.footer-grid li{ margin-bottom:9px; }
-.footer-grid a:hover{ color:var(--orange); }
-
-.footer-brand .logo{ margin-bottom:14px; }
-.footer-brand p{ max-width:280px; color:#9d9a90; margin-bottom:16px; }
-
-.socials{ display:flex; gap:10px; }
-.socials a{
-    width:32px; height:32px;
-    border:1px solid var(--steel-line);
-    display:flex; align-items:center; justify-content:center;
-    font-size:12px;
-}
-.socials a:hover{ border-color:var(--orange); color:var(--orange); }
-
-.footer-bottom{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:20px 0;
-    font-size:12px;
-    color:#8b877c;
-    flex-wrap:wrap;
-    gap:10px;
-}
-
-.footer-bottom .legal-links{ display:flex; gap:18px; }
-.footer-bottom .legal-links a:hover{ color:var(--orange); }
-
-/* back to top */
-.top-btn{
-    position:fixed;
-    right:22px;
-    bottom:22px;
-    width:46px;
-    height:46px;
-    background:var(--orange);
-    color:var(--white);
-    border:none;
-    font-size:18px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .2s ease, transform .2s ease;
-    z-index:99;
-}
-.top-btn.show{ opacity:1; pointer-events:auto; }
-.top-btn:hover{ background:var(--orange-dark); transform:translateY(-3px); }
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
-@media (max-width:980px){
-    .hero-grid{ grid-template-columns:1fr; }
-    .configure{ grid-template-columns:repeat(2,1fr); }
-    .configure .go{ grid-column:1/-1; padding:16px; }
-    .trust-bar .wrap{ grid-template-columns:repeat(2,1fr); }
-    .trust-item:nth-child(3){ border-left:none; }
-    .cat-grid{ grid-template-columns:repeat(2,1fr); }
-    .ind-grid{ grid-template-columns:repeat(3,1fr); }
-    .stats-strip .wrap{ grid-template-columns:repeat(2,1fr); gap:20px 0; }
-    .process-grid{ grid-template-columns:repeat(2,1fr); gap:24px; }
-    .process-step:not(:last-child)::after{ display:none; }
-    .test-grid{ grid-template-columns:1fr; }
-    .footer-grid{ grid-template-columns:1fr 1fr; }
+
+@media(max-width:1100px){
+
+    .workspace{
+        grid-template-columns:1fr;
+    }
+
+    .preview-panel{
+        position:relative;
+        top:0;
+    }
+
 }
 
-@media (max-width:680px){
-    .search-bar{ display:none; }
-    .header-actions .label-text{ display:none; }
-    .nav-row a{ font-size:12px; }
-    .cat-grid{ grid-template-columns:1fr; }
-    .ind-grid{ grid-template-columns:repeat(2,1fr); }
-    .footer-grid{ grid-template-columns:1fr; }
-    .cta-band .wrap{ flex-direction:column; align-items:flex-start; }
-    .cta-form{ width:100%; }
-    .cta-form input{ min-width:0; flex:1; }
+@media(max-width:700px){
+
+    .header{
+        position:relative;
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .header-actions{
+        width:100%;
+    }
+
+    .grid-2,
+    .grid-3{
+        grid-template-columns:1fr;
+    }
+
+    .border-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .qr-grid{
+        grid-template-columns:1fr;
+    }
+
+    .preview-canvas{
+        min-height:500px;
+        padding:12px;
+    }
+
+    .paper{
+        width:290px;
+        min-height:410px;
+    }
+
+    .toast{
+        left:10px;
+        right:10px;
+        min-width:0;
+        max-width:none;
+    }
 }
 
+@media(max-width:450px){
+
+    .border-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .mode-tabs{
+        grid-template-columns:1fr;
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print{
+
+    body{
+        background:#fff;
+    }
+
+    .header,
+    .main-nav,
+    .controls,
+    .preview-toolbar,
+    .footer{
+        display:none!important;
+    }
+
+    .app{
+        padding:0;
+    }
+
+    .workspace{
+        display:block;
+    }
+
+    .preview-canvas{
+        padding:0;
+        border:0;
+        background:#fff;
+    }
+
+    .paper{
+        box-shadow:none;
+        border:0;
+    }
+
+}
 </style>
 </head>
+
+
 <body>
 
-<!-- ============ HEADER ============ -->
-<header class="site-header">
-    <div class="wrap header-top">
-        <a href="#top" class="logo"><span class="mark">IM</span>IRON<span>MARK</span></a>
+<!-- =======================================================
+     HEADER
+======================================================= -->
 
-        <form class="search-bar" role="search">
-            <input type="text" placeholder="Search labels, sizes, materials…" aria-label="Search for a product">
-            <button type="submit" aria-label="Search">&#128269;</button>
-        </form>
+<header class="header">
 
-        <div class="header-actions">
-            <span class="action"><span class="label-text">Live Chat</span></span>
-            <span class="action"><span class="label-text">1-888-575-2235</span></span>
-            <span class="action"><span class="label-text">Account</span></span>
-            <span class="action">Cart <span class="badge">0</span></span>
+    <div class="brand">
+
+        <div class="brand-logo">📚</div>
+
+        <div>
+            <h1>Books Label Studio</h1>
+            <small>Professional Label & PDF Generator</small>
         </div>
+
     </div>
 
-    <nav class="nav-row">
-        <div class="wrap" style="display:flex;align-items:center;gap:28px;">
-            <a href="#categories" class="active">Blank Labels</a>
-            <a href="#categories">Custom Labels</a>
-            <a href="#industries">Industrial &amp; Hazmat</a>
-            <a href="#process">Design &amp; Templates</a>
-            <a href="#reviews">Reviews</a>
-            <a href="#quote">Bulk Quote</a>
-            <a href="#" class="call">Get a Free Sample Kit &rarr;</a>
-        </div>
-    </nav>
+
+    <div class="header-actions">
+
+        <button class="btn" id="undoBtn">
+            ↶ Undo
+        </button>
+
+        <button class="btn" id="redoBtn">
+            ↷ Redo
+        </button>
+
+        <button class="btn" id="defaultBtn">
+            ↺ Default
+        </button>
+
+        <button class="btn" id="saveDefaultBtn">
+            💾 Save Default
+        </button>
+
+    </div>
+
 </header>
 
-<div class="hazard" role="presentation"></div>
 
-<!-- ============ HERO ============ -->
-<section class="hero" id="top">
-    <div class="wrap hero-grid">
-        <div>
-            <span class="eyebrow">// Industrial-grade label supply</span>
-            <h1>Built to stick.<br><em>Made to last.</em></h1>
-            <p class="lede">Blank stock, custom prints, and hazmat-rated labels that hold up on drums, crates, cold storage, and the open road — shipped from our own presses.</p>
-            <div class="hero-ctas">
-                <a href="#categories" class="btn btn-primary">Shop Label Sizes</a>
-                <a href="#quote" class="btn btn-outline">Request Bulk Quote</a>
-            </div>
-        </div>
-        <div class="hero-visual">
-            <div class="roll-icon"></div>
-            <span class="tag">500m ROLL · WATERPROOF</span>
-        </div>
-    </div>
+<!-- =======================================================
+     APP
+======================================================= -->
 
-    <div class="configure wrap" style="max-width:1240px;margin:0 auto;">
-        <div class="field">
-            <label>Type</label>
-            <select><option>Blank Labels</option><option>Custom Labels</option><option>Hazmat / DOT</option></select>
-        </div>
-        <div class="field">
-            <label>Format</label>
-            <select><option>Sheets</option><option>Rolls</option><option>Fanfold</option></select>
-        </div>
-        <div class="field">
-            <label>Material</label>
-            <select><option>Paper</option><option>Waterproof Poly</option><option>Foil</option></select>
-        </div>
-        <div class="field">
-            <label>Size</label>
-            <select><option>Choose a size</option><option>2" x 3"</option><option>4" x 6"</option></select>
-        </div>
-        <button class="go">Find My Label &rarr;</button>
-    </div>
-</section>
+<main class="app">
 
-<!-- ============ TRUST BAR ============ -->
-<section class="trust-bar">
-    <div class="wrap">
-        <div class="trust-item">
-            <div class="icon">&#128230;</div>
-            <div><strong>No Minimum Orders</strong><span>Order 1 sheet or 10,000</span></div>
-        </div>
-        <div class="trust-item">
-            <div class="icon">$</div>
-            <div><strong>Lowest Price Guarantee</strong><span>Beat any verified quote</span></div>
-        </div>
-        <div class="trust-item">
-            <div class="icon">&#9878;</div>
-            <div><strong>Free Design Templates</strong><span>Print-ready, any size</span></div>
-        </div>
-        <div class="trust-item">
-            <div class="icon">&#128666;</div>
-            <div><strong>Same Day Shipping</strong><span>Orders before 4 PM ET</span></div>
-        </div>
-    </div>
-</section>
 
-<!-- ============ CATEGORIES ============ -->
-<section class="section" id="categories">
-    <div class="wrap">
-        <div class="section-head">
-            <div>
-                <span class="eyebrow">Shop by product</span>
-                <h2>Four ways to label it</h2>
-                <p>From single blank sheets to full-run custom prints — pick the format that matches the job.</p>
-            </div>
-            <a href="#" class="link-arrow">View full catalog &rarr;</a>
-        </div>
+    <!-- ===================================================
+         NAV
+    =================================================== -->
 
-        <div class="cat-grid">
-            <div class="cat-card">
-                <span class="stock-tag">In Stock</span>
-                <div class="thumb"><div class="swatch"></div></div>
-                <div class="body">
-                    <h3>Blank Labels</h3>
-                    <p>Thousands of blank sheet and roll sizes, ready to print at home or in bulk.</p>
-                    <div class="links"><a href="#">Shop Sheets</a><a href="#">Shop Rolls</a></div>
+    <nav class="main-nav">
+
+        <button class="nav-btn active"
+                data-section="coco">
+            🎨 Coco Blue
+        </button>
+
+        <button class="nav-btn"
+                data-section="other">
+            📦 Other PO
+        </button>
+
+        <button class="nav-btn"
+                data-section="isbn">
+            🔖 ISBN
+        </button>
+
+        <button class="nav-btn"
+                data-section="address">
+            📍 Address
+        </button>
+
+    </nav>
+
+
+    <div class="workspace">
+
+
+        <!-- =================================================
+             LEFT CONTROLS
+        ================================================= -->
+
+        <div class="controls">
+
+
+            <!-- =============================================
+                 COCO BLUE
+            ============================================== -->
+
+            <section class="section active"
+                     id="section-coco">
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>🎨 Coco Blue Label</span>
+                        <small>Live Controls</small>
+                    </div>
+
+
+                    <div class="mode-tabs">
+
+                        <button class="mode-btn active"
+                                data-mode="manual">
+                            ✍️ Manual
+                        </button>
+
+                        <button class="mode-btn"
+                                data-mode="excel">
+                            📊 Excel
+                        </button>
+
+                        <button class="mode-btn"
+                                data-mode="combined">
+                            🔗 Combined
+                        </button>
+
+                    </div>
+
+
+                    <!-- MANUAL -->
+
+                    <div class="mode-panel active"
+                         id="mode-manual">
+
+                        <div class="field">
+
+                            <label>
+                                PO Number
+                            </label>
+
+                            <input
+                                type="text"
+                                id="poInput"
+                                placeholder="ABC123"
+                                value="ABC123">
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>
+                                Box Number
+                            </label>
+
+                            <input
+                                type="number"
+                                id="boxInput"
+                                value="1"
+                                min="1">
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- EXCEL -->
+
+                    <div class="mode-panel"
+                         id="mode-excel"
+                         style="display:none;">
+
+                        <div class="upload-box">
+
+                            <strong>
+                                📊 Upload Excel
+                            </strong>
+
+                            <small>
+                                First row is treated as Header
+                                and ignored as PO data.
+                            </small>
+
+                            <br><br>
+
+                            <input
+                                type="file"
+                                id="excelInput"
+                                accept=".xlsx,.xls,.csv">
+
+                        </div>
+
+
+                        <div id="excelPreview"
+                             class="excel-preview">
+                        </div>
+
+                    </div>
+
+
+                    <!-- COMBINED -->
+
+                    <div class="mode-panel"
+                         id="mode-combined"
+                         style="display:none;">
+
+                        <div class="field">
+
+                            <label>
+                                Combined PO + Box
+                            </label>
+
+                            <input
+                                type="text"
+                                id="combinedInput"
+                                value="ABC123">
+
+                        </div>
+
+                        <small style="color:#6b7280;">
+                            Combined mode freezes separate
+                            PO and Box settings.
+                        </small>
+
+                    </div>
+
+
+                    <hr style="border:0;border-top:1px solid #eee;margin:14px 0;">
+
+
+                    <div class="check-row">
+
+                        <label class="check">
+
+                            <input
+                                type="checkbox"
+                                id="showPO"
+                                checked>
+
+                            Show PO
+
+                        </label>
+
+
+                        <label class="check">
+
+                            <input
+                                type="checkbox"
+                                id="showBox"
+                                checked>
+
+                            Show Box
+
+                        </label>
+
+                    </div>
+
                 </div>
-            </div>
-            <div class="cat-card">
-                <span class="stock-tag">Popular</span>
-                <div class="thumb"><div class="swatch" style="background:var(--orange);border-color:var(--charcoal);"></div></div>
-                <div class="body">
-                    <h3>Custom Labels</h3>
-                    <p>Professionally printed and delivered — your art, your brand, your sizes.</p>
-                    <div class="links"><a href="#">Shop Sheets</a><a href="#">Shop Rolls</a></div>
+
+
+                <!-- =========================================
+                     PO FONT
+                ========================================== -->
+
+                <div class="card"
+                     id="poSettingsCard">
+
+                    <div class="card-title">
+                        <span>🔤 PO Font</span>
+                    </div>
+
+
+                    <div class="grid-2">
+
+                        <div class="field">
+
+                            <label>Font</label>
+
+                            <select id="poFont">
+
+                                <option>Arial</option>
+                                <option>Helvetica</option>
+                                <option>Times New Roman</option>
+                                <option>Georgia</option>
+                                <option>Verdana</option>
+                                <option>Tahoma</option>
+                                <option>Trebuchet MS</option>
+                                <option>Courier New</option>
+                                <option>Calibri</option>
+                                <option>Cambria</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Font Size</label>
+
+                            <select id="poFontSize">
+
+                                <option value="12">12</option>
+                                <option value="14">14</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                                <option value="20">20</option>
+                                <option value="22">22</option>
+                                <option value="24">24</option>
+                                <option value="26" selected>26</option>
+                                <option value="28">28</option>
+                                <option value="30">30</option>
+                                <option value="32">32</option>
+                                <option value="36">36</option>
+                                <option value="40">40</option>
+                                <option value="48">48</option>
+                                <option value="56">56</option>
+                                <option value="64">64</option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="grid-3">
+
+                        <label class="check">
+                            <input type="checkbox"
+                                   id="poBold"
+                                   checked>
+                            Bold
+                        </label>
+
+                        <label class="check">
+                            <input type="checkbox"
+                                   id="poItalic">
+                            Italic
+                        </label>
+
+                        <label class="check">
+                            <input type="checkbox"
+                                   id="poUnderline">
+                            Underline
+                        </label>
+
+                    </div>
+
                 </div>
-            </div>
-            <div class="cat-card">
-                <span class="stock-tag">Rugged</span>
-                <div class="thumb"><div class="swatch" style="background:var(--charcoal);"></div></div>
-                <div class="body">
-                    <h3>Waterproof &amp; Poly</h3>
-                    <p>Tear, chemical, and UV-resistant stock for outdoor and cold-chain use.</p>
-                    <div class="links"><a href="#">Shop Poly</a><a href="#">Shop Foil</a></div>
+
+
+                <!-- =========================================
+                     BOX FONT
+                ========================================== -->
+
+                <div class="card"
+                     id="boxSettingsCard">
+
+                    <div class="card-title">
+                        <span>🔢 Box Font</span>
+                    </div>
+
+
+                    <div class="grid-2">
+
+                        <div class="field">
+
+                            <label>Font</label>
+
+                            <select id="boxFont">
+
+                                <option>Arial</option>
+                                <option>Helvetica</option>
+                                <option>Times New Roman</option>
+                                <option>Georgia</option>
+                                <option>Verdana</option>
+                                <option>Tahoma</option>
+                                <option>Trebuchet MS</option>
+                                <option>Courier New</option>
+                                <option>Calibri</option>
+                                <option>Cambria</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Font Size</label>
+
+                            <select id="boxFontSize">
+
+                                <option value="12">12</option>
+                                <option value="14">14</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                                <option value="20" selected>20</option>
+                                <option value="22">22</option>
+                                <option value="24">24</option>
+                                <option value="26">26</option>
+                                <option value="28">28</option>
+                                <option value="30">30</option>
+                                <option value="32">32</option>
+                                <option value="36">36</option>
+                                <option value="40">40</option>
+                                <option value="48">48</option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="grid-2">
+
+                        <label class="check">
+                            <input type="checkbox"
+                                   id="boxBold"
+                                   checked>
+                            Bold
+                        </label>
+
+                        <label class="check">
+                            <input type="checkbox"
+                                   id="boxItalic">
+                            Italic
+                        </label>
+
+                    </div>
+
                 </div>
-            </div>
-            <div class="cat-card">
-                <span class="stock-tag">DOT / OSHA</span>
-                <div class="thumb"><div class="swatch" style="background:var(--stripe);border:none;border-radius:0;width:70px;height:70px;"></div></div>
-                <div class="body">
-                    <h3>Hazmat &amp; Industrial</h3>
-                    <p>GHS, DOT, and pipe-marking labels built to spec for regulated shipping.</p>
-                    <div class="links"><a href="#">Shop GHS</a><a href="#">Shop DOT</a></div>
+
+
+                <!-- =========================================
+                     PO BORDER
+                ========================================== -->
+
+                <div class="card"
+                     id="poBorderCard">
+
+                    <div class="card-title">
+                        <span>▣ PO Border Style</span>
+                        <small>PO only</small>
+                    </div>
+
+
+                    <div class="border-grid"
+                         id="poBorderGrid">
+
+
+                        <button class="border-option active"
+                                data-po-border="solid">
+                            <div class="border-sample sample-solid"></div>
+                            Solid
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="double">
+                            <div class="border-sample sample-double"></div>
+                            Double
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="dashed">
+                            <div class="border-sample sample-dashed"></div>
+                            Dashed
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="dotted">
+                            <div class="border-sample sample-dotted"></div>
+                            Dotted
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="groove">
+                            <div class="border-sample sample-groove"></div>
+                            Groove
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="ridge">
+                            <div class="border-sample sample-ridge"></div>
+                            Ridge
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="inset">
+                            <div class="border-sample sample-inset"></div>
+                            Inset
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="outset">
+                            <div class="border-sample sample-outset"></div>
+                            Outset
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="thin">
+                            <div class="border-sample sample-thin"></div>
+                            Thin
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="medium">
+                            <div class="border-sample sample-medium"></div>
+                            Medium
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="thick">
+                            <div class="border-sample sample-thick"></div>
+                            Thick
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="blue">
+                            <div class="border-sample sample-blue"></div>
+                            Blue
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="red">
+                            <div class="border-sample sample-red"></div>
+                            Red
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="green">
+                            <div class="border-sample sample-green"></div>
+                            Green
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="gray">
+                            <div class="border-sample sample-gray"></div>
+                            Gray
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="shadow">
+                            <div class="border-sample sample-shadow"></div>
+                            Shadow
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="softshadow">
+                            <div class="border-sample sample-softshadow"></div>
+                            Soft Shadow
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="rounded">
+                            <div class="border-sample sample-rounded"></div>
+                            Rounded
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="double-rounded">
+                            <div class="border-sample sample-double-rounded"></div>
+                            Double Rounded
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="groove-thick">
+                            <div class="border-sample sample-groove-thick"></div>
+                            Thick Groove
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="ridge-thick">
+                            <div class="border-sample sample-ridge-thick"></div>
+                            Thick Ridge
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="inset-thick">
+                            <div class="border-sample sample-inset-thick"></div>
+                            Thick Inset
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="outset-thick">
+                            <div class="border-sample sample-outset-thick"></div>
+                            Thick Outset
+                        </button>
+
+
+                        <button class="border-option"
+                                data-po-border="double-thick">
+                            <div class="border-sample sample-doublethick"></div>
+                            Double Thick
+                        </button>
+
+                    </div>
+
                 </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-<!-- ============ STATS ============ -->
-<section class="stats-strip">
-    <div class="wrap">
-        <div class="stat"><strong>25+</strong><span>Years Printing</span></div>
-        <div class="stat"><strong>60,000+</strong><span>Label Sizes Stocked</span></div>
-        <div class="stat"><strong>1.2M</strong><span>Orders Shipped</span></div>
-        <div class="stat"><strong>4.9/5</strong><span>Average Rating</span></div>
-    </div>
-</section>
 
-<!-- ============ INDUSTRIES ============ -->
-<section class="section industries" id="industries">
-    <div class="wrap">
-        <span class="eyebrow">Where our labels work</span>
-        <h2>Trusted across the supply chain</h2>
-        <div class="ind-grid">
-            <div class="ind-card"><div class="icon"><span>&#127974;</span></div><p>Warehousing</p></div>
-            <div class="ind-card"><div class="icon"><span>&#129466;</span></div><p>Food &amp; Bev</p></div>
-            <div class="ind-card"><div class="icon"><span>&#9879;</span></div><p>Chemical</p></div>
-            <div class="ind-card"><div class="icon"><span>&#128677;</span></div><p>Logistics</p></div>
-            <div class="ind-card"><div class="icon"><span>&#128138;</span></div><p>Pharma</p></div>
-            <div class="ind-card"><div class="icon"><span>&#128736;</span></div><p>Manufacturing</p></div>
-        </div>
-    </div>
-</section>
+                <!-- =========================================
+                     BOX BORDER
+                ========================================== -->
 
-<!-- ============ HOW IT WORKS ============ -->
-<section class="section" id="process">
-    <div class="wrap">
-        <div class="section-head">
-            <div>
-                <span class="eyebrow">From order to install</span>
-                <h2>Four steps, no guesswork</h2>
-            </div>
-        </div>
-        <div class="process-grid">
-            <div class="process-step">
-                <div class="num">01</div>
-                <h3>Pick a size</h3>
-                <p>Search by product, dimension, or upload a die-line.</p>
-            </div>
-            <div class="process-step">
-                <div class="num">02</div>
-                <h3>Choose material</h3>
-                <p>Paper, poly, foil, or chemical-resistant stock.</p>
-            </div>
-            <div class="process-step">
-                <div class="num">03</div>
-                <h3>Upload or design</h3>
-                <p>Use a free template or send print-ready art.</p>
-            </div>
-            <div class="process-step">
-                <div class="num">04</div>
-                <h3>Ship same day</h3>
-                <p>Orders before 4 PM ET leave our dock today.</p>
-            </div>
-        </div>
-    </div>
-</section>
+                <div class="card"
+                     id="boxBorderCard">
 
-<!-- ============ TESTIMONIALS ============ -->
-<section class="section testimonials" id="reviews">
-    <div class="wrap">
-        <div class="section-head">
-            <div>
-                <span class="eyebrow">From the warehouse floor</span>
-                <h2>What operators say</h2>
-            </div>
-        </div>
-        <div class="test-grid">
-            <div class="test-card">
-                <div class="stars">★★★★★</div>
-                <p>"We run poly labels through -20°C cold storage daily. Zero peel-off in two years."</p>
-                <div class="who">— Ops Lead, Cold Chain Logistics</div>
-            </div>
-            <div class="test-card">
-                <div class="stars">★★★★★</div>
-                <p>"Custom die-cuts arrived exactly to spec, no minimum order hassle for a small batch test run."</p>
-                <div class="who">— Packaging Manager, Consumer Goods</div>
-            </div>
-            <div class="test-card">
-                <div class="stars">★★★★★</div>
-                <p>"DOT hazmat labels passed inspection first try. Templates made the layout painless."</p>
-                <div class="who">— Compliance Officer, Chemical Transport</div>
-            </div>
-        </div>
-    </div>
-</section>
+                    <div class="card-title">
+                        <span>▣ Box Border Style</span>
+                        <small>Box only</small>
+                    </div>
 
-<!-- ============ QUOTE / NEWSLETTER ============ -->
-<section class="cta-band" id="quote">
-    <div class="wrap">
+
+                    <div class="border-grid"
+                         id="boxBorderGrid">
+
+
+                        <button class="border-option active"
+                                data-box-border="solid">
+                            <div class="border-sample sample-solid"></div>
+                            Solid
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="double">
+                            <div class="border-sample sample-double"></div>
+                            Double
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="dashed">
+                            <div class="border-sample sample-dashed"></div>
+                            Dashed
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="dotted">
+                            <div class="border-sample sample-dotted"></div>
+                            Dotted
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="groove">
+                            <div class="border-sample sample-groove"></div>
+                            Groove
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="ridge">
+                            <div class="border-sample sample-ridge"></div>
+                            Ridge
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="inset">
+                            <div class="border-sample sample-inset"></div>
+                            Inset
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="outset">
+                            <div class="border-sample sample-outset"></div>
+                            Outset
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="thin">
+                            <div class="border-sample sample-thin"></div>
+                            Thin
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="medium">
+                            <div class="border-sample sample-medium"></div>
+                            Medium
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="thick">
+                            <div class="border-sample sample-thick"></div>
+                            Thick
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="blue">
+                            <div class="border-sample sample-blue"></div>
+                            Blue
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="red">
+                            <div class="border-sample sample-red"></div>
+                            Red
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="green">
+                            <div class="border-sample sample-green"></div>
+                            Green
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="gray">
+                            <div class="border-sample sample-gray"></div>
+                            Gray
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="shadow">
+                            <div class="border-sample sample-shadow"></div>
+                            Shadow
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="rounded">
+                            <div class="border-sample sample-rounded"></div>
+                            Rounded
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="double-rounded">
+                            <div class="border-sample sample-double-rounded"></div>
+                            Double Rounded
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="groove-thick">
+                            <div class="border-sample sample-groove-thick"></div>
+                            Thick Groove
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="ridge-thick">
+                            <div class="border-sample sample-ridge-thick"></div>
+                            Thick Ridge
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="inset-thick">
+                            <div class="border-sample sample-inset-thick"></div>
+                            Thick Inset
+                        </button>
+
+
+                        <button class="border-option"
+                                data-box-border="outset-thick">
+                            <div class="border-sample sample-outset-thick"></div>
+                            Thick Outset
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     COMBINED BORDER
+                ========================================== -->
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>🔗 Combined Border</span>
+                        <small>Used only in Combined mode</small>
+                    </div>
+
+
+                    <div class="border-grid">
+
+                        <button class="border-option active"
+                                data-combined-border="solid">
+                            <div class="border-sample sample-solid"></div>
+                            Solid
+                        </button>
+
+                        <button class="border-option"
+                                data-combined-border="double">
+                            <div class="border-sample sample-double"></div>
+                            Double
+                        </button>
+
+                        <button class="border-option"
+                                data-combined-border="dashed">
+                            <div class="border-sample sample-dashed"></div>
+                            Dashed
+                        </button>
+
+                        <button class="border-option"
+                                data-combined-border="dotted">
+                            <div class="border-sample sample-dotted"></div>
+                            Dotted
+                        </button>
+
+                        <button class="border-option"
+                                data-combined-border="groove">
+                            <div class="border-sample sample-groove"></div>
+                            Groove
+                        </button>
+
+                        <button class="border-option"
+                                data-combined-border="ridge">
+                            <div class="border-sample sample-ridge"></div>
+                            Ridge
+                        </button>
+
+                        <button class="border-option"
+                                data-combined-border="shadow">
+                            <div class="border-sample sample-shadow"></div>
+                            Shadow
+                        </button>
+
+                        <button class="border-option"
+                                data-combined-border="rounded">
+                            <div class="border-sample sample-rounded"></div>
+                            Rounded
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     BORDER OPTIONS
+                ========================================== -->
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>🎨 Border Settings</span>
+                    </div>
+
+
+                    <div class="grid-3">
+
+                        <div class="field">
+
+                            <label>Width</label>
+
+                            <input
+                                type="number"
+                                id="borderWidth"
+                                min="0"
+                                max="10"
+                                value="2">
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Radius</label>
+
+                            <input
+                                type="number"
+                                id="borderRadius"
+                                min="0"
+                                max="30"
+                                value="0">
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Color</label>
+
+                            <input
+                                type="color"
+                                id="borderColor"
+                                value="#222222">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     PAGE
+                ========================================== -->
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>📄 Page & Layout</span>
+                        <small>Live Preview</small>
+                    </div>
+
+
+                    <div class="grid-2">
+
+                        <div class="field">
+
+                            <label>Page Size</label>
+
+                            <select id="pageSize">
+
+                                <option value="4x6"
+                                        selected>
+                                    4 × 6 inch
+                                </option>
+
+                                <option value="a4">
+                                    A4
+                                </option>
+
+                                <option value="a5">
+                                    A5
+                                </option>
+
+                                <option value="letter">
+                                    Letter
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Orientation</label>
+
+                            <select id="orientation">
+
+                                <option value="portrait"
+                                        selected>
+                                    Portrait
+                                </option>
+
+                                <option value="landscape">
+                                    Landscape
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="grid-2">
+
+                        <div class="field">
+
+                            <label>
+                                Labels Per Page
+                            </label>
+
+                            <select id="labelsPerPage">
+
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="4">4</option>
+                                <option value="6">6</option>
+                                <option value="9">9</option>
+                                <option value="12">12</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>
+                                Starting Box No.
+                            </label>
+
+                            <input
+                                type="number"
+                                id="startBox"
+                                value="1"
+                                min="1">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div style="display:flex;gap:7px;flex-wrap:wrap;">
+
+                    <button class="btn"
+                            id="copyStyleBtn">
+                        📋 Copy Style
+                    </button>
+
+                    <button class="btn"
+                            id="pasteStyleBtn">
+                        📌 Paste Style
+                    </button>
+
+                    <button class="btn primary"
+                            id="generateCocoPDF">
+                        📄 Generate PDF
+                    </button>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =================================================
+                 OTHER PO
+            ================================================= -->
+
+            <section class="section"
+                     id="section-other">
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>📦 Other PO</span>
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>
+                            PO Numbers
+                        </label>
+
+                        <textarea
+                            id="otherPO"
+                            placeholder="Enter one PO per line">ABC123</textarea>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>🔤 Font</span>
+                    </div>
+
+
+                    <div class="grid-2">
+
+                        <div class="field">
+
+                            <label>Font</label>
+
+                            <select id="otherFont">
+
+                                <option>Arial</option>
+                                <option>Helvetica</option>
+                                <option>Times New Roman</option>
+                                <option>Georgia</option>
+                                <option>Verdana</option>
+                                <option>Tahoma</option>
+                                <option>Courier New</option>
+                                <option>Calibri</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Font Size</label>
+
+                            <select id="otherFontSize">
+
+                                <option value="12">12</option>
+                                <option value="14">14</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                                <option value="20" selected>20</option>
+                                <option value="22">22</option>
+                                <option value="24">24</option>
+                                <option value="26">26</option>
+                                <option value="28">28</option>
+                                <option value="32">32</option>
+                                <option value="36">36</option>
+                                <option value="40">40</option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>▣ Border Design</span>
+                    </div>
+
+
+                    <div class="border-grid">
+
+                        <button class="border-option active"
+                                data-other-border="solid">
+                            <div class="border-sample sample-solid"></div>
+                            Solid
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="double">
+                            <div class="border-sample sample-double"></div>
+                            Double
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="dashed">
+                            <div class="border-sample sample-dashed"></div>
+                            Dashed
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="dotted">
+                            <div class="border-sample sample-dotted"></div>
+                            Dotted
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="groove">
+                            <div class="border-sample sample-groove"></div>
+                            Groove
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="ridge">
+                            <div class="border-sample sample-ridge"></div>
+                            Ridge
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="inset">
+                            <div class="border-sample sample-inset"></div>
+                            Inset
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="outset">
+                            <div class="border-sample sample-outset"></div>
+                            Outset
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="blue">
+                            <div class="border-sample sample-blue"></div>
+                            Blue
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="red">
+                            <div class="border-sample sample-red"></div>
+                            Red
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="green">
+                            <div class="border-sample sample-green"></div>
+                            Green
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="shadow">
+                            <div class="border-sample sample-shadow"></div>
+                            Shadow
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="rounded">
+                            <div class="border-sample sample-rounded"></div>
+                            Rounded
+                        </button>
+
+                        <button class="border-option"
+                                data-other-border="thick">
+                            <div class="border-sample sample-thick"></div>
+                            Thick
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <button class="btn primary"
+                        id="generateOtherPDF">
+                    📄 Generate PDF
+                </button>
+
+
+            </section>
+
+
+            <!-- =================================================
+                 ISBN
+            ================================================= -->
+
+            <section class="section"
+                     id="section-isbn">
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>🔖 ISBN</span>
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>Book Title</label>
+
+                        <input
+                            type="text"
+                            id="bookTitle"
+                            placeholder="Book title">
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>ISBN</label>
+
+                        <input
+                            type="text"
+                            id="isbn"
+                            placeholder="9781234567890">
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>🔤 ISBN Font</span>
+                    </div>
+
+
+                    <div class="grid-2">
+
+                        <div class="field">
+
+                            <label>Font</label>
+
+                            <select id="isbnFont">
+
+                                <option>Arial</option>
+                                <option>Helvetica</option>
+                                <option>Times New Roman</option>
+                                <option>Georgia</option>
+                                <option>Verdana</option>
+                                <option>Tahoma</option>
+                                <option>Courier New</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Font Size</label>
+
+                            <select id="isbnFontSize">
+
+                                <option value="12">12</option>
+                                <option value="14">14</option>
+                                <option value="16" selected>16</option>
+                                <option value="18">18</option>
+                                <option value="20">20</option>
+                                <option value="24">24</option>
+                                <option value="28">28</option>
+                                <option value="32">32</option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>▣ ISBN Border</span>
+                    </div>
+
+
+                    <div class="border-grid">
+
+                        <button class="border-option active"
+                                data-isbn-border="solid">
+                            <div class="border-sample sample-solid"></div>
+                            Solid
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="double">
+                            <div class="border-sample sample-double"></div>
+                            Double
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="dashed">
+                            <div class="border-sample sample-dashed"></div>
+                            Dashed
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="dotted">
+                            <div class="border-sample sample-dotted"></div>
+                            Dotted
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="groove">
+                            <div class="border-sample sample-groove"></div>
+                            Groove
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="ridge">
+                            <div class="border-sample sample-ridge"></div>
+                            Ridge
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="inset">
+                            <div class="border-sample sample-inset"></div>
+                            Inset
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="outset">
+                            <div class="border-sample sample-outset"></div>
+                            Outset
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="shadow">
+                            <div class="border-sample sample-shadow"></div>
+                            Shadow
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="rounded">
+                            <div class="border-sample sample-rounded"></div>
+                            Rounded
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="blue">
+                            <div class="border-sample sample-blue"></div>
+                            Blue
+                        </button>
+
+                        <button class="border-option"
+                                data-isbn-border="green">
+                            <div class="border-sample sample-green"></div>
+                            Green
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <button class="btn primary"
+                        id="generateISBNPDF">
+                    📄 Generate ISBN PDF
+                </button>
+
+
+            </section>
+
+
+            <!-- =================================================
+                 ADDRESS
+            ================================================= -->
+
+            <section class="section"
+                     id="section-address">
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>📍 Address</span>
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>From Address</label>
+
+                        <textarea
+                            id="fromAddress"
+                            placeholder="From address"></textarea>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>To Address</label>
+
+                        <textarea
+                            id="toAddress"
+                            placeholder="To address"></textarea>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>Email</label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            placeholder="example@email.com">
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>🔤 Address Font</span>
+                    </div>
+
+
+                    <div class="grid-2">
+
+                        <div class="field">
+
+                            <label>Font</label>
+
+                            <select id="addressFont">
+
+                                <option>Arial</option>
+                                <option>Helvetica</option>
+                                <option>Times New Roman</option>
+                                <option>Georgia</option>
+                                <option>Verdana</option>
+                                <option>Tahoma</option>
+                                <option>Courier New</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Font Size</label>
+
+                            <select id="addressFontSize">
+
+                                <option value="10">10</option>
+                                <option value="12">12</option>
+                                <option value="14" selected>14</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                                <option value="20">20</option>
+                                <option value="24">24</option>
+                                <option value="28">28</option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-title">
+                        <span>▣ Address Border</span>
+                    </div>
+
+
+                    <div class="border-grid">
+
+                        <button class="border-option active"
+                                data-address-border="solid">
+                            <div class="border-sample sample-solid"></div>
+                            Solid
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="double">
+                            <div class="border-sample sample-double"></div>
+                            Double
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="dashed">
+                            <div class="border-sample sample-dashed"></div>
+                            Dashed
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="dotted">
+                            <div class="border-sample sample-dotted"></div>
+                            Dotted
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="groove">
+                            <div class="border-sample sample-groove"></div>
+                            Groove
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="ridge">
+                            <div class="border-sample sample-ridge"></div>
+                            Ridge
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="inset">
+                            <div class="border-sample sample-inset"></div>
+                            Inset
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="outset">
+                            <div class="border-sample sample-outset"></div>
+                            Outset
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="shadow">
+                            <div class="border-sample sample-shadow"></div>
+                            Shadow
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="rounded">
+                            <div class="border-sample sample-rounded"></div>
+                            Rounded
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="blue">
+                            <div class="border-sample sample-blue"></div>
+                            Blue
+                        </button>
+
+                        <button class="border-option"
+                                data-address-border="green">
+                            <div class="border-sample sample-green"></div>
+                            Green
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="qr-grid">
+
+                    <div class="qr-card">
+
+                        <strong>
+                            📍 Address QR
+                        </strong>
+
+                        <div id="addressQR"></div>
+
+                        <button class="btn"
+                                id="addressQRBtn">
+                            Generate QR
+                        </button>
+
+                    </div>
+
+
+                    <div class="qr-card">
+
+                        <strong>
+                            ✉️ Email QR
+                        </strong>
+
+                        <div id="emailQR"></div>
+
+                        <button class="btn"
+                                id="emailQRBtn">
+                            Generate QR
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <br>
+
+                <button class="btn primary"
+                        id="generateAddressPDF">
+                    📄 Generate Address PDF
+                </button>
+
+
+            </section>
+
+
+        </div>
+
+
+        <!-- =================================================
+             RIGHT PREVIEW
+        ================================================= -->
+
+        <div class="preview-panel">
+
+            <div class="card">
+
+                <div class="preview-toolbar">
+
+                    <strong>
+                        👁️ Live Page Preview
+                    </strong>
+
+                    <span class="live-badge">
+                        <span class="live-dot"></span>
+                        LIVE
+                    </span>
+
+                </div>
+
+
+                <div class="preview-canvas">
+
+                    <div class="paper"
+                         id="paper">
+
+
+                        <!-- COCO LABEL -->
+
+                        <div class="label"
+                             id="labelPreview">
+
+                            <div class="preview-po"
+                                 id="previewPO">
+                                ABC123
+                            </div>
+
+
+                            <div class="preview-box"
+                                 id="previewBox">
+                                BOX NO. 1
+                            </div>
+
+
+                            <div class="combined-preview"
+                                 id="combinedPreview">
+                                ABC123 — BOX NO. 1
+                            </div>
+
+                        </div>
+
+
+                        <!-- OTHER -->
+
+                        <div id="otherPreview"
+                             style="
+                             display:none;
+                             width:90%;
+                             min-height:180px;
+                             align-items:center;
+                             justify-content:center;
+                             text-align:center;
+                             font-size:20px;
+                             font-weight:bold;
+                             ">
+                            ABC123
+                        </div>
+
+
+                        <!-- ISBN -->
+
+                        <div class="isbn-preview"
+                             id="isbnPreview"
+                             style="display:none;">
+
+                            <div class="isbn-title"
+                                 id="isbnTitlePreview">
+                                Book Title
+                            </div>
+
+                            <svg id="isbnBarcode"></svg>
+
+                            <div class="isbn-number"
+                                 id="isbnNumberPreview">
+                                ISBN
+                            </div>
+
+                        </div>
+
+
+                        <!-- ADDRESS -->
+
+                        <div id="addressPreview"
+                             style="
+                             display:none;
+                             width:90%;
+                             min-height:220px;
+                             padding:18px;
+                             border:2px solid #222;
+                             background:#fff;
+                             ">
+
+                            <div>
+                                <strong>FROM</strong>
+                                <div id="fromPreview">
+                                    FROM ADDRESS
+                                </div>
+                            </div>
+
+                            <br>
+
+                            <div>
+                                <strong>TO</strong>
+                                <div id="toPreview">
+                                    TO ADDRESS
+                                </div>
+                            </div>
+
+                            <br>
+
+                            <div id="emailPreview"></div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="footer">
+
         <div>
-            <h2>Ordering 500+ rolls? Get a bulk quote in 24 hours.</h2>
-            <p>Or drop your email for restock alerts and new material drops.</p>
+            Created &amp; Developed by
+            <strong>Ashish Verma</strong>
         </div>
-        <form class="cta-form">
-            <input type="email" placeholder="you@company.com" aria-label="Email address">
-            <button type="submit">Get Quote</button>
-        </form>
-    </div>
-</section>
 
-<div class="hazard" role="presentation"></div>
+        <div>
+            © 2026 Ashish Verma. All Rights Reserved.
+        </div>
 
-<!-- ============ FOOTER ============ -->
-<footer class="site-footer">
-    <div class="wrap footer-grid">
-        <div class="footer-brand">
-            <a href="#top" class="logo" style="color:var(--white);"><span class="mark">IM</span>IRON<span>MARK</span></a>
-            <p>Industrial and commercial label supply — blank stock, custom print, and regulated hazmat labeling, shipped from our own facility.</p>
-            <div class="socials">
-                <a href="#" aria-label="Facebook">f</a>
-                <a href="#" aria-label="Instagram">ig</a>
-                <a href="#" aria-label="LinkedIn">in</a>
-            </div>
-        </div>
-        <div>
-            <h4>Shop</h4>
-            <ul>
-                <li><a href="#categories">Blank Labels</a></li>
-                <li><a href="#categories">Custom Labels</a></li>
-                <li><a href="#categories">Waterproof &amp; Poly</a></li>
-                <li><a href="#categories">Hazmat &amp; DOT</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4>Resources</h4>
-            <ul>
-                <li><a href="#process">Design Templates</a></li>
-                <li><a href="#">Material Guide</a></li>
-                <li><a href="#">Size Chart</a></li>
-                <li><a href="#">Compliance Info</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4>Company</h4>
-            <ul>
-                <li><a href="#">About Ironmark</a></li>
-                <li><a href="#industries">Industries Served</a></li>
-                <li><a href="#reviews">Reviews</a></li>
-                <li><a href="#">Careers</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4>Support</h4>
-            <ul>
-                <li><a href="#">Live Chat</a></li>
-                <li><a href="#">1-888-575-2235</a></li>
-                <li><a href="#quote">Bulk Quote</a></li>
-                <li><a href="#">Track Order</a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="wrap footer-bottom">
-        <span>&copy; 2026 Ironmark Labels. All rights reserved.</span>
-        <div class="legal-links">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">Shipping Policy</a>
-        </div>
-    </div>
-</footer>
+    </footer>
 
-<button class="top-btn" id="topBtn" aria-label="Back to top">&uarr;</button>
+</main>
+
+
+<!-- =======================================================
+     TOAST
+======================================================= -->
+
+<div class="toast"
+     id="toast">
+
+    <span id="toastText">
+        Done
+    </span>
+
+</div>
+
 
 <script>
-(function(){
-    "use strict";
+"use strict";
 
-    var topBtn = document.getElementById("topBtn");
+/* =========================================================
+   STATE
+========================================================= */
 
-    window.addEventListener("scroll", function(){
-        if(window.scrollY > 500){
-            topBtn.classList.add("show");
-        }else{
-            topBtn.classList.remove("show");
+const state = {
+
+    section:"coco",
+
+    mode:"manual",
+
+    poBorder:"solid",
+    boxBorder:"solid",
+    combinedBorder:"solid",
+
+    otherBorder:"solid",
+    isbnBorder:"solid",
+    addressBorder:"solid",
+
+    history:[],
+    historyIndex:-1,
+
+    copiedStyle:null
+
+};
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = id =>
+    document.getElementById(id);
+
+const $$ = selector =>
+    Array.from(
+        document.querySelectorAll(selector)
+    );
+
+
+function numberValue(
+    id,
+    fallback=0
+){
+
+    const el = $(id);
+
+    if(!el){
+        return fallback;
+    }
+
+    const n =
+        Number(el.value);
+
+    return Number.isFinite(n)
+        ? n
+        : fallback;
+
+}
+
+
+function escapeHTML(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function toast(
+    message,
+    type="green"
+){
+
+    const box =
+        $("toast");
+
+    const text =
+        $("toastText");
+
+    if(!box){
+        return;
+    }
+
+    if(text){
+        text.textContent =
+            message;
+    }
+
+    box.className =
+        "toast " +
+        type +
+        " show";
+
+    clearTimeout(
+        toast.timer
+    );
+
+    toast.timer =
+        setTimeout(
+            ()=>{
+                box.classList.remove(
+                    "show"
+                );
+            },
+            2600
+        );
+
+}
+
+
+/* =========================================================
+   DYNAMIC LIBRARY LOADER
+========================================================= */
+
+const CDN = {
+
+    xlsx:[
+        "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+        "https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"
+    ],
+
+    qrcode:[
+        "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js",
+        "https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js"
+    ],
+
+    barcode:[
+        "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js",
+        "https://unpkg.com/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
+    ],
+
+    jspdf:[
+        "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
+        "https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"
+    ]
+
+};
+
+
+function libraryReady(
+    name
+){
+
+    if(name==="xlsx"){
+        return typeof XLSX !== "undefined";
+    }
+
+    if(name==="qrcode"){
+        return typeof QRCode !== "undefined";
+    }
+
+    if(name==="barcode"){
+        return typeof JsBarcode !== "undefined";
+    }
+
+    if(name==="jspdf"){
+        return !!(
+            window.jspdf &&
+            window.jspdf.jsPDF
+        );
+    }
+
+    return false;
+
+}
+
+
+function loadScript(
+    src
+){
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            const script =
+                document.createElement(
+                    "script"
+                );
+
+            script.src =
+                src;
+
+            script.onload =
+                ()=>resolve();
+
+            script.onerror =
+                ()=>reject();
+
+            document.head.appendChild(
+                script
+            );
+
         }
-    });
+    );
 
-    topBtn.addEventListener("click", function(){
-        window.scrollTo({ top:0, behavior:"smooth" });
-    });
+}
 
-    document.querySelectorAll('.nav-row a[href^="#"]').forEach(function(link){
-        link.addEventListener("click", function(){
-            document.querySelectorAll(".nav-row a").forEach(function(a){ a.classList.remove("active"); });
-            link.classList.add("active");
-        });
-    });
 
-    var forms = document.querySelectorAll(".cta-form, .search-bar");
-    forms.forEach(function(form){
-        form.addEventListener("submit", function(e){
-            e.preventDefault();
-        });
-    });
+async function ensureLibrary(
+    name
+){
 
-})();
+    if(libraryReady(name)){
+        return true;
+    }
+
+    for(
+        const src of
+        (CDN[name] || [])
+    ){
+
+        try{
+
+            await loadScript(src);
+
+            if(
+                libraryReady(name)
+            ){
+
+                return true;
+
+            }
+
+        }catch(e){
+
+            console.warn(
+                "Library failed:",
+                src
+            );
+
+        }
+
+    }
+
+    return false;
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+$$(".nav-btn")
+.forEach(
+    button=>{
+
+        button.addEventListener(
+            "click",
+            ()=>{
+
+                state.section =
+                    button.dataset.section;
+
+                $$(".nav-btn")
+                .forEach(
+                    b=>
+                        b.classList.toggle(
+                            "active",
+                            b===button
+                        )
+                );
+
+                $$(".section")
+                .forEach(
+                    section=>
+                        section.classList.toggle(
+                            "active",
+                            section.id ===
+                            "section-" +
+                            state.section
+                        )
+                );
+
+                updatePreview();
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   COCO MODE
+========================================================= */
+
+$$(".mode-btn")
+.forEach(
+    button=>{
+
+        button.addEventListener(
+            "click",
+            ()=>{
+
+                state.mode =
+                    button.dataset.mode;
+
+                $$(".mode-btn")
+                .forEach(
+                    b=>
+                        b.classList.toggle(
+                            "active",
+                            b===button
+                        )
+                );
+
+                $$(".mode-panel")
+                .forEach(
+                    panel=>{
+                        panel.style.display =
+                            "none";
+                    }
+                );
+
+                const panel =
+                    $("mode-" +
+                      state.mode);
+
+                if(panel){
+                    panel.style.display =
+                        "block";
+                }
+
+                applyFreezeState();
+
+                updatePreview();
+
+                toast(
+                    state.mode === "combined"
+                        ? "Combined mode enabled"
+                        : state.mode === "manual"
+                            ? "Manual mode enabled"
+                            : "Excel mode enabled",
+                    "green"
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   FREEZE LOGIC
+========================================================= */
+
+function applyFreezeState(){
+
+    const freeze =
+        state.mode === "combined";
+
+
+    [
+        "poSettingsCard",
+        "boxSettingsCard",
+        "poBorderCard",
+        "boxBorderCard"
+    ]
+    .forEach(
+        id=>{
+
+            const card =
+                $(id);
+
+            if(!card){
+                return;
+            }
+
+            card.classList.toggle(
+                "frozen",
+                freeze
+            );
+
+            card.querySelectorAll(
+                "input,select,button"
+            )
+            .forEach(
+                element=>{
+                    element.disabled =
+                        freeze;
+                }
+            );
+
+        }
+    );
+
+
+    const combinedCard =
+        $("combinedInput");
+
+    if(combinedCard){
+
+        combinedCard.disabled =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   BORDER STYLE HELPERS
+========================================================= */
+
+function cssBorder(
+    style
+){
+
+    const styles = {
+
+        solid:"solid",
+        double:"double",
+        dashed:"dashed",
+        dotted:"dotted",
+        groove:"groove",
+        ridge:"ridge",
+        inset:"inset",
+        outset:"outset",
+        thin:"solid",
+        medium:"solid",
+        thick:"solid",
+        blue:"solid",
+        red:"solid",
+        green:"solid",
+        gray:"solid",
+        shadow:"solid",
+        softshadow:"solid",
+        rounded:"solid",
+        "double-rounded":"double",
+        "groove-thick":"groove",
+        "ridge-thick":"ridge",
+        "inset-thick":"inset",
+        "outset-thick":"outset",
+        "double-thick":"double"
+
+    };
+
+    return styles[style] ||
+        "solid";
+
+}
+
+
+function borderWidth(
+    style
+){
+
+    if(style==="thin"){
+        return 1;
+    }
+
+    if(style==="medium"){
+        return 3;
+    }
+
+    if(style==="thick"){
+        return 5;
+    }
+
+    if(
+        style==="groove-thick" ||
+        style==="ridge-thick" ||
+        style==="inset-thick" ||
+        style==="outset-thick"
+    ){
+        return 6;
+    }
+
+    if(style==="double-thick"){
+        return 6;
+    }
+
+    return numberValue(
+        "borderWidth",
+        2
+    );
+
+}
+
+
+function borderColor(
+    style
+){
+
+    if(style==="blue"){
+        return "#2563eb";
+    }
+
+    if(style==="red"){
+        return "#dc2626";
+    }
+
+    if(style==="green"){
+        return "#16a34a";
+    }
+
+    if(style==="gray"){
+        return "#64748b";
+    }
+
+    return $("borderColor")
+        ? $("borderColor").value
+        : "#222222";
+
+}
+
+
+/* =========================================================
+   APPLY PO BORDER
+========================================================= */
+
+function applyPOBorder(){
+
+    const element =
+        $("previewPO");
+
+    if(!element){
+        return;
+    }
+
+    const style =
+        state.poBorder;
+
+    element.style.border =
+        `${borderWidth(style)}px ` +
+        `${cssBorder(style)} ` +
+        `${borderColor(style)}`;
+
+    element.style.padding =
+        "4px 8px";
+
+    element.style.borderRadius =
+        style.includes("rounded")
+            ? "8px"
+            : "0";
+
+    element.style.boxShadow =
+        style==="shadow"
+            ? "4px 4px 0 #aaa"
+            : style==="softshadow"
+                ? "0 3px 8px rgba(0,0,0,.22)"
+                : "none";
+
+}
+
+
+/* =========================================================
+   APPLY BOX BORDER
+========================================================= */
+
+function applyBoxBorder(){
+
+    const element =
+        $("previewBox");
+
+    if(!element){
+        return;
+    }
+
+    const style =
+        state.boxBorder;
+
+    element.style.border =
+        `${borderWidth(style)}px ` +
+        `${cssBorder(style)} ` +
+        `${borderColor(style)}`;
+
+    element.style.padding =
+        "4px 8px";
+
+    element.style.borderRadius =
+        style.includes("rounded")
+            ? "8px"
+            : "0";
+
+    element.style.boxShadow =
+        style==="shadow"
+            ? "4px 4px 0 #aaa"
+            : style==="softshadow"
+                ? "0 3px 8px rgba(0,0,0,.22)"
+                : "none";
+
+}
+
+
+/* =========================================================
+   COMBINED BORDER
+========================================================= */
+
+function applyCombinedBorder(){
+
+    const label =
+        $("labelPreview");
+
+    if(!label){
+        return;
+    }
+
+    const style =
+        state.combinedBorder;
+
+    label.style.border =
+        `${borderWidth(style)}px ` +
+        `${cssBorder(style)} ` +
+        `${borderColor(style)}`;
+
+    label.style.borderRadius =
+        style.includes("rounded")
+            ? "8px"
+            : "0";
+
+    label.style.boxShadow =
+        style==="shadow"
+            ? "5px 5px 0 #aaa"
+            : style==="softshadow"
+                ? "0 4px 10px rgba(0,0,0,.2)"
+                : "none";
+
+}
+
+
+/* =========================================================
+   BORDER BUTTONS
+========================================================= */
+
+$$("[data-po-border]")
+.forEach(
+    button=>{
+
+        button.addEventListener(
+            "click",
+            ()=>{
+
+                state.poBorder =
+                    button.dataset.poBorder;
+
+                $$("#poBorderGrid .border-option")
+                .forEach(
+                    b=>
+                        b.classList.toggle(
+                            "active",
+                            b===button
+                        )
+                );
+
+                applyPOBorder();
+
+                updatePreview();
+
+            }
+        );
+
+    }
+);
+
+
+$$("[data-box-border]")
+.forEach(
+    button=>{
+
+        button.addEventListener(
+            "click",
+            ()=>{
+
+                state.boxBorder =
+                    button.dataset.boxBorder;
+
+                $$("#boxBorderGrid .border-option")
+                .forEach(
+                    b=>
+                        b.classList.toggle(
+                            "active",
+                            b===button
+                        )
+                );
+
+                applyBoxBorder();
+
+                updatePreview();
+
+            }
+        );
+
+    }
+);
+
+
+$$("[data-combined-border]")
+.forEach(
+    button=>{
+
+        button.addEventListener(
+            "click",
+            ()=>{
+
+                state.combinedBorder =
+                    button.dataset.combinedBorder;
+
+                $$("[data-combined-border]")
+                .forEach(
+                    b=>
+                        b.classList.toggle(
+                            "active",
+                            b===button
+                        )
+                );
+
+                applyCombinedBorder();
+
+                updatePreview();
+
+            }
+        );
+
+    }
+);
+
+
+$$("[data-other-border]")
+.forEach(
+    button=>{
+
+        button.addEventListener(
+            "click",
+            ()=>{
+
+                state.otherBorder =
+                    button.dataset.otherBorder;
+
+                $$("#section-other .border-option")
+                .forEach(
+                    b=>
+                        b.classList.toggle(
+                            "active",
+                            b===button
+                        )
+                );
+
+                updatePreview();
+
+            }
+        );
+
+    }
+);
+
+
+$$("[data-isbn-border]")
+.forEach(
+    button=>{
+
+        button.addEventListener(
+            "click",
+            ()=>{
+
+                state.isbnBorder =
+                    button.dataset.isbnBorder;
+
+                $$("#section-isbn .border-option")
+                .forEach(
+                    b=>
+                        b.classList.toggle(
+                            "active",
+                            b===button
+                        )
+                );
+
+                updatePreview();
+
+            }
+        );
+
+    }
+);
+
+
+$$("[data-address-border]")
+.forEach(
+    button=>{
+
+        button.addEventListener(
+            "click",
+            ()=>{
+
+                state.addressBorder =
+                    button.dataset.addressBorder;
+
+                $$("#section-address .border-option")
+                .forEach(
+                    b=>
+                        b.classList.toggle(
+                            "active",
+                            b===button
+                        )
+                );
+
+                updatePreview();
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   EXCEL
+========================================================= */
+
+$("excelInput")
+.addEventListener(
+    "change",
+    async event=>{
+
+        const file =
+            event.target.files[0];
+
+        if(!file){
+            return;
+        }
+
+        const ready =
+            await ensureLibrary("xlsx");
+
+        if(!ready){
+
+            toast(
+                "Excel library could not be loaded",
+                "red"
+            );
+
+            return;
+        }
+
+        try{
+
+            const buffer =
+                await file.arrayBuffer();
+
+            const workbook =
+                XLSX.read(
+                    buffer,
+                    {
+                        type:"array"
+                    }
+                );
+
+            const sheet =
+                workbook.Sheets[
+                    workbook.SheetNames[0]
+                ];
+
+            const rows =
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    {
+                        header:1,
+                        defval:""
+                    }
+                );
+
+            if(!rows.length){
+
+                toast(
+                    "Excel file is empty",
+                    "red"
+                );
+
+                return;
+            }
+
+
+            /*
+              IMPORTANT:
+              FIRST ROW = HEADER
+              FIRST ROW IS NOT PO DATA.
+            */
+
+            const header =
+                rows[0];
+
+            const data =
+                rows.slice(1);
+
+
+            renderExcel(
+                header,
+                data
+            );
+
+
+            if(data.length){
+
+                $("poInput").value =
+                    String(
+                        data[0][0] || ""
+                    );
+
+            }
+
+
+            updatePreview();
+
+
+            toast(
+                "Excel loaded. First row used as header and ignored.",
+                "green"
+            );
+
+        }catch(error){
+
+            console.error(error);
+
+            toast(
+                "Excel could not be read",
+                "red"
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   EXCEL PREVIEW
+========================================================= */
+
+function renderExcel(
+    header,
+    rows
+){
+
+    const container =
+        $("excelPreview");
+
+    let html =
+        "<table><thead><tr>";
+
+    header.forEach(
+        cell=>{
+            html +=
+                "<th>" +
+                escapeHTML(cell) +
+                "</th>";
+        }
+    );
+
+    html +=
+        "</tr></thead><tbody>";
+
+    rows.slice(0,100)
+    .forEach(
+        row=>{
+
+            html +=
+                "<tr>";
+
+            header.forEach(
+                (_,index)=>{
+
+                    html +=
+                        "<td>" +
+                        escapeHTML(
+                            row[index] ?? ""
+                        ) +
+                        "</td>";
+
+                }
+            );
+
+            html +=
+                "</tr>";
+
+        }
+    );
+
+    html +=
+        "</tbody></table>";
+
+    container.innerHTML =
+        html;
+
+}
+
+
+/* =========================================================
+   QR
+========================================================= */
+
+async function generateQR(
+    containerId,
+    value
+){
+
+    const container =
+        $(containerId);
+
+    if(!container){
+        return;
+    }
+
+    if(!value.trim()){
+
+        toast(
+            "QR data is empty",
+            "red"
+        );
+
+        return;
+    }
+
+    const ready =
+        await ensureLibrary(
+            "qrcode"
+        );
+
+    if(!ready){
+
+        toast(
+            "QR library could not be loaded",
+            "red"
+        );
+
+        return;
+    }
+
+    container.innerHTML = "";
+
+    try{
+
+        const canvas =
+            document.createElement(
+                "canvas"
+            );
+
+        container.appendChild(
+            canvas
+        );
+
+        await QRCode.toCanvas(
+            canvas,
+            value,
+            {
+                width:140,
+                margin:2
+            }
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        toast(
+            "QR generation failed",
+            "red"
+        );
+
+    }
+
+}
+
+
+$("addressQRBtn")
+.addEventListener(
+    "click",
+    ()=>{
+
+        const value =
+            [
+                $("fromAddress").value,
+                $("toAddress").value
+            ]
+            .filter(Boolean)
+            .join("\n");
+
+        generateQR(
+            "addressQR",
+            value
+        );
+
+    }
+);
+
+
+$("emailQRBtn")
+.addEventListener(
+    "click",
+    ()=>{
+
+        const email =
+            $("email").value.trim();
+
+        generateQR(
+            "emailQR",
+            "mailto:" + email
+        );
+
+    }
+);
+
+
+/* =========================================================
+   ISBN BARCODE
+========================================================= */
+
+async function updateISBN(){
+
+    const isbn =
+        $("isbn").value.trim();
+
+    $("isbnTitlePreview")
+        .textContent =
+        $("bookTitle").value ||
+        "Book Title";
+
+    $("isbnNumberPreview")
+        .textContent =
+        isbn ||
+        "ISBN";
+
+    if(!isbn){
+        $("isbnBarcode").innerHTML="";
+        return;
+    }
+
+    const ready =
+        await ensureLibrary(
+            "barcode"
+        );
+
+    if(!ready){
+        return;
+    }
+
+    try{
+
+        JsBarcode(
+            "#isbnBarcode",
+            isbn,
+            {
+                format:"auto",
+                width:1.4,
+                height:50,
+                displayValue:true,
+                margin:4
+            }
+        );
+
+    }catch(error){
+
+        console.warn(
+            "Barcode error",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+function updatePreview(){
+
+    const section =
+        state.section;
+
+
+    /* -----------------------------------------
+       COCO
+    ----------------------------------------- */
+
+    if(section==="coco"){
+
+        $("labelPreview")
+            .style.display =
+            "flex";
+
+        $("otherPreview")
+            .style.display =
+            "none";
+
+        $("isbnPreview")
+            .style.display =
+            "none";
+
+        $("addressPreview")
+            .style.display =
+            "none";
+
+
+        let po =
+            $("poInput").value.trim() ||
+            "ABC123";
+
+        let box =
+            numberValue(
+                "boxInput",
+                1
+            );
+
+
+        const showPO =
+            $("showPO").checked;
+
+        const showBox =
+            $("showBox").checked;
+
+
+        $("previewPO")
+            .textContent =
+            po;
+
+
+        $("previewBox")
+            .textContent =
+            "BOX NO. " +
+            box;
+
+
+        $("previewPO")
+            .style.display =
+            showPO
+                ? "block"
+                : "none";
+
+
+        $("previewBox")
+            .style.display =
+            showBox
+                ? "block"
+                : "none";
+
+
+        /* -----------------------------------
+           COMBINED
+        ----------------------------------- */
+
+        if(state.mode==="combined"){
+
+            $("previewPO")
+                .style.display =
+                "none";
+
+            $("previewBox")
+                .style.display =
+                "none";
+
+            $("combinedPreview")
+                .classList.add(
+                    "show"
+                );
+
+            $("combinedPreview")
+                .textContent =
+                $("combinedInput")
+                    .value.trim() ||
+                `${po} — BOX NO. ${box}`;
+
+            applyCombinedBorder();
+
+        }else{
+
+            $("combinedPreview")
+                .classList.remove(
+                    "show"
+                );
+
+            applyPOBorder();
+            applyBoxBorder();
+
+        }
+
+
+        /* FONT */
+
+        $("previewPO")
+            .style.fontFamily =
+            $("poFont").value;
+
+        $("previewPO")
+            .style.fontSize =
+            numberValue(
+                "poFontSize",
+                26
+            ) + "px";
+
+        $("previewPO")
+            .style.fontWeight =
+            $("poBold").checked
+                ? "bold"
+                : "normal";
+
+        $("previewPO")
+            .style.fontStyle =
+            $("poItalic").checked
+                ? "italic"
+                : "normal";
+
+        $("previewPO")
+            .style.textDecoration =
+            $("poUnderline").checked
+                ? "underline"
+                : "none";
+
+
+        $("previewBox")
+            .style.fontFamily =
+            $("boxFont").value;
+
+        $("previewBox")
+            .style.fontSize =
+            numberValue(
+                "boxFontSize",
+                20
+            ) + "px";
+
+        $("previewBox")
+            .style.fontWeight =
+            $("boxBold").checked
+                ? "bold"
+                : "normal";
+
+        $("previewBox")
+            .style.fontStyle =
+            $("boxItalic").checked
+                ? "italic"
+                : "normal";
+
+    }
+
+
+    /* -----------------------------------------
+       OTHER
+    ----------------------------------------- */
+
+    if(section==="other"){
+
+        $("labelPreview")
+            .style.display =
+            "none";
+
+        $("otherPreview")
+            .style.display =
+            "flex";
+
+        $("isbnPreview")
+            .style.display =
+            "none";
+
+        $("addressPreview")
+            .style.display =
+            "none";
+
+
+        const firstPO =
+            $("otherPO")
+                .value
+                .split(/\r?\n/)
+                .map(x=>x.trim())
+                .filter(Boolean)[0]
+            || "ABC123";
+
+
+        $("otherPreview")
+            .textContent =
+            firstPO;
+
+
+        $("otherPreview")
+            .style.fontFamily =
+            $("otherFont").value;
+
+        $("otherPreview")
+            .style.fontSize =
+            numberValue(
+                "otherFontSize",
+                20
+            ) + "px";
+
+
+        $("otherPreview")
+            .style.border =
+            `${borderWidth(state.otherBorder)}px ` +
+            `${cssBorder(state.otherBorder)} ` +
+            `${borderColor(state.otherBorder)}`;
+
+
+        $("otherPreview")
+            .style.borderRadius =
+            state.otherBorder
+                .includes("rounded")
+                ? "8px"
+                : "0";
+
+    }
+
+
+    /* -----------------------------------------
+       ISBN
+    ----------------------------------------- */
+
+    if(section==="isbn"){
+
+        $("labelPreview")
+            .style.display =
+            "none";
+
+        $("otherPreview")
+            .style.display =
+            "none";
+
+        $("isbnPreview")
+            .style.display =
+            "flex";
+
+        $("addressPreview")
+            .style.display =
+            "none";
+
+
+        $("isbnPreview")
+            .style.border =
+            `${borderWidth(state.isbnBorder)}px ` +
+            `${cssBorder(state.isbnBorder)} ` +
+            `${borderColor(state.isbnBorder)}`;
+
+
+        $("isbnPreview")
+            .style.borderRadius =
+            state.isbnBorder
+                .includes("rounded")
+                ? "8px"
+                : "0";
+
+
+        $("isbnPreview")
+            .style.fontFamily =
+            $("isbnFont").value;
+
+        $("isbnPreview")
+            .style.fontSize =
+            numberValue(
+                "isbnFontSize",
+                16
+            ) + "px";
+
+
+        updateISBN();
+
+    }
+
+
+    /* -----------------------------------------
+       ADDRESS
+    ----------------------------------------- */
+
+    if(section==="address"){
+
+        $("labelPreview")
+            .style.display =
+            "none";
+
+        $("otherPreview")
+            .style.display =
+            "none";
+
+        $("isbnPreview")
+            .style.display =
+            "none";
+
+        $("addressPreview")
+            .style.display =
+            "block";
+
+
+        $("addressPreview")
+            .style.border =
+            `${borderWidth(state.addressBorder)}px ` +
+            `${cssBorder(state.addressBorder)} ` +
+            `${borderColor(state.addressBorder)}`;
+
+
+        $("addressPreview")
+            .style.borderRadius =
+            state.addressBorder
+                .includes("rounded")
+                ? "8px"
+                : "0";
+
+
+        $("addressPreview")
+            .style.fontFamily =
+            $("addressFont").value;
+
+        $("addressPreview")
+            .style.fontSize =
+            numberValue(
+                "addressFontSize",
+                14
+            ) + "px";
+
+
+        $("fromPreview")
+            .textContent =
+            $("fromAddress").value ||
+            "FROM ADDRESS";
+
+
+        $("toPreview")
+            .textContent =
+            $("toAddress").value ||
+            "TO ADDRESS";
+
+
+        $("emailPreview")
+            .textContent =
+            $("email").value
+                ? "Email: " +
+                  $("email").value
+                : "";
+
+    }
+
+
+    updatePage();
+
+}
+
+
+/* =========================================================
+   PAGE LIVE PREVIEW
+========================================================= */
+
+function updatePage(){
+
+    const paper =
+        $("paper");
+
+    const size =
+        $("pageSize").value;
+
+
+    let width=380;
+    let height=540;
+
+
+    if(size==="a4"){
+        width=420;
+        height=594;
+    }
+
+    if(size==="a5"){
+        width=350;
+        height=495;
+    }
+
+    if(size==="letter"){
+        width=420;
+        height=545;
+    }
+
+    if(
+        $("orientation").value ===
+        "landscape"
+    ){
+
+        [width,height] =
+        [height,width];
+
+    }
+
+
+    paper.style.width =
+        width + "px";
+
+    paper.style.minHeight =
+        height + "px";
+
+
+    const count =
+        Number(
+            $("labelsPerPage").value
+        );
+
+
+    if(count>1){
+
+        paper.style.display =
+            "grid";
+
+        const columns =
+            count<=2
+                ? 1
+                : count<=6
+                    ? 2
+                    : 3;
+
+        paper.style.gridTemplateColumns =
+            `repeat(${columns},1fr)`;
+
+        paper.style.gap =
+            "6px";
+
+        $("labelPreview")
+            .style.width =
+            "100%";
+
+    }else{
+
+        paper.style.display =
+            "flex";
+
+        paper.style.gridTemplateColumns =
+            "";
+
+        paper.style.gap =
+            "";
+
+        $("labelPreview")
+            .style.width =
+            "90%";
+
+    }
+
+}
+
+
+/* =========================================================
+   LIVE EVENTS
+========================================================= */
+
+$$(
+    "input,select,textarea"
+)
+.forEach(
+    element=>{
+
+        element.addEventListener(
+            "input",
+            ()=>{
+
+                updatePreview();
+
+            }
+        );
+
+
+        element.addEventListener(
+            "change",
+            ()=>{
+
+                updatePreview();
+
+                if(
+                    element.type ===
+                    "checkbox"
+                ){
+
+                    toast(
+                        element.checked
+                            ? "Feature Enabled"
+                            : "Feature Disabled",
+                        element.checked
+                            ? "green"
+                            : "red"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   PDF
+========================================================= */
+
+function pdfConstructor(){
+
+    if(
+        window.jspdf &&
+        window.jspdf.jsPDF
+    ){
+
+        return window.jspdf.jsPDF;
+
+    }
+
+    return null;
+
+}
+
+
+async function generatePDF(){
+
+    const PDF =
+        pdfConstructor() ||
+        (
+            await ensureLibrary(
+                "jspdf"
+            ),
+            pdfConstructor()
+        );
+
+
+    if(!PDF){
+
+        toast(
+            "PDF library is not loaded. Check internet connection.",
+            "red"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        let pageSize =
+            $("pageSize").value;
+
+
+        let format =
+            "a4";
+
+
+        if(pageSize==="a5"){
+            format="a5";
+        }
+
+        if(pageSize==="letter"){
+            format="letter";
+        }
+
+        if(pageSize==="4x6"){
+            format=[
+                101.6,
+                152.4
+            ];
+        }
+
+
+        const doc =
+            new PDF({
+                orientation:
+                    $("orientation").value,
+                unit:"mm",
+                format:format
+            });
+
+
+        const pageWidth =
+            doc.internal.pageSize
+                .getWidth();
+
+        const pageHeight =
+            doc.internal.pageSize
+                .getHeight();
+
+
+        const labels =
+            Number(
+                $("labelsPerPage").value
+            );
+
+
+        const columns =
+            labels<=2
+                ? 1
+                : labels<=6
+                    ? 2
+                    : 3;
+
+
+        const rows =
+            Math.ceil(
+                labels/columns
+            );
+
+
+        const margin=8;
+        const gap=4;
+
+
+        const cellWidth =
+            (
+                pageWidth -
+                margin*2 -
+                gap*(columns-1)
+            ) / columns;
+
+
+        const cellHeight =
+            (
+                pageHeight -
+                margin*2 -
+                gap*(rows-1)
+            ) / rows;
+
+
+        let poList=[];
+
+
+        if(state.mode==="excel"){
+
+            poList =
+                $("excelPreview")
+                    .querySelectorAll(
+                        "tbody tr"
+                    );
+
+
+            const values=[];
+
+            poList.forEach(
+                row=>{
+
+                    const first =
+                        row
+                            .querySelector(
+                                "td"
+                            );
+
+                    if(first){
+                        values.push(
+                            first.textContent
+                        );
+                    }
+
+                }
+            );
+
+            poList =
+                values;
+
+        }else{
+
+            poList=[
+                $("poInput")
+                    .value.trim()
+                ||
+                "ABC123"
+            ];
+
+        }
+
+
+        if(
+            !poList.length
+        ){
+
+            poList=[
+                "ABC123"
+            ];
+
+        }
+
+
+        const startBox =
+            numberValue(
+                "boxInput",
+                1
+            );
+
+
+        const total =
+            Math.max(
+                poList.length,
+                labels
+            );
+
+
+        for(
+            let i=0;
+            i<total;
+            i++
+        ){
+
+            if(
+                i>0 &&
+                i%labels===0
+            ){
+
+                doc.addPage();
+
+            }
+
+
+            const slot =
+                i%labels;
+
+
+            const row =
+                Math.floor(
+                    slot/columns
+                );
+
+
+            const column =
+                slot%columns;
+
+
+            const x =
+                margin +
+                column*
+                (
+                    cellWidth+
+                    gap
+                );
+
+
+            const y =
+                margin +
+                row*
+                (
+                    cellHeight+
+                    gap
+                );
+
+
+            let border =
+                state.poBorder;
+
+
+            if(
+                state.mode==="combined"
+            ){
+
+                border =
+                    state.combinedBorder;
+
+            }
+
+
+            const color =
+                borderColor(border);
+
+
+            const rgb =
+                color
+                    .replace("#","")
+                    .match(/.{2}/g)
+                    .map(
+                        x=>parseInt(
+                            x,
+                            16
+                        )
+                    );
+
+
+            doc.setDrawColor(
+                ...rgb
+            );
+
+
+            doc.setLineWidth(
+                Math.max(
+                    .2,
+                    borderWidth(
+                        border
+                    )*.25
+                )
+            );
+
+
+            if(
+                border==="dashed"
+            ){
+
+                doc.setLineDashPattern(
+                    [3,2],
+                    0
+                );
+
+            }else if(
+                border==="dotted"
+            ){
+
+                doc.setLineDashPattern(
+                    [1,2],
+                    0
+                );
+
+            }else{
+
+                doc.setLineDashPattern(
+                    [],
+                    0
+                );
+
+            }
+
+
+            doc.rect(
+                x,
+                y,
+                cellWidth,
+                cellHeight
+            );
+
+
+            doc.setLineDashPattern(
+                [],
+                0
+            );
+
+
+            const po =
+                poList[i%poList.length];
+
+
+            doc.setFont(
+                "helvetica",
+                $("poBold").checked
+                    ? "bold"
+                    : "normal"
+            );
+
+
+            doc.setFontSize(
+                Math.max(
+                    7,
+                    numberValue(
+                        "poFontSize",
+                        26
+                    )*.72
+                )
+            );
+
+
+            if(
+                state.mode==="combined"
+            ){
+
+                doc.text(
+                    po +
+                    " — BOX NO. " +
+                    (
+                        startBox+i
+                    ),
+                    x+
+                    cellWidth/2,
+                    y+
+                    cellHeight/2,
+                    {
+                        align:"center",
+                        maxWidth:
+                            cellWidth-8
+                    }
+                );
+
+            }else{
+
+                if(
+                    $("showPO").checked
+                ){
+
+                    doc.text(
+                        po,
+                        x+
+                        cellWidth/2,
+                        y+
+                        cellHeight*.43,
+                        {
+                            align:"center",
+                            maxWidth:
+                                cellWidth-8
+                        }
+                    );
+
+                }
+
+
+                if(
+                    $("showBox").checked
+                ){
+
+                    doc.setFont(
+                        "helvetica",
+                        $("boxBold").checked
+                            ? "bold"
+                            : "normal"
+                    );
+
+
+                    doc.setFontSize(
+                        Math.max(
+                            7,
+                            numberValue(
+                                "boxFontSize",
+                                20
+                            )*.72
+                        )
+                    );
+
+
+                    doc.text(
+                        "BOX NO. " +
+                        (
+                            startBox+i
+                        ),
+                        x+
+                        cellWidth/2,
+                        y+
+                        cellHeight*.62,
+                        {
+                            align:"center",
+                            maxWidth:
+                                cellWidth-8
+                        }
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        doc.save(
+            "Books-Label-Studio.pdf"
+        );
+
+
+        toast(
+            "PDF generated successfully",
+            "green"
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "PDF Error:",
+            error
+        );
+
+        toast(
+            "PDF generation failed: " +
+            error.message,
+            "red"
+        );
+
+    }
+
+}
+
+
+$("generateCocoPDF")
+.addEventListener(
+    "click",
+    generatePDF
+);
+
+
+$("generateOtherPDF")
+.addEventListener(
+    "click",
+    generatePDF
+);
+
+
+$("generateISBNPDF")
+.addEventListener(
+    "click",
+    generatePDF
+);
+
+
+$("generateAddressPDF")
+.addEventListener(
+    "click",
+    generatePDF
+);
+
+
+/* =========================================================
+   QR BUTTONS
+========================================================= */
+
+
+/* Already handled above */
+
+
+/* =========================================================
+   SNAPSHOT
+========================================================= */
+
+function snapshot(){
+
+    const data={};
+
+    $$(
+        "input,select,textarea"
+    )
+    .forEach(
+        element=>{
+
+            if(
+                !element.id ||
+                element.type==="file"
+            ){
+                return;
+            }
+
+            data[element.id] =
+                element.type==="checkbox"
+                    ? element.checked
+                    : element.value;
+
+        }
+    );
+
+
+    data.state =
+        JSON.stringify(
+            state
+        );
+
+
+    return data;
+
+}
+
+
+function restore(
+    data
+){
+
+    if(!data){
+        return;
+    }
+
+
+    Object.keys(data)
+    .forEach(
+        id=>{
+
+            if(id==="state"){
+                return;
+            }
+
+            const element =
+                $(id);
+
+            if(!element){
+                return;
+            }
+
+            if(
+                element.type==="checkbox"
+            ){
+
+                element.checked =
+                    Boolean(
+                        data[id]
+                    );
+
+            }else{
+
+                element.value =
+                    data[id];
+
+            }
+
+        }
+    );
+
+
+    if(data.state){
+
+        try{
+
+            const saved =
+                JSON.parse(
+                    data.state
+                );
+
+            Object.assign(
+                state,
+                saved
+            );
+
+        }catch(e){}
+
+    }
+
+
+    updatePreview();
+
+    applyFreezeState();
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function saveHistory(){
+
+    const current =
+        snapshot();
+
+
+    const previous =
+        state.history[
+            state.historyIndex
+        ];
+
+
+    if(
+        previous &&
+        JSON.stringify(previous)===
+        JSON.stringify(current)
+    ){
+
+        return;
+
+    }
+
+
+    state.history =
+        state.history.slice(
+            0,
+            state.historyIndex+1
+        );
+
+
+    state.history.push(
+        current
+    );
+
+
+    if(
+        state.history.length>40
+    ){
+
+        state.history.shift();
+
+    }
+
+
+    state.historyIndex =
+        state.history.length-1;
+
+}
+
+
+$("undoBtn")
+.addEventListener(
+    "click",
+    ()=>{
+
+        if(
+            state.historyIndex<=0
+        ){
+
+            toast(
+                "Nothing to undo",
+                "orange"
+            );
+
+            return;
+
+        }
+
+
+        state.historyIndex--;
+
+        restore(
+            state.history[
+                state.historyIndex
+            ]
+        );
+
+
+        toast(
+            "Undo applied",
+            "green"
+        );
+
+    }
+);
+
+
+$("redoBtn")
+.addEventListener(
+    "click",
+    ()=>{
+
+        if(
+            state.historyIndex>=
+            state.history.length-1
+        ){
+
+            toast(
+                "Nothing to redo",
+                "orange"
+            );
+
+            return;
+
+        }
+
+
+        state.historyIndex++;
+
+        restore(
+            state.history[
+                state.historyIndex
+            ]
+        );
+
+
+        toast(
+            "Redo applied",
+            "green"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   DEFAULT
+========================================================= */
+
+$("defaultBtn")
+.addEventListener(
+    "click",
+    ()=>{
+
+        if(
+            !confirm(
+                "Reset all settings to default?"
+            )
+        ){
+            return;
+        }
+
+
+        localStorage.removeItem(
+            "BooksLabelStudio"
+        );
+
+
+        location.reload();
+
+    }
+);
+
+
+$("saveDefaultBtn")
+.addEventListener(
+    "click",
+    ()=>{
+
+        localStorage.setItem(
+            "BooksLabelStudio",
+            JSON.stringify(
+                snapshot()
+            )
+        );
+
+
+        toast(
+            "Default settings saved",
+            "green"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   COPY STYLE
+========================================================= */
+
+$("copyStyleBtn")
+.addEventListener(
+    "click",
+    ()=>{
+
+        state.copiedStyle={
+
+            poFont:
+                $("poFont").value,
+
+            poFontSize:
+                $("poFontSize").value,
+
+            boxFont:
+                $("boxFont").value,
+
+            boxFontSize:
+                $("boxFontSize").value,
+
+            poBorder:
+                state.poBorder,
+
+            boxBorder:
+                state.boxBorder,
+
+            combinedBorder:
+                state.combinedBorder,
+
+            borderWidth:
+                $("borderWidth").value,
+
+            borderColor:
+                $("borderColor").value,
+
+            borderRadius:
+                $("borderRadius").value
+
+        };
+
+
+        toast(
+            "Style copied",
+            "green"
+        );
+
+    }
+);
+
+
+$("pasteStyleBtn")
+.addEventListener(
+    "click",
+    ()=>{
+
+        if(!state.copiedStyle){
+
+            toast(
+                "No copied style",
+                "orange"
+            );
+
+            return;
+
+        }
+
+
+        const s =
+            state.copiedStyle;
+
+
+        $("poFont").value =
+            s.poFont;
+
+        $("poFontSize").value =
+            s.poFontSize;
+
+        $("boxFont").value =
+            s.boxFont;
+
+        $("boxFontSize").value =
+            s.boxFontSize;
+
+        $("borderWidth").value =
+            s.borderWidth;
+
+        $("borderColor").value =
+            s.borderColor;
+
+        $("borderRadius").value =
+            s.borderRadius;
+
+
+        state.poBorder =
+            s.poBorder;
+
+        state.boxBorder =
+            s.boxBorder;
+
+        state.combinedBorder =
+            s.combinedBorder;
+
+
+        updatePreview();
+
+
+        toast(
+            "Style pasted",
+            "green"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event=>{
+
+        if(
+            event.ctrlKey &&
+            event.key.toLowerCase()==="z"
+        ){
+
+            event.preventDefault();
+
+            $("undoBtn").click();
+
+        }
+
+
+        if(
+            event.ctrlKey &&
+            event.key.toLowerCase()==="y"
+        ){
+
+            event.preventDefault();
+
+            $("redoBtn").click();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   LOAD SAVED DEFAULT
+========================================================= */
+
+function loadDefault(){
+
+    try{
+
+        const saved =
+            localStorage.getItem(
+                "BooksLabelStudio"
+            );
+
+        if(saved){
+
+            restore(
+                JSON.parse(saved)
+            );
+
+        }
+
+    }catch(error){
+
+        console.warn(
+            "Default load failed",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+async function init(){
+
+    loadDefault();
+
+    applyFreezeState();
+
+    updatePreview();
+
+    saveHistory();
+
+
+    /*
+       Preload libraries without
+       blocking interface.
+    */
+
+    Promise.allSettled([
+
+        ensureLibrary("xlsx"),
+        ensureLibrary("qrcode"),
+        ensureLibrary("barcode"),
+        ensureLibrary("jspdf")
+
+    ])
+    .then(
+        ()=>{
+            updatePreview();
+        }
+    );
+
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    init
+);
+
 </script>
 
 </body>
