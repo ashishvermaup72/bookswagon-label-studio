@@ -2,26 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BooksWagon Label Studio</title>
+<title>BWG BooksWagon Label Studio</title>
 
-<!-- PDF LIBRARY -->
+<!-- Excel reader -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<!-- PDF generator -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 :root{
   --blue:#1769e0;
-  --blue2:#0d55c7;
-  --soft:#eef6ff;
+  --blue-dark:#0b4db3;
+  --blue-soft:#edf5ff;
+  --blue-light:#dcecff;
+  --gold:#f2b84b;
   --green:#16a34a;
   --red:#dc2626;
   --bg:#f4f7fb;
-  --white:#fff;
-  --text:#182230;
+  --card:#ffffff;
+  --text:#172033;
   --muted:#667085;
-  --border:#d9e1ea;
-  --shadow:0 10px 30px rgba(15,23,42,.08);
+  --border:#dce3ec;
+  --shadow:0 12px 35px rgba(15,23,42,.09);
 }
 
 *{
@@ -35,13 +40,10 @@ html{
 body{
   margin:0;
   background:
-    linear-gradient(135deg,#f8fbff,#edf3fa);
+    radial-gradient(circle at top left,#eaf4ff,transparent 35%),
+    linear-gradient(135deg,#f8fbff,#eef3f8);
   color:var(--text);
-  font-family:
-    Inter,
-    "Segoe UI",
-    Arial,
-    sans-serif;
+  font-family:Inter,"Segoe UI",Arial,sans-serif;
 }
 
 button,
@@ -55,241 +57,186 @@ button{
   cursor:pointer;
 }
 
-/* ================= APP ================= */
-
 .app{
   width:min(1500px,100%);
   margin:auto;
-  padding:20px;
+  padding:18px;
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 
 .header{
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  gap:20px;
-
-  padding:20px;
-
-  background:var(--white);
-
+  justify-content:space-between;
+  gap:18px;
+  padding:20px 22px;
+  background:#fff;
   border:1px solid var(--border);
-  border-radius:18px;
-
+  border-radius:20px;
   box-shadow:var(--shadow);
-
-  margin-bottom:16px;
+  margin-bottom:15px;
 }
 
 .brand{
   display:flex;
   align-items:center;
-  gap:13px;
+  gap:14px;
 }
 
 .logo{
-  width:52px;
-  height:52px;
-
+  width:58px;
+  height:58px;
+  border-radius:16px;
   display:grid;
   place-items:center;
-
-  border-radius:14px;
-
-  color:#fff;
-  font-weight:900;
-
+  color:white;
+  font-weight:1000;
+  font-size:14px;
   background:
-    linear-gradient(
-      135deg,
-      var(--blue),
-      #5ba6ff
-    );
-
-  box-shadow:
-    0 8px 22px
-    rgba(23,105,224,.25);
+    linear-gradient(135deg,var(--blue),#4c9cff);
+  box-shadow:0 10px 25px rgba(23,105,224,.25);
 }
 
 .brand h1{
   margin:0;
   font-size:22px;
+  letter-spacing:-.4px;
 }
 
 .brand p{
-  margin:4px 0 0;
+  margin:5px 0 0;
   color:var(--muted);
   font-size:10px;
 }
 
-.status{
+.live-status{
+  display:flex;
+  align-items:center;
+  gap:8px;
   padding:8px 13px;
   border-radius:20px;
-
-  background:var(--soft);
-  color:var(--blue);
-
+  background:#effcf4;
+  color:var(--green);
   font-size:9px;
   font-weight:900;
 }
 
-/* ================= MODULES ================= */
+.live-dot{
+  width:9px;
+  height:9px;
+  background:#22c55e;
+  border-radius:50%;
+  box-shadow:0 0 0 0 rgba(34,197,94,.65);
+  animation:pulseLive 1.25s infinite;
+}
+
+@keyframes pulseLive{
+  0%{
+    transform:scale(.85);
+    box-shadow:0 0 0 0 rgba(34,197,94,.65);
+  }
+  60%{
+    transform:scale(1.18);
+    box-shadow:0 0 0 9px rgba(34,197,94,0);
+  }
+  100%{
+    transform:scale(.85);
+    box-shadow:0 0 0 0 rgba(34,197,94,0);
+  }
+}
+
+/* MODULES */
 
 .modules{
   display:grid;
-  grid-template-columns:
-    repeat(4,1fr);
-
+  grid-template-columns:repeat(4,1fr);
   gap:13px;
-
-  margin-bottom:16px;
+  margin-bottom:15px;
 }
 
 .module{
-  position:relative;
-
   border:1px solid var(--border);
   background:#fff;
-
-  border-radius:15px;
-
-  min-height:105px;
+  border-radius:17px;
   padding:17px;
-
+  min-height:105px;
   display:flex;
   align-items:center;
   gap:12px;
-
   text-align:left;
-
   box-shadow:var(--shadow);
-
-  transition:
-    transform .28s,
-    box-shadow .28s,
-    border-color .28s;
+  transition:.3s cubic-bezier(.16,1,.3,1);
 }
 
 .module:hover{
-  transform:
-    translateY(-4px)
-    scale(1.02);
-
-  border-color:#8ebcff;
-
-  box-shadow:
-    0 17px 38px
-    rgba(15,23,42,.13);
+  transform:translateY(-5px) scale(1.025);
+  border-color:#8bbcff;
+  box-shadow:0 20px 42px rgba(15,23,42,.14);
 }
 
 .module:active{
-  transform:scale(.97);
+  transform:scale(.96);
 }
 
 .module.active{
-  background:
-    linear-gradient(
-      135deg,
-      #eef6ff,
-      #dcecff
-    );
-
+  background:linear-gradient(135deg,#edf6ff,#dbeaff);
   border-color:var(--blue);
-
-  animation:
-    moduleZoom
-    .4s cubic-bezier(.16,1,.3,1);
+  animation:modulePop .42s cubic-bezier(.16,1,.3,1);
 }
 
-@keyframes moduleZoom{
+@keyframes modulePop{
   0%{
     opacity:0;
-    transform:
-      translateX(35px)
-      scale(.75);
+    transform:translateX(35px) scale(.72);
   }
-
   65%{
     opacity:1;
-    transform:
-      translateX(-5px)
-      scale(1.06);
+    transform:translateX(-4px) scale(1.06);
   }
-
   100%{
-    opacity:1;
-    transform:
-      translateX(0)
-      scale(1);
+    transform:translateX(0) scale(1);
   }
 }
 
 .module-icon{
-  width:47px;
-  height:47px;
-
-  flex:0 0 47px;
-
+  width:48px;
+  height:48px;
+  flex:0 0 48px;
+  border-radius:14px;
   display:grid;
   place-items:center;
-
-  border-radius:12px;
-
-  background:#edf2f7;
+  background:#eef3f8;
   color:var(--blue);
-
-  font-size:10px;
-  font-weight:900;
-
+  font-size:22px;
   transition:.25s;
 }
 
 .module.active .module-icon{
   background:var(--blue);
   color:#fff;
-  transform:scale(1.08);
+  transform:scale(1.1);
 }
 
-.module-info strong{
+.module strong{
   display:block;
   font-size:13px;
 }
 
-.module-info span{
+.module small{
   display:block;
-  margin-top:4px;
-
+  margin-top:5px;
   color:var(--muted);
-
   font-size:9px;
 }
 
-.arrow{
-  margin-left:auto;
-
-  font-size:22px;
-  color:#98a2b3;
-
-  transition:.2s;
-}
-
-.module:hover .arrow{
-  color:var(--blue);
-  transform:translateX(4px);
-}
-
-/* ================= WORKSPACE ================= */
+/* WORKSPACE */
 
 .workspace{
   background:#fff;
-
   border:1px solid var(--border);
-  border-radius:18px;
-
+  border-radius:20px;
   overflow:hidden;
-
   box-shadow:var(--shadow);
 }
 
@@ -299,50 +246,36 @@ button{
 
 .panel.active{
   display:block;
-
-  animation:
-    panelIn
-    .42s cubic-bezier(.16,1,.3,1);
+  animation:panelSlide .43s cubic-bezier(.16,1,.3,1);
 }
 
-@keyframes panelIn{
-  0%{
+@keyframes panelSlide{
+  from{
     opacity:0;
-    transform:
-      translateX(35px)
-      scale(.82);
+    transform:translateX(40px) scale(.8);
   }
-
   65%{
     opacity:1;
-    transform:
-      translateX(-4px)
-      scale(1.025);
+    transform:translateX(-4px) scale(1.025);
   }
-
-  100%{
+  to{
     opacity:1;
-    transform:
-      translateX(0)
-      scale(1);
+    transform:none;
   }
 }
-
-/* ================= PANEL HEADER ================= */
 
 .panel-head{
   display:flex;
-  justify-content:space-between;
   align-items:flex-start;
-
+  justify-content:space-between;
+  gap:15px;
   padding:20px 22px;
-
   border-bottom:1px solid var(--border);
 }
 
 .panel-head h2{
   margin:0 0 4px;
-  font-size:19px;
+  font-size:20px;
 }
 
 .panel-head p{
@@ -352,86 +285,61 @@ button{
 }
 
 .close{
-  width:35px;
-  height:35px;
-
+  width:36px;
+  height:36px;
   border:1px solid var(--border);
-  border-radius:9px;
-
   background:#fff;
-
+  border-radius:9px;
   font-size:19px;
-
-  transition:.2s;
 }
 
 .close:hover{
   color:var(--red);
   background:#fff3f3;
-  transform:scale(1.08);
+  transform:scale(1.06);
 }
 
-/* ================= TABS ================= */
+/* TABS */
 
 .tabs{
   display:flex;
-  gap:5px;
-
+  gap:6px;
   padding:11px 18px;
-
   background:#f8fafc;
-
   border-bottom:1px solid var(--border);
-
-  overflow-x:auto;
 }
 
 .tab{
+  padding:9px 16px;
   border:1px solid transparent;
-
-  background:transparent;
-
-  color:var(--muted);
-
-  padding:9px 15px;
-
   border-radius:8px;
-
-  white-space:nowrap;
-
+  background:transparent;
+  color:var(--muted);
   font-size:10px;
   font-weight:800;
-
-  transition:.2s;
-}
-
-.tab:hover{
-  background:#fff;
-  color:var(--blue);
-  transform:scale(1.03);
 }
 
 .tab.active{
   background:#fff;
   color:var(--blue);
-
   border-color:var(--border);
-
-  box-shadow:
-    0 3px 10px
-    rgba(15,23,42,.06);
+  box-shadow:0 3px 10px rgba(15,23,42,.06);
 }
 
-/* ================= SECTION ================= */
+.tab:hover{
+  color:var(--blue);
+  transform:scale(1.03);
+}
+
+/* SECTIONS */
 
 .section{
   padding:19px 22px;
-
   border-bottom:1px solid var(--border);
 }
 
 .section-title{
-  margin-bottom:13px;
+  margin-bottom:12px;
 }
 
 .section-title h3{
@@ -447,26 +355,22 @@ button{
 
 .grid{
   display:grid;
-  grid-template-columns:
-    repeat(2,1fr);
-
+  grid-template-columns:repeat(2,1fr);
   gap:11px;
 }
 
 .grid3{
-  grid-template-columns:
-    repeat(3,1fr);
+  grid-template-columns:repeat(3,1fr);
 }
 
-/* ================= FIELDS ================= */
+.grid4{
+  grid-template-columns:repeat(4,1fr);
+}
 
 .field label{
   display:block;
-
   margin-bottom:5px;
-
   color:#475467;
-
   font-size:9px;
   font-weight:800;
 }
@@ -475,19 +379,12 @@ input,
 select,
 textarea{
   width:100%;
-
   border:1px solid var(--border);
-
   border-radius:8px;
-
   padding:9px;
-
   outline:none;
-
   background:#fff;
-
   color:var(--text);
-
   transition:.2s;
 }
 
@@ -495,78 +392,169 @@ input:focus,
 select:focus,
 textarea:focus{
   border-color:var(--blue);
-
-  box-shadow:
-    0 0 0 3px
-    rgba(23,105,224,.1);
+  box-shadow:0 0 0 3px rgba(23,105,224,.1);
 }
 
 textarea{
-  min-height:120px;
+  min-height:125px;
   resize:vertical;
 }
 
-/* ================= MANUAL ================= */
+/* MODE BOX */
+
+.mode-box{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+
+.mode-card{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:10px;
+  padding:12px;
+  transition:.22s;
+}
+
+.mode-card:hover{
+  border-color:#91bdf4;
+  transform:scale(1.015);
+}
+
+.mode-card.active{
+  border-color:var(--blue);
+  background:var(--blue-soft);
+  box-shadow:0 5px 15px rgba(23,105,224,.09);
+}
+
+.mode-card label{
+  margin:0;
+  cursor:pointer;
+  font-size:10px;
+  font-weight:800;
+}
+
+.mode-card input{
+  width:auto;
+  margin-right:6px;
+}
+
+/* MANUAL */
 
 .manual-grid{
   display:grid;
-
-  grid-template-columns:
-    repeat(4,1fr);
-
+  grid-template-columns:repeat(4,1fr);
   gap:8px;
 }
 
 .manual-item{
   padding:8px;
-
-  background:#f8fafc;
-
   border:1px solid var(--border);
-
   border-radius:8px;
+  background:#f8fafc;
 }
 
 .manual-item small{
   display:block;
-
   margin-bottom:4px;
-
   color:var(--muted);
-
   font-size:8px;
 }
 
-/* ================= CHOICES ================= */
+/* EXCEL */
+
+.excel-upload{
+  border:2px dashed #9ec4f7;
+  border-radius:13px;
+  padding:25px;
+  text-align:center;
+  background:#f7fbff;
+  transition:.25s;
+}
+
+.excel-upload:hover{
+  border-color:var(--blue);
+  background:#eef7ff;
+}
+
+.excel-upload input{
+  max-width:350px;
+  margin:10px auto 0;
+}
+
+.excel-status{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:9px;
+}
+
+.excel-preview-wrap{
+  display:none;
+  margin-top:15px;
+  overflow:auto;
+  max-height:310px;
+  border:1px solid var(--border);
+  border-radius:10px;
+}
+
+.excel-preview-wrap.show{
+  display:block;
+  animation:previewIn .35s ease;
+}
+
+@keyframes previewIn{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
+
+.excel-preview{
+  width:100%;
+  border-collapse:collapse;
+  font-size:9px;
+}
+
+.excel-preview th,
+.excel-preview td{
+  padding:8px;
+  border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);
+  text-align:left;
+  white-space:nowrap;
+}
+
+.excel-preview th{
+  background:#edf5ff;
+  color:var(--blue-dark);
+  font-weight:900;
+  position:sticky;
+  top:0;
+}
+
+/* CHOICES */
 
 .choices{
   display:grid;
-
-  grid-template-columns:
-    repeat(3,1fr);
-
+  grid-template-columns:repeat(3,1fr);
   gap:9px;
 }
 
 .choice{
-  display:flex;
-  align-items:center;
-  gap:8px;
-
   padding:11px;
-
-  background:#fff;
-
   border:1px solid var(--border);
-
   border-radius:9px;
-
+  background:#fff;
   transition:.2s;
 }
 
 .choice:hover{
-  background:var(--soft);
-  border-color:#8ebcff;
+  background:var(--blue-soft);
+  border-color:#91bdf4;
   transform:scale(1.015);
 }
 
@@ -575,132 +563,98 @@ textarea{
 }
 
 .choice label{
-  margin:0;
-
+  margin:0 0 0 5px;
   font-size:10px;
-  font-weight:700;
+  font-weight:800;
 }
 
-/* ================= FROZEN ================= */
+/* FROZEN */
 
 .frozen{
-  opacity:.45;
-
+  opacity:.43;
   pointer-events:none;
-
-  filter:grayscale(.4);
-
+  filter:grayscale(.5);
   position:relative;
 }
 
 .frozen::after{
   content:"FROZEN";
-
   position:absolute;
-
   right:7px;
   top:7px;
-
-  padding:3px 5px;
-
-  background:#edf0f4;
-
-  color:#667085;
-
+  padding:3px 6px;
   border-radius:4px;
-
+  background:#e5e7eb;
+  color:#667085;
   font-size:7px;
   font-weight:900;
 }
 
-/* ================= CUSTOM ================= */
+/* CUSTOM */
 
-.custom{
+.custom-box{
   display:none;
   margin-top:10px;
 }
 
-.custom.open{
+.custom-box.open{
   display:grid;
-
-  animation:
-    customIn
-    .3s cubic-bezier(.16,1,.3,1);
+  animation:customOpen .3s cubic-bezier(.16,1,.3,1);
 }
 
-@keyframes customIn{
+@keyframes customOpen{
   from{
     opacity:0;
-    transform:
-      translateY(-10px)
-      scale(.9);
+    transform:translateY(-10px) scale(.9);
   }
-
   to{
     opacity:1;
-    transform:
-      translateY(0)
-      scale(1);
+    transform:none;
   }
 }
 
-/* ================= BORDERS ================= */
+/* BORDERS */
 
 .border-grid{
   display:grid;
-
-  grid-template-columns:
-    repeat(4,1fr);
-
+  grid-template-columns:repeat(4,1fr);
   gap:9px;
 }
 
 .border-card{
   position:relative;
-
   padding:11px;
-
-  background:#f8fafc;
-
   border:1px solid var(--border);
-
   border-radius:9px;
-
-  transition:.2s;
+  background:#f8fafc;
 }
 
 .border-card:hover{
-  transform:translateY(-2px);
-  border-color:#9ec4f7;
+  border-color:#91bdf4;
 }
 
-.border-top{
+.border-card .top{
   display:flex;
-  align-items:center;
   justify-content:space-between;
-
+  align-items:center;
   margin-bottom:7px;
 }
 
-.border-top strong{
+.border-card strong{
   font-size:10px;
 }
 
-.border-top input{
+.border-card input{
   width:auto;
 }
 
-/* ================= FONTS ================= */
+/* FONTS */
 
 .font-card{
   padding:13px;
-
   margin-bottom:9px;
-
   background:#f8fafc;
-
   border:1px solid var(--border);
-
   border-radius:10px;
 }
 
@@ -711,369 +665,220 @@ textarea{
 
 .font-controls{
   display:grid;
-
-  grid-template-columns:
-    1.5fr
-    .6fr
-    .7fr
-    43px
-    43px
-    43px;
-
+  grid-template-columns:1.5fr .6fr .7fr 44px 44px 44px;
   gap:7px;
-
-  align-items:end;
 }
 
-.format{
-  height:36px;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
+.format-btn{
+  min-height:37px;
   border:1px solid var(--border);
   border-radius:7px;
-
   background:#fff;
-
   font-weight:900;
-
-  transition:.2s;
 }
 
-.format:hover{
-  background:var(--soft);
+.format-btn.active{
+  background:var(--blue);
+  color:#fff;
   border-color:var(--blue);
-  transform:scale(1.05);
 }
 
-.format input{
-  width:auto;
-}
+/* PREVIEW */
 
-/* ================= PREVIEW ================= */
-
-.preview{
+.preview-section{
   padding:20px 22px;
 }
 
-.preview-head{
+.preview-header{
   display:flex;
   justify-content:space-between;
-  align-items:flex-start;
-
+  align-items:center;
   margin-bottom:11px;
 }
 
-.preview-head h3{
-  margin:0 0 3px;
+.preview-header h3{
+  margin:0;
   font-size:13px;
 }
 
-.preview-head p{
-  margin:0;
-  color:var(--muted);
-  font-size:9px;
-}
-
-.live{
-  padding:6px 10px;
-
-  background:#ecfdf3;
+.preview-live{
+  display:flex;
+  align-items:center;
+  gap:6px;
   color:var(--green);
-
-  border-radius:20px;
-
   font-size:8px;
   font-weight:900;
 }
 
 .preview-stage{
-  min-height:350px;
-
-  padding:25px;
-
+  min-height:400px;
+  padding:28px;
+  background:#e9eef5;
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:auto;
   display:flex;
   justify-content:center;
-  align-items:center;
-
-  background:#e8edf4;
-
-  border:1px solid var(--border);
-  border-radius:10px;
-
-  overflow:auto;
+  align-items:flex-start;
 }
 
-/*
-  IMPORTANT:
-  This element is directly passed to html2pdf.
-  It is never moved off-screen.
-*/
-
 .preview-page{
-  width:500px;
-  min-height:340px;
-
+  width:508px;
+  min-height:762px;
   padding:12px;
-
-  display:grid;
-
-  grid-template-columns:
-    repeat(2,1fr);
-
-  gap:8px;
-
   background:#fff;
-
-  box-shadow:
-    0 18px 40px
-    rgba(15,23,42,.17);
-
-  border:0 solid transparent;
-
-  transition:
-    width .25s,
-    min-height .25s,
-    border .2s;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  box-shadow:0 18px 45px rgba(15,23,42,.17);
+  transform-origin:top center;
+  transition:.25s;
 }
 
 .label{
   min-width:0;
-
-  display:flex;
-
-  justify-content:center;
-  align-items:center;
-
-  gap:7px;
-
+  min-height:70px;
   padding:8px;
-
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
   background:#fff;
-
-  border:1px solid #d9dee5;
-
+  border:1px solid #d8dee7;
   text-align:center;
-
   overflow:hidden;
-
   break-inside:avoid;
   page-break-inside:avoid;
 }
 
 .po-preview{
-  font-size:20px;
   font-weight:700;
+  word-break:break-word;
 }
 
 .box-preview{
-  font-size:17px;
   font-weight:700;
+  word-break:break-word;
 }
 
-/* ================= ADDRESS ================= */
+/* ADDRESS */
 
-.address-label{
+.address-preview{
   width:100%;
-
-  min-height:160px;
-
+  min-height:180px;
   padding:20px;
-
   border:2px solid #2563eb;
-
-  border-radius:14px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #fff,
-      #edf6ff
-    );
-
-  box-shadow:
-    inset 0 0 0 5px
-    rgba(37,99,235,.05);
-}
-
-.address-icon{
-  font-size:25px;
-  margin-bottom:8px;
-}
-
-.address-text{
-  font-size:14px;
+  border-radius:15px;
+  background:linear-gradient(135deg,#fff,#edf6ff);
+  text-align:left;
   line-height:1.55;
 }
 
-/* ================= ISBN ================= */
+/* ISBN */
 
-.barcode{
-  width:240px;
-  height:75px;
+.isbn-preview-box{
+  width:100%;
+  min-height:190px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+}
 
+.fake-barcode{
+  width:260px;
+  height:80px;
   background:
     repeating-linear-gradient(
       90deg,
-      #111 0,
-      #111 2px,
-      #fff 2px,
-      #fff 5px,
-      #111 5px,
-      #111 7px,
-      #fff 7px,
-      #fff 10px
+      #111 0 2px,
+      #fff 2px 5px,
+      #111 5px 7px,
+      #fff 7px 11px
     );
 }
 
-.isbn-number{
-  margin-top:8px;
-
-  font-family:
-    monospace;
-
-  font-size:14px;
-}
-
-/* ================= ACTIONS ================= */
+/* ACTIONS */
 
 .actions{
   display:flex;
   justify-content:flex-end;
   gap:9px;
-
   padding:16px 22px;
-
   background:#f8fafc;
-
   border-top:1px solid var(--border);
 }
 
 .btn{
-  min-height:40px;
-
-  padding:0 17px;
-
+  min-height:41px;
+  padding:0 18px;
   border:1px solid var(--border);
-
   border-radius:8px;
-
   background:#fff;
-
   color:#344054;
-
   font-size:10px;
-  font-weight:800;
-
+  font-weight:900;
   transition:.2s;
 }
 
 .btn:hover{
-  transform:
-    translateY(-2px)
-    scale(1.02);
-
-  box-shadow:
-    0 8px 18px
-    rgba(15,23,42,.1);
+  transform:translateY(-2px) scale(1.02);
+  box-shadow:0 8px 20px rgba(15,23,42,.11);
 }
 
 .btn.primary{
   color:#fff;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--blue),
-      #3488ef
-    );
-
+  background:linear-gradient(135deg,var(--blue),#368ef5);
   border-color:var(--blue);
 }
 
 .btn.print{
   color:#fff;
-
-  background:
-    linear-gradient(
-      135deg,
-      #111827,
-      #374151
-    );
-
+  background:linear-gradient(135deg,#111827,#374151);
   border-color:#111827;
 }
 
-/* ================= TOAST ================= */
+/* TOAST */
 
-.toast-wrap{
+.toast-container{
   position:fixed;
-
   top:18px;
   right:18px;
-
   z-index:99999;
-
-  width:min(
-    410px,
-    calc(100vw - 36px)
-  );
+  width:min(410px,calc(100vw - 36px));
 }
 
 .toast{
   display:flex;
+  align-items:center;
   gap:10px;
-
   padding:14px;
-
   background:#fff;
-
   border:1px solid var(--border);
-
-  border-radius:12px;
-
-  box-shadow:
-    0 18px 45px
-    rgba(15,23,42,.2);
-
-  transform:
-    translateX(120%)
-    scale(.75);
-
+  border-radius:13px;
+  box-shadow:0 20px 50px rgba(15,23,42,.2);
   opacity:0;
-
+  transform:translateX(130%) scale(.75);
   pointer-events:none;
 }
 
 .toast.show{
-  animation:
-    toastIn
-    .42s cubic-bezier(.16,1,.3,1)
-    forwards;
+  animation:toastPop .42s cubic-bezier(.16,1,.3,1) forwards;
 }
 
-@keyframes toastIn{
+@keyframes toastPop{
   0%{
     opacity:0;
-    transform:
-      translateX(120%)
-      scale(.75);
+    transform:translateX(130%) scale(.75);
   }
-
   65%{
     opacity:1;
-    transform:
-      translateX(-7px)
-      scale(1.05);
+    transform:translateX(-7px) scale(1.06);
   }
-
   100%{
     opacity:1;
-    transform:
-      translateX(0)
-      scale(1);
+    transform:translateX(0) scale(1);
   }
 }
 
@@ -1086,17 +891,13 @@ textarea{
 }
 
 .toast-icon{
-  width:30px;
-  height:30px;
-
-  flex:0 0 30px;
-
+  width:32px;
+  height:32px;
+  flex:0 0 32px;
   display:grid;
   place-items:center;
-
   border-radius:50%;
-
-  font-weight:900;
+  font-weight:1000;
 }
 
 .toast.green .toast-icon{
@@ -1115,25 +916,16 @@ textarea{
 
 .toast p{
   margin:3px 0 0;
-
   color:var(--muted);
-
   font-size:9px;
 }
 
-/* ================= FOOTER ================= */
+/* FOOTER */
 
 footer{
-  display:flex;
-
-  justify-content:space-between;
-
-  gap:20px;
-
-  padding:19px 3px 3px;
-
+  padding:18px 3px 2px;
+  text-align:center;
   color:var(--muted);
-
   font-size:8px;
 }
 
@@ -1141,30 +933,23 @@ footer strong{
   color:#475467;
 }
 
-/* ================= RESPONSIVE ================= */
+/* RESPONSIVE */
 
-@media(max-width:1050px){
+@media(max-width:1100px){
 
   .modules{
-    grid-template-columns:
-      repeat(2,1fr);
+    grid-template-columns:repeat(2,1fr);
   }
 
   .border-grid{
-    grid-template-columns:
-      repeat(2,1fr);
-  }
-
-  .manual-grid{
-    grid-template-columns:
-      repeat(3,1fr);
+    grid-template-columns:repeat(2,1fr);
   }
 }
 
 @media(max-width:750px){
 
   .app{
-    padding:10px;
+    padding:9px;
   }
 
   .header{
@@ -1175,31 +960,23 @@ footer strong{
   .modules,
   .grid,
   .grid3,
+  .grid4,
   .choices,
-  .border-grid{
+  .border-grid,
+  .mode-box{
     grid-template-columns:1fr;
   }
 
   .manual-grid{
-    grid-template-columns:
-      repeat(2,1fr);
+    grid-template-columns:repeat(2,1fr);
   }
 
   .font-controls{
-    grid-template-columns:
-      1fr 1fr;
-  }
-
-  .preview-page{
-    width:350px;
-  }
-
-  footer{
-    flex-direction:column;
+    grid-template-columns:1fr 1fr;
   }
 
   .actions{
-    flex-direction:column-reverse;
+    flex-direction:column;
   }
 
   .btn{
@@ -1207,7 +984,7 @@ footer strong{
   }
 }
 
-/* ================= PRINT ================= */
+/* PRINT */
 
 @media print{
 
@@ -1215,36 +992,33 @@ footer strong{
     background:#fff;
   }
 
+  .no-print,
   .header,
   .modules,
   .panel-head,
   .tabs,
   .section,
-  .preview-head,
+  .preview-header,
   .actions,
   footer,
-  .toast-wrap{
+  .toast-container{
     display:none !important;
   }
 
   .workspace,
   .panel,
-  .preview,
+  .preview-section,
   .preview-stage{
     display:block !important;
-
-    padding:0;
-
-    border:0;
-
-    box-shadow:none;
-
-    background:#fff;
+    padding:0 !important;
+    border:0 !important;
+    box-shadow:none !important;
+    background:#fff !important;
   }
 
   .preview-page{
-    box-shadow:none;
-    margin:0;
+    box-shadow:none !important;
+    margin:0 !important;
   }
 }
 </style>
@@ -1254,1457 +1028,992 @@ footer strong{
 
 <div class="app">
 
-<!-- ================= HEADER ================= -->
+  <!-- HEADER -->
+  <header class="header">
 
-<header class="header">
+    <div class="brand">
 
-  <div class="brand">
-
-    <div class="logo">
-      BW
-    </div>
-
-    <div>
-      <h1>BooksWagon Label Studio</h1>
-
-      <p>
-        Professional PO • Box • ISBN • Address Label Designer
-      </p>
-    </div>
-
-  </div>
-
-  <div class="status">
-    LABEL STUDIO • 2026
-  </div>
-
-</header>
-
-
-<!-- ================= MODULES ================= -->
-
-<div class="modules">
-
-  <button
-    class="module active"
-    data-panel="cocoPanel"
-  >
-
-    <div class="module-icon">
-      CB
-    </div>
-
-    <div class="module-info">
-      <strong>CocoBlue</strong>
-      <span>PO + Box Labels</span>
-    </div>
-
-    <div class="arrow">›</div>
-
-  </button>
-
-
-  <button
-    class="module"
-    data-panel="otherPanel"
-  >
-
-    <div class="module-icon">
-      PO
-    </div>
-
-    <div class="module-info">
-      <strong>Other PO</strong>
-      <span>PO + Box Labels</span>
-    </div>
-
-    <div class="arrow">›</div>
-
-  </button>
-
-
-  <button
-    class="module"
-    data-panel="isbnPanel"
-  >
-
-    <div class="module-icon">
-      ISBN
-    </div>
-
-    <div class="module-info">
-      <strong>ISBN Barcode Maker</strong>
-      <span>ISBN Barcode Labels</span>
-    </div>
-
-    <div class="arrow">›</div>
-
-  </button>
-
-
-  <button
-    class="module"
-    data-panel="addressPanel"
-  >
-
-    <div class="module-icon">
-      ADR
-    </div>
-
-    <div class="module-info">
-      <strong>Address Label</strong>
-      <span>Designer Address Labels</span>
-    </div>
-
-    <div class="arrow">›</div>
-
-  </button>
-
-</div>
-
-
-<div class="workspace">
-
-
-<!-- ======================================================
-     COCOBLUE
-====================================================== -->
-
-<section
-  class="panel active"
-  id="cocoPanel"
->
-
-  <div class="panel-head">
-
-    <div>
-      <h2>💙 CocoBlue</h2>
-      <p>PO and Box label generator</p>
-    </div>
-
-    <button class="close">×</button>
-
-  </div>
-
-
-  <!-- TABS -->
-
-  <div class="tabs">
-
-    <button
-      class="tab active"
-      data-tab="manualTab"
-    >
-      Manual
-    </button>
-
-    <button
-      class="tab"
-      data-tab="bulkTab"
-    >
-      Bulk
-    </button>
-
-    <button
-      class="tab"
-      data-tab="excelTab"
-    >
-      Excel
-    </button>
-
-  </div>
-
-
-  <!-- MANUAL -->
-
-  <div
-    class="section coco-tab"
-    id="manualTab"
-  >
-
-    <div class="section-title">
-
-      <h3>📝 Manual PO</h3>
-
-      <p>
-        20 manual PO fields are available.
-      </p>
-
-    </div>
-
-    <div
-      class="manual-grid"
-      id="manualGrid"
-    ></div>
-
-  </div>
-
-
-  <!-- BULK -->
-
-  <div
-    class="section coco-tab"
-    id="bulkTab"
-    style="display:none"
-  >
-
-    <div class="section-title">
-
-      <h3>📋 Bulk PO</h3>
-
-      <p>
-        Unlimited PO numbers separated by comma or new line.
-      </p>
-
-    </div>
-
-    <textarea
-      id="bulkInput"
-      placeholder="BWG123,BWG124,BWG125
-BWG126"
-    ></textarea>
-
-    <small id="bulkCount">
-      0 PO numbers
-    </small>
-
-  </div>
-
-
-  <!-- EXCEL -->
-
-  <div
-    class="section coco-tab"
-    id="excelTab"
-    style="display:none"
-  >
-
-    <div class="section-title">
-
-      <h3>📊 Excel</h3>
-
-      <p>
-        Unlimited Excel rows. First row is treated as header.
-      </p>
-
-    </div>
-
-    <input
-      type="file"
-      id="excelInput"
-      accept=".xlsx,.xls,.csv"
-    >
-
-    <p id="excelStatus">
-      No Excel file selected.
-    </p>
-
-  </div>
-
-
-  <!-- PO BOX -->
-
-  <div class="section">
-
-    <div class="section-title">
-
-      <h3>📦 PO & Box Number</h3>
-
-      <p>
-        Start and End Box numbers are completely free-range.
-      </p>
-
-    </div>
-
-    <div class="grid">
-
-      <div class="field">
-
-        <label>PO Number</label>
-
-        <input
-          id="poNumber"
-          placeholder="BWG123"
-        >
-
+      <div class="logo">
+        BWG
       </div>
-
-
-      <div class="field">
-
-        <label>PO Prefix</label>
-
-        <input
-          id="poPrefix"
-          placeholder="Optional"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Start Box Number</label>
-
-        <input
-          id="startBox"
-          type="number"
-          placeholder="1500"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>End Box Number</label>
-
-        <input
-          id="endBox"
-          type="number"
-          placeholder="2000"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Box Prefix</label>
-
-        <input
-          id="boxPrefix"
-          value="BOX NO."
-        >
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- CONTENT -->
-
-  <div class="section">
-
-    <div class="section-title">
-
-      <h3>🏷 Label Content</h3>
-
-    </div>
-
-    <div class="choices">
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="contentMode"
-          id="poOnly"
-          value="po"
-          checked
-        >
-
-        <label for="poOnly">
-          PO Number Only
-        </label>
-
-      </div>
-
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="contentMode"
-          id="boxOnly"
-          value="box"
-        >
-
-        <label for="boxOnly">
-          Box Number Only
-        </label>
-
-      </div>
-
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="contentMode"
-          id="combinedMode"
-          value="combined"
-        >
-
-        <label for="combinedMode">
-          Combined PO + Box
-        </label>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- LINE -->
-
-  <div class="section">
-
-    <div class="section-title">
-
-      <h3>↔ PO & Box Layout</h3>
-
-    </div>
-
-    <div class="choices">
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="lineMode"
-          value="separate"
-          checked
-        >
-
-        <label>
-          Separate Line
-        </label>
-
-      </div>
-
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="lineMode"
-          value="same"
-        >
-
-        <label>
-          Same Line
-        </label>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- PAGE -->
-
-  <div class="section">
-
-    <div class="section-title">
-
-      <h3>📄 Page Setting</h3>
-
-    </div>
-
-    <div class="grid">
-
-      <div class="field">
-
-        <label>Page Size</label>
-
-        <select id="pageSize">
-
-          <option value="4x6">
-            4 × 6 inches
-          </option>
-
-          <option value="70x35">
-            70 × 35 mm
-          </option>
-
-          <option value="a4">
-            A4
-          </option>
-
-          <option value="custom">
-            Custom
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Labels Per Page</label>
-
-        <select id="labelsPerPage">
-
-          <option>1</option>
-          <option selected>2</option>
-          <option>4</option>
-          <option>6</option>
-          <option>8</option>
-          <option>10</option>
-          <option>12</option>
-          <option>14</option>
-          <option>15</option>
-          <option>16</option>
-          <option>18</option>
-          <option>20</option>
-          <option value="custom">Custom</option>
-
-        </select>
-
-      </div>
-
-    </div>
-
-
-    <div
-      class="grid custom"
-      id="customPage"
-    >
-
-      <div class="field">
-
-        <label>Custom Width (mm)</label>
-
-        <input
-          id="customWidth"
-          type="number"
-          placeholder="Width"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Custom Height (mm)</label>
-
-        <input
-          id="customHeight"
-          type="number"
-          placeholder="Height"
-        >
-
-      </div>
-
-    </div>
-
-
-    <div
-      class="custom"
-      id="customLabels"
-    >
-
-      <div class="field">
-
-        <label>Custom Labels Per Page</label>
-
-        <input
-          id="customLabelCount"
-          type="number"
-          min="1"
-          placeholder="Number of labels"
-        >
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- FLOW -->
-
-  <div class="section">
-
-    <div class="section-title">
-
-      <h3>🔢 Box Flow</h3>
-
-    </div>
-
-    <div class="choices">
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="boxFlow"
-          value="sequential"
-          checked
-        >
-
-        <label>
-          Sequential Box Number
-        </label>
-
-      </div>
-
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="boxFlow"
-          value="same"
-        >
-
-        <label>
-          Same Box Number
-        </label>
-
-      </div>
-
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="boxFlow"
-          value="alternate"
-        >
-
-        <label>
-          Alternate Flow
-        </label>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- BORDER -->
-
-  <div class="section">
-
-    <div class="section-title">
-
-      <h3>▣ Border Settings</h3>
-
-      <p>
-        35 border designs.
-      </p>
-
-    </div>
-
-
-    <div class="border-grid">
-
-      <div
-        class="border-card"
-        id="pageBorderCard"
-      >
-
-        <div class="border-top">
-
-          <strong>
-            Page Border
-          </strong>
-
-          <input
-            type="checkbox"
-            id="pageBorder"
-          >
-
-        </div>
-
-        <select id="pageBorderStyle"></select>
-
-      </div>
-
-
-      <div
-        class="border-card"
-        id="poBorderCard"
-      >
-
-        <div class="border-top">
-
-          <strong>
-            PO Border
-          </strong>
-
-          <input
-            type="checkbox"
-            id="poBorder"
-          >
-
-        </div>
-
-        <select id="poBorderStyle"></select>
-
-      </div>
-
-
-      <div
-        class="border-card"
-        id="boxBorderCard"
-      >
-
-        <div class="border-top">
-
-          <strong>
-            Box Border
-          </strong>
-
-          <input
-            type="checkbox"
-            id="boxBorder"
-          >
-
-        </div>
-
-        <select id="boxBorderStyle"></select>
-
-      </div>
-
-
-      <div
-        class="border-card"
-        id="allBorderCard"
-      >
-
-        <div class="border-top">
-
-          <strong>
-            All Border
-          </strong>
-
-          <input
-            type="checkbox"
-            id="allBorder"
-          >
-
-        </div>
-
-        <select id="allBorderStyle"></select>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- FONTS -->
-
-  <div class="section">
-
-    <div class="section-title">
-
-      <h3>🔤 Font Settings</h3>
-
-      <p>
-        40 font families with size, opacity, bold, italic and underline.
-      </p>
-
-    </div>
-
-
-    <div class="font-card">
-
-      <h4>PO Number Font</h4>
-
-      <div class="font-controls">
-
-        <div class="field">
-
-          <label>Font</label>
-
-          <select id="poFont"></select>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Size</label>
-
-          <input
-            id="poSize"
-            type="number"
-            value="20"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Opacity</label>
-
-          <input
-            id="poOpacity"
-            type="number"
-            min="0"
-            max="100"
-            value="100"
-          >
-
-        </div>
-
-
-        <label class="format">
-          <input id="poBold" type="checkbox">
-          B
-        </label>
-
-
-        <label class="format">
-          <input id="poItalic" type="checkbox">
-          I
-        </label>
-
-
-        <label class="format">
-          <input id="poUnderline" type="checkbox">
-          U
-        </label>
-
-      </div>
-
-    </div>
-
-
-    <div class="font-card">
-
-      <h4>Box Number Font</h4>
-
-      <div class="font-controls">
-
-        <div class="field">
-
-          <label>Font</label>
-
-          <select id="boxFont"></select>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Size</label>
-
-          <input
-            id="boxSize"
-            type="number"
-            value="17"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Opacity</label>
-
-          <input
-            id="boxOpacity"
-            type="number"
-            min="0"
-            max="100"
-            value="100"
-          >
-
-        </div>
-
-
-        <label class="format">
-          <input id="boxBold" type="checkbox">
-          B
-        </label>
-
-
-        <label class="format">
-          <input id="boxItalic" type="checkbox">
-          I
-        </label>
-
-
-        <label class="format">
-          <input id="boxUnderline" type="checkbox">
-          U
-        </label>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- PREVIEW -->
-
-  <div class="preview">
-
-    <div class="preview-head">
 
       <div>
-
-        <h3>🖨 Live Print Preview</h3>
-
-        <p>
-          Every setting updates the preview immediately.
-        </p>
-
-      </div>
-
-      <div class="live">
-        LIVE
+        <h1>📚 BooksWagon Label Studio</h1>
+        <p>Professional PO • Box • ISBN • Address Label Generator</p>
       </div>
 
     </div>
 
-
-    <div class="preview-stage">
-
-      <div
-        class="preview-page"
-        id="cocoPreview"
-      ></div>
-
+    <div class="live-status">
+      <span class="live-dot"></span>
+      WEBSITE IS LIVE
     </div>
 
-  </div>
+  </header>
 
 
-  <!-- ACTIONS -->
+  <!-- MODULES -->
+  <section class="modules">
 
-  <div class="actions">
-
-    <button
-      class="btn"
-      id="resetCoco"
-    >
-      Reset
-    </button>
-
-    <button
-      class="btn primary"
-      id="generateCoco"
-    >
-      Generate PDF
-    </button>
-
-    <button
-      class="btn print"
-      id="printCoco"
-    >
-      Print PDF
-    </button>
-
-  </div>
-
-</section>
-
-
-<!-- ======================================================
-     OTHER PO
-====================================================== -->
-
-<section
-  class="panel"
-  id="otherPanel"
->
-
-  <div class="panel-head">
-
-    <div>
-      <h2>📦 Other PO</h2>
-      <p>Independent PO and Box label tool.</p>
-    </div>
-
-    <button class="close">×</button>
-
-  </div>
-
-
-  <div class="section">
-
-    <div class="grid">
-
-      <div class="field">
-
-        <label>PO Number</label>
-
-        <input
-          id="otherPO"
-          placeholder="BWG123"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>PO Prefix</label>
-
-        <input
-          id="otherPOPrefix"
-          placeholder="Optional"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Start Box Number</label>
-
-        <input
-          id="otherStart"
-          type="number"
-          placeholder="1500"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>End Box Number</label>
-
-        <input
-          id="otherEnd"
-          type="number"
-          placeholder="2000"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Box Prefix</label>
-
-        <input
-          id="otherBoxPrefix"
-          value="BOX NO."
-        >
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="section">
-
-    <div class="section-title">
-      <h3>🏷 Label Content</h3>
-    </div>
-
-    <div class="choices">
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="otherContent"
-          value="po"
-          checked
-        >
-
-        <label>PO Number Only</label>
-
-      </div>
-
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="otherContent"
-          value="box"
-        >
-
-        <label>Box Number Only</label>
-
-      </div>
-
-
-      <div class="choice">
-
-        <input
-          type="radio"
-          name="otherContent"
-          value="combined"
-        >
-
-        <label>Combined PO + Box</label>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="section">
-
-    <div class="grid grid3">
-
-      <div class="field">
-
-        <label>Page Size</label>
-
-        <select class="generic-page-size">
-
-          <option value="4x6">4 × 6 inches</option>
-          <option value="70x35">70 × 35 mm</option>
-          <option value="a4">A4</option>
-          <option value="custom">Custom</option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Labels Per Page</label>
-
-        <select>
-
-          <option>1</option>
-          <option>2</option>
-          <option>4</option>
-          <option>6</option>
-          <option>8</option>
-          <option>10</option>
-          <option>12</option>
-          <option>15</option>
-          <option>16</option>
-          <option>20</option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Box Flow</label>
-
-        <select>
-
-          <option>Sequential</option>
-          <option>Same Box</option>
-          <option>Alternate</option>
-
-        </select>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="section">
-
-    <div class="section-title">
-      <h3>▣ Border Settings</h3>
-    </div>
-
-    <div class="border-grid">
-
-      <div class="border-card">
-
-        <div class="border-top">
-          <strong>Page Border</strong>
-          <input type="checkbox">
-        </div>
-
-        <select class="borderSelect"></select>
-
-      </div>
-
-
-      <div class="border-card">
-
-        <div class="border-top">
-          <strong>PO Border</strong>
-          <input type="checkbox">
-        </div>
-
-        <select class="borderSelect"></select>
-
-      </div>
-
-
-      <div class="border-card">
-
-        <div class="border-top">
-          <strong>Box Border</strong>
-          <input type="checkbox">
-        </div>
-
-        <select class="borderSelect"></select>
-
-      </div>
-
-
-      <div class="border-card">
-
-        <div class="border-top">
-          <strong>All Border</strong>
-          <input type="checkbox">
-        </div>
-
-        <select class="borderSelect"></select>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="preview">
-
-    <div class="preview-head">
-
+    <button class="module active" data-panel="cocoPanel">
+      <div class="module-icon">💙</div>
       <div>
-        <h3>🖨 Live Print Preview</h3>
-        <p>Other PO independent preview.</p>
+        <strong>📦 CocoBlue</strong>
+        <small>PO & Box Labels</small>
+      </div>
+    </button>
+
+    <button class="module" data-panel="otherPanel">
+      <div class="module-icon">🟦</div>
+      <div>
+        <strong>📦 Other PO</strong>
+        <small>PO Label Maker</small>
+      </div>
+    </button>
+
+    <button class="module" data-panel="isbnPanel">
+      <div class="module-icon">📚</div>
+      <div>
+        <strong>🔖 ISBN Barcode</strong>
+        <small>ISBN Barcode Maker</small>
+      </div>
+    </button>
+
+    <button class="module" data-panel="addressPanel">
+      <div class="module-icon">🏠</div>
+      <div>
+        <strong>📮 Address Label</strong>
+        <small>Address Label Maker</small>
+      </div>
+    </button>
+
+  </section>
+
+
+  <main class="workspace">
+
+
+    <!-- =================================================
+         COCOBLUE
+         ================================================= -->
+
+    <section class="panel active" id="cocoPanel">
+
+      <div class="panel-head">
+
+        <div>
+          <h2>💙 CocoBlue Label Maker</h2>
+          <p>PO and Box label generation studio</p>
+        </div>
+
+        <button class="close">×</button>
+
       </div>
 
-      <div class="live">LIVE</div>
 
-    </div>
+      <!-- INPUT MODE -->
+
+      <div class="tabs">
+
+        <button class="tab active" data-tab="manualTab">
+          Manual
+        </button>
+
+        <button class="tab" data-tab="bulkTab">
+          Bulk
+        </button>
+
+        <button class="tab" data-tab="excelTab">
+          Excel
+        </button>
+
+      </div>
 
 
-    <div class="preview-stage">
+      <!-- MANUAL -->
 
-      <div
-        class="preview-page"
-        id="otherPreview"
-      >
+      <div id="manualTab" class="coco-tab">
 
-        <div class="label">
+        <div class="section">
 
-          <div
-            class="po-preview"
-            id="otherPOPreview"
-          >
-            BWG123
+          <div class="section-title">
+            <h3>Manual PO Entry</h3>
+            <p>Up to 20 PO numbers can be entered manually.</p>
           </div>
 
+          <div class="manual-grid" id="manualGrid"></div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BULK -->
+
+      <div id="bulkTab" class="coco-tab" style="display:none">
+
+        <div class="section">
+
+          <div class="section-title">
+            <h3>Bulk PO Entry</h3>
+            <p>Unlimited PO numbers. Separate them using comma or new line.</p>
+          </div>
+
+          <textarea
+            id="bulkInput"
+            placeholder="Example: BWG123, BWG124, BWG125, BWG126..."
+          ></textarea>
+
           <div
-            class="box-preview"
-            id="otherBoxPreview"
+            id="bulkCount"
+            style="margin-top:7px;color:#667085;font-size:9px"
           >
-            BOX NO.121
+            0 PO numbers
           </div>
 
         </div>
 
       </div>
 
-    </div>
 
-  </div>
+      <!-- EXCEL -->
 
+      <div id="excelTab" class="coco-tab" style="display:none">
 
-  <div class="actions">
+        <div class="section">
 
-    <button
-      class="btn primary"
-      onclick="generatePDF('Other_PO')"
-    >
-      Generate PDF
-    </button>
+          <div class="section-title">
+            <h3>Excel Upload</h3>
+            <p>
+              Upload an Excel file. The first row is treated as the header.
+              No manual PO number field is required here.
+            </p>
+          </div>
 
-    <button
-      class="btn print"
-      onclick="printPDF()"
-    >
-      Print PDF
-    </button>
+          <div class="excel-upload">
 
-  </div>
+            <div style="font-size:28px">
+              📊
+            </div>
 
-</section>
+            <strong>
+              Upload Excel File
+            </strong>
 
+            <div style="margin-top:5px;color:#667085;font-size:9px">
+              XLSX / XLS / CSV
+            </div>
 
-<!-- ======================================================
-     ISBN
-====================================================== -->
-
-<section
-  class="panel"
-  id="isbnPanel"
->
-
-  <div class="panel-head">
-
-    <div>
-      <h2>📚 ISBN Barcode Maker</h2>
-      <p>Independent ISBN barcode generator.</p>
-    </div>
-
-    <button class="close">×</button>
-
-  </div>
-
-
-  <div class="section">
-
-    <div class="grid">
-
-      <div class="field">
-
-        <label>ISBN Number</label>
-
-        <input
-          id="isbnNumber"
-          placeholder="978XXXXXXXXXX"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Book Title</label>
-
-        <input
-          id="isbnTitle"
-          placeholder="Optional"
-        >
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="section">
-
-    <div class="grid grid3">
-
-      <div class="field">
-
-        <label>Label Size</label>
-
-        <select class="generic-page-size">
-
-          <option value="4x6">4 × 6 inches</option>
-          <option value="70x35">70 × 35 mm</option>
-          <option value="a4">A4</option>
-          <option value="custom">Custom</option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Labels Per Page</label>
-
-        <select>
-
-          <option>1</option>
-          <option>2</option>
-          <option>4</option>
-          <option>6</option>
-          <option>8</option>
-          <option>10</option>
-          <option>12</option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Barcode Type</label>
-
-        <select>
-
-          <option>ISBN-13</option>
-          <option>ISBN-10</option>
-          <option>EAN-13</option>
-
-        </select>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="section">
-
-    <div class="grid">
-
-      <div class="field">
-
-        <label>Border Style</label>
-
-        <select class="borderSelect"></select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Font</label>
-
-        <select class="fontSelect"></select>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="preview">
-
-    <div class="preview-head">
-
-      <div>
-        <h3>🖨 Live ISBN Preview</h3>
-        <p>ISBN preview updates live.</p>
-      </div>
-
-      <div class="live">LIVE</div>
-
-    </div>
-
-
-    <div class="preview-stage">
-
-      <div
-        class="preview-page"
-        id="isbnPreviewPage"
-      >
-
-        <div class="label">
-
-          <div>
-
-            <div class="barcode"></div>
+            <input
+              type="file"
+              id="excelInput"
+              accept=".xlsx,.xls,.csv"
+            >
 
             <div
-              class="isbn-number"
-              id="isbnPreview"
+              class="excel-status"
+              id="excelStatus"
             >
-              Enter ISBN
+              No Excel file selected.
+            </div>
+
+          </div>
+
+          <div
+            id="excelPreviewWrap"
+            class="excel-preview-wrap"
+          >
+
+            <table class="excel-preview">
+
+              <thead id="excelHead"></thead>
+
+              <tbody id="excelBody"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- PO / BOX DATA -->
+
+      <div class="section">
+
+        <div class="section-title">
+          <h3>📦 PO & Box Information</h3>
+          <p>
+            In Excel mode PO values come from the uploaded file.
+            Manual and Bulk modes use their respective inputs.
+          </p>
+        </div>
+
+        <div class="grid4">
+
+          <div class="field">
+
+            <label>PO Prefix</label>
+
+            <input
+              id="poPrefix"
+              type="text"
+              placeholder="Optional"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>Start Box Number</label>
+
+            <input
+              id="startBox"
+              type="number"
+              placeholder="Example: 121"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>End Box Number</label>
+
+            <input
+              id="endBox"
+              type="number"
+              placeholder="Example: 150"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>Box Prefix</label>
+
+            <input
+              id="boxPrefix"
+              type="text"
+              value="BOX NO."
+              placeholder="BOX NO."
+            >
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- CONTENT -->
+
+      <div class="section">
+
+        <div class="section-title">
+          <h3>🏷️ Label Content</h3>
+          <p>Choose what should appear on the label.</p>
+        </div>
+
+        <div class="choices">
+
+          <div class="choice">
+            <input
+              type="radio"
+              name="contentMode"
+              id="poOnly"
+              value="po"
+              checked
+            >
+            <label for="poOnly">PO Number Only</label>
+          </div>
+
+          <div class="choice">
+            <input
+              type="radio"
+              name="contentMode"
+              id="boxOnly"
+              value="box"
+            >
+            <label for="boxOnly">Box Number Only</label>
+          </div>
+
+          <div class="choice">
+            <input
+              type="radio"
+              name="contentMode"
+              id="combinedContent"
+              value="combined"
+            >
+            <label for="combinedContent">
+              Combined PO + Box
+            </label>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- LAYOUT -->
+
+      <div class="section">
+
+        <div class="section-title">
+          <h3>📐 PO & Box Layout</h3>
+          <p>Choose separate or same line layout.</p>
+        </div>
+
+        <div class="choices">
+
+          <div class="choice">
+
+            <input
+              type="radio"
+              name="lineMode"
+              id="separateLine"
+              value="separate"
+              checked
+            >
+
+            <label for="separateLine">
+              Separate Line
+            </label>
+
+          </div>
+
+          <div class="choice">
+
+            <input
+              type="radio"
+              name="lineMode"
+              id="sameLine"
+              value="same"
+            >
+
+            <label for="sameLine">
+              Same Line
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- PAGE SETTINGS -->
+
+      <div class="section">
+
+        <div class="section-title">
+          <h3>📄 Page Settings</h3>
+          <p>Page size and label quantity.</p>
+        </div>
+
+        <div class="grid3">
+
+          <div class="field">
+
+            <label>Page Size</label>
+
+            <select id="pageSize">
+
+              <option value="4x6">
+                4 × 6 Inches
+              </option>
+
+              <option value="70x35">
+                70 × 35 mm
+              </option>
+
+              <option value="a4">
+                A4
+              </option>
+
+              <option value="custom">
+                Custom
+              </option>
+
+            </select>
+
+          </div>
+
+          <div class="field">
+
+            <label>Labels Per Page</label>
+
+            <select id="labelsPerPage">
+
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="12">12</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="18">18</option>
+              <option value="20">20</option>
+              <option value="custom">Custom</option>
+
+            </select>
+
+          </div>
+
+          <div class="field">
+
+            <label>Box Flow</label>
+
+            <select id="boxFlow">
+
+              <option value="sequential">
+                Sequential Box Number
+              </option>
+
+              <option value="same">
+                Same Box Number
+              </option>
+
+              <option value="alternate">
+                Alternate Flow
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="customPage"
+          class="custom-box grid"
+        >
+
+          <div class="field">
+
+            <label>Custom Width (mm)</label>
+
+            <input
+              id="customWidth"
+              type="number"
+              min="1"
+              value="70"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>Custom Height (mm)</label>
+
+            <input
+              id="customHeight"
+              type="number"
+              min="1"
+              value="35"
+            >
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="customLabels"
+          class="custom-box"
+        >
+
+          <div class="field">
+
+            <label>Custom Labels Per Page</label>
+
+            <input
+              id="customLabelCount"
+              type="number"
+              min="1"
+              value="2"
+            >
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BORDER -->
+
+      <div class="section">
+
+        <div class="section-title">
+
+          <h3>▦ Border Settings</h3>
+
+          <p>
+            Individual borders or All Border.
+            All Border freezes the three individual controls.
+          </p>
+
+        </div>
+
+        <div class="border-grid">
+
+          <div class="border-card">
+
+            <div class="top">
+              <strong>Page Border</strong>
+
+              <input
+                type="checkbox"
+                id="pageBorder"
+              >
+            </div>
+
+            <select id="pageBorderStyle"></select>
+
+          </div>
+
+
+          <div class="border-card">
+
+            <div class="top">
+              <strong>PO Border</strong>
+
+              <input
+                type="checkbox"
+                id="poBorder"
+              >
+            </div>
+
+            <select id="poBorderStyle"></select>
+
+          </div>
+
+
+          <div class="border-card">
+
+            <div class="top">
+              <strong>Box Border</strong>
+
+              <input
+                type="checkbox"
+                id="boxBorder"
+              >
+            </div>
+
+            <select id="boxBorderStyle"></select>
+
+          </div>
+
+
+          <div class="border-card">
+
+            <div class="top">
+              <strong>All Border</strong>
+
+              <input
+                type="checkbox"
+                id="allBorder"
+              >
+            </div>
+
+            <select id="allBorderStyle"></select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- FONT -->
+
+      <div class="section">
+
+        <div class="section-title">
+          <h3>🔤 Font Settings</h3>
+          <p>PO and Box text can be styled independently.</p>
+        </div>
+
+
+        <!-- PO FONT -->
+
+        <div class="font-card">
+
+          <h4>PO Number Font</h4>
+
+          <div class="font-controls">
+
+            <select id="poFont">
+
+              <option>Arial</option>
+              <option>Segoe UI</option>
+              <option>Verdana</option>
+              <option>Georgia</option>
+              <option>Times New Roman</option>
+              <option>Calibri</option>
+              <option>Cambria</option>
+
+            </select>
+
+            <input
+              id="poSize"
+              type="number"
+              value="20"
+              min="5"
+              max="150"
+              title="Font Size"
+            >
+
+            <input
+              id="poOpacity"
+              type="number"
+              value="100"
+              min="0"
+              max="100"
+              title="Opacity"
+            >
+
+            <button
+              type="button"
+              class="format-btn"
+              id="poBold"
+            >
+              B
+            </button>
+
+            <button
+              type="button"
+              class="format-btn"
+              id="poItalic"
+            >
+              I
+            </button>
+
+            <button
+              type="button"
+              class="format-btn"
+              id="poUnderline"
+            >
+              U
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- BOX FONT -->
+
+        <div class="font-card">
+
+          <h4>Box Number Font</h4>
+
+          <div class="font-controls">
+
+            <select id="boxFont">
+
+              <option>Arial</option>
+              <option>Segoe UI</option>
+              <option>Verdana</option>
+              <option>Georgia</option>
+              <option>Times New Roman</option>
+              <option>Calibri</option>
+              <option>Cambria</option>
+
+            </select>
+
+            <input
+              id="boxSize"
+              type="number"
+              value="17"
+              min="5"
+              max="150"
+              title="Font Size"
+            >
+
+            <input
+              id="boxOpacity"
+              type="number"
+              value="100"
+              min="0"
+              max="100"
+              title="Opacity"
+            >
+
+            <button
+              type="button"
+              class="format-btn"
+              id="boxBold"
+            >
+              B
+            </button>
+
+            <button
+              type="button"
+              class="format-btn"
+              id="boxItalic"
+            >
+              I
+            </button>
+
+            <button
+              type="button"
+              class="format-btn"
+              id="boxUnderline"
+            >
+              U
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- PREVIEW -->
+
+      <div class="preview-section">
+
+        <div class="preview-header">
+
+          <div>
+            <h3>🖨️ Live Print Preview</h3>
+          </div>
+
+          <div class="preview-live">
+            <span class="live-dot"></span>
+            LIVE
+          </div>
+
+        </div>
+
+        <div class="preview-stage">
+
+          <div
+            class="preview-page"
+            id="cocoPreview"
+          ></div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ACTIONS -->
+
+      <div class="actions">
+
+        <button
+          class="btn"
+          id="resetCoco"
+        >
+          Reset
+        </button>
+
+        <button
+          class="btn primary"
+          id="downloadCoco"
+        >
+          ⬇ Download PDF
+        </button>
+
+        <button
+          class="btn print"
+          id="printCoco"
+        >
+          🖨 Print PDF
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         OTHER PO
+         ================================================= -->
+
+    <section class="panel" id="otherPanel">
+
+      <div class="panel-head">
+
+        <div>
+          <h2>📦 Other PO Label Maker</h2>
+          <p>PO and Box label generation</p>
+        </div>
+
+        <button class="close">×</button>
+
+      </div>
+
+
+      <div class="section">
+
+        <div class="grid4">
+
+          <div class="field">
+
+            <label>PO Number</label>
+
+            <input
+              id="otherPO"
+              type="text"
+              placeholder="BWG123"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>PO Prefix</label>
+
+            <input
+              id="otherPOPrefix"
+              type="text"
+              placeholder="Optional"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>Start Box Number</label>
+
+            <input
+              id="otherStart"
+              type="number"
+              placeholder="121"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>End Box Number</label>
+
+            <input
+              id="otherEnd"
+              type="number"
+              placeholder="150"
+            >
+
+          </div>
+
+        </div>
+
+        <div class="grid" style="margin-top:11px">
+
+          <div class="field">
+
+            <label>Box Prefix</label>
+
+            <input
+              id="otherBoxPrefix"
+              value="BOX NO."
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>Page Size</label>
+
+            <select class="generic-page-size">
+
+              <option value="4x6">4 × 6 Inches</option>
+              <option value="70x35">70 × 35 mm</option>
+              <option value="a4">A4</option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="section">
+
+        <div class="section-title">
+          <h3>Label Content</h3>
+        </div>
+
+        <div class="choices">
+
+          <div class="choice">
+            <input
+              type="radio"
+              name="otherContent"
+              checked
+            >
+            <label>PO Number Only</label>
+          </div>
+
+          <div class="choice">
+            <input
+              type="radio"
+              name="otherContent"
+            >
+            <label>Box Number Only</label>
+          </div>
+
+          <div class="choice">
+            <input
+              type="radio"
+              name="otherContent"
+            >
+            <label>Combined PO + Box</label>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="preview-section">
+
+        <div class="preview-header">
+
+          <h3>📦 Live Preview</h3>
+
+          <div class="preview-live">
+            <span class="live-dot"></span>
+            LIVE
+          </div>
+
+        </div>
+
+        <div class="preview-stage">
+
+          <div
+            class="preview-page"
+            id="otherPreview"
+          >
+
+            <div class="label">
+
+              <div
+                class="po-preview"
+                id="otherPOPreview"
+              >
+                BWG123
+              </div>
+
+              <div
+                class="box-preview"
+                id="otherBoxPreview"
+              >
+                BOX NO.121
+              </div>
+
             </div>
 
           </div>
@@ -2713,266 +2022,296 @@ BWG126"
 
       </div>
 
-    </div>
 
-  </div>
+      <div class="actions">
 
-
-  <div class="actions">
-
-    <button
-      class="btn primary"
-      onclick="generatePDF('ISBN_Barcode')"
-    >
-      Generate PDF
-    </button>
-
-    <button
-      class="btn print"
-      onclick="printPDF()"
-    >
-      Print PDF
-    </button>
-
-  </div>
-
-</section>
-
-
-<!-- ======================================================
-     ADDRESS
-====================================================== -->
-
-<section
-  class="panel"
-  id="addressPanel"
->
-
-  <div class="panel-head">
-
-    <div>
-      <h2>🏠 Address Label</h2>
-      <p>Designer address labels. No QR code.</p>
-    </div>
-
-    <button class="close">×</button>
-
-  </div>
-
-
-  <div class="section">
-
-    <div class="grid">
-
-      <div class="field">
-
-        <label>Address</label>
-
-        <textarea
-          id="addressInput"
-          placeholder="Enter complete address..."
-        ></textarea>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Email ID</label>
-
-        <input
-          id="addressEmail"
-          type="email"
-          placeholder="email@example.com"
+        <button
+          class="btn primary"
+          data-generate="other"
         >
+          ⬇ Download PDF
+        </button>
+
+        <button
+          class="btn print"
+          data-print="other"
+        >
+          🖨 Print PDF
+        </button>
 
       </div>
 
-    </div>
-
-  </div>
+    </section>
 
 
-  <div class="section">
+    <!-- =================================================
+         ISBN
+         ================================================= -->
 
-    <div class="grid grid3">
+    <section class="panel" id="isbnPanel">
 
-      <div class="field">
+      <div class="panel-head">
 
-        <label>Page Size</label>
+        <div>
+          <h2>🔖 ISBN Barcode Maker</h2>
+          <p>ISBN barcode label generation</p>
+        </div>
 
-        <select class="generic-page-size">
-
-          <option value="4x6">4 × 6 inches</option>
-          <option value="70x35">70 × 35 mm</option>
-          <option value="a4">A4</option>
-          <option value="custom">Custom</option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Labels Per Page</label>
-
-        <select>
-
-          <option>1</option>
-          <option>2</option>
-          <option>4</option>
-          <option>6</option>
-          <option>8</option>
-          <option>10</option>
-          <option>12</option>
-
-        </select>
+        <button class="close">×</button>
 
       </div>
 
 
-      <div class="field">
+      <div class="section">
 
-        <label>Alignment</label>
+        <div class="grid">
 
-        <select id="addressAlign">
+          <div class="field">
 
-          <option>Left</option>
-          <option>Center</option>
-          <option>Right</option>
+            <label>ISBN Number</label>
 
-        </select>
+            <input
+              id="isbnNumber"
+              type="text"
+              placeholder="978XXXXXXXXXX"
+            >
 
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="section">
-
-    <div class="grid">
-
-      <div class="field">
-
-        <label>Border Style</label>
-
-        <select class="borderSelect"></select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>Font</label>
-
-        <select class="fontSelect"></select>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="preview">
-
-    <div class="preview-head">
-
-      <div>
-        <h3>🏠 Live Address Preview</h3>
-        <p>Designer-style address label.</p>
-      </div>
-
-      <div class="live">LIVE</div>
-
-    </div>
-
-
-    <div class="preview-stage">
-
-      <div
-        class="preview-page"
-        id="addressPreviewPage"
-      >
-
-        <div class="address-label">
-
-          <div class="address-icon">
-            📦 ✉️ 🏠
           </div>
 
-          <div
-            class="address-text"
-            id="addressPreview"
-          >
-            Your address will appear here.
+          <div class="field">
+
+            <label>Page Size</label>
+
+            <select class="generic-page-size">
+
+              <option value="4x6">4 × 6 Inches</option>
+              <option value="70x35">70 × 35 mm</option>
+              <option value="a4">A4</option>
+
+            </select>
+
           </div>
 
         </div>
 
       </div>
 
+
+      <div class="preview-section">
+
+        <div class="preview-header">
+
+          <h3>📚 Live ISBN Preview</h3>
+
+          <div class="preview-live">
+            <span class="live-dot"></span>
+            LIVE
+          </div>
+
+        </div>
+
+        <div class="preview-stage">
+
+          <div
+            class="preview-page"
+            id="isbnPreviewPage"
+          >
+
+            <div class="label">
+
+              <div class="isbn-preview-box">
+
+                <div class="fake-barcode"></div>
+
+                <strong id="isbnPreview">
+                  Enter ISBN
+                </strong>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          class="btn primary"
+          data-generate="isbn"
+        >
+          ⬇ Download PDF
+        </button>
+
+        <button
+          class="btn print"
+          data-print="isbn"
+        >
+          🖨 Print PDF
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         ADDRESS
+         ================================================= -->
+
+    <section class="panel" id="addressPanel">
+
+      <div class="panel-head">
+
+        <div>
+          <h2>🏠 Address Label Maker</h2>
+          <p>Professional address label design</p>
+        </div>
+
+        <button class="close">×</button>
+
+      </div>
+
+
+      <div class="section">
+
+        <div class="grid">
+
+          <div class="field">
+
+            <label>Address</label>
+
+            <textarea
+              id="addressInput"
+              placeholder="Enter complete address..."
+            ></textarea>
+
+          </div>
+
+          <div>
+
+            <div class="field">
+
+              <label>Email</label>
+
+              <input
+                id="addressEmail"
+                type="email"
+                placeholder="email@example.com"
+              >
+
+            </div>
+
+            <div class="field" style="margin-top:11px">
+
+              <label>Text Alignment</label>
+
+              <select id="addressAlign">
+
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="preview-section">
+
+        <div class="preview-header">
+
+          <h3>🏠 Live Address Preview</h3>
+
+          <div class="preview-live">
+            <span class="live-dot"></span>
+            LIVE
+          </div>
+
+        </div>
+
+        <div class="preview-stage">
+
+          <div
+            class="preview-page"
+            id="addressPreviewPage"
+          >
+
+            <div class="label">
+
+              <div
+                class="address-preview"
+                id="addressPreview"
+              >
+                🏠 Your address will appear here.
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          class="btn primary"
+          data-generate="address"
+        >
+          ⬇ Download PDF
+        </button>
+
+        <button
+          class="btn print"
+          data-print="address"
+        >
+          🖨 Print PDF
+        </button>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+  <!-- FOOTER -->
+
+  <footer>
+
+    <div>
+      Created by <strong>Ashish Verma</strong> • 2026
     </div>
 
-  </div>
+    <div>
+      © All Rights Reserved by <strong>Ashish Verma</strong>
+    </div>
 
-
-  <div class="actions">
-
-    <button
-      class="btn primary"
-      onclick="generatePDF('Address_Label')"
-    >
-      Generate PDF
-    </button>
-
-    <button
-      class="btn print"
-      onclick="printPDF()"
-    >
-      Print PDF
-    </button>
-
-  </div>
-
-</section>
+  </footer>
 
 </div>
 
 
-<!-- ================= FOOTER ================= -->
+<!-- TOAST -->
 
-<footer>
-
-  <div>
-    <strong>Created by Ashish Verma</strong><br>
-    BooksWagon Label Studio
-  </div>
-
-  <div>
-    <strong>© 2026 Ashish Verma</strong><br>
-    All Rights Reserved by Ashish Verma
-  </div>
-
-  <div>
-    <strong>Contact: Ashish Verma</strong><br>
-    Contact details can be configured later.
-  </div>
-
-</footer>
-
-</div>
-
-
-<!-- ================= TOAST ================= -->
-
-<div class="toast-wrap">
+<div class="toast-container">
 
   <div
-    class="toast green"
+    class="toast"
     id="toast"
   >
 
@@ -3002,55 +2341,910 @@ BWG126"
 
 <script>
 
-/* ======================================================
-   DATA
-====================================================== */
+/* =========================================================
+   GLOBAL STATE
+   ========================================================= */
 
-const FONTS=[
-  "Arial",
-  "Helvetica",
-  "Times New Roman",
-  "Georgia",
-  "Verdana",
-  "Tahoma",
-  "Trebuchet MS",
-  "Courier New",
-  "Lucida Console",
-  "Lucida Sans",
-  "Palatino Linotype",
-  "Book Antiqua",
-  "Garamond",
-  "Cambria",
-  "Calibri",
-  "Candara",
-  "Consolas",
-  "Constantia",
-  "Corbel",
-  "Segoe UI",
-  "Segoe UI Light",
-  "Segoe UI Semibold",
-  "Century Gothic",
-  "Franklin Gothic Medium",
-  "Gill Sans",
-  "Impact",
-  "Rockwell",
-  "Baskerville",
-  "Didot",
-  "Copperplate",
-  "Futura",
-  "Optima",
-  "Avenir",
-  "Monaco",
-  "Menlo",
-  "Courier",
-  "System UI",
-  "Sans Serif",
-  "Serif",
-  "Monospace"
-];
+const state = {
+  excelRows: [],
+  excelHeaders: [],
+  activeModule: "cocoPanel"
+};
 
 
-const BORDERS=[
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+const $ = (selector, parent=document) =>
+  parent.querySelector(selector);
+
+const $$ = (selector, parent=document) =>
+  [...parent.querySelectorAll(selector)];
+
+function showToast(type,title,message){
+
+  const toast = $("#toast");
+
+  if(!toast) return;
+
+  toast.className = "toast " + type;
+
+  $("#toastIcon").textContent =
+    type === "green" ? "✓" : "!";
+
+  $("#toastTitle").textContent = title;
+  $("#toastText").textContent = message;
+
+  void toast.offsetWidth;
+
+  toast.classList.add("show");
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer =
+    setTimeout(()=>{
+      toast.classList.remove("show");
+    },3200);
+}
+
+
+function number(value, fallback=0){
+
+  const n = Number(value);
+
+  return Number.isFinite(n)
+    ? n
+    : fallback;
+}
+
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+
+/* =========================================================
+   MODULE SWITCH
+   ========================================================= */
+
+$$(".module").forEach(button=>{
+
+  button.addEventListener("click",()=>{
+
+    const target =
+      button.dataset.panel;
+
+    $$(".module").forEach(item=>{
+      item.classList.remove("active");
+    });
+
+    $$(".panel").forEach(panel=>{
+      panel.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    const panel =
+      document.getElementById(target);
+
+    if(panel){
+      panel.classList.add("active");
+    }
+
+    state.activeModule = target;
+
+    showToast(
+      "green",
+      "Feature Enabled",
+      `${button.querySelector("strong")?.textContent || "Tool"} has been enabled.`
+    );
+
+  });
+
+});
+
+
+/* =========================================================
+   CLOSE PANEL
+   ========================================================= */
+
+$$(".close").forEach(button=>{
+
+  button.addEventListener("click",()=>{
+
+    const panel =
+      button.closest(".panel");
+
+    panel?.classList.remove("active");
+
+    $$(".module").forEach(item=>{
+      item.classList.remove("active");
+    });
+
+    showToast(
+      "red",
+      "Feature Disabled",
+      "This feature has been disabled."
+    );
+
+  });
+
+});
+
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+$$(".tab").forEach(tab=>{
+
+  tab.addEventListener("click",()=>{
+
+    $$(".tab").forEach(t=>{
+      t.classList.remove("active");
+    });
+
+    tab.classList.add("active");
+
+    $$(".coco-tab").forEach(tabContent=>{
+      tabContent.style.display = "none";
+    });
+
+    const target =
+      document.getElementById(
+        tab.dataset.tab
+      );
+
+    if(target){
+      target.style.display = "block";
+    }
+
+    showToast(
+      "green",
+      "Input Mode Enabled",
+      `${tab.textContent.trim()} mode has been enabled.`
+    );
+
+    updateCocoPreview();
+
+  });
+
+});
+
+
+/* =========================================================
+   MANUAL 20 PO FIELDS
+   ========================================================= */
+
+const manualGrid =
+  $("#manualGrid");
+
+if(manualGrid){
+
+  for(let i=1;i<=20;i++){
+
+    const div =
+      document.createElement("div");
+
+    div.className =
+      "manual-item";
+
+    div.innerHTML = `
+      <small>PO ${i}</small>
+      <input
+        class="manualPO"
+        type="text"
+        placeholder="PO Number"
+      >
+    `;
+
+    manualGrid.appendChild(div);
+
+  }
+
+}
+
+
+/* =========================================================
+   MANUAL / BULK PO DATA
+   ========================================================= */
+
+function getManualPOs(){
+
+  return $$(".manualPO")
+    .map(input=>input.value.trim())
+    .filter(Boolean);
+
+}
+
+
+function getBulkPOs(){
+
+  const value =
+    $("#bulkInput")?.value || "";
+
+  return value
+    .split(/[,\n\r]+/)
+    .map(v=>v.trim())
+    .filter(Boolean);
+
+}
+
+
+function activeInputMode(){
+
+  const active =
+    $(".tab.active");
+
+  return active?.dataset.tab ||
+    "manualTab";
+
+}
+
+
+function getPOList(){
+
+  const mode =
+    activeInputMode();
+
+  if(mode === "manualTab"){
+    return getManualPOs();
+  }
+
+  if(mode === "bulkTab"){
+    return getBulkPOs();
+  }
+
+  /*
+   * Excel mode:
+   * PO comes directly from Excel.
+   */
+  if(mode === "excelTab"){
+    return getExcelPOs();
+  }
+
+  return [];
+}
+
+
+/* =========================================================
+   EXCEL
+   ========================================================= */
+
+const excelInput =
+  $("#excelInput");
+
+if(excelInput){
+
+  excelInput.addEventListener(
+    "change",
+    handleExcelUpload
+  );
+
+}
+
+
+async function handleExcelUpload(event){
+
+  const file =
+    event.target.files?.[0];
+
+  if(!file) return;
+
+  const status =
+    $("#excelStatus");
+
+  try{
+
+    const data =
+      await file.arrayBuffer();
+
+    const workbook =
+      XLSX.read(data,{
+        type:"array"
+      });
+
+    const firstSheet =
+      workbook.Sheets[
+        workbook.SheetNames[0]
+      ];
+
+    /*
+     * header:1 preserves the first row
+     * so we can explicitly use it as header.
+     */
+
+    const rows =
+      XLSX.utils.sheet_to_json(
+        firstSheet,
+        {
+          header:1,
+          defval:""
+        }
+      );
+
+    if(!rows.length){
+
+      throw new Error(
+        "The Excel file is empty."
+      );
+
+    }
+
+    const headers =
+      rows[0].map(
+        value=>String(value).trim()
+      );
+
+    const dataRows =
+      rows
+        .slice(1)
+        .filter(row =>
+          row.some(
+            value =>
+              String(value ?? "").trim() !== ""
+          )
+        );
+
+    state.excelHeaders =
+      headers;
+
+    state.excelRows =
+      dataRows;
+
+    renderExcelPreview();
+
+    if(status){
+
+      status.innerHTML =
+        `✅ <strong>${escapeHTML(file.name)}</strong> uploaded successfully. ` +
+        `<strong>${dataRows.length}</strong> data rows found. ` +
+        `<strong>${headers.length}</strong> columns detected.`;
+
+    }
+
+    showToast(
+      "green",
+      "Excel File Uploaded",
+      `Your Excel file is uploaded. ${dataRows.length} data rows found.`
+    );
+
+    updateCocoPreview();
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    if(status){
+      status.textContent =
+        "Unable to read this Excel file.";
+    }
+
+    showToast(
+      "red",
+      "Excel Upload Failed",
+      error.message ||
+      "Unable to read the Excel file."
+    );
+
+  }
+
+}
+
+
+function renderExcelPreview(){
+
+  const wrap =
+    $("#excelPreviewWrap");
+
+  const head =
+    $("#excelHead");
+
+  const body =
+    $("#excelBody");
+
+  if(!wrap || !head || !body)
+    return;
+
+  head.innerHTML = "";
+  body.innerHTML = "";
+
+  const headerRow =
+    document.createElement("tr");
+
+  state.excelHeaders.forEach(
+    header=>{
+
+      const th =
+        document.createElement("th");
+
+      th.textContent =
+        header || "Column";
+
+      headerRow.appendChild(th);
+
+    }
+  );
+
+  head.appendChild(headerRow);
+
+
+  /*
+   * Show a practical preview.
+   * The complete data remains in memory
+   * and is used for generation.
+   */
+
+  const previewRows =
+    state.excelRows.slice(0,25);
+
+  previewRows.forEach(row=>{
+
+    const tr =
+      document.createElement("tr");
+
+    state.excelHeaders.forEach(
+      (_,index)=>{
+
+        const td =
+          document.createElement("td");
+
+        td.textContent =
+          row[index] ?? "";
+
+        tr.appendChild(td);
+
+      }
+    );
+
+    body.appendChild(tr);
+
+  });
+
+  wrap.classList.add("show");
+
+}
+
+
+function findPOColumn(){
+
+  const headers =
+    state.excelHeaders;
+
+  if(!headers.length)
+    return -1;
+
+  const exactNames = [
+    "po",
+    "po number",
+    "po no",
+    "po no.",
+    "purchase order",
+    "purchase order number"
+  ];
+
+  let index =
+    headers.findIndex(
+      h =>
+        exactNames.includes(
+          String(h)
+            .trim()
+            .toLowerCase()
+        )
+    );
+
+  if(index >= 0)
+    return index;
+
+  /*
+   * Fallback:
+   * first header containing "po".
+   */
+
+  index =
+    headers.findIndex(
+      h =>
+        String(h)
+          .toLowerCase()
+          .includes("po")
+    );
+
+  /*
+   * If no PO header is obvious,
+   * use the first column.
+   */
+
+  return index >= 0 ? index : 0;
+
+}
+
+
+function getExcelPOs(){
+
+  const column =
+    findPOColumn();
+
+  if(column < 0)
+    return [];
+
+  return state.excelRows
+    .map(row =>
+      String(
+        row[column] ?? ""
+      ).trim()
+    )
+    .filter(Boolean);
+
+}
+
+
+/* =========================================================
+   BULK COUNTER
+   ========================================================= */
+
+$("#bulkInput")?.addEventListener(
+  "input",
+  ()=>{
+
+    const count =
+      getBulkPOs().length;
+
+    $("#bulkCount").textContent =
+      `${count} PO numbers`;
+
+    updateCocoPreview();
+
+  }
+);
+
+
+/* =========================================================
+   RANGE VALIDATION
+   ========================================================= */
+
+function validateRange(){
+
+  const start =
+    $("#startBox");
+
+  const end =
+    $("#endBox");
+
+  if(!start || !end)
+    return true;
+
+  if(
+    start.value === "" ||
+    end.value === ""
+  ){
+
+    start.setCustomValidity("");
+    end.setCustomValidity("");
+
+    return true;
+
+  }
+
+  const s =
+    number(start.value);
+
+  const e =
+    number(end.value);
+
+  if(s > e){
+
+    const msg =
+      "Start Box Number must be less than End Box Number.";
+
+    start.setCustomValidity(msg);
+    end.setCustomValidity(msg);
+
+    showToast(
+      "red",
+      "Invalid Box Range",
+      "Start Box Number cannot be greater than End Box Number."
+    );
+
+    return false;
+
+  }
+
+  start.setCustomValidity("");
+  end.setCustomValidity("");
+
+  return true;
+
+}
+
+
+$("#startBox")?.addEventListener(
+  "input",
+  ()=>{
+    validateRange();
+    updateCocoPreview();
+  }
+);
+
+$("#endBox")?.addEventListener(
+  "input",
+  ()=>{
+    validateRange();
+    updateCocoPreview();
+  }
+);
+
+
+/* =========================================================
+   CONTENT MODE + FREEZE
+   ========================================================= */
+
+function updateContentMode(){
+
+  const combined =
+    $("#combinedContent")?.checked;
+
+  const poOnly =
+    $("#poOnly");
+
+  const boxOnly =
+    $("#boxOnly");
+
+  if(combined){
+
+    poOnly?.closest(".choice")
+      ?.classList.add("frozen");
+
+    boxOnly?.closest(".choice")
+      ?.classList.add("frozen");
+
+    if(poOnly){
+      poOnly.disabled = true;
+    }
+
+    if(boxOnly){
+      boxOnly.disabled = true;
+    }
+
+  }else{
+
+    poOnly?.closest(".choice")
+      ?.classList.remove("frozen");
+
+    boxOnly?.closest(".choice")
+      ?.classList.remove("frozen");
+
+    if(poOnly){
+      poOnly.disabled = false;
+    }
+
+    if(boxOnly){
+      boxOnly.disabled = false;
+    }
+
+  }
+
+  showToast(
+    combined ? "green" : "red",
+    combined
+      ? "Combined Content Enabled"
+      : "Combined Content Disabled",
+    combined
+      ? "PO and Box content are combined."
+      : "PO and Box content can be selected individually."
+  );
+
+  updateCocoPreview();
+
+}
+
+
+$$('input[name="contentMode"]')
+  .forEach(input=>{
+    input.addEventListener(
+      "change",
+      updateContentMode
+    );
+  });
+
+
+/* =========================================================
+   PAGE SIZE
+   ========================================================= */
+
+$("#pageSize")?.addEventListener(
+  "change",
+  ()=>{
+
+    const custom =
+      $("#pageSize").value === "custom";
+
+    $("#customPage")
+      ?.classList.toggle(
+        "open",
+        custom
+      );
+
+    showToast(
+      custom ? "green" : "red",
+      custom
+        ? "Custom Page Enabled"
+        : "Custom Page Disabled",
+      custom
+        ? "Custom width and height fields are now available."
+        : "Custom page fields are hidden."
+    );
+
+    updateCocoPreview();
+
+  }
+);
+
+
+/* =========================================================
+   LABEL COUNT
+   ========================================================= */
+
+$("#labelsPerPage")?.addEventListener(
+  "change",
+  ()=>{
+
+    const custom =
+      $("#labelsPerPage").value === "custom";
+
+    $("#customLabels")
+      ?.classList.toggle(
+        "open",
+        custom
+      );
+
+    updateCocoPreview();
+
+  }
+);
+
+
+/* =========================================================
+   BOX FLOW
+   ========================================================= */
+
+$("#boxFlow")?.addEventListener(
+  "change",
+  ()=>{
+
+    showToast(
+      "green",
+      "Box Flow Updated",
+      $("#boxFlow").selectedOptions[0].text
+    );
+
+    updateCocoPreview();
+
+  }
+);
+
+
+/* =========================================================
+   ALL BORDER
+   ========================================================= */
+
+function applyAllBorderState(){
+
+  const all =
+    $("#allBorder")?.checked;
+
+  const ids = [
+    "pageBorder",
+    "poBorder",
+    "boxBorder"
+  ];
+
+  ids.forEach(id=>{
+
+    const checkbox =
+      $("#" + id);
+
+    if(!checkbox)
+      return;
+
+    checkbox.disabled =
+      !!all;
+
+    if(all){
+      checkbox.checked = true;
+    }
+
+    checkbox.closest(".border-card")
+      ?.classList.toggle(
+        "frozen",
+        !!all
+      );
+
+  });
+
+  showToast(
+    all ? "green" : "red",
+    all
+      ? "All Borders Enabled"
+      : "All Borders Disabled",
+    all
+      ? "Page, PO and Box borders are enabled and frozen."
+      : "Individual border controls are available again."
+  );
+
+  updateCocoPreview();
+
+}
+
+
+$("#allBorder")?.addEventListener(
+  "change",
+  applyAllBorderState
+);
+
+
+/* =========================================================
+   FONT FORMAT BUTTONS
+   ========================================================= */
+
+function initFormatButton(id){
+
+  const button =
+    $("#" + id);
+
+  if(!button)
+    return;
+
+  button.addEventListener(
+    "click",
+    ()=>{
+
+      button.classList.toggle("active");
+
+      const enabled =
+        button.classList.contains("active");
+
+      showToast(
+        enabled ? "green" : "red",
+        enabled
+          ? "Feature Enabled"
+          : "Feature Disabled",
+        `${button.textContent.trim()} formatting has been ${
+          enabled ? "enabled" : "disabled"
+        }.`
+      );
+
+      updateCocoPreview();
+
+    }
+  );
+
+}
+
+
+[
+  "poBold",
+  "poItalic",
+  "poUnderline",
+  "boxBold",
+  "boxItalic",
+  "boxUnderline"
+].forEach(initFormatButton);
+
+
+/* =========================================================
+   BORDER STYLE OPTIONS
+   ========================================================= */
+
+const borderStyles = [
   ["none","No Border"],
   ["solid","Solid"],
   ["dashed","Dashed"],
@@ -3068,7 +3262,6 @@ const BORDERS=[
   ["short-dash","Short Dash"],
   ["long-dash","Long Dash"],
   ["dash-dot","Dash Dot"],
-  ["dash-dot-dot","Dash Dot Dot"],
   ["triple","Triple"],
   ["quadruple","Quadruple"],
   ["soft","Soft"],
@@ -3089,284 +3282,26 @@ const BORDERS=[
 ];
 
 
-/* ======================================================
-   HELPERS
-====================================================== */
+function populateBorderSelect(id){
 
-const $=(s,p=document)=>p.querySelector(s);
-const $$=(s,p=document)=>[...p.querySelectorAll(s)];
+  const select =
+    $("#" + id);
 
-function toast(type,title,text){
+  if(!select)
+    return;
 
-  const box=$("#toast");
+  select.innerHTML = "";
 
-  box.className=
-    "toast "+type;
+  borderStyles.forEach(
+    ([value,label])=>{
 
-  $("#toastIcon").textContent=
-    type==="green" ? "✓" : "!";
-
-  $("#toastTitle").textContent=
-    title;
-
-  $("#toastText").textContent=
-    text;
-
-  void box.offsetWidth;
-
-  box.classList.add("show");
-
-  clearTimeout(window.toastTimer);
-
-  window.toastTimer=
-    setTimeout(()=>{
-      box.classList.remove("show");
-    },3000);
-}
-
-
-function number(v,def=0){
-
-  const n=Number(v);
-
-  return Number.isFinite(n)
-    ? n
-    : def;
-}
-
-
-/* ======================================================
-   FONT DROPDOWNS
-====================================================== */
-
-function initFonts(){
-
-  $$("#poFont,#boxFont,.fontSelect")
-  .forEach(select=>{
-
-    if(select.options.length)
-      return;
-
-    FONTS.forEach(font=>{
-
-      const o=
+      const option =
         document.createElement("option");
 
-      o.value=font;
-      o.textContent=font;
+      option.value = value;
+      option.textContent = label;
 
-      select.appendChild(o);
-
-    });
-
-  });
-
-}
-
-
-/* ======================================================
-   BORDER DROPDOWNS
-====================================================== */
-
-function initBorders(){
-
-  $$("#pageBorderStyle,#poBorderStyle,#boxBorderStyle,#allBorderStyle,.borderSelect")
-  .forEach(select=>{
-
-    if(select.options.length)
-      return;
-
-    BORDERS.forEach(([value,label])=>{
-
-      const o=
-        document.createElement("option");
-
-      o.value=value;
-      o.textContent=label;
-
-      select.appendChild(o);
-
-    });
-
-  });
-
-}
-
-
-/* ======================================================
-   MODULE SWITCH
-====================================================== */
-
-function initModules(){
-
-  $$(".module").forEach(button=>{
-
-    button.addEventListener(
-      "click",
-      ()=>{
-
-        const id=
-          button.dataset.panel;
-
-        $$(".module").forEach(x=>
-          x.classList.remove("active")
-        );
-
-        $$(".panel").forEach(x=>
-          x.classList.remove("active")
-        );
-
-        button.classList.add("active");
-
-        const panel=
-          document.getElementById(id);
-
-        if(panel)
-          panel.classList.add("active");
-
-        toast(
-          "green",
-          "Tool Enabled",
-          `${button.querySelector("strong").textContent} has been enabled.`
-        );
-
-      }
-    );
-
-  });
-
-
-  $$(".close").forEach(button=>{
-
-    button.addEventListener(
-      "click",
-      ()=>{
-
-        const panel=
-          button.closest(".panel");
-
-        if(panel)
-          panel.classList.remove("active");
-
-        $$(".module").forEach(x=>
-          x.classList.remove("active")
-        );
-
-        toast(
-          "red",
-          "Tool Disabled",
-          "The selected tool has been disabled."
-        );
-
-      }
-    );
-
-  });
-
-}
-
-
-/* ======================================================
-   COCO TABS
-====================================================== */
-
-function initTabs(){
-
-  $$("#cocoPanel .tab").forEach(tab=>{
-
-    tab.addEventListener(
-      "click",
-      ()=>{
-
-        $$("#cocoPanel .tab").forEach(x=>
-          x.classList.remove("active")
-        );
-
-        $$("#cocoPanel .coco-tab").forEach(x=>{
-          x.style.display="none";
-        });
-
-        tab.classList.add("active");
-
-        const target=
-          document.getElementById(
-            tab.dataset.tab
-          );
-
-        if(target)
-          target.style.display="block";
-
-        toast(
-          "green",
-          "Input Mode Enabled",
-          `${tab.textContent.trim()} has been enabled.`
-        );
-
-      }
-    );
-
-  });
-
-}
-
-
-/* ======================================================
-   MANUAL 20
-====================================================== */
-
-function initManual(){
-
-  const grid=
-    $("#manualGrid");
-
-  for(let i=1;i<=20;i++){
-
-    const item=
-      document.createElement("div");
-
-    item.className=
-      "manual-item";
-
-    item.innerHTML=`
-      <small>PO ${i}</small>
-      <input
-        class="manualPO"
-        type="text"
-        placeholder="PO Number"
-      >
-    `;
-
-    grid.appendChild(item);
-
-  }
-
-}
-
-
-/* ======================================================
-   BULK
-====================================================== */
-
-function initBulk(){
-
-  const input=
-    $("#bulkInput");
-
-  const count=
-    $("#bulkCount");
-
-  input.addEventListener(
-    "input",
-    ()=>{
-
-      const values=
-        input.value
-        .split(/[,\n\r]+/)
-        .map(x=>x.trim())
-        .filter(Boolean);
-
-      count.textContent=
-        `${values.length} PO numbers`;
+      select.appendChild(option);
 
     }
   );
@@ -3374,205 +3309,22 @@ function initBulk(){
 }
 
 
-/* ======================================================
-   EXCEL
-====================================================== */
-
-function initExcel(){
-
-  $("#excelInput")
-  .addEventListener(
-    "change",
-    function(){
-
-      if(!this.files.length)
-        return;
-
-      $("#excelStatus").textContent=
-        `${this.files[0].name} selected — first row will be treated as header.`;
-
-      toast(
-        "green",
-        "Excel Enabled",
-        "Excel input has been enabled."
-      );
-
-    }
-  );
-
-}
+[
+  "pageBorderStyle",
+  "poBorderStyle",
+  "boxBorderStyle",
+  "allBorderStyle"
+].forEach(populateBorderSelect);
 
 
-/* ======================================================
-   RANGE VALIDATION
-====================================================== */
-
-function validateRange(startEl,endEl){
-
-  const start=
-    number($(startEl).value);
-
-  const end=
-    number($(endEl).value);
-
-  if(
-    $(startEl).value==="" ||
-    $(endEl).value===""
-  ){
-
-    $(startEl).setCustomValidity("");
-    $(endEl).setCustomValidity("");
-
-    return true;
-  }
-
-  if(start>end){
-
-    const message=
-      "Start Box Number must be less than End Box Number.";
-
-    $(startEl).setCustomValidity(message);
-    $(endEl).setCustomValidity(message);
-
-    toast(
-      "red",
-      "Invalid Box Range",
-      "Start Box Number is greater than End Box Number."
-    );
-
-    return false;
-
-  }
-
-  $(startEl).setCustomValidity("");
-  $(endEl).setCustomValidity("");
-
-  return true;
-}
-
-
-/* ======================================================
-   CUSTOM PAGE
-====================================================== */
-
-function initCustomPage(){
-
-  $("#pageSize")
-  .addEventListener(
-    "change",
-    function(){
-
-      $("#customPage")
-        .classList
-        .toggle(
-          "open",
-          this.value==="custom"
-        );
-
-      if(this.value==="custom"){
-
-        toast(
-          "green",
-          "Custom Page Enabled",
-          "Custom width and height fields are now available."
-        );
-
-      }else{
-
-        toast(
-          "red",
-          "Custom Page Disabled",
-          "Custom fields are hidden."
-        );
-
-      }
-
-      updateCoco();
-
-    }
-  );
-
-
-  $("#labelsPerPage")
-  .addEventListener(
-    "change",
-    function(){
-
-      $("#customLabels")
-        .classList
-        .toggle(
-          "open",
-          this.value==="custom"
-        );
-
-      updateCoco();
-
-    }
-  );
-
-}
-
-
-/* ======================================================
-   ALL BORDER
-====================================================== */
-
-function initAllBorder(){
-
-  $("#allBorder")
-  .addEventListener(
-    "change",
-    function(){
-
-      const enabled=
-        this.checked;
-
-      ["pageBorder","poBorder","boxBorder"]
-      .forEach(id=>{
-
-        const input=
-          $("#"+id);
-
-        input.checked=
-          enabled;
-
-        input.disabled=
-          enabled;
-
-        input.closest(".border-card")
-          .classList
-          .toggle(
-            "frozen",
-            enabled
-          );
-
-      });
-
-      toast(
-        enabled?"green":"red",
-        enabled
-          ?"All Border Enabled"
-          :"All Border Disabled",
-        enabled
-          ?"Page, PO and Box borders are selected and frozen."
-          :"Individual border controls are available again."
-      );
-
-      updateCoco();
-
-    }
-  );
-
-}
-
-
-/* ======================================================
+/* =========================================================
    BORDER CSS
-====================================================== */
+   ========================================================= */
 
 function borderCSS(style){
 
-  const map={
+  const map = {
+
     none:"none",
     solid:"1px solid #111",
     dashed:"2px dashed #111",
@@ -3590,7 +3342,6 @@ function borderCSS(style){
     "short-dash":"2px dashed #111",
     "long-dash":"3px dashed #111",
     "dash-dot":"2px dashed #111",
-    "dash-dot-dot":"2px dashed #111",
     triple:"5px double #111",
     quadruple:"6px double #111",
     soft:"1px solid #94a3b8",
@@ -3608,323 +3359,524 @@ function borderCSS(style){
     "groove-thin":"2px groove #64748b",
     "ridge-thin":"2px ridge #64748b",
     "classic-double":"4px double #111"
+
   };
 
-  return map[style]||"none";
+  return map[style] || "none";
+
 }
 
 
-/* ======================================================
+/* =========================================================
+   PAGE SIZE
+   ========================================================= */
+
+function getPageSize(){
+
+  const value =
+    $("#pageSize")?.value;
+
+  if(value === "4x6"){
+    return {
+      width:101.6,
+      height:152.4,
+      cssWidth:508,
+      cssHeight:762
+    };
+  }
+
+  if(value === "70x35"){
+    return {
+      width:70,
+      height:35,
+      cssWidth:420,
+      cssHeight:210
+    };
+  }
+
+  if(value === "a4"){
+    return {
+      width:210,
+      height:297,
+      cssWidth:595,
+      cssHeight:842
+    };
+  }
+
+  const width =
+    Math.max(
+      1,
+      number(
+        $("#customWidth")?.value,
+        70
+      )
+    );
+
+  const height =
+    Math.max(
+      1,
+      number(
+        $("#customHeight")?.value,
+        35
+      )
+    );
+
+  return {
+    width,
+    height,
+    cssWidth:Math.max(200,width*5),
+    cssHeight:Math.max(150,height*5)
+  };
+
+}
+
+
+/* =========================================================
    LABEL COUNT
-====================================================== */
+   ========================================================= */
 
 function labelCount(){
 
-  const value=
-    $("#labelsPerPage").value;
+  const value =
+    $("#labelsPerPage")?.value;
 
-  if(value==="custom"){
+  if(value === "custom"){
 
     return Math.max(
       1,
       number(
-        $("#customLabelCount").value,
-        1
+        $("#customLabelCount")?.value,
+        2
       )
     );
 
   }
 
-  return number(value,1);
-}
-
-
-/* ======================================================
-   PAGE PREVIEW SIZE
-====================================================== */
-
-function setPreviewSize(page){
-
-  const size=
-    $("#pageSize").value;
-
-  if(size==="4x6"){
-
-    page.style.width="508px";
-    page.style.minHeight="762px";
-
-  }
-  else if(size==="70x35"){
-
-    page.style.width="420px";
-    page.style.minHeight="210px";
-
-  }
-  else if(size==="a4"){
-
-    page.style.width="595px";
-    page.style.minHeight="842px";
-
-  }
-  else{
-
-    const w=
-      number(
-        $("#customWidth").value,
-        70
-      );
-
-    const h=
-      number(
-        $("#customHeight").value,
-        35
-      );
-
-    page.style.width=
-      Math.max(200,w*5)+"px";
-
-    page.style.minHeight=
-      Math.max(150,h*5)+"px";
-
-  }
+  return Math.max(
+    1,
+    number(value,2)
+  );
 
 }
 
 
-/* ======================================================
-   COCO PREVIEW
-====================================================== */
+/* =========================================================
+   BOX FLOW
+   ========================================================= */
 
-function updateCoco(){
+function boxNumberForIndex(index){
 
-  const page=
-    $("#cocoPreview");
-
-  const count=
-    Math.min(
-      labelCount(),
-      50
-    );
-
-  setPreviewSize(page);
-
-  let cols=1;
-
-  if(count>=2) cols=2;
-  if(count>=6) cols=3;
-  if(count>=12) cols=4;
-
-  page.style.gridTemplateColumns=
-    `repeat(${cols},1fr)`;
-
-  page.innerHTML="";
-
-
-  const po=
-    $("#poNumber").value.trim()
-    || "BWG123";
-
-  const poPrefix=
-    $("#poPrefix").value.trim();
-
-  const boxPrefix=
-    $("#boxPrefix").value.trim()
-    || "BOX NO.";
-
-
-  const start=
+  const start =
     number(
-      $("#startBox").value,
-      121
+      $("#startBox")?.value,
+      1
     );
 
+  const end =
+    number(
+      $("#endBox")?.value,
+      start
+    );
 
-  const content=
+  const flow =
+    $("#boxFlow")?.value ||
+    "sequential";
+
+  if(flow === "same"){
+    return start;
+  }
+
+  if(flow === "alternate"){
+
+    const first =
+      start + (index % 2);
+
+    return Math.min(
+      first,
+      end
+    );
+
+  }
+
+  return start + index;
+
+}
+
+
+/* =========================================================
+   GET PO VALUES
+   ========================================================= */
+
+function getPreviewPOs(){
+
+  const mode =
+    activeInputMode();
+
+  if(mode === "excelTab"){
+
+    const values =
+      getExcelPOs();
+
+    if(values.length)
+      return values;
+
+  }
+
+  if(mode === "bulkTab"){
+
+    const values =
+      getBulkPOs();
+
+    if(values.length)
+      return values;
+
+  }
+
+  if(mode === "manualTab"){
+
+    const values =
+      getManualPOs();
+
+    if(values.length)
+      return values;
+
+  }
+
+  /*
+   * No more forced BWG123 as actual data.
+   * This is only a preview placeholder.
+   */
+
+  return ["PO NUMBER"];
+
+}
+
+
+/* =========================================================
+   CREATE LABEL
+   ========================================================= */
+
+function createCocoLabel(
+  po,
+  boxNumber,
+  index
+){
+
+  const label =
+    document.createElement("div");
+
+  label.className =
+    "label";
+
+  const content =
     document.querySelector(
       'input[name="contentMode"]:checked'
-    )?.value
-    || "po";
+    )?.value || "po";
 
-
-  const line=
+  const line =
     document.querySelector(
       'input[name="lineMode"]:checked'
-    )?.value
-    || "separate";
+    )?.value || "separate";
+
+  label.style.flexDirection =
+    line === "same"
+      ? "row"
+      : "column";
+
+  const poEl =
+    document.createElement("div");
+
+  poEl.className =
+    "po-preview";
+
+  const boxEl =
+    document.createElement("div");
+
+  boxEl.className =
+    "box-preview";
 
 
-  /* PAGE BORDER */
+  const poPrefix =
+    $("#poPrefix")?.value || "";
 
-  if($("#pageBorder").checked ||
-     $("#allBorder").checked){
+  const boxPrefix =
+    $("#boxPrefix")?.value ||
+    "BOX NO.";
 
-    const style=
-      $("#allBorder").checked
-        ? $("#allBorderStyle").value
-        : $("#pageBorderStyle").value;
 
-    page.style.border=
+  poEl.textContent =
+    `${poPrefix}${po}`;
+
+  boxEl.textContent =
+    `${boxPrefix}${boxNumber}`;
+
+
+  /*
+   * Content visibility.
+   */
+
+  if(content === "po"){
+    boxEl.style.display = "none";
+  }
+
+  else if(content === "box"){
+    poEl.style.display = "none";
+  }
+
+  else{
+    poEl.style.display = "";
+    boxEl.style.display = "";
+  }
+
+
+  /*
+   * PO font.
+   */
+
+  poEl.style.fontFamily =
+    $("#poFont")?.value ||
+    "Arial";
+
+  poEl.style.fontSize =
+    number(
+      $("#poSize")?.value,
+      20
+    ) + "px";
+
+  poEl.style.opacity =
+    number(
+      $("#poOpacity")?.value,
+      100
+    ) / 100;
+
+  poEl.style.fontWeight =
+    $("#poBold")
+      ?.classList.contains("active")
+      ? "700"
+      : "400";
+
+  poEl.style.fontStyle =
+    $("#poItalic")
+      ?.classList.contains("active")
+      ? "italic"
+      : "normal";
+
+  poEl.style.textDecoration =
+    $("#poUnderline")
+      ?.classList.contains("active")
+      ? "underline"
+      : "none";
+
+
+  /*
+   * Box font.
+   */
+
+  boxEl.style.fontFamily =
+    $("#boxFont")?.value ||
+    "Arial";
+
+  boxEl.style.fontSize =
+    number(
+      $("#boxSize")?.value,
+      17
+    ) + "px";
+
+  boxEl.style.opacity =
+    number(
+      $("#boxOpacity")?.value,
+      100
+    ) / 100;
+
+  boxEl.style.fontWeight =
+    $("#boxBold")
+      ?.classList.contains("active")
+      ? "700"
+      : "400";
+
+  boxEl.style.fontStyle =
+    $("#boxItalic")
+      ?.classList.contains("active")
+      ? "italic"
+      : "normal";
+
+  boxEl.style.textDecoration =
+    $("#boxUnderline")
+      ?.classList.contains("active")
+      ? "underline"
+      : "none";
+
+
+  /*
+   * PO border.
+   */
+
+  if(
+    $("#poBorder")?.checked ||
+    $("#allBorder")?.checked
+  ){
+
+    const style =
+      $("#allBorder")?.checked
+        ? $("#allBorderStyle")?.value
+        : $("#poBorderStyle")?.value;
+
+    poEl.style.border =
+      borderCSS(style);
+
+    poEl.style.padding =
+      "3px 7px";
+
+  }
+
+
+  /*
+   * Box border.
+   */
+
+  if(
+    $("#boxBorder")?.checked ||
+    $("#allBorder")?.checked
+  ){
+
+    const style =
+      $("#allBorder")?.checked
+        ? $("#allBorderStyle")?.value
+        : $("#boxBorderStyle")?.value;
+
+    boxEl.style.border =
+      borderCSS(style);
+
+    boxEl.style.padding =
+      "3px 7px";
+
+  }
+
+
+  label.append(
+    poEl,
+    boxEl
+  );
+
+  return label;
+
+}
+
+
+/* =========================================================
+   LIVE COCO PREVIEW
+   ========================================================= */
+
+function updateCocoPreview(){
+
+  const page =
+    $("#cocoPreview");
+
+  if(!page)
+    return;
+
+
+  const size =
+    getPageSize();
+
+  page.style.width =
+    size.cssWidth + "px";
+
+  page.style.minHeight =
+    size.cssHeight + "px";
+
+
+  /*
+   * Page border.
+   */
+
+  if(
+    $("#pageBorder")?.checked ||
+    $("#allBorder")?.checked
+  ){
+
+    const style =
+      $("#allBorder")?.checked
+        ? $("#allBorderStyle")?.value
+        : $("#pageBorderStyle")?.value;
+
+    page.style.border =
       borderCSS(style);
 
   }else{
 
-    page.style.border="none";
+    page.style.border =
+      "none";
 
   }
 
 
-  for(let i=0;i<count;i++){
+  /*
+   * Dynamic columns.
+   */
 
-    const label=
-      document.createElement("div");
+  const count =
+    labelCount();
 
-    label.className="label";
+  let columns = 1;
 
-    label.style.flexDirection=
-      line==="same"
-        ? "row"
-        : "column";
+  if(count >= 2)
+    columns = 2;
 
+  if(count >= 6)
+    columns = 3;
 
-    const poEl=
-      document.createElement("div");
+  if(count >= 12)
+    columns = 4;
 
-    poEl.className=
-      "po-preview";
-
-    poEl.textContent=
-      `${poPrefix}${po}`;
-
-
-    const boxEl=
-      document.createElement("div");
-
-    boxEl.className=
-      "box-preview";
-
-    boxEl.textContent=
-      `${boxPrefix}${start+i}`;
+  page.style.gridTemplateColumns =
+    `repeat(${columns},minmax(0,1fr))`;
 
 
-    /* CONTENT */
+  /*
+   * Get all PO data.
+   */
 
-    if(content==="po")
-      boxEl.style.display="none";
+  const pos =
+    getPreviewPOs();
 
-    if(content==="box")
-      poEl.style.display="none";
-
-
-    /* PO FONT */
-
-    poEl.style.fontFamily=
-      $("#poFont").value;
-
-    poEl.style.fontSize=
-      number(
-        $("#poSize").value,
-        20
-      )+"px";
-
-    poEl.style.opacity=
-      number(
-        $("#poOpacity").value,
-        100
-      )/100;
-
-    poEl.style.fontWeight=
-      $("#poBold").checked
-        ? "700"
-        : "400";
-
-    poEl.style.fontStyle=
-      $("#poItalic").checked
-        ? "italic"
-        : "normal";
-
-    poEl.style.textDecoration=
-      $("#poUnderline").checked
-        ? "underline"
-        : "none";
+  page.innerHTML = "";
 
 
-    /* BOX FONT */
+  /*
+   * IMPORTANT:
+   *
+   * We create enough labels for ALL
+   * PO rows, not just one default label.
+   */
 
-    boxEl.style.fontFamily=
-      $("#boxFont").value;
-
-    boxEl.style.fontSize=
-      number(
-        $("#boxSize").value,
-        17
-      )+"px";
-
-    boxEl.style.opacity=
-      number(
-        $("#boxOpacity").value,
-        100
-      )/100;
-
-    boxEl.style.fontWeight=
-      $("#boxBold").checked
-        ? "700"
-        : "400";
-
-    boxEl.style.fontStyle=
-      $("#boxItalic").checked
-        ? "italic"
-        : "normal";
-
-    boxEl.style.textDecoration=
-      $("#boxUnderline").checked
-        ? "underline"
-        : "none";
+  const totalLabels =
+    Math.max(
+      count,
+      pos.length
+    );
 
 
-    /* PO BORDER */
+  for(
+    let i=0;
+    i<totalLabels;
+    i++
+  ){
 
-    if(
-      $("#poBorder").checked ||
-      $("#allBorder").checked
-    ){
+    const po =
+      pos[
+        i % pos.length
+      ];
 
-      const style=
-        $("#allBorder").checked
-          ? $("#allBorderStyle").value
-          : $("#poBorderStyle").value;
+    const box =
+      boxNumberForIndex(i);
 
-      poEl.style.border=
-        borderCSS(style);
-
-      poEl.style.padding=
-        "3px 6px";
-
-    }
-
-
-    /* BOX BORDER */
-
-    if(
-      $("#boxBorder").checked ||
-      $("#allBorder").checked
-    ){
-
-      const style=
-        $("#allBorder").checked
-          ? $("#allBorderStyle").value
-          : $("#boxBorderStyle").value;
-
-      boxEl.style.border=
-        borderCSS(style);
-
-      boxEl.style.padding=
-        "3px 6px";
-
-    }
-
-
-    label.appendChild(poEl);
-    label.appendChild(boxEl);
+    const label =
+      createCocoLabel(
+        po,
+        box,
+        i
+      );
 
     page.appendChild(label);
 
@@ -3933,139 +3885,222 @@ function updateCoco(){
 }
 
 
-/* ======================================================
-   OTHER PO PREVIEW
-====================================================== */
+/* =========================================================
+   LIVE INPUTS
+   ========================================================= */
 
-function updateOther(){
+$$(
+  "#cocoPanel input, #cocoPanel select, #cocoPanel textarea"
+).forEach(element=>{
 
-  const po=
-    $("#otherPO").value.trim()
-    || "BWG123";
-
-  const box=
-    number(
-      $("#otherStart").value,
-      121
-    );
-
-  $("#otherPOPreview").textContent=
-    po;
-
-  $("#otherBoxPreview").textContent=
-    `${$("#otherBoxPrefix").value || "BOX NO."}${box}`;
-
-}
-
-
-/* ======================================================
-   ISBN
-====================================================== */
-
-function initISBN(){
-
-  $("#isbnNumber")
-  .addEventListener(
+  element.addEventListener(
     "input",
-    function(){
+    updateCocoPreview
+  );
 
-      $("#isbnPreview").textContent=
-        this.value.trim()
-        || "Enter ISBN";
+  element.addEventListener(
+    "change",
+    updateCocoPreview
+  );
+
+});
+
+
+/* =========================================================
+   ENABLE / DISABLE FEEDBACK
+   ========================================================= */
+
+$$(
+  '#cocoPanel input[type="checkbox"]'
+).forEach(input=>{
+
+  if(input.id === "allBorder")
+    return;
+
+  input.addEventListener(
+    "change",
+    ()=>{
+
+      const label =
+        input.closest(".choice,.border-card")
+          ?.querySelector("label,strong")
+          ?.textContent
+          ?.trim() ||
+        "This feature";
+
+      showToast(
+        input.checked
+          ? "green"
+          : "red",
+
+        input.checked
+          ? "Feature Enabled"
+          : "Feature Disabled",
+
+        `${label} has been ${
+          input.checked
+            ? "enabled"
+            : "disabled"
+        }.`
+      );
+
+      updateCocoPreview();
 
     }
   );
 
+});
+
+
+/* =========================================================
+   GENERIC PREVIEWS
+   ========================================================= */
+
+$("#otherPO")?.addEventListener(
+  "input",
+  updateOtherPreview
+);
+
+$("#otherStart")?.addEventListener(
+  "input",
+  updateOtherPreview
+);
+
+$("#otherBoxPrefix")?.addEventListener(
+  "input",
+  updateOtherPreview
+);
+
+
+function updateOtherPreview(){
+
+  const po =
+    $("#otherPO")?.value.trim() ||
+    "PO NUMBER";
+
+  const box =
+    number(
+      $("#otherStart")?.value,
+      1
+    );
+
+  $("#otherPOPreview").textContent =
+    po;
+
+  $("#otherBoxPreview").textContent =
+    `${$("#otherBoxPrefix")?.value || "BOX NO."}${box}`;
+
 }
 
 
-/* ======================================================
+/* =========================================================
+   ISBN
+   ========================================================= */
+
+$("#isbnNumber")?.addEventListener(
+  "input",
+  ()=>{
+    $("#isbnPreview").textContent =
+      $("#isbnNumber").value.trim() ||
+      "Enter ISBN";
+  }
+);
+
+
+/* =========================================================
    ADDRESS
-====================================================== */
+   ========================================================= */
 
-function initAddress(){
+function updateAddress(){
 
-  function update(){
+  const address =
+    $("#addressInput")?.value.trim() ||
+    "🏠 Your address will appear here.";
 
-    const address=
-      $("#addressInput").value.trim()
-      || "Your address will appear here.";
+  const email =
+    $("#addressEmail")?.value.trim();
 
-    const email=
-      $("#addressEmail").value.trim();
+  let html =
+    escapeHTML(address)
+      .replace(/\n/g,"<br>");
 
-    $("#addressPreview").innerHTML=
-      address.replace(
-        /\n/g,
-        "<br>"
-      )+
-      (
-        email
-          ? `<br><br>✉️ ${email}`
-          : ""
-      );
+  if(email){
 
-    $("#addressPreview").style.textAlign=
-      $("#addressAlign").value.toLowerCase();
+    html +=
+      `<br><br>✉️ ${escapeHTML(email)}`;
 
   }
 
-  [
-    "#addressInput",
-    "#addressEmail",
-    "#addressAlign"
-  ]
-  .forEach(selector=>{
+  const preview =
+    $("#addressPreview");
 
-    $(selector).addEventListener(
-      "input",
-      update
-    );
+  if(preview){
 
-    $(selector).addEventListener(
-      "change",
-      update
-    );
+    preview.innerHTML =
+      html;
 
-  });
+    preview.style.textAlign =
+      $("#addressAlign")?.value ||
+      "left";
 
-  update();
+  }
 
 }
 
 
-/* ======================================================
-   ACTIVE PREVIEW
-====================================================== */
+[
+  "#addressInput",
+  "#addressEmail",
+  "#addressAlign"
+].forEach(selector=>{
 
-function getActivePreview(){
+  $(selector)?.addEventListener(
+    "input",
+    updateAddress
+  );
 
-  const panel=
+  $(selector)?.addEventListener(
+    "change",
+    updateAddress
+  );
+
+});
+
+
+/* =========================================================
+   PDF — GET ACTIVE PREVIEW
+   ========================================================= */
+
+function activePreview(){
+
+  const panel =
     $(".panel.active");
 
   if(!panel){
 
-    toast(
+    showToast(
       "red",
       "No Tool Selected",
-      "Please select a tool first."
+      "Please select a tool."
     );
 
     return null;
+
   }
 
-  let page=
+  let page =
     $(".preview-page",panel);
 
   if(!page){
 
-    toast(
+    showToast(
       "red",
-      "Preview Missing",
-      "Live preview could not be found."
+      "Preview Not Found",
+      "Live preview is unavailable."
     );
 
     return null;
+
   }
 
   return {
@@ -4076,326 +4111,245 @@ function getActivePreview(){
 }
 
 
-/* ======================================================
-   PDF PAGE SIZE
-====================================================== */
+/* =========================================================
+   PDF SIZE
+   ========================================================= */
 
-function getPDFSize(panel){
-
-  /* CocoBlue */
+function pdfSizeForPanel(panel){
 
   if(
-    panel.id==="cocoPanel"
+    panel?.id === "cocoPanel"
   ){
 
-    const size=
-      $("#pageSize").value;
-
-    if(size==="4x6"){
-
-      return {
-        width:101.6,
-        height:152.4
-      };
-
-    }
-
-    if(size==="70x35"){
-
-      return {
-        width:70,
-        height:35
-      };
-
-    }
-
-    if(size==="a4"){
-
-      return {
-        width:210,
-        height:297
-      };
-
-    }
+    const size =
+      getPageSize();
 
     return {
-      width:number(
-        $("#customWidth").value,
-        70
-      ),
-      height:number(
-        $("#customHeight").value,
-        35
-      )
+      width:size.width,
+      height:size.height
     };
 
   }
 
-
-  /* Other modules */
-
-  const select=
+  const select =
     $(".generic-page-size",panel);
 
-  const value=
+  const value =
     select?.value || "a4";
 
-
-  if(value==="4x6"){
-
+  if(value === "4x6"){
     return {
       width:101.6,
       height:152.4
     };
-
   }
 
-  if(value==="70x35"){
-
+  if(value === "70x35"){
     return {
       width:70,
       height:35
     };
-
   }
-
-  if(value==="a4"){
-
-    return {
-      width:210,
-      height:297
-    };
-
-  }
-
-
-  /*
-     Generic custom fallback.
-  */
 
   return {
-    width:70,
-    height:35
+    width:210,
+    height:297
   };
 
 }
 
 
-/* ======================================================
-   FINAL PDF GENERATOR
-====================================================== */
+/* =========================================================
+   DOWNLOAD PDF
+   ========================================================= */
 
-async function generatePDF(
-  moduleName="BooksWagon_Label"
-){
+async function downloadPDF(){
 
-  const result=
-    getActivePreview();
+  const result =
+    activePreview();
 
   if(!result)
     return;
 
-
   if(
-    typeof html2pdf===
-    "undefined"
+    typeof html2pdf !==
+    "function"
   ){
 
-    toast(
+    showToast(
       "red",
       "PDF Engine Missing",
       "html2pdf.js could not be loaded."
     );
 
     return;
+
   }
 
 
   /*
-   * IMPORTANT:
-   *
-   * We are NOT cloning the preview.
-   * We are NOT moving it off-screen.
-   * We are NOT using display:none.
-   *
-   * html2pdf captures the actual visible
-   * live preview directly.
+   * Always rebuild Coco preview
+   * immediately before PDF generation.
    */
 
-  const page=
-    result.page;
+  if(
+    result.panel.id ===
+    "cocoPanel"
+  ){
 
-  const panel=
-    result.panel;
+    if(!validateRange())
+      return;
+
+    updateCocoPreview();
+
+  }
 
 
-  const pdfSize=
-    getPDFSize(panel);
-
-
-  toast(
-    "green",
-    "Generating PDF",
-    "Creating your PDF..."
+  await new Promise(
+    resolve =>
+      requestAnimationFrame(
+        ()=>requestAnimationFrame(resolve)
+      )
   );
 
 
-  /*
-   * Temporarily remove visual shadow.
-   * The preview itself remains visible.
-   */
-
-  const oldShadow=
-    page.style.boxShadow;
-
-  page.style.boxShadow=
-    "none";
+  const size =
+    pdfSizeForPanel(
+      result.panel
+    );
 
 
-  /*
-   * Make sure all images/fonts/layouts
-   * have been rendered before capture.
-   */
-
-  await new Promise(resolve=>{
-
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(resolve);
-    });
-
-  });
-
-
-  const options={
-
-    margin:0,
-
-    filename:
-      `${moduleName}.pdf`,
-
-    image:{
-      type:"jpeg",
-      quality:.98
-    },
-
-    html2canvas:{
-
-      scale:2,
-
-      useCORS:true,
-
-      allowTaint:true,
-
-      backgroundColor:"#ffffff",
-
-      logging:false,
-
-      scrollX:0,
-
-      scrollY:0,
-
-      /*
-       * Capture the real element.
-       */
-
-      width:
-        page.scrollWidth,
-
-      height:
-        page.scrollHeight
-
-    },
-
-    jsPDF:{
-
-      unit:"mm",
-
-      format:[
-        pdfSize.width,
-        pdfSize.height
-      ],
-
-      orientation:
-        pdfSize.width >
-        pdfSize.height
-          ? "landscape"
-          : "portrait",
-
-      compress:true
-
-    },
-
-    pagebreak:{
-      mode:[
-        "css",
-        "legacy"
-      ]
-    }
-
-  };
+  showToast(
+    "green",
+    "Generating PDF",
+    "Preparing all labels and pages..."
+  );
 
 
   try{
 
     await html2pdf()
-      .set(options)
-      .from(page)
+      .set({
+
+        margin:0,
+
+        filename:
+          "BooksWagon_Label_Studio.pdf",
+
+        image:{
+          type:"jpeg",
+          quality:.98
+        },
+
+        html2canvas:{
+
+          scale:2,
+
+          useCORS:true,
+
+          allowTaint:true,
+
+          backgroundColor:"#ffffff",
+
+          scrollX:0,
+
+          scrollY:0,
+
+          logging:false
+
+        },
+
+        jsPDF:{
+
+          unit:"mm",
+
+          format:[
+            size.width,
+            size.height
+          ],
+
+          orientation:
+            size.width >
+            size.height
+              ? "landscape"
+              : "portrait",
+
+          compress:true
+
+        },
+
+        pagebreak:{
+          mode:[
+            "css",
+            "legacy"
+          ]
+        }
+
+      })
+      .from(result.page)
       .save();
 
 
-    toast(
+    showToast(
       "green",
-      "PDF Generated",
-      `${moduleName}.pdf has been downloaded.`
+      "PDF Ready",
+      "Your PDF has been downloaded successfully."
     );
 
+  }
 
-  }catch(error){
+  catch(error){
 
     console.error(
-      "PDF generation error:",
+      "PDF ERROR:",
       error
     );
 
-    toast(
+    showToast(
       "red",
       "PDF Failed",
-      "The PDF could not be generated."
+      error.message ||
+      "PDF could not be generated."
     );
-
-
-  }finally{
-
-    page.style.boxShadow=
-      oldShadow;
 
   }
 
 }
 
 
-/* ======================================================
+/* =========================================================
    PRINT PDF
-====================================================== */
+   ========================================================= */
 
 function printPDF(){
 
-  const result=
-    getActivePreview();
+  const result =
+    activePreview();
 
   if(!result)
     return;
 
 
-  const page=
-    result.page;
+  if(
+    result.panel.id ===
+    "cocoPanel"
+  ){
+
+    if(!validateRange())
+      return;
+
+    updateCocoPreview();
+
+  }
 
 
-  const pdfSize=
-    getPDFSize(result.panel);
+  const size =
+    pdfSizeForPanel(
+      result.panel
+    );
 
 
-  const printWindow=
+  const printWindow =
     window.open(
       "",
       "_blank",
@@ -4405,24 +4359,23 @@ function printPDF(){
 
   if(!printWindow){
 
-    toast(
+    showToast(
       "red",
       "Popup Blocked",
-      "Please allow popups for Print PDF."
+      "Allow popups to open Print PDF."
     );
 
     return;
+
   }
 
 
-  const printHTML=
-    page.outerHTML;
-
-
-  printWindow.document.open();
+  const html =
+    result.page.outerHTML;
 
 
   printWindow.document.write(`
+
 <!DOCTYPE html>
 
 <html>
@@ -4432,7 +4385,7 @@ function printPDF(){
 <meta charset="UTF-8">
 
 <title>
-BooksWagon Label Print
+BooksWagon Label Studio - Print
 </title>
 
 <style>
@@ -4449,19 +4402,24 @@ body{
 }
 
 body{
-  width:${pdfSize.width}mm;
-  min-height:${pdfSize.height}mm;
+  width:${size.width}mm;
+  min-height:${size.height}mm;
 }
 
 .preview-page{
-  width:${pdfSize.width}mm !important;
-  min-height:${pdfSize.height}mm !important;
+
+  width:${size.width}mm !important;
+
+  min-height:${size.height}mm !important;
 
   margin:0 !important;
+
+  padding:3mm !important;
 
   box-shadow:none !important;
 
   background:#fff !important;
+
 }
 
 .label{
@@ -4470,7 +4428,7 @@ body{
 }
 
 @page{
-  size:${pdfSize.width}mm ${pdfSize.height}mm;
+  size:${size.width}mm ${size.height}mm;
   margin:0;
 }
 
@@ -4490,7 +4448,7 @@ body{
 
 <body>
 
-${printHTML}
+${html}
 
 <script>
 
@@ -4499,7 +4457,6 @@ window.onload=function(){
   setTimeout(function(){
 
     window.focus();
-
     window.print();
 
   },500);
@@ -4511,13 +4468,14 @@ window.onload=function(){
 </body>
 
 </html>
+
 `);
 
 
   printWindow.document.close();
 
 
-  toast(
+  showToast(
     "green",
     "Print PDF",
     "Print dialog is opening..."
@@ -4526,330 +4484,165 @@ window.onload=function(){
 }
 
 
-/* ======================================================
-   RESET COCO
-====================================================== */
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 
-function initReset(){
+$("#downloadCoco")?.addEventListener(
+  "click",
+  downloadPDF
+);
 
-  $("#resetCoco")
-  .addEventListener(
+$("#printCoco")?.addEventListener(
+  "click",
+  printPDF
+);
+
+
+/* Other PO */
+
+$('[data-generate="other"]')
+  ?.addEventListener(
     "click",
-    ()=>{
+    downloadPDF
+  );
 
-      $("#poNumber").value="";
-      $("#poPrefix").value="";
-      $("#startBox").value="";
-      $("#endBox").value="";
-      $("#boxPrefix").value="BOX NO.";
+$('[data-print="other"]')
+  ?.addEventListener(
+    "click",
+    printPDF
+  );
 
-      $("#poOnly").checked=true;
 
-      $("#pageSize").value="4x6";
+/* ISBN */
 
-      $("#labelsPerPage").value="2";
+$('[data-generate="isbn"]')
+  ?.addEventListener(
+    "click",
+    downloadPDF
+  );
 
-      $("#customPage")
-        .classList
-        .remove("open");
+$('[data-print="isbn"]')
+  ?.addEventListener(
+    "click",
+    printPDF
+  );
 
-      $("#customLabels")
-        .classList
-        .remove("open");
 
-      $("#allBorder").checked=false;
+/* Address */
 
-      [
-        "pageBorder",
-        "poBorder",
-        "boxBorder"
-      ].forEach(id=>{
+$('[data-generate="address"]')
+  ?.addEventListener(
+    "click",
+    downloadPDF
+  );
 
-        $("#"+id).checked=false;
-        $("#"+id).disabled=false;
+$('[data-print="address"]')
+  ?.addEventListener(
+    "click",
+    printPDF
+  );
 
-        $("#"+id)
-          .closest(".border-card")
-          .classList
-          .remove("frozen");
 
+/* =========================================================
+   RESET
+   ========================================================= */
+
+$("#resetCoco")?.addEventListener(
+  "click",
+  ()=>{
+
+    $("#poPrefix").value = "";
+    $("#startBox").value = "";
+    $("#endBox").value = "";
+    $("#boxPrefix").value = "BOX NO.";
+
+    $("#bulkInput").value = "";
+
+    $$(".manualPO").forEach(
+      input=>input.value=""
+    );
+
+    state.excelRows = [];
+    state.excelHeaders = [];
+
+    $("#excelInput").value = "";
+
+    $("#excelPreviewWrap")
+      ?.classList.remove("show");
+
+    $("#excelStatus").textContent =
+      "No Excel file selected.";
+
+    $("#poOnly").checked = true;
+
+    $("#combinedContent").checked =
+      false;
+
+    $("#separateLine").checked =
+      true;
+
+    $("#pageSize").value =
+      "4x6";
+
+    $("#labelsPerPage").value =
+      "2";
+
+    $("#boxFlow").value =
+      "sequential";
+
+    $("#customPage")
+      ?.classList.remove("open");
+
+    $("#customLabels")
+      ?.classList.remove("open");
+
+    $("#allBorder").checked =
+      false;
+
+    [
+      "pageBorder",
+      "poBorder",
+      "boxBorder"
+    ].forEach(id=>{
+
+      const element =
+        $("#" + id);
+
+      element.checked = false;
+      element.disabled = false;
+
+      element.closest(".border-card")
+        ?.classList.remove("frozen");
+
+    });
+
+    $$(".format-btn")
+      .forEach(btn=>{
+        btn.classList.remove("active");
       });
 
-      updateCoco();
+    updateContentMode();
+    updateCocoPreview();
 
-      toast(
-        "green",
-        "Settings Reset",
-        "CocoBlue settings have been reset."
-      );
-
-    }
-  );
-
-}
-
-
-/* ======================================================
-   LIVE COCO INPUTS
-====================================================== */
-
-function initCocoLive(){
-
-  $$("#cocoPanel input,#cocoPanel select")
-  .forEach(input=>{
-
-    input.addEventListener(
-      "input",
-      updateCoco
+    showToast(
+      "green",
+      "Settings Reset",
+      "CocoBlue settings have been reset."
     );
 
-    input.addEventListener(
-      "change",
-      updateCoco
-    );
+  }
+);
 
-  });
 
-}
+/* =========================================================
+   INITIAL
+   ========================================================= */
 
-
-/* ======================================================
-   OTHER LIVE
-====================================================== */
-
-function initOtherLive(){
-
-  $$("#otherPanel input,#otherPanel select")
-  .forEach(input=>{
-
-    input.addEventListener(
-      "input",
-      updateOther
-    );
-
-    input.addEventListener(
-      "change",
-      updateOther
-    );
-
-  });
-
-}
-
-
-/* ======================================================
-   ENABLE / DISABLE TOAST
-====================================================== */
-
-function initFeatureToast(){
-
-  $$(
-    'input[type="checkbox"]'
-  )
-  .forEach(input=>{
-
-    if(
-      input.id==="allBorder"
-    )
-      return;
-
-    input.addEventListener(
-      "change",
-      ()=>{
-
-        const parent=
-          input.closest(
-            ".choice,.format,.border-card"
-          );
-
-        const label=
-          parent?.querySelector(
-            "label,strong"
-          );
-
-        const name=
-          label?.textContent.trim()
-          || "Feature";
-
-        toast(
-          input.checked
-            ? "green"
-            : "red",
-
-          input.checked
-            ? "Feature Enabled"
-            : "Feature Disabled",
-
-          `${name} has been ${
-            input.checked
-              ? "enabled"
-              : "disabled"
-          }.`
-        );
-
-      }
-    );
-
-  });
-
-}
-
-
-/* ======================================================
-   RANGE EVENTS
-====================================================== */
-
-function initRangeEvents(){
-
-  $("#startBox")
-    .addEventListener(
-      "input",
-      ()=>{
-        validateRange(
-          "#startBox",
-          "#endBox"
-        );
-
-        updateCoco();
-      }
-    );
-
-
-  $("#endBox")
-    .addEventListener(
-      "input",
-      ()=>{
-        validateRange(
-          "#startBox",
-          "#endBox"
-        );
-
-        updateCoco();
-      }
-    );
-
-
-  $("#otherStart")
-    .addEventListener(
-      "input",
-      ()=>{
-        validateRange(
-          "#otherStart",
-          "#otherEnd"
-        );
-
-        updateOther();
-      }
-    );
-
-
-  $("#otherEnd")
-    .addEventListener(
-      "input",
-      ()=>{
-        validateRange(
-          "#otherStart",
-          "#otherEnd"
-        );
-
-        updateOther();
-      }
-    );
-
-}
-
-
-/* ======================================================
-   BUTTONS
-====================================================== */
-
-function initButtons(){
-
-  $("#generateCoco")
-    .addEventListener(
-      "click",
-      ()=>{
-        generatePDF(
-          "CocoBlue_Label"
-        );
-      }
-    );
-
-
-  $("#printCoco")
-    .addEventListener(
-      "click",
-      printPDF
-    );
-
-}
-
-
-/* ======================================================
-   INITIALIZE
-====================================================== */
-
-function init(){
-
-  initFonts();
-
-  initBorders();
-
-  initModules();
-
-  initTabs();
-
-  initManual();
-
-  initBulk();
-
-  initExcel();
-
-  initCustomPage();
-
-  initAllBorder();
-
-  initCocoLive();
-
-  initOtherLive();
-
-  initISBN();
-
-  initAddress();
-
-  initReset();
-
-  initFeatureToast();
-
-  initRangeEvents();
-
-  initButtons();
-
-  updateCoco();
-
-  updateOther();
-
-}
-
-
-/* ======================================================
-   START
-====================================================== */
-
-if(
-  document.readyState==="loading"
-){
-
-  document.addEventListener(
-    "DOMContentLoaded",
-    init
-  );
-
-}else{
-
-  init();
-
-}
+updateContentMode();
+updateOtherPreview();
+updateAddress();
+updateCocoPreview();
 
 </script>
 
