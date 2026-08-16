@@ -7,15 +7,10 @@
 <title>BW G Books Wagon Label Studio</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.2.5.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
-
-/* =========================================================
-   GLOBAL
-========================================================= */
-
 :root{
     --blue:#1264d8;
     --blue-dark:#073b82;
@@ -26,7 +21,6 @@
     --muted:#667085;
     --border:#d7e0ea;
     --bg:#f3f6fa;
-    --white:#fff;
 }
 
 *{
@@ -40,30 +34,12 @@ html{
 body{
     margin:0;
     padding:0;
-    font-family:
-        Inter,
-        "Segoe UI",
-        Arial,
-        sans-serif;
-
+    font-family:Inter,"Segoe UI",Arial,sans-serif;
     color:var(--text);
-
     background:
-        radial-gradient(
-            circle at 0 0,
-            rgba(18,100,216,.10),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at 100% 0,
-            rgba(226,167,46,.09),
-            transparent 28%
-        ),
-        linear-gradient(
-            135deg,
-            #f8fafc,
-            #eef2f7
-        );
+        radial-gradient(circle at 0 0,rgba(18,100,216,.10),transparent 30%),
+        radial-gradient(circle at 100% 0,rgba(226,167,46,.09),transparent 28%),
+        linear-gradient(135deg,#f8fafc,#eef2f7);
 }
 
 button,
@@ -77,37 +53,25 @@ button{
     cursor:pointer;
 }
 
-/* =========================================================
-   APP
-========================================================= */
-
 .app{
     width:min(1500px,100%);
     margin:auto;
     padding:16px;
 }
 
-/* =========================================================
-   HEADER
-========================================================= */
+/* HEADER */
 
 .header{
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:20px;
-
     padding:20px;
-
     margin-bottom:15px;
-
     background:#fff;
-
     border:1px solid var(--border);
     border-radius:22px;
-
-    box-shadow:
-        0 12px 35px rgba(15,23,42,.08);
+    box-shadow:0 12px 35px rgba(15,23,42,.08);
 }
 
 .brand{
@@ -119,36 +83,20 @@ button{
 .logo{
     width:62px;
     height:62px;
-    flex-shrink:0;
-
     display:grid;
     place-items:center;
-
     border-radius:17px;
-
     color:#fff;
     font-size:17px;
     font-weight:1000;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--blue-dark),
-            var(--blue)
-        );
-
-    box-shadow:
-        0 10px 25px rgba(18,100,216,.25);
+    background:linear-gradient(135deg,var(--blue-dark),var(--blue));
 }
 
 .brand h1{
     margin:0;
-
     font-size:24px;
     line-height:1.15;
-
     font-weight:1000;
-    letter-spacing:-.6px;
 }
 
 .brand h1 span{
@@ -157,120 +105,74 @@ button{
 
 .brand p{
     margin:5px 0 0;
-
     color:var(--muted);
-
     font-size:10px;
     font-weight:600;
 }
-
-/* =========================================================
-   LIVE
-========================================================= */
 
 .live{
     display:flex;
     align-items:center;
     gap:8px;
-
     padding:8px 13px;
-
     color:var(--green);
-
     background:#effdf4;
-
     border:1px solid #bbf7d0;
     border-radius:30px;
-
     font-size:9px;
     font-weight:1000;
-
-    white-space:nowrap;
 }
 
 .live-dot{
     width:9px;
     height:9px;
-
     border-radius:50%;
-
     background:#22c55e;
-
     animation:livePulse 1.4s infinite;
 }
 
 @keyframes livePulse{
-
     0%,100%{
         transform:scale(.75);
         opacity:.55;
     }
-
     50%{
         transform:scale(1.2);
         opacity:1;
-
-        box-shadow:
-            0 0 0 7px
-            rgba(34,197,94,.08);
+        box-shadow:0 0 0 7px rgba(34,197,94,.08);
     }
 }
 
-/* =========================================================
-   TOOL NAVIGATION
-   TOP TO BOTTOM
-========================================================= */
+/* TOOLS - TOP TO BOTTOM */
 
 .modules{
     width:100%;
-
     display:flex;
     flex-direction:column;
-
     gap:12px;
-
     margin-bottom:15px;
 }
 
 .module{
     position:relative;
-
     width:100%;
     min-height:92px;
-
     display:flex;
     align-items:center;
-
     gap:16px;
-
     padding:18px 20px;
-
     text-align:left;
-
     background:#fff;
-
     border:1px solid var(--border);
     border-radius:19px;
-
-    box-shadow:
-        0 7px 22px rgba(15,23,42,.06);
-
-    transition:
-        transform .28s ease,
-        box-shadow .28s ease,
-        border-color .28s ease;
+    box-shadow:0 7px 22px rgba(15,23,42,.06);
+    transition:.28s;
 }
 
 .module:hover{
-    transform:
-        translateY(-4px)
-        scale(1.01);
-
+    transform:translateY(-4px) scale(1.01);
     border-color:#91bceb;
-
-    box-shadow:
-        0 18px 38px
-        rgba(15,23,42,.13);
+    box-shadow:0 18px 38px rgba(15,23,42,.13);
 }
 
 .module:active{
@@ -279,119 +181,46 @@ button{
 
 .module.active{
     border-color:#78aee8;
-
-    background:
-        linear-gradient(
-            135deg,
-            #eef7ff,
-            #e5f0ff
-        );
-
-    box-shadow:
-        0 15px 35px
-        rgba(18,100,216,.13);
-}
-
-.module::before{
-    content:"";
-
-    position:absolute;
-
-    left:0;
-    top:0;
-
-    width:5px;
-    height:100%;
-
-    border-radius:
-        19px 0 0 19px;
-
-    background:
-        linear-gradient(
-            180deg,
-            var(--blue),
-            var(--gold)
-        );
-
-    transform:scaleY(0);
-
-    transition:.3s;
-}
-
-.module.active::before,
-.module:hover::before{
-    transform:scaleY(1);
+    background:linear-gradient(135deg,#eef7ff,#e5f0ff);
 }
 
 .module-icon{
     width:58px;
     height:58px;
     min-width:58px;
-
     display:grid;
     place-items:center;
-
     border-radius:16px;
-
     background:#f1f5f9;
-
     font-size:27px;
-
-    transition:.3s;
-}
-
-.module:hover .module-icon{
-    transform:scale(1.08);
-    background:#eaf4ff;
 }
 
 .module.active .module-icon{
     color:#fff;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--blue-dark),
-            var(--blue)
-        );
-
-    box-shadow:
-        0 8px 20px
-        rgba(18,100,216,.22);
+    background:linear-gradient(135deg,var(--blue-dark),var(--blue));
 }
 
 .module strong{
     display:block;
-
     font-size:14px;
     font-weight:1000;
 }
 
 .module small{
     display:block;
-
     margin-top:5px;
-
     color:var(--muted);
-
     font-size:9px;
 }
 
-/* =========================================================
-   WORKSPACE
-========================================================= */
+/* WORKSPACE */
 
 .workspace{
     overflow:hidden;
-
     background:#fff;
-
     border:1px solid var(--border);
     border-radius:22px;
-
-    box-shadow:
-        0 15px 45px
-        rgba(15,23,42,.08);
+    box-shadow:0 15px 45px rgba(15,23,42,.08);
 }
 
 .panel{
@@ -400,117 +229,75 @@ button{
 
 .panel.active{
     display:block;
-
-    animation:
-        panelIn .4s
-        cubic-bezier(.16,1,.3,1);
+    animation:panelIn .4s cubic-bezier(.16,1,.3,1);
 }
 
 @keyframes panelIn{
-
     from{
         opacity:0;
-
-        transform:
-            translateY(22px)
-            scale(.97);
+        transform:translateY(22px) scale(.97);
     }
-
     to{
         opacity:1;
-
-        transform:
-            translateY(0)
-            scale(1);
+        transform:translateY(0) scale(1);
     }
 }
-
-/* =========================================================
-   PANEL HEAD
-========================================================= */
 
 .panel-head{
     display:flex;
     align-items:center;
     justify-content:space-between;
-
     padding:20px;
-
-    border-bottom:
-        1px solid var(--border);
+    border-bottom:1px solid var(--border);
 }
 
 .panel-head h2{
     margin:0;
-
     font-size:20px;
     font-weight:1000;
 }
 
 .panel-head p{
     margin:5px 0 0;
-
     color:var(--muted);
-
     font-size:9px;
 }
 
-/* =========================================================
-   SECTIONS
-========================================================= */
-
 .section{
     padding:19px 21px;
-
-    border-bottom:
-        1px solid var(--border);
+    border-bottom:1px solid var(--border);
 }
 
 .section h3{
     margin:0 0 5px;
-
     font-size:13px;
     font-weight:1000;
 }
 
 .desc{
     margin:0 0 13px;
-
     color:var(--muted);
-
     font-size:9px;
 }
 
-/* =========================================================
-   GRID
-========================================================= */
-
 .grid{
     display:grid;
-
-    grid-template-columns:
-        repeat(2,minmax(0,1fr));
-
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:11px;
 }
 
 .grid3{
-    grid-template-columns:
-        repeat(3,minmax(0,1fr));
+    grid-template-columns:repeat(3,minmax(0,1fr));
 }
 
 .grid4{
-    grid-template-columns:
-        repeat(4,minmax(0,1fr));
+    grid-template-columns:repeat(4,minmax(0,1fr));
 }
 
 .field label{
     display:block;
-
     margin-bottom:5px;
-
     color:#475467;
-
     font-size:9px;
     font-weight:900;
 }
@@ -519,20 +306,12 @@ input,
 select,
 textarea{
     width:100%;
-
     padding:10px;
-
     color:var(--text);
-
     background:#fff;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:9px;
-
     outline:none;
-
     transition:.2s;
 }
 
@@ -545,93 +324,61 @@ input:focus,
 select:focus,
 textarea:focus{
     border-color:var(--blue);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(18,100,216,.10);
+    box-shadow:0 0 0 3px rgba(18,100,216,.10);
 }
 
 input:disabled,
 select:disabled,
 textarea:disabled{
     background:#f0f2f5;
-
     color:#98a2b3;
-
     cursor:not-allowed;
 }
 
-/* =========================================================
-   MODE BUTTONS
-========================================================= */
+/* MODE */
 
 .mode-grid{
     display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
+    grid-template-columns:repeat(3,1fr);
     gap:9px;
 }
 
 .mode{
     padding:14px;
-
     text-align:left;
-
     background:#fff;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:11px;
-
     transition:.22s;
 }
 
 .mode:hover{
     transform:translateY(-2px);
-
     border-color:#8bb9ed;
 }
 
 .mode.active{
     color:var(--blue);
-
     background:#edf6ff;
-
     border-color:var(--blue);
-
-    box-shadow:
-        0 7px 18px
-        rgba(18,100,216,.08);
 }
 
 .mode-icon{
     margin-bottom:6px;
-
     font-size:22px;
 }
 
 .mode strong{
     display:block;
-
     font-size:10px;
 }
 
 .mode small{
     display:block;
-
     margin-top:4px;
-
     color:var(--muted);
-
     font-size:8px;
 }
-
-/* =========================================================
-   MODE CONTENT
-========================================================= */
 
 .mode-panel{
     display:none;
@@ -641,83 +388,43 @@ textarea:disabled{
     display:block;
 }
 
-/* =========================================================
-   EXCEL
-========================================================= */
+/* EXCEL */
 
 .excel-upload{
     padding:25px;
-
     text-align:center;
-
-    border:
-        2px dashed #8db9ed;
-
+    border:2px dashed #8db9ed;
     border-radius:13px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #f5faff,
-            #eef7ff
-        );
-
-    transition:.25s;
-}
-
-.excel-upload:hover{
-    border-color:var(--blue);
-
-    background:#edf6ff;
-
-    transform:translateY(-2px);
+    background:linear-gradient(135deg,#f5faff,#eef7ff);
 }
 
 .excel-upload input{
     max-width:420px;
-
     margin:12px auto 0;
 }
 
 .excel-success{
     display:none;
-
     margin-top:11px;
-
     padding:11px;
-
     color:#166534;
-
     background:#effdf4;
-
-    border:
-        1px solid #bbf7d0;
-
+    border:1px solid #bbf7d0;
     border-radius:9px;
-
     font-size:9px;
     font-weight:900;
 }
 
 .excel-success.show{
     display:block;
-
-    animation:
-        smallPop .35s ease;
 }
 
 .excel-preview-wrap{
     display:none;
-
     max-height:300px;
-
     overflow:auto;
-
     margin-top:13px;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:10px;
 }
 
@@ -727,99 +434,55 @@ textarea:disabled{
 
 .excel-preview{
     width:100%;
-
     border-collapse:collapse;
-
     font-size:9px;
 }
 
 .excel-preview th,
 .excel-preview td{
     padding:8px;
-
     text-align:left;
-
     white-space:nowrap;
-
-    border-right:
-        1px solid var(--border);
-
-    border-bottom:
-        1px solid var(--border);
+    border-right:1px solid var(--border);
+    border-bottom:1px solid var(--border);
 }
 
 .excel-preview th{
     position:sticky;
-
     top:0;
-
     z-index:2;
-
     color:var(--blue-dark);
-
     background:#eaf4ff;
 }
 
-@keyframes smallPop{
-
-    from{
-        opacity:0;
-        transform:scale(.94);
-    }
-
-    to{
-        opacity:1;
-        transform:scale(1);
-    }
-}
-
-/* =========================================================
-   CHOICES
-========================================================= */
+/* CHOICES */
 
 .choice-grid{
     display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
+    grid-template-columns:repeat(3,1fr);
     gap:9px;
 }
 
 .choice{
     display:flex;
-
     align-items:center;
-
     gap:8px;
-
     padding:11px;
-
     background:#fff;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:10px;
-
     cursor:pointer;
-
     transition:.2s;
 }
 
 .choice:hover{
     transform:translateY(-2px);
-
     background:#f5faff;
-
-    border-color:#8bb9ed;
 }
 
 .choice.active{
     color:var(--blue);
-
     background:#edf6ff;
-
     border-color:var(--blue);
 }
 
@@ -827,63 +490,73 @@ textarea:disabled{
     width:auto;
 }
 
-/* =========================================================
-   FREEZE MESSAGE
-========================================================= */
+/* ADDRESS FROM / TO */
 
-.freeze-note{
-    display:none;
+.address-route{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
 
-    margin-top:10px;
+.route-card{
+    padding:16px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:#fbfdff;
+}
 
-    padding:9px;
+.route-card.from{
+    border-top:4px solid #1264d8;
+}
 
-    color:#166534;
+.route-card.to{
+    border-top:4px solid #e2a72e;
+}
 
-    background:#effdf4;
+.route-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:12px;
+}
 
-    border:
-        1px solid #bbf7d0;
-
+.route-title span{
+    display:grid;
+    place-items:center;
+    width:30px;
+    height:30px;
     border-radius:8px;
-
-    font-size:9px;
-    font-weight:900;
+    background:#eef5ff;
 }
 
-.freeze-note.show{
-    display:block;
+.route-title strong{
+    font-size:12px;
+    font-weight:1000;
 }
 
-/* =========================================================
-   BORDERS
-========================================================= */
+.route-fields{
+    display:grid;
+    gap:9px;
+}
+
+/* BORDER */
 
 .border-grid{
     display:grid;
-
-    grid-template-columns:
-        repeat(4,1fr);
-
+    grid-template-columns:repeat(4,1fr);
     gap:9px;
 }
 
 .border-card{
     padding:12px;
-
     background:#fff;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:10px;
 }
 
 .border-card strong{
     display:block;
-
     margin-bottom:7px;
-
     font-size:10px;
 }
 
@@ -891,140 +564,91 @@ textarea:disabled{
     width:auto;
 }
 
-/* =========================================================
-   FONT
-========================================================= */
+/* FONT */
 
 .font-card{
     padding:13px;
-
     margin-bottom:10px;
-
     background:#f9fbfd;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:11px;
 }
 
 .font-card h4{
     margin:0 0 10px;
-
     font-size:10px;
 }
 
 .font-controls{
     display:grid;
-
-    grid-template-columns:
-        1.5fr
-        .6fr
-        .6fr
-        42px
-        42px
-        42px;
-
+    grid-template-columns:1.5fr .6fr .6fr 42px 42px 42px;
     gap:7px;
 }
 
 .format{
     background:#fff;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:8px;
-
     font-weight:1000;
 }
 
 .format.active{
     color:#fff;
-
     background:var(--blue);
-
     border-color:var(--blue);
 }
 
-/* =========================================================
-   PREVIEW
-========================================================= */
+/* PREVIEW */
 
 .preview-section{
     padding:20px;
-
     background:#f8fafc;
 }
 
 .preview-title{
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
-
     margin-bottom:11px;
 }
 
 .preview-title h3{
     margin:0;
-
     font-size:13px;
 }
 
 .page-count{
     padding:6px 10px;
-
     color:var(--blue);
-
     background:#eaf4ff;
-
     border-radius:20px;
-
     font-size:9px;
     font-weight:900;
 }
 
 .preview-stage{
     padding:25px;
-
     overflow:auto;
-
     background:#e8edf3;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:12px;
 }
 
 .preview-pages{
     display:flex;
-
     flex-direction:column;
-
     align-items:center;
-
     gap:28px;
 }
 
 .preview-page{
     position:relative;
-
     flex:0 0 auto;
-
     display:grid;
-
     align-content:start;
-
     overflow:hidden;
-
     background:#fff;
-
-    box-shadow:
-        0 16px 45px
-        rgba(0,0,0,.18);
+    box-shadow:0 16px 45px rgba(0,0,0,.18);
 }
 
 .preview-page.a4{
@@ -1042,174 +666,159 @@ textarea:disabled{
     height:132px;
 }
 
-.preview-page.custom{
-    width:794px;
-    height:1123px;
-}
-
 .label{
     min-width:0;
     min-height:0;
-
     overflow:hidden;
-
     display:flex;
-
     align-items:center;
     justify-content:center;
-
     padding:7px;
-
     background:#fff;
-
     text-align:center;
-
     break-inside:avoid;
     page-break-inside:avoid;
 }
 
-.same-line{
-    width:100%;
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    gap:9px;
-}
-
 .separate-line{
     width:100%;
-
     display:flex;
-
     flex-direction:column;
-
     align-items:center;
     justify-content:center;
-
     gap:7px;
+}
+
+.same-line{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
 }
 
 .po-value,
 .box-value{
     max-width:100%;
-
     word-break:break-word;
-
     overflow-wrap:anywhere;
-
     line-height:1.08;
 }
 
-/* =========================================================
-   ACTIONS
-========================================================= */
+/* ADDRESS PREVIEW */
+
+.address-label-design{
+    width:100%;
+    min-height:70%;
+    padding:25px;
+    border:2px solid #1264d8;
+    border-radius:18px;
+    background:
+        linear-gradient(
+            135deg,
+            #f8fbff,
+            #fffdf7
+        );
+}
+
+.address-from-preview{
+    padding-bottom:15px;
+    border-bottom:1px dashed #b8c5d6;
+}
+
+.address-to-preview{
+    padding-top:18px;
+}
+
+.address-small-title{
+    margin-bottom:6px;
+    color:#1264d8;
+    font-size:11px;
+    font-weight:1000;
+    text-transform:uppercase;
+}
+
+.address-to-preview .address-small-title{
+    color:#b07b05;
+}
+
+.address-person{
+    font-size:20px;
+    font-weight:1000;
+}
+
+.address-phone{
+    margin-top:5px;
+    font-size:12px;
+}
+
+.address-body{
+    margin-top:8px;
+    font-size:15px;
+    line-height:1.5;
+    white-space:pre-wrap;
+}
+
+/* ACTIONS */
 
 .actions{
     display:flex;
-
     justify-content:flex-end;
-
     gap:9px;
-
     padding:16px 20px;
-
-    border-top:
-        1px solid var(--border);
+    border-top:1px solid var(--border);
 }
 
 .btn{
     padding:11px 18px;
-
     border:0;
-
     border-radius:9px;
-
     color:#fff;
-
     font-size:10px;
     font-weight:1000;
-
     transition:.2s;
 }
 
 .btn:hover{
-    transform:
-        translateY(-2px)
-        scale(1.02);
+    transform:translateY(-2px) scale(1.02);
 }
 
 .btn-download{
-    background:
-        linear-gradient(
-            135deg,
-            #0754b8,
-            #1264d8
-        );
+    background:linear-gradient(135deg,#0754b8,#1264d8);
 }
 
 .btn-print{
-    background:
-        linear-gradient(
-            135deg,
-            #111827,
-            #374151
-        );
+    background:linear-gradient(135deg,#111827,#374151);
 }
 
-/* =========================================================
-   TOAST
-========================================================= */
+/* TOAST */
 
 #toastContainer{
     position:fixed;
-
     top:18px;
     right:18px;
-
     z-index:99999;
-
-    width:
-        min(
-            390px,
-            calc(100vw - 36px)
-        );
+    width:min(390px,calc(100vw - 36px));
 }
 
 .toast{
     display:flex;
-
     align-items:center;
-
     gap:10px;
-
     padding:13px;
-
     margin-bottom:8px;
-
     background:#fff;
-
     border-radius:12px;
-
-    box-shadow:
-        0 20px 45px
-        rgba(0,0,0,.18);
-
-    animation:
-        toastIn .4s
-        cubic-bezier(.16,1,.3,1);
+    box-shadow:0 20px 45px rgba(0,0,0,.18);
+    animation:toastIn .4s cubic-bezier(.16,1,.3,1);
 }
 
 .toast.green{
-    border-right:
-        5px solid var(--green);
+    border-right:5px solid var(--green);
 }
 
 .toast.red{
-    border-right:
-        5px solid var(--red);
+    border-right:5px solid var(--red);
 }
 
 .toast-icon{
@@ -1218,56 +827,37 @@ textarea:disabled{
 
 .toast strong{
     display:block;
-
     font-size:10px;
 }
 
 .toast span{
     display:block;
-
     margin-top:3px;
-
     color:var(--muted);
-
     font-size:8px;
 }
 
 @keyframes toastIn{
-
     from{
         opacity:0;
-
-        transform:
-            translateX(120%)
-            scale(.75);
+        transform:translateX(120%) scale(.75);
     }
-
     to{
         opacity:1;
-
-        transform:
-            translateX(0)
-            scale(1);
+        transform:translateX(0) scale(1);
     }
 }
 
-/* =========================================================
-   FOOTER
-========================================================= */
+/* FOOTER */
 
 footer{
     padding:18px;
-
     text-align:center;
-
     color:var(--muted);
-
     font-size:8px;
 }
 
-/* =========================================================
-   PRINT
-========================================================= */
+/* PRINT */
 
 @media print{
 
@@ -1277,88 +867,63 @@ footer{
 
     html,
     body{
-        margin:0 !important;
-        padding:0 !important;
-
-        background:#fff !important;
+        margin:0!important;
+        padding:0!important;
+        background:#fff!important;
     }
 
     body *{
-        visibility:hidden !important;
+        visibility:hidden!important;
     }
 
     #printAreaHidden,
     #printAreaHidden *{
-        visibility:visible !important;
+        visibility:visible!important;
     }
 
     #printAreaHidden{
-        position:absolute !important;
-
-        left:0 !important;
-        top:0 !important;
-
-        width:100% !important;
-
-        margin:0 !important;
-        padding:0 !important;
+        position:absolute!important;
+        left:0!important;
+        top:0!important;
+        width:100%!important;
+        margin:0!important;
+        padding:0!important;
     }
 
     #printAreaHidden .preview-page{
-
-        margin:0 !important;
-
-        box-shadow:none !important;
-
-        break-after:page !important;
-
-        page-break-after:always !important;
-
-        break-inside:avoid !important;
-
-        page-break-inside:avoid !important;
-
-        align-content:start !important;
-
-        transform:none !important;
+        margin:0!important;
+        box-shadow:none!important;
+        break-after:page!important;
+        page-break-after:always!important;
+        break-inside:avoid!important;
+        page-break-inside:avoid!important;
+        transform:none!important;
     }
 
-    #printAreaHidden
-    .preview-page:last-child{
-
-        break-after:auto !important;
-
-        page-break-after:auto !important;
-    }
-
-    #printAreaHidden
-    .label{
-
-        break-inside:avoid !important;
-
-        page-break-inside:avoid !important;
+    #printAreaHidden .preview-page:last-child{
+        break-after:auto!important;
+        page-break-after:auto!important;
     }
 }
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+/* RESPONSIVE */
 
 @media(max-width:900px){
 
     .grid4{
-        grid-template-columns:
-            repeat(2,1fr);
+        grid-template-columns:repeat(2,1fr);
     }
 
     .grid3{
-        grid-template-columns:
-            repeat(2,1fr);
+        grid-template-columns:repeat(2,1fr);
     }
 
     .border-grid{
-        grid-template-columns:
-            repeat(2,1fr);
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .address-route{
+        grid-template-columns:1fr;
     }
 }
 
@@ -1370,29 +935,11 @@ footer{
 
     .header{
         flex-direction:column;
-
         align-items:flex-start;
     }
 
-    /* STILL TOP TO BOTTOM */
-
     .modules{
-        display:flex;
-
         flex-direction:column;
-
-        width:100%;
-    }
-
-    .module{
-        width:100%;
-        min-height:80px;
-    }
-
-    .module-icon{
-        width:50px;
-        height:50px;
-        min-width:50px;
     }
 
     .grid,
@@ -1422,7 +969,6 @@ footer{
         width:100%;
     }
 }
-
 </style>
 </head>
 
@@ -1430,9 +976,7 @@ footer{
 
 <div class="app">
 
-<!-- ======================================================
-     HEADER
-====================================================== -->
+<!-- HEADER -->
 
 <header class="header">
 
@@ -1458,109 +1002,68 @@ footer{
     </div>
 
     <div class="live">
-
         <span class="live-dot"></span>
-
         WEBSITE IS LIVE
-
     </div>
 
 </header>
 
 
-<!-- ======================================================
-     FOUR TOOLS
-====================================================== -->
+<!-- TOOLS -->
 
 <nav class="modules">
 
-    <button
-        class="module active"
-        data-tool="coco">
+    <button class="module active" data-tool="coco">
 
         <div class="module-icon">
             🎨
         </div>
 
         <div>
-
-            <strong>
-                COCO BLUE
-            </strong>
-
-            <small>
-                PO + Box Labels
-            </small>
-
+            <strong>COCO BLUE</strong>
+            <small>PO + Box Labels</small>
         </div>
 
     </button>
 
 
-    <button
-        class="module"
-        data-tool="other">
+    <button class="module" data-tool="other">
 
         <div class="module-icon">
             📦
         </div>
 
         <div>
-
-            <strong>
-                OTHER PO
-            </strong>
-
-            <small>
-                PO + Box Labels
-            </small>
-
+            <strong>OTHER PO</strong>
+            <small>PO + Box Labels</small>
         </div>
 
     </button>
 
 
-    <button
-        class="module"
-        data-tool="isbn">
+    <button class="module" data-tool="isbn">
 
         <div class="module-icon">
             📚
         </div>
 
         <div>
-
-            <strong>
-                ISBN BARCODE
-            </strong>
-
-            <small>
-                ISBN + Barcode
-            </small>
-
+            <strong>ISBN BARCODE</strong>
+            <small>ISBN + Barcode</small>
         </div>
 
     </button>
 
 
-    <button
-        class="module"
-        data-tool="address">
+    <button class="module" data-tool="address">
 
         <div class="module-icon">
             🚚
         </div>
 
         <div>
-
-            <strong>
-                ADDRESS LABEL
-            </strong>
-
-            <small>
-                Bulk Address Labels
-            </small>
-
+            <strong>ADDRESS LABEL</strong>
+            <small>From + To Address Labels</small>
         </div>
 
     </button>
@@ -1568,106 +1071,44 @@ footer{
 </nav>
 
 
-<!-- ======================================================
-     WORKSPACE
-====================================================== -->
-
 <main class="workspace">
 
 
 <!-- ======================================================
-     COCO BLUE
+COCO BLUE
 ====================================================== -->
 
-<section
-    class="panel active"
-    id="cocoPanel">
+<section class="panel active" id="cocoPanel">
 
     <div class="panel-head">
-
         <div>
-
-            <h2>
-                🎨 Coco Blue Label Generator
-            </h2>
-
-            <p>
-                PO and Box label generation
-            </p>
-
+            <h2>🎨 Coco Blue Label Generator</h2>
+            <p>PO and Box label generation</p>
         </div>
-
     </div>
-
-
-    <!-- MODE -->
 
     <div class="section">
 
-        <h3>
-            ⚙ Input Mode
-        </h3>
-
-        <p class="desc">
-            Choose Manual, Bulk or Excel.
-        </p>
+        <h3>⚙ Input Mode</h3>
 
         <div class="mode-grid">
 
-            <button
-                class="mode active"
-                data-mode="manual">
-
-                <div class="mode-icon">
-                    👤
-                </div>
-
-                <strong>
-                    Manual
-                </strong>
-
-                <small>
-                    20 PO inputs
-                </small>
-
+            <button class="mode active" data-mode="manual">
+                <div class="mode-icon">👤</div>
+                <strong>Manual</strong>
+                <small>20 PO inputs</small>
             </button>
 
-
-            <button
-                class="mode"
-                data-mode="bulk">
-
-                <div class="mode-icon">
-                    🚚
-                </div>
-
-                <strong>
-                    Bulk
-                </strong>
-
-                <small>
-                    Unlimited comma separated
-                </small>
-
+            <button class="mode" data-mode="bulk">
+                <div class="mode-icon">🚚</div>
+                <strong>Bulk</strong>
+                <small>Unlimited comma separated</small>
             </button>
 
-
-            <button
-                class="mode"
-                data-mode="excel">
-
-                <div class="mode-icon">
-                    📊
-                </div>
-
-                <strong>
-                    Excel
-                </strong>
-
-                <small>
-                    Unlimited Excel rows
-                </small>
-
+            <button class="mode" data-mode="excel">
+                <div class="mode-icon">📊</div>
+                <strong>Excel</strong>
+                <small>Unlimited Excel rows</small>
             </button>
 
         </div>
@@ -1675,53 +1116,31 @@ footer{
     </div>
 
 
-    <!-- MANUAL -->
+    <div class="section mode-panel active" id="cocoManual">
 
-    <div
-        class="section mode-panel active"
-        id="cocoManual">
+        <h3>📝 Manual PO Numbers</h3>
 
-        <h3>
-            📝 Manual PO Numbers
-        </h3>
-
-        <div
-            class="grid grid4"
-            id="cocoManualInputs">
-        </div>
+        <div class="grid grid4" id="cocoManualInputs"></div>
 
     </div>
 
 
-    <!-- BULK -->
+    <div class="section mode-panel" id="cocoBulk">
 
-    <div
-        class="section mode-panel"
-        id="cocoBulk">
-
-        <h3>
-            🚚 Bulk PO Numbers
-        </h3>
+        <h3>🚚 Bulk PO Numbers</h3>
 
         <textarea
             id="cocoBulkInput"
-            placeholder="BWG001, BWG002, BWG003, BWG004...">
-        </textarea>
+            placeholder="PO001, PO002, PO003..."></textarea>
 
     </div>
 
 
-    <!-- EXCEL -->
-
-    <div
-        class="section mode-panel"
-        id="cocoExcel">
+    <div class="section mode-panel" id="cocoExcel">
 
         <div class="excel-upload">
 
-            <strong>
-                📊 Upload Excel File
-            </strong>
+            <strong>📊 Upload Excel File</strong>
 
             <br>
 
@@ -1738,24 +1157,15 @@ footer{
 
         </div>
 
-        <div
-            class="excel-success"
-            id="cocoExcelStatus">
-        </div>
+        <div class="excel-success" id="cocoExcelStatus"></div>
 
-        <div
-            class="excel-preview-wrap"
-            id="cocoExcelPreview">
+        <div class="excel-preview-wrap" id="cocoExcelPreview">
 
             <table class="excel-preview">
 
-                <thead
-                    id="cocoExcelHead">
-                </thead>
+                <thead id="cocoExcelHead"></thead>
 
-                <tbody
-                    id="cocoExcelBody">
-                </tbody>
+                <tbody id="cocoExcelBody"></tbody>
 
             </table>
 
@@ -1764,184 +1174,86 @@ footer{
     </div>
 
 
-    <!-- PO BOX -->
-
     <div class="section">
 
-        <h3>
-            📦 PO & Box Settings
-        </h3>
+        <h3>📦 PO & Box Settings</h3>
 
         <div class="grid grid4">
 
             <div class="field">
-
-                <label>
-                    PO Prefix
-                </label>
-
-                <input
-                    id="cocoPoPrefix"
-                    placeholder="Optional">
-
+                <label>PO Prefix</label>
+                <input id="cocoPoPrefix">
             </div>
 
-
             <div class="field">
-
-                <label>
-                    Box Prefix
-                </label>
-
-                <input
-                    id="cocoBoxPrefix"
-                    value="BOX NO.">
-
+                <label>Box Prefix</label>
+                <input id="cocoBoxPrefix" value="BOX NO.">
             </div>
 
-
             <div class="field">
-
-                <label>
-                    Start Box Number
-                </label>
-
-                <input
-                    id="cocoStartBox"
-                    type="number"
-                    value="1">
-
+                <label>Start Box Number</label>
+                <input id="cocoStartBox" type="number" value="1">
             </div>
 
-
             <div class="field">
-
-                <label>
-                    End Box Number
-                </label>
-
-                <input
-                    id="cocoEndBox"
-                    type="number"
-                    value="20">
-
+                <label>End Box Number</label>
+                <input id="cocoEndBox" type="number" value="20">
             </div>
 
         </div>
 
-
-        <div
-            id="cocoRangeWarning"
-            style="
-            display:none;
-            margin-top:10px;
-            padding:9px;
-            color:#be123c;
-            background:#fff1f2;
-            border:1px solid #fecdd3;
-            border-radius:8px;
-            font-size:9px;
-            font-weight:900;">
+        <div id="cocoRangeWarning"
+             style="display:none;margin-top:10px;padding:9px;color:#be123c;background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;font-size:9px;font-weight:900;">
         </div>
 
     </div>
 
 
-    <!-- CONTENT -->
-
     <div class="section">
 
-        <h3>
-            🏷 Label Content
-        </h3>
+        <h3>🏷 Label Content</h3>
 
         <div class="choice-grid">
 
             <label class="choice">
-
-                <input
-                    type="radio"
-                    name="cocoContent"
-                    value="po">
-
+                <input type="radio" name="cocoContent" value="po">
                 PO Number Only
-
             </label>
 
-
             <label class="choice">
-
-                <input
-                    type="radio"
-                    name="cocoContent"
-                    value="box">
-
+                <input type="radio" name="cocoContent" value="box">
                 Box Number Only
-
             </label>
 
-
-            <label
-                class="choice active">
-
-                <input
-                    type="radio"
-                    name="cocoContent"
-                    value="combined"
-                    checked>
-
+            <label class="choice active">
+                <input type="radio" name="cocoContent" value="combined" checked>
                 Combined PO + Box
-
             </label>
 
         </div>
 
-
-        <div
-            id="cocoFreeze"
-            class="freeze-note show">
-
-            🔒 Combined selected:
-            PO Number and Box Number are frozen.
-
+        <div id="cocoFreeze"
+             style="margin-top:10px;padding:9px;color:#166534;background:#effdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:9px;font-weight:900;">
+            🔒 Combined selected: PO Number and Box Number are frozen.
         </div>
 
     </div>
 
 
-    <!-- LAYOUT -->
-
     <div class="section">
 
-        <h3>
-            📐 PO & Box Layout
-        </h3>
+        <h3>📐 PO & Box Layout</h3>
 
         <div class="choice-grid">
 
-            <label
-                class="choice active">
-
-                <input
-                    type="radio"
-                    name="cocoLayout"
-                    value="separate"
-                    checked>
-
+            <label class="choice active">
+                <input type="radio" name="cocoLayout" value="separate" checked>
                 Separate Line
-
             </label>
 
-
             <label class="choice">
-
-                <input
-                    type="radio"
-                    name="cocoLayout"
-                    value="same">
-
+                <input type="radio" name="cocoLayout" value="same">
                 Same Line
-
             </label>
 
         </div>
@@ -1949,462 +1261,68 @@ footer{
     </div>
 
 
-    <!-- PAGE -->
-
     <div class="section">
 
-        <h3>
-            📄 Page Setting
-        </h3>
+        <h3>📄 Page Setting</h3>
 
         <div class="choice-grid">
 
-            <label
-                class="choice active">
-
-                <input
-                    type="radio"
-                    name="cocoPage"
-                    value="a4"
-                    checked>
-
+            <label class="choice active">
+                <input type="radio" name="cocoPage" value="a4" checked>
                 A4
-
             </label>
 
-
             <label class="choice">
-
-                <input
-                    type="radio"
-                    name="cocoPage"
-                    value="4x6">
-
+                <input type="radio" name="cocoPage" value="4x6">
                 4 × 6 inch
-
             </label>
 
-
             <label class="choice">
-
-                <input
-                    type="radio"
-                    name="cocoPage"
-                    value="70x35">
-
+                <input type="radio" name="cocoPage" value="70x35">
                 70 × 35 mm
-
             </label>
-
 
             <label class="choice">
-
-                <input
-                    type="radio"
-                    name="cocoPage"
-                    value="custom">
-
+                <input type="radio" name="cocoPage" value="custom">
                 Custom
-
             </label>
 
         </div>
 
-
-        <div
-            id="cocoCustom"
-            class="grid"
-            style="
-            display:none;
-            margin-top:10px;">
-
-            <div class="field">
-
-                <label>
-                    Custom Width
-                </label>
-
-                <input
-                    id="cocoCustomW"
-                    type="number"
-                    value="794">
-
-            </div>
-
-
-            <div class="field">
-
-                <label>
-                    Custom Height
-                </label>
-
-                <input
-                    id="cocoCustomH"
-                    type="number"
-                    value="1123">
-
-            </div>
-
-        </div>
-
     </div>
 
-
-    <!-- LABELS -->
-
-    <div class="section">
-
-        <h3>
-            🔢 Labels Per Page
-        </h3>
-
-        <div class="grid grid3">
-
-            <div class="field">
-
-                <label>
-                    Labels Per Page
-                </label>
-
-                <select id="cocoPerPage">
-
-                    <option value="1">1</option>
-                    <option value="2" selected>2</option>
-                    <option value="4">4</option>
-                    <option value="6">6</option>
-                    <option value="8">8</option>
-                    <option value="10">10</option>
-                    <option value="12">12</option>
-                    <option value="14">14</option>
-                    <option value="15">15</option>
-                    <option value="16">16</option>
-                    <option value="18">18</option>
-                    <option value="20">20</option>
-
-                </select>
-
-            </div>
-
-
-            <div class="field">
-
-                <label>
-                    Box Flow
-                </label>
-
-                <select id="cocoFlow">
-
-                    <option value="sequential">
-                        Sequential Box Number
-                    </option>
-
-                    <option value="same">
-                        Same Box Number
-                    </option>
-
-                    <option value="alternate">
-                        Alternate Flow
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <div class="field">
-
-                <label>
-                    Total Labels
-                </label>
-
-                <input
-                    id="cocoTotal"
-                    readonly
-                    value="0">
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- BORDER -->
-
-    <div class="section">
-
-        <h3>
-            🖼 Border Setting
-        </h3>
-
-        <div class="border-grid">
-
-            <div class="border-card">
-
-                <strong>
-                    Page Border
-                </strong>
-
-                <input
-                    id="cocoPageBorder"
-                    type="checkbox"
-                    checked>
-
-            </div>
-
-
-            <div class="border-card">
-
-                <strong>
-                    PO Border
-                </strong>
-
-                <input
-                    id="cocoPoBorder"
-                    type="checkbox"
-                    checked>
-
-            </div>
-
-
-            <div class="border-card">
-
-                <strong>
-                    Box Border
-                </strong>
-
-                <input
-                    id="cocoBoxBorder"
-                    type="checkbox"
-                    checked>
-
-            </div>
-
-
-            <div class="border-card">
-
-                <strong>
-                    All Border
-                </strong>
-
-                <input
-                    id="cocoAllBorder"
-                    type="checkbox">
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- FONT -->
-
-    <div class="section">
-
-        <h3>
-            🔤 Font Setting
-        </h3>
-
-        <div class="font-card">
-
-            <h4>
-                PO Number Font
-            </h4>
-
-            <div class="font-controls">
-
-                <select id="cocoPoFont">
-
-                    <option>Arial</option>
-                    <option>Verdana</option>
-                    <option>Tahoma</option>
-                    <option>Calibri</option>
-                    <option>Georgia</option>
-                    <option>Times New Roman</option>
-                    <option>Courier New</option>
-                    <option>Trebuchet MS</option>
-                    <option>Segoe UI</option>
-                    <option>Impact</option>
-
-                </select>
-
-
-                <select id="cocoPoSize">
-
-                    <option>10</option>
-                    <option>12</option>
-                    <option selected>16</option>
-                    <option>18</option>
-                    <option>20</option>
-                    <option>24</option>
-                    <option>28</option>
-                    <option>32</option>
-
-                </select>
-
-
-                <select id="cocoPoOpacity">
-
-                    <option>100</option>
-                    <option>90</option>
-                    <option>80</option>
-                    <option>70</option>
-                    <option>60</option>
-
-                </select>
-
-
-                <button
-                    class="format active"
-                    id="cocoPoBold">
-                    B
-                </button>
-
-                <button
-                    class="format"
-                    id="cocoPoItalic">
-                    I
-                </button>
-
-                <button
-                    class="format"
-                    id="cocoPoUnderline">
-                    U
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="font-card">
-
-            <h4>
-                Box Number Font
-            </h4>
-
-            <div class="font-controls">
-
-                <select id="cocoBoxFont">
-
-                    <option>Arial</option>
-                    <option>Verdana</option>
-                    <option>Tahoma</option>
-                    <option>Calibri</option>
-                    <option>Georgia</option>
-                    <option>Times New Roman</option>
-                    <option>Courier New</option>
-                    <option>Trebuchet MS</option>
-                    <option>Segoe UI</option>
-                    <option>Impact</option>
-
-                </select>
-
-
-                <select id="cocoBoxSize">
-
-                    <option>10</option>
-                    <option>12</option>
-                    <option selected>14</option>
-                    <option>16</option>
-                    <option>18</option>
-                    <option>20</option>
-                    <option>24</option>
-
-                </select>
-
-
-                <select id="cocoBoxOpacity">
-
-                    <option>100</option>
-                    <option>90</option>
-                    <option>80</option>
-                    <option>70</option>
-                    <option>60</option>
-
-                </select>
-
-
-                <button
-                    class="format active"
-                    id="cocoBoxBold">
-                    B
-                </button>
-
-                <button
-                    class="format"
-                    id="cocoBoxItalic">
-                    I
-                </button>
-
-                <button
-                    class="format"
-                    id="cocoBoxUnderline">
-                    U
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- PREVIEW -->
 
     <div class="preview-section">
 
         <div class="preview-title">
 
-            <h3>
-                👁 Live Print Preview
-            </h3>
+            <h3>👁 Live Print Preview</h3>
 
             <div class="page-count">
-
                 Preview:
-                <span id="cocoPreviewCount">
-                    0
-                </span>
+                <span id="cocoPreviewCount">0</span>
                 / 5 pages max
-
             </div>
 
         </div>
 
-
         <div class="preview-stage">
 
-            <div
-                id="cocoPreview"
-                class="preview-pages">
-            </div>
+            <div id="cocoPreview" class="preview-pages"></div>
 
         </div>
 
     </div>
 
 
-    <!-- ACTIONS -->
-
     <div class="actions">
 
-        <button
-            class="btn btn-download"
-            id="cocoDownload">
-
+        <button class="btn btn-download" id="cocoDownload">
             ⬇️ DOWNLOAD PDF
-
         </button>
 
-
-        <button
-            class="btn btn-print"
-            id="cocoPrint">
-
+        <button class="btn btn-print" id="cocoPrint">
             🖨️ PRINT PDF
-
         </button>
 
     </div>
@@ -2413,92 +1331,42 @@ footer{
 
 
 <!-- ======================================================
-     OTHER PO
+OTHER PO
 ====================================================== -->
 
-<section
-    class="panel"
-    id="otherPanel">
+<section class="panel" id="otherPanel">
 
     <div class="panel-head">
 
         <div>
-
-            <h2>
-                📦 Other PO Label Generator
-            </h2>
-
-            <p>
-                PO + Box label generator
-            </p>
-
+            <h2>📦 Other PO Label Generator</h2>
+            <p>PO and Box label generation</p>
         </div>
 
     </div>
-
 
     <div class="section">
 
-        <h3>
-            ⚙ Input Mode
-        </h3>
+        <h3>⚙ Input Mode</h3>
 
         <div class="mode-grid">
 
-            <button
-                class="mode active"
-                data-other-mode="manual">
-
-                <div class="mode-icon">
-                    👤
-                </div>
-
-                <strong>
-                    Manual
-                </strong>
-
-                <small>
-                    20 PO inputs
-                </small>
-
+            <button class="mode active" data-other-mode="manual">
+                <div class="mode-icon">👤</div>
+                <strong>Manual</strong>
+                <small>20 PO inputs</small>
             </button>
 
-
-            <button
-                class="mode"
-                data-other-mode="bulk">
-
-                <div class="mode-icon">
-                    🚚
-                </div>
-
-                <strong>
-                    Bulk
-                </strong>
-
-                <small>
-                    Unlimited
-                </small>
-
+            <button class="mode" data-other-mode="bulk">
+                <div class="mode-icon">🚚</div>
+                <strong>Bulk</strong>
+                <small>Unlimited</small>
             </button>
 
-
-            <button
-                class="mode"
-                data-other-mode="excel">
-
-                <div class="mode-icon">
-                    📊
-                </div>
-
-                <strong>
-                    Excel
-                </strong>
-
-                <small>
-                    Unlimited rows
-                </small>
-
+            <button class="mode" data-other-mode="excel">
+                <div class="mode-icon">📊</div>
+                <strong>Excel</strong>
+                <small>Unlimited rows</small>
             </button>
 
         </div>
@@ -2506,47 +1374,31 @@ footer{
     </div>
 
 
-    <div
-        class="section mode-panel active"
-        id="otherManual">
+    <div class="section mode-panel active" id="otherManual">
 
-        <h3>
-            📝 Manual PO
-        </h3>
+        <h3>📝 Manual PO</h3>
 
-        <div
-            class="grid grid4"
-            id="otherManualInputs">
-        </div>
+        <div class="grid grid4" id="otherManualInputs"></div>
 
     </div>
 
 
-    <div
-        class="section mode-panel"
-        id="otherBulk">
+    <div class="section mode-panel" id="otherBulk">
 
-        <h3>
-            🚚 Bulk PO
-        </h3>
+        <h3>🚚 Bulk PO</h3>
 
         <textarea
             id="otherBulkInput"
-            placeholder="PO001, PO002, PO003...">
-        </textarea>
+            placeholder="PO001, PO002, PO003..."></textarea>
 
     </div>
 
 
-    <div
-        class="section mode-panel"
-        id="otherExcel">
+    <div class="section mode-panel" id="otherExcel">
 
         <div class="excel-upload">
 
-            <strong>
-                📊 Upload Other PO Excel
-            </strong>
+            <strong>📊 Upload Other PO Excel</strong>
 
             <br>
 
@@ -2557,24 +1409,15 @@ footer{
 
         </div>
 
-        <div
-            class="excel-success"
-            id="otherExcelStatus">
-        </div>
+        <div class="excel-success" id="otherExcelStatus"></div>
 
-        <div
-            class="excel-preview-wrap"
-            id="otherExcelPreview">
+        <div class="excel-preview-wrap" id="otherExcelPreview">
 
             <table class="excel-preview">
 
-                <thead
-                    id="otherExcelHead">
-                </thead>
+                <thead id="otherExcelHead"></thead>
 
-                <tbody
-                    id="otherExcelBody">
-                </tbody>
+                <tbody id="otherExcelBody"></tbody>
 
             </table>
 
@@ -2585,46 +1428,23 @@ footer{
 
     <div class="section">
 
-        <h3>
-            📦 Box Settings
-        </h3>
+        <h3>📦 Box Settings</h3>
 
         <div class="grid grid3">
 
             <div class="field">
-
-                <label>
-                    PO Prefix
-                </label>
-
-                <input
-                    id="otherPoPrefix">
-
+                <label>PO Prefix</label>
+                <input id="otherPoPrefix">
             </div>
 
             <div class="field">
-
-                <label>
-                    Box Prefix
-                </label>
-
-                <input
-                    id="otherBoxPrefix"
-                    value="BOX NO.">
-
+                <label>Box Prefix</label>
+                <input id="otherBoxPrefix" value="BOX NO.">
             </div>
 
             <div class="field">
-
-                <label>
-                    Start Box
-                </label>
-
-                <input
-                    id="otherStartBox"
-                    type="number"
-                    value="1">
-
+                <label>Start Box</label>
+                <input id="otherStartBox" type="number" value="1">
             </div>
 
         </div>
@@ -2635,20 +1455,11 @@ footer{
     <div class="preview-section">
 
         <div class="preview-title">
-
-            <h3>
-                👁 Other PO Preview
-            </h3>
-
+            <h3>👁 Other PO Preview</h3>
         </div>
 
         <div class="preview-stage">
-
-            <div
-                id="otherPreview"
-                class="preview-pages">
-            </div>
-
+            <div id="otherPreview" class="preview-pages"></div>
         </div>
 
     </div>
@@ -2656,20 +1467,12 @@ footer{
 
     <div class="actions">
 
-        <button
-            class="btn btn-download"
-            id="otherDownload">
-
+        <button class="btn btn-download" id="otherDownload">
             ⬇️ DOWNLOAD PDF
-
         </button>
 
-        <button
-            class="btn btn-print"
-            id="otherPrint">
-
+        <button class="btn btn-print" id="otherPrint">
             🖨️ PRINT PDF
-
         </button>
 
     </div>
@@ -2678,25 +1481,16 @@ footer{
 
 
 <!-- ======================================================
-     ISBN
+ISBN
 ====================================================== -->
 
-<section
-    class="panel"
-    id="isbnPanel">
+<section class="panel" id="isbnPanel">
 
     <div class="panel-head">
 
         <div>
-
-            <h2>
-                📚 ISBN Barcode Maker
-            </h2>
-
-            <p>
-                ISBN barcode label generator
-            </p>
-
+            <h2>📚 ISBN Barcode Maker</h2>
+            <p>ISBN + Barcode label generator</p>
         </div>
 
     </div>
@@ -2704,66 +1498,26 @@ footer{
 
     <div class="section">
 
-        <h3>
-            ⚙ Input Mode
-        </h3>
+        <h3>⚙ Input Mode</h3>
 
         <div class="mode-grid">
 
-            <button
-                class="mode active"
-                data-isbn-mode="manual">
-
-                <div class="mode-icon">
-                    👤
-                </div>
-
-                <strong>
-                    Manual
-                </strong>
-
-                <small>
-                    20 ISBN inputs
-                </small>
-
+            <button class="mode active" data-isbn-mode="manual">
+                <div class="mode-icon">👤</div>
+                <strong>Manual</strong>
+                <small>20 ISBN inputs</small>
             </button>
 
-
-            <button
-                class="mode"
-                data-isbn-mode="bulk">
-
-                <div class="mode-icon">
-                    🚚
-                </div>
-
-                <strong>
-                    Bulk
-                </strong>
-
-                <small>
-                    Unlimited
-                </small>
-
+            <button class="mode" data-isbn-mode="bulk">
+                <div class="mode-icon">🚚</div>
+                <strong>Bulk</strong>
+                <small>Unlimited</small>
             </button>
 
-
-            <button
-                class="mode"
-                data-isbn-mode="excel">
-
-                <div class="mode-icon">
-                    📊
-                </div>
-
-                <strong>
-                    Excel
-                </strong>
-
-                <small>
-                    Unlimited rows
-                </small>
-
+            <button class="mode" data-isbn-mode="excel">
+                <div class="mode-icon">📊</div>
+                <strong>Excel</strong>
+                <small>Unlimited rows</small>
             </button>
 
         </div>
@@ -2771,47 +1525,31 @@ footer{
     </div>
 
 
-    <div
-        class="section mode-panel active"
-        id="isbnManual">
+    <div class="section mode-panel active" id="isbnManual">
 
-        <h3>
-            📚 ISBN Numbers
-        </h3>
+        <h3>📚 ISBN Numbers</h3>
 
-        <div
-            class="grid grid4"
-            id="isbnManualInputs">
-        </div>
+        <div class="grid grid4" id="isbnManualInputs"></div>
 
     </div>
 
 
-    <div
-        class="section mode-panel"
-        id="isbnBulk">
+    <div class="section mode-panel" id="isbnBulk">
 
-        <h3>
-            🚚 Bulk ISBN
-        </h3>
+        <h3>🚚 Bulk ISBN</h3>
 
         <textarea
             id="isbnBulkInput"
-            placeholder="9781234567890, 9789876543210...">
-        </textarea>
+            placeholder="9781234567890, 9789876543210..."></textarea>
 
     </div>
 
 
-    <div
-        class="section mode-panel"
-        id="isbnExcel">
+    <div class="section mode-panel" id="isbnExcel">
 
         <div class="excel-upload">
 
-            <strong>
-                📊 Upload ISBN Excel
-            </strong>
+            <strong>📊 Upload ISBN Excel</strong>
 
             <br>
 
@@ -2822,24 +1560,15 @@ footer{
 
         </div>
 
-        <div
-            class="excel-success"
-            id="isbnExcelStatus">
-        </div>
+        <div class="excel-success" id="isbnExcelStatus"></div>
 
-        <div
-            class="excel-preview-wrap"
-            id="isbnExcelPreview">
+        <div class="excel-preview-wrap" id="isbnExcelPreview">
 
             <table class="excel-preview">
 
-                <thead
-                    id="isbnExcelHead">
-                </thead>
+                <thead id="isbnExcelHead"></thead>
 
-                <tbody
-                    id="isbnExcelBody">
-                </tbody>
+                <tbody id="isbnExcelBody"></tbody>
 
             </table>
 
@@ -2850,56 +1579,33 @@ footer{
 
     <div class="section">
 
-        <h3>
-            🏷 Barcode Setting
-        </h3>
+        <h3>🏷 Barcode Setting</h3>
 
         <div class="grid">
 
             <div class="field">
 
-                <label>
-                    Barcode Type
-                </label>
+                <label>Barcode Type</label>
 
                 <select id="isbnBarcodeType">
 
-                    <option>
-                        EAN-13
-                    </option>
-
-                    <option>
-                        CODE-128
-                    </option>
-
-                    <option>
-                        ISBN
-                    </option>
+                    <option>EAN-13</option>
+                    <option>CODE-128</option>
+                    <option>ISBN</option>
 
                 </select>
 
             </div>
 
-
             <div class="field">
 
-                <label>
-                    Label Size
-                </label>
+                <label>Label Size</label>
 
                 <select id="isbnPageSize">
 
-                    <option>
-                        4 × 6 inch
-                    </option>
-
-                    <option>
-                        A4
-                    </option>
-
-                    <option>
-                        70 × 35 mm
-                    </option>
+                    <option>4 × 6 inch</option>
+                    <option>A4</option>
+                    <option>70 × 35 mm</option>
 
                 </select>
 
@@ -2913,20 +1619,11 @@ footer{
     <div class="preview-section">
 
         <div class="preview-title">
-
-            <h3>
-                👁 ISBN Live Preview
-            </h3>
-
+            <h3>👁 ISBN Live Preview</h3>
         </div>
 
         <div class="preview-stage">
-
-            <div
-                id="isbnPreview"
-                class="preview-pages">
-            </div>
-
+            <div id="isbnPreview" class="preview-pages"></div>
         </div>
 
     </div>
@@ -2934,20 +1631,12 @@ footer{
 
     <div class="actions">
 
-        <button
-            class="btn btn-download"
-            id="isbnDownload">
-
+        <button class="btn btn-download" id="isbnDownload">
             ⬇️ DOWNLOAD PDF
-
         </button>
 
-        <button
-            class="btn btn-print"
-            id="isbnPrint">
-
+        <button class="btn btn-print" id="isbnPrint">
             🖨️ PRINT PDF
-
         </button>
 
     </div>
@@ -2956,23 +1645,20 @@ footer{
 
 
 <!-- ======================================================
-     ADDRESS
+ADDRESS LABEL
+ONLY ADDRESS HAS FROM / TO
 ====================================================== -->
 
-<section
-    class="panel"
-    id="addressPanel">
+<section class="panel" id="addressPanel">
 
     <div class="panel-head">
 
         <div>
 
-            <h2>
-                🚚 Address Label Maker
-            </h2>
+            <h2>🚚 Address Label Maker</h2>
 
             <p>
-                Address label generator
+                Professional From & To Address Labels
             </p>
 
         </div>
@@ -2980,11 +1666,11 @@ footer{
     </div>
 
 
+    <!-- ADDRESS MODES -->
+
     <div class="section">
 
-        <h3>
-            ⚙ Input Mode
-        </h3>
+        <h3>⚙ Input Mode</h3>
 
         <div class="mode-grid">
 
@@ -3001,7 +1687,7 @@ footer{
                 </strong>
 
                 <small>
-                    20 addresses
+                    From + To
                 </small>
 
             </button>
@@ -3049,81 +1735,194 @@ footer{
     </div>
 
 
+    <!-- ADDRESS MANUAL -->
+
     <div
         class="section mode-panel active"
         id="addressManual">
 
         <h3>
-            📍 Manual Address
+            📍 From & To Address
         </h3>
 
-        <div class="grid">
+        <p class="desc">
+            Enter the sender in From and the receiver in To.
+        </p>
 
-            <div class="field">
 
-                <label>
-                    Name
-                </label>
+        <div class="address-route">
 
-                <input
-                    id="addressName"
-                    placeholder="Customer Name">
+            <!-- FROM -->
+
+            <div class="route-card from">
+
+                <div class="route-title">
+
+                    <span>
+                        📤
+                    </span>
+
+                    <strong>
+                        FROM ADDRESS
+                    </strong>
+
+                </div>
+
+
+                <div class="route-fields">
+
+                    <div class="field">
+
+                        <label>
+                            From Name
+                        </label>
+
+                        <input
+                            id="fromName"
+                            placeholder="Sender Name">
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>
+                            From Phone
+                        </label>
+
+                        <input
+                            id="fromPhone"
+                            placeholder="Sender Phone">
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>
+                            From Address
+                        </label>
+
+                        <textarea
+                            id="fromAddress"
+                            placeholder="Complete sender address...">
+                        </textarea>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
-            <div class="field">
+            <!-- TO -->
 
-                <label>
-                    Phone
-                </label>
+            <div class="route-card to">
 
-                <input
-                    id="addressPhone"
-                    placeholder="Phone Number">
+                <div class="route-title">
+
+                    <span>
+                        📥
+                    </span>
+
+                    <strong>
+                        TO ADDRESS
+                    </strong>
+
+                </div>
+
+
+                <div class="route-fields">
+
+                    <div class="field">
+
+                        <label>
+                            To Name
+                        </label>
+
+                        <input
+                            id="toName"
+                            placeholder="Receiver Name">
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>
+                            To Phone
+                        </label>
+
+                        <input
+                            id="toPhone"
+                            placeholder="Receiver Phone">
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>
+                            To Address
+                        </label>
+
+                        <textarea
+                            id="toAddress"
+                            placeholder="Complete receiver address...">
+                        </textarea>
+
+                    </div>
+
+                </div>
 
             </div>
-
-        </div>
-
-
-        <br>
-
-        <div class="field">
-
-            <label>
-                Complete Address
-            </label>
-
-            <textarea
-                id="addressText"
-                placeholder="Complete address...">
-            </textarea>
 
         </div>
 
     </div>
 
+
+    <!-- ADDRESS BULK -->
 
     <div
         class="section mode-panel"
         id="addressBulk">
 
         <h3>
-            🚚 Bulk Address
+            🚚 Bulk From & To Addresses
         </h3>
+
+        <p class="desc">
+            One record per line. Use the format:
+            FROM | TO
+        </p>
 
         <textarea
             id="addressBulkInput"
-            placeholder="Address 1, Address 2, Address 3...">
+            placeholder="From Address 1 | To Address 1
+
+From Address 2 | To Address 2
+
+From Address 3 | To Address 3">
         </textarea>
 
     </div>
 
 
+    <!-- ADDRESS EXCEL -->
+
     <div
         class="section mode-panel"
         id="addressExcel">
+
+        <h3>
+            📊 Address Excel Upload
+        </h3>
+
+        <p class="desc">
+            Excel columns can contain From and To address information.
+        </p>
+
 
         <div class="excel-upload">
 
@@ -3134,7 +1933,7 @@ footer{
             <br>
 
             <small>
-                Excel is supported here too.
+                First row should contain headers.
             </small>
 
             <br>
@@ -3146,10 +1945,12 @@ footer{
 
         </div>
 
+
         <div
             class="excel-success"
             id="addressExcelStatus">
         </div>
+
 
         <div
             class="excel-preview-wrap"
@@ -3172,10 +1973,12 @@ footer{
     </div>
 
 
+    <!-- ADDRESS BORDER -->
+
     <div class="section">
 
         <h3>
-            🖼 Address Border
+            🖼 Address Border Setting
         </h3>
 
         <div class="border-grid">
@@ -3187,6 +1990,7 @@ footer{
                 </strong>
 
                 <input
+                    id="addressPageBorder"
                     type="checkbox"
                     checked>
 
@@ -3196,10 +2000,11 @@ footer{
             <div class="border-card">
 
                 <strong>
-                    Label Border
+                    From Border
                 </strong>
 
                 <input
+                    id="addressFromBorder"
                     type="checkbox"
                     checked>
 
@@ -3209,11 +2014,13 @@ footer{
             <div class="border-card">
 
                 <strong>
-                    Text Border
+                    To Border
                 </strong>
 
                 <input
-                    type="checkbox">
+                    id="addressToBorder"
+                    type="checkbox"
+                    checked>
 
             </div>
 
@@ -3225,6 +2032,7 @@ footer{
                 </strong>
 
                 <input
+                    id="addressAllBorder"
                     type="checkbox">
 
             </div>
@@ -3234,6 +2042,159 @@ footer{
     </div>
 
 
+    <!-- ADDRESS FONT -->
+
+    <div class="section">
+
+        <h3>
+            🔤 Address Font Setting
+        </h3>
+
+
+        <div class="font-card">
+
+            <h4>
+                From Address Font
+            </h4>
+
+            <div class="font-controls">
+
+                <select id="fromFont">
+
+                    <option>Arial</option>
+                    <option>Verdana</option>
+                    <option>Tahoma</option>
+                    <option>Calibri</option>
+                    <option>Georgia</option>
+                    <option>Times New Roman</option>
+                    <option>Courier New</option>
+                    <option>Trebuchet MS</option>
+                    <option>Segoe UI</option>
+
+                </select>
+
+
+                <select id="fromSize">
+
+                    <option>10</option>
+                    <option>12</option>
+                    <option selected>16</option>
+                    <option>18</option>
+                    <option>20</option>
+                    <option>24</option>
+                    <option>28</option>
+
+                </select>
+
+
+                <select id="fromOpacity">
+
+                    <option>100</option>
+                    <option>90</option>
+                    <option>80</option>
+                    <option>70</option>
+                    <option>60</option>
+
+                </select>
+
+
+                <button
+                    class="format active"
+                    id="fromBold">
+                    B
+                </button>
+
+                <button
+                    class="format"
+                    id="fromItalic">
+                    I
+                </button>
+
+                <button
+                    class="format"
+                    id="fromUnderline">
+                    U
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="font-card">
+
+            <h4>
+                To Address Font
+            </h4>
+
+            <div class="font-controls">
+
+                <select id="toFont">
+
+                    <option>Arial</option>
+                    <option>Verdana</option>
+                    <option>Tahoma</option>
+                    <option>Calibri</option>
+                    <option>Georgia</option>
+                    <option>Times New Roman</option>
+                    <option>Courier New</option>
+                    <option>Trebuchet MS</option>
+                    <option>Segoe UI</option>
+
+                </select>
+
+
+                <select id="toSize">
+
+                    <option>10</option>
+                    <option>12</option>
+                    <option selected>18</option>
+                    <option>20</option>
+                    <option>24</option>
+                    <option>28</option>
+                    <option>32</option>
+
+                </select>
+
+
+                <select id="toOpacity">
+
+                    <option>100</option>
+                    <option>90</option>
+                    <option>80</option>
+                    <option>70</option>
+                    <option>60</option>
+
+                </select>
+
+
+                <button
+                    class="format active"
+                    id="toBold">
+                    B
+                </button>
+
+                <button
+                    class="format"
+                    id="toItalic">
+                    I
+                </button>
+
+                <button
+                    class="format"
+                    id="toUnderline">
+                    U
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ADDRESS PREVIEW -->
+
     <div class="preview-section">
 
         <div class="preview-title">
@@ -3242,7 +2203,16 @@ footer{
                 👁 Address Live Preview
             </h3>
 
+            <div class="page-count">
+                Preview:
+                <span id="addressPreviewCount">
+                    0
+                </span>
+                / 5 pages max
+            </div>
+
         </div>
+
 
         <div class="preview-stage">
 
@@ -3256,6 +2226,8 @@ footer{
     </div>
 
 
+    <!-- ADDRESS ACTIONS -->
+
     <div class="actions">
 
         <button
@@ -3265,6 +2237,7 @@ footer{
             ⬇️ DOWNLOAD PDF
 
         </button>
+
 
         <button
             class="btn btn-print"
@@ -3284,9 +2257,7 @@ footer{
 <footer>
 
     Credit By
-    <strong>
-        Ashish Verma
-    </strong>
+    <strong>Ashish Verma</strong>
     • 2026
 
     <br>
@@ -3307,8 +2278,7 @@ footer{
    STATE
 ========================================================= */
 
-const state = {
-
+const state={
     coco:{
         mode:"manual",
         excel:[],
@@ -3330,7 +2300,6 @@ const state = {
         mode:"manual",
         excel:[]
     }
-
 };
 
 
@@ -3340,7 +2309,7 @@ const state = {
 
 function toast(message,type="green"){
 
-    const box=
+    const container=
         document.getElementById(
             "toastContainer"
         );
@@ -3372,16 +2341,14 @@ function toast(message,type="green"){
             </span>
 
         </div>
-
     `;
 
-    box.appendChild(el);
+    container.appendChild(el);
 
     setTimeout(
         ()=>el.remove(),
         2600
     );
-
 }
 
 
@@ -3389,23 +2356,26 @@ function toast(message,type="green"){
    ESCAPE
 ========================================================= */
 
-function escapeHTML(v){
+function escapeHTML(value){
 
-    return String(v ?? "")
+    return String(value ?? "")
         .replaceAll("&","&amp;")
         .replaceAll("<","&lt;")
         .replaceAll(">","&gt;")
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
-
 }
 
 
 /* =========================================================
-   CREATE 20 INPUTS
+   MAKE 20 INPUTS
 ========================================================= */
 
-function make20(containerId,cls,placeholder){
+function make20(
+    containerId,
+    className,
+    label
+){
 
     const box=
         document.getElementById(
@@ -3414,27 +2384,25 @@ function make20(containerId,cls,placeholder){
 
     for(let i=1;i<=20;i++){
 
-        const f=
+        const field=
             document.createElement("div");
 
-        f.className="field";
+        field.className="field";
 
-        f.innerHTML=`
+        field.innerHTML=`
 
             <label>
-                ${placeholder} ${i}
+                ${label} ${i}
             </label>
 
             <input
-                class="${cls}"
-                placeholder="${placeholder} ${i}">
+                class="${className}"
+                placeholder="${label} ${i}">
 
         `;
 
-        box.appendChild(f);
-
+        box.appendChild(field);
     }
-
 }
 
 make20(
@@ -3457,19 +2425,19 @@ make20(
 
 
 /* =========================================================
-   TOOL NAV
+   TOOL SWITCH
 ========================================================= */
 
 document
 .querySelectorAll(".module")
-.forEach(btn=>{
+.forEach(button=>{
 
-    btn.addEventListener(
+    button.addEventListener(
         "click",
         ()=>{
 
             const tool=
-                btn.dataset.tool;
+                button.dataset.tool;
 
             document
             .querySelectorAll(".module")
@@ -3477,7 +2445,7 @@ document
                 x.classList.remove("active")
             );
 
-            btn.classList.add("active");
+            button.classList.add("active");
 
             document
             .querySelectorAll(".panel")
@@ -3495,7 +2463,6 @@ document
                 `${tool.toUpperCase()} tool opened`,
                 "green"
             );
-
         }
     );
 
@@ -3503,103 +2470,19 @@ document
 
 
 /* =========================================================
-   GENERIC MODE HANDLER
-========================================================= */
-
-function setupModes(
-    selector,
-    stateKey,
-    panels
-){
-
-    document
-    .querySelectorAll(selector)
-    .forEach(btn=>{
-
-        btn.addEventListener(
-            "click",
-            ()=>{
-
-                const mode=
-                    btn.dataset[
-                        selector.includes("other")
-                        ?"otherMode"
-                        :
-                        selector.includes("isbn")
-                        ?"isbnMode"
-                        :
-                        selector.includes("address")
-                        ?"addressMode"
-                        :
-                        "mode"
-                    ];
-
-                state[stateKey].mode=
-                    mode;
-
-                document
-                .querySelectorAll(
-                    selector
-                )
-                .forEach(x=>
-                    x.classList.remove("active")
-                );
-
-                btn.classList.add("active");
-
-                panels.forEach(
-                    id=>{
-
-                        const panel=
-                            document
-                            .getElementById(id);
-
-                        if(panel){
-
-                            panel.classList.toggle(
-                                "active",
-                                id.toLowerCase()
-                                .includes(mode)
-                            );
-
-                        }
-
-                    }
-                );
-
-                toast(
-                    `${mode.toUpperCase()} mode selected`,
-                    "green"
-                );
-
-                if(stateKey==="coco"){
-                    renderCoco();
-                }
-
-            }
-        );
-
-    });
-
-}
-
-
-/* =========================================================
-   COCO MODES
+   COCO MODE
 ========================================================= */
 
 document
-.querySelectorAll(
-    "#cocoPanel .mode"
-)
-.forEach(btn=>{
+.querySelectorAll("#cocoPanel .mode")
+.forEach(button=>{
 
-    btn.addEventListener(
+    button.addEventListener(
         "click",
         ()=>{
 
             const mode=
-                btn.dataset.mode;
+                button.dataset.mode;
 
             state.coco.mode=
                 mode;
@@ -3612,20 +2495,22 @@ document
                 x.classList.remove("active")
             );
 
-            btn.classList.add("active");
+            button.classList.add("active");
 
             ["manual","bulk","excel"]
-            .forEach(m=>{
+            .forEach(modeName=>{
 
                 document
                 .getElementById(
                     "coco"+
-                    m.charAt(0).toUpperCase()+
-                    m.slice(1)
+                    modeName
+                    .charAt(0)
+                    .toUpperCase()+
+                    modeName.slice(1)
                 )
                 .classList.toggle(
                     "active",
-                    m===mode
+                    modeName===mode
                 );
 
             });
@@ -3636,7 +2521,6 @@ document
             );
 
             renderCoco();
-
         }
     );
 
@@ -3644,21 +2528,19 @@ document
 
 
 /* =========================================================
-   OTHER MODES
+   OTHER MODE
 ========================================================= */
 
 document
-.querySelectorAll(
-    "#otherPanel .mode"
-)
-.forEach(btn=>{
+.querySelectorAll("#otherPanel .mode")
+.forEach(button=>{
 
-    btn.addEventListener(
+    button.addEventListener(
         "click",
         ()=>{
 
             const mode=
-                btn.dataset.otherMode;
+                button.dataset.otherMode;
 
             state.other.mode=
                 mode;
@@ -3671,20 +2553,22 @@ document
                 x.classList.remove("active")
             );
 
-            btn.classList.add("active");
+            button.classList.add("active");
 
             ["manual","bulk","excel"]
-            .forEach(m=>{
+            .forEach(modeName=>{
 
                 document
                 .getElementById(
                     "other"+
-                    m.charAt(0).toUpperCase()+
-                    m.slice(1)
+                    modeName
+                    .charAt(0)
+                    .toUpperCase()+
+                    modeName.slice(1)
                 )
                 .classList.toggle(
                     "active",
-                    m===mode
+                    modeName===mode
                 );
 
             });
@@ -3695,7 +2579,6 @@ document
             );
 
             renderOther();
-
         }
     );
 
@@ -3703,21 +2586,19 @@ document
 
 
 /* =========================================================
-   ISBN MODES
+   ISBN MODE
 ========================================================= */
 
 document
-.querySelectorAll(
-    "#isbnPanel .mode"
-)
-.forEach(btn=>{
+.querySelectorAll("#isbnPanel .mode")
+.forEach(button=>{
 
-    btn.addEventListener(
+    button.addEventListener(
         "click",
         ()=>{
 
             const mode=
-                btn.dataset.isbnMode;
+                button.dataset.isbnMode;
 
             state.isbn.mode=
                 mode;
@@ -3730,20 +2611,22 @@ document
                 x.classList.remove("active")
             );
 
-            btn.classList.add("active");
+            button.classList.add("active");
 
             ["manual","bulk","excel"]
-            .forEach(m=>{
+            .forEach(modeName=>{
 
                 document
                 .getElementById(
                     "isbn"+
-                    m.charAt(0).toUpperCase()+
-                    m.slice(1)
+                    modeName
+                    .charAt(0)
+                    .toUpperCase()+
+                    modeName.slice(1)
                 )
                 .classList.toggle(
                     "active",
-                    m===mode
+                    modeName===mode
                 );
 
             });
@@ -3754,7 +2637,6 @@ document
             );
 
             renderISBN();
-
         }
     );
 
@@ -3762,21 +2644,19 @@ document
 
 
 /* =========================================================
-   ADDRESS MODES
+   ADDRESS MODE
 ========================================================= */
 
 document
-.querySelectorAll(
-    "#addressPanel .mode"
-)
-.forEach(btn=>{
+.querySelectorAll("#addressPanel .mode")
+.forEach(button=>{
 
-    btn.addEventListener(
+    button.addEventListener(
         "click",
         ()=>{
 
             const mode=
-                btn.dataset.addressMode;
+                button.dataset.addressMode;
 
             state.address.mode=
                 mode;
@@ -3789,20 +2669,22 @@ document
                 x.classList.remove("active")
             );
 
-            btn.classList.add("active");
+            button.classList.add("active");
 
             ["manual","bulk","excel"]
-            .forEach(m=>{
+            .forEach(modeName=>{
 
                 document
                 .getElementById(
                     "address"+
-                    m.charAt(0).toUpperCase()+
-                    m.slice(1)
+                    modeName
+                    .charAt(0)
+                    .toUpperCase()+
+                    modeName.slice(1)
                 )
                 .classList.toggle(
                     "active",
-                    m===mode
+                    modeName===mode
                 );
 
             });
@@ -3813,7 +2695,6 @@ document
             );
 
             renderAddress();
-
         }
     );
 
@@ -3821,7 +2702,7 @@ document
 
 
 /* =========================================================
-   GET MANUAL
+   GET VALUES
 ========================================================= */
 
 function values(selector){
@@ -3836,7 +2717,7 @@ function values(selector){
 
 
 /* =========================================================
-   EXCEL COMMON READER
+   EXCEL READER
 ========================================================= */
 
 function readExcel(
@@ -3851,309 +2732,176 @@ function readExcel(
     const reader=
         new FileReader();
 
-    reader.onload=
-        e=>{
+    reader.onload=e=>{
 
-            try{
+        try{
 
-                const wb=
-                    XLSX.read(
-                        e.target.result,
-                        {type:"array"}
-                    );
+            const workbook=
+                XLSX.read(
+                    e.target.result,
+                    {type:"array"}
+                );
 
-                const ws=
-                    wb.Sheets[
-                        wb.SheetNames[0]
-                    ];
+            const sheet=
+                workbook.Sheets[
+                    workbook.SheetNames[0]
+                ];
 
-                const rows=
-                    XLSX.utils.sheet_to_json(
-                        ws,
-                        {
-                            header:1,
-                            defval:""
-                        }
-                    );
+            const rows=
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    {
+                        header:1,
+                        defval:""
+                    }
+                );
 
-                if(!rows.length){
+            if(!rows.length){
 
-                    toast(
-                        "Excel file is empty.",
-                        "red"
-                    );
+                toast(
+                    "Excel file is empty.",
+                    "red"
+                );
 
-                    return;
+                return;
+            }
 
-                }
+            const headers=
+                rows[0].map(
+                    (x,i)=>
+                    String(
+                        x ||
+                        `Column ${i+1}`
+                    )
+                );
 
-                const headers=
-                    rows[0].map(
-                        (x,i)=>
-                        String(
-                            x ||
-                            `Column ${i+1}`
+            const data=
+                rows
+                .slice(1)
+                .filter(
+                    row=>
+                    row.some(
+                        x=>
+                        String(x).trim()!==""
+                    )
+                );
+
+            document
+            .getElementById(statusId)
+            .innerHTML=
+                `✅ Excel file uploaded successfully — ${data.length} data rows found.`;
+
+            document
+            .getElementById(statusId)
+            .classList.add("show");
+
+            document
+            .getElementById(previewId)
+            .classList.add("show");
+
+            document
+            .getElementById(headId)
+            .innerHTML=`
+
+                <tr>
+
+                    <th>#</th>
+
+                    ${
+                        headers
+                        .map(
+                            h=>
+                            `<th>
+                                ${escapeHTML(h)}
+                            </th>`
                         )
-                    );
+                        .join("")
+                    }
 
-                const data=
-                    rows
-                    .slice(1)
-                    .filter(
-                        row=>
-                        row.some(
-                            x=>
-                            String(x)
-                            .trim()!==""
-                        )
-                    );
+                </tr>
+            `;
 
-                document
-                .getElementById(
-                    statusId
-                )
-                .innerHTML=
-                    `✅ Excel uploaded successfully — ${data.length} data rows found.`;
-
-                document
-                .getElementById(
-                    statusId
-                )
-                .classList.add("show");
-
-                document
-                .getElementById(
-                    previewId
-                )
-                .classList.add("show");
-
-                document
-                .getElementById(
-                    headId
-                )
-                .innerHTML=`
-
+            document
+            .getElementById(bodyId)
+            .innerHTML=
+                data
+                .slice(0,25)
+                .map(
+                    (row,index)=>
+                    `
                     <tr>
-                        <th>#</th>
+
+                        <td>
+                            ${index+1}
+                        </td>
 
                         ${
                             headers
                             .map(
-                                h=>
-                                `<th>
-                                    ${escapeHTML(h)}
-                                </th>`
+                                (_,i)=>
+                                `
+                                <td>
+                                    ${escapeHTML(
+                                        row[i] ?? ""
+                                    )}
+                                </td>
+                                `
                             )
                             .join("")
                         }
 
                     </tr>
-
-                `;
-
-                document
-                .getElementById(
-                    bodyId
+                    `
                 )
-                .innerHTML=
-                    data
-                    .slice(0,25)
-                    .map(
-                        (row,i)=>
-                        `
-                        <tr>
+                .join("");
 
-                            <td>
-                                ${i+1}
-                            </td>
+            callback(
+                data,
+                headers
+            );
 
-                            ${
-                                headers
-                                .map(
-                                    (_,j)=>
-                                    `
-                                    <td>
-                                        ${escapeHTML(
-                                            row[j] ?? ""
-                                        )}
-                                    </td>
-                                    `
-                                )
-                                .join("")
-                            }
+            toast(
+                `Excel uploaded: ${data.length} rows.`,
+                "green"
+            );
 
-                        </tr>
-                        `
-                    )
-                    .join("");
+        }
+        catch(error){
 
-                callback(
-                    data,
-                    headers
-                );
+            console.error(error);
 
-                toast(
-                    `Excel uploaded: ${data.length} rows.`,
-                    "green"
-                );
+            toast(
+                "Unable to read Excel file.",
+                "red"
+            );
 
-            }
-            catch(err){
+        }
 
-                console.error(err);
-
-                toast(
-                    "Excel file could not be read.",
-                    "red"
-                );
-
-            }
-
-        };
+    };
 
     reader.readAsArrayBuffer(file);
-
 }
 
 
 /* =========================================================
-   COCO EXCEL
-========================================================= */
-
-document
-.getElementById("cocoExcelFile")
-.addEventListener(
-    "change",
-    e=>{
-
-        const file=
-            e.target.files[0];
-
-        if(!file)return;
-
-        readExcel(
-            file,
-            "cocoExcelStatus",
-            "cocoExcelPreview",
-            "cocoExcelHead",
-            "cocoExcelBody",
-            data=>{
-
-                state.coco.excel=
-                    data.map(row=>({
-
-                        po:
-                        String(
-                            row[0] || ""
-                        ).trim()
-
-                    }))
-                    .filter(x=>x.po);
-
-                renderCoco();
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   OTHER EXCEL
-========================================================= */
-
-document
-.getElementById("otherExcelFile")
-.addEventListener(
-    "change",
-    e=>{
-
-        const file=
-            e.target.files[0];
-
-        if(!file)return;
-
-        readExcel(
-            file,
-            "otherExcelStatus",
-            "otherExcelPreview",
-            "otherExcelHead",
-            "otherExcelBody",
-            data=>{
-
-                state.other.excel=
-                    data.map(row=>({
-
-                        po:
-                        String(
-                            row[0] || ""
-                        ).trim()
-
-                    }))
-                    .filter(x=>x.po);
-
-                renderOther();
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   ISBN EXCEL
-========================================================= */
-
-document
-.getElementById("isbnExcelFile")
-.addEventListener(
-    "change",
-    e=>{
-
-        const file=
-            e.target.files[0];
-
-        if(!file)return;
-
-        readExcel(
-            file,
-            "isbnExcelStatus",
-            "isbnExcelPreview",
-            "isbnExcelHead",
-            "isbnExcelBody",
-            data=>{
-
-                state.isbn.excel=
-                    data.map(row=>
-                        String(
-                            row[0] || ""
-                        ).trim()
-                    )
-                    .filter(Boolean);
-
-                renderISBN();
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
    ADDRESS EXCEL
+   First columns:
+   From Name
+   From Phone
+   From Address
+   To Name
+   To Phone
+   To Address
 ========================================================= */
 
 document
 .getElementById("addressExcelFile")
 .addEventListener(
     "change",
-    e=>{
+    event=>{
 
         const file=
-            e.target.files[0];
+            event.target.files[0];
 
         if(!file)return;
 
@@ -4168,14 +2916,23 @@ document
                 state.address.excel=
                     data.map(row=>({
 
-                        name:
+                        fromName:
                             row[0] || "",
 
-                        phone:
+                        fromPhone:
                             row[1] || "",
 
-                        address:
-                            row[2] || ""
+                        fromAddress:
+                            row[2] || "",
+
+                        toName:
+                            row[3] || "",
+
+                        toPhone:
+                            row[4] || "",
+
+                        toAddress:
+                            row[5] || ""
 
                     }));
 
@@ -4189,29 +2946,645 @@ document
 
 
 /* =========================================================
-   COCO DATA
+   ADDRESS BULK PARSER
+========================================================= */
+
+function getAddressData(){
+
+    if(
+        state.address.mode==="manual"
+    ){
+
+        return [{
+
+            fromName:
+                document
+                .getElementById(
+                    "fromName"
+                )
+                .value
+                .trim(),
+
+            fromPhone:
+                document
+                .getElementById(
+                    "fromPhone"
+                )
+                .value
+                .trim(),
+
+            fromAddress:
+                document
+                .getElementById(
+                    "fromAddress"
+                )
+                .value
+                .trim(),
+
+            toName:
+                document
+                .getElementById(
+                    "toName"
+                )
+                .value
+                .trim(),
+
+            toPhone:
+                document
+                .getElementById(
+                    "toPhone"
+                )
+                .value
+                .trim(),
+
+            toAddress:
+                document
+                .getElementById(
+                    "toAddress"
+                )
+                .value
+                .trim()
+
+        }];
+
+    }
+
+
+    if(
+        state.address.mode==="bulk"
+    ){
+
+        const text=
+            document
+            .getElementById(
+                "addressBulkInput"
+            )
+            .value
+            .trim();
+
+        if(!text){
+            return [];
+        }
+
+        return text
+        .split("\n")
+        .map(line=>{
+
+            const parts=
+                line.split("|");
+
+            return {
+
+                fromName:"",
+                fromPhone:"",
+                fromAddress:
+                    (parts[0] || "")
+                    .trim(),
+
+                toName:"",
+                toPhone:"",
+                toAddress:
+                    (parts.slice(1).join("|") || "")
+                    .trim()
+
+            };
+
+        })
+        .filter(
+            x=>
+            x.fromAddress ||
+            x.toAddress
+        );
+
+    }
+
+
+    return state.address.excel;
+
+}
+
+
+/* =========================================================
+   ADDRESS PREVIEW
+========================================================= */
+
+function renderAddress(){
+
+    const area=
+        document.getElementById(
+            "addressPreview"
+        );
+
+    area.innerHTML="";
+
+    const data=
+        getAddressData()
+        .filter(
+            item=>
+            item.fromName ||
+            item.fromAddress ||
+            item.toName ||
+            item.toAddress
+        );
+
+    document
+    .getElementById(
+        "addressPreviewCount"
+    )
+    .textContent=
+        Math.min(
+            data.length,
+            5
+        );
+
+    if(!data.length){
+
+        const page=
+            document.createElement("div");
+
+        page.className=
+            "preview-page four-six";
+
+        page.style.display="flex";
+
+        page.style.alignItems="center";
+
+        page.style.justifyContent="center";
+
+        page.innerHTML=`
+
+            <div
+                style="
+                text-align:center;
+                color:#667085;">
+
+                <div style="font-size:40px">
+                    🚚
+                </div>
+
+                <strong>
+                    From & To Address Preview
+                </strong>
+
+            </div>
+
+        `;
+
+        area.appendChild(page);
+
+        return;
+    }
+
+
+    /*
+       ONLY FIRST 5 PAGES
+       ARE SHOWN IN PREVIEW.
+    */
+
+    data
+    .slice(0,5)
+    .forEach(item=>{
+
+        const page=
+            document.createElement("div");
+
+        page.className=
+            "preview-page four-six";
+
+        page.style.padding="25px";
+
+        page.style.display="flex";
+
+        page.style.alignItems="center";
+
+        page.style.justifyContent="center";
+
+
+        const card=
+            document.createElement("div");
+
+        card.className=
+            "address-label-design";
+
+
+        /* FROM */
+
+        const from=
+            document.createElement("div");
+
+        from.className=
+            "address-from-preview";
+
+        if(
+            document
+            .getElementById(
+                "addressFromBorder"
+            )
+            .checked
+        ){
+
+            from.style.borderBottom=
+                "1px dashed #b8c5d6";
+
+        }
+        else{
+
+            from.style.borderBottom=
+                "none";
+
+        }
+
+
+        from.innerHTML=`
+
+            <div
+                class="address-small-title">
+
+                📤 FROM
+
+            </div>
+
+            <div
+                class="address-person">
+
+                ${escapeHTML(
+                    item.fromName ||
+                    "Sender Name"
+                )}
+
+            </div>
+
+            <div
+                class="address-phone">
+
+                ${escapeHTML(
+                    item.fromPhone ||
+                    "Sender Phone"
+                )}
+
+            </div>
+
+            <div
+                class="address-body">
+
+                ${escapeHTML(
+                    item.fromAddress ||
+                    "Sender Address"
+                )}
+
+            </div>
+
+        `;
+
+
+        /* TO */
+
+        const to=
+            document.createElement("div");
+
+        to.className=
+            "address-to-preview";
+
+
+        if(
+            document
+            .getElementById(
+                "addressToBorder"
+            )
+            .checked
+        ){
+
+            to.style.borderTop=
+                "0";
+
+        }
+
+
+        to.innerHTML=`
+
+            <div
+                class="address-small-title">
+
+                📥 TO
+
+            </div>
+
+            <div
+                class="address-person">
+
+                ${escapeHTML(
+                    item.toName ||
+                    "Receiver Name"
+                )}
+
+            </div>
+
+            <div
+                class="address-phone">
+
+                ${escapeHTML(
+                    item.toPhone ||
+                    "Receiver Phone"
+                )}
+
+            </div>
+
+            <div
+                class="address-body">
+
+                ${escapeHTML(
+                    item.toAddress ||
+                    "Receiver Address"
+                )}
+
+            </div>
+
+        `;
+
+
+        /* FONT FROM */
+
+        const fromFont=
+            document
+            .getElementById(
+                "fromFont"
+            )
+            .value;
+
+        const fromSize=
+            document
+            .getElementById(
+                "fromSize"
+            )
+            .value;
+
+        from.style.fontFamily=
+            fromFont;
+
+        from.style.fontSize=
+            fromSize+"px";
+
+        from.style.opacity=
+            Number(
+                document
+                .getElementById(
+                    "fromOpacity"
+                )
+                .value
+            )/100;
+
+
+        /* FONT TO */
+
+        const toFont=
+            document
+            .getElementById(
+                "toFont"
+            )
+            .value;
+
+        const toSize=
+            document
+            .getElementById(
+                "toSize"
+            )
+            .value;
+
+        to.style.fontFamily=
+            toFont;
+
+        to.style.fontSize=
+            toSize+"px";
+
+        to.style.opacity=
+            Number(
+                document
+                .getElementById(
+                    "toOpacity"
+                )
+                .value
+            )/100;
+
+
+        /* CARD BORDER */
+
+        if(
+            document
+            .getElementById(
+                "addressPageBorder"
+            )
+            .checked
+        ){
+
+            card.style.border=
+                "2px solid #1264d8";
+
+        }
+        else{
+
+            card.style.border=
+                "none";
+
+        }
+
+
+        card.appendChild(from);
+        card.appendChild(to);
+
+        page.appendChild(card);
+
+        area.appendChild(page);
+
+    });
+
+}
+
+
+/* =========================================================
+   ADDRESS LIVE INPUTS
+========================================================= */
+
+document
+.querySelectorAll(
+    "#addressPanel input,#addressPanel textarea,#addressPanel select"
+)
+.forEach(element=>{
+
+    element.addEventListener(
+        "input",
+        renderAddress
+    );
+
+    element.addEventListener(
+        "change",
+        renderAddress
+    );
+
+});
+
+
+/* =========================================================
+   ADDRESS FONT BUTTONS
+========================================================= */
+
+[
+    "fromBold",
+    "fromItalic",
+    "fromUnderline",
+    "toBold",
+    "toItalic",
+    "toUnderline"
+]
+.forEach(id=>{
+
+    document
+    .getElementById(id)
+    .addEventListener(
+        "click",
+        event=>{
+
+            event.currentTarget
+            .classList.toggle(
+                "active"
+            );
+
+            const enabled=
+                event.currentTarget
+                .classList.contains(
+                    "active"
+                );
+
+            toast(
+                `${id} ${
+                    enabled
+                    ? "enabled"
+                    : "disabled"
+                }`,
+                enabled
+                ? "green"
+                : "red"
+            );
+
+            renderAddress();
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   ADDRESS ALL BORDER
+========================================================= */
+
+document
+.getElementById(
+    "addressAllBorder"
+)
+.addEventListener(
+    "change",
+    event=>{
+
+        [
+            "addressPageBorder",
+            "addressFromBorder",
+            "addressToBorder"
+        ]
+        .forEach(id=>{
+
+            const control=
+                document
+                .getElementById(id);
+
+            control.checked=
+                event.target.checked;
+
+            control.disabled=
+                event.target.checked;
+
+        });
+
+        toast(
+            event.target.checked
+            ? "All address borders enabled. Individual borders frozen."
+            : "All address borders disabled. Individual borders unlocked.",
+            event.target.checked
+            ? "green"
+            : "red"
+        );
+
+        renderAddress();
+
+    }
+);
+
+
+/* =========================================================
+   ADDRESS BORDER TOAST
+========================================================= */
+
+[
+    "addressPageBorder",
+    "addressFromBorder",
+    "addressToBorder"
+]
+.forEach(id=>{
+
+    document
+    .getElementById(id)
+    .addEventListener(
+        "change",
+        event=>{
+
+            toast(
+                event.target.checked
+                ? `${id} enabled`
+                : `${id} disabled`,
+                event.target.checked
+                ? "green"
+                : "red"
+            );
+
+            renderAddress();
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   GENERIC COCO DATA
 ========================================================= */
 
 function getCocoPO(){
 
-    if(state.coco.mode==="manual"){
+    if(
+        state.coco.mode==="manual"
+    ){
 
-        return values(".coco-manual");
+        return values(
+            ".coco-manual"
+        );
 
     }
 
-    if(state.coco.mode==="bulk"){
+
+    if(
+        state.coco.mode==="bulk"
+    ){
 
         return document
-            .getElementById(
-                "cocoBulkInput"
-            )
-            .value
-            .split(",")
-            .map(x=>x.trim())
-            .filter(Boolean);
+        .getElementById(
+            "cocoBulkInput"
+        )
+        .value
+        .split(",")
+        .map(x=>x.trim())
+        .filter(Boolean);
 
     }
+
 
     return state.coco.excel
         .map(x=>x.po)
@@ -4221,10 +3594,10 @@ function getCocoPO(){
 
 
 /* =========================================================
-   BOX DATA
+   COCO BOX DATA
 ========================================================= */
 
-function makeBoxData(){
+function getCocoData(){
 
     const pos=
         getCocoPO();
@@ -4268,75 +3641,20 @@ function makeBoxData(){
     warning.style.display=
         "none";
 
-    const flow=
-        document
-        .getElementById(
-            "cocoFlow"
-        )
-        .value;
-
-    const output=[];
-
-    if(!pos.length){
-
-        return [];
-
-    }
-
-    if(flow==="same"){
-
-        pos.forEach(
-            po=>
-            output.push({
-                po,
-                box:start
-            })
-        );
-
-        return output;
-
-    }
-
-    if(flow==="alternate"){
-
-        pos.forEach(
-            (po,i)=>{
-
-                output.push({
-
-                    po,
-
-                    box:
-                        start +
-                        (
-                            i %
-                            Math.max(
-                                1,
-                                end-start+1
-                            )
-                        )
-
-                });
-
-            }
-        );
-
-        return output;
-
-    }
+    const result=[];
 
     pos.forEach(
         po=>{
 
             for(
-                let b=start;
-                b<=end;
-                b++
+                let box=start;
+                box<=end;
+                box++
             ){
 
-                output.push({
+                result.push({
                     po,
-                    box:b
+                    box
                 });
 
             }
@@ -4344,116 +3662,13 @@ function makeBoxData(){
         }
     );
 
-    return output;
+    return result;
 
 }
 
 
 /* =========================================================
-   PAGE CONFIG
-========================================================= */
-
-function getPageConfig(){
-
-    const page=
-        document
-        .querySelector(
-            'input[name="cocoPage"]:checked'
-        )
-        ?.value || "a4";
-
-    const per=
-        Number(
-            document
-            .getElementById(
-                "cocoPerPage"
-            )
-            .value
-        );
-
-    const layouts={
-
-        1:[1,1],
-        2:[1,2],
-        4:[2,2],
-        6:[2,3],
-        8:[2,4],
-        10:[2,5],
-        12:[3,4],
-        14:[2,7],
-        15:[3,5],
-        16:[4,4],
-        18:[3,6],
-        20:[4,5]
-
-    };
-
-    const dimensions={
-
-        a4:{
-            cls:"a4",
-            w:794,
-            h:1123
-        },
-
-        "4x6":{
-            cls:"four-six",
-            w:384,
-            h:576
-        },
-
-        "70x35":{
-            cls:"seventy-thirtyfive",
-            w:265,
-            h:132
-        },
-
-        custom:{
-            cls:"custom",
-
-            w:
-                Number(
-                    document
-                    .getElementById(
-                        "cocoCustomW"
-                    )
-                    .value
-                ) || 794,
-
-            h:
-                Number(
-                    document
-                    .getElementById(
-                        "cocoCustomH"
-                    )
-                    .value
-                ) || 1123
-
-        }
-
-    };
-
-    return {
-
-        ...dimensions[page],
-
-        page,
-
-        per,
-
-        rows:
-            layouts[per]?.[0] || 1,
-
-        cols:
-            layouts[per]?.[1] || per
-
-    };
-
-}
-
-
-/* =========================================================
-   LABEL ELEMENT
+   COCO LABEL
 ========================================================= */
 
 function makeCocoLabel(item){
@@ -4463,11 +3678,6 @@ function makeCocoLabel(item){
 
     label.className="label";
 
-    const content=
-        state.coco.content;
-
-    const layout=
-        state.coco.layout;
 
     const po=
         document.createElement("div");
@@ -4481,57 +3691,8 @@ function makeCocoLabel(item){
                 "cocoPoPrefix"
             )
             .value || ""
-        ) + item.po;
-
-    po.style.fontFamily=
-        document
-        .getElementById(
-            "cocoPoFont"
-        )
-        .value;
-
-    po.style.fontSize=
-        document
-        .getElementById(
-            "cocoPoSize"
-        )
-        .value+"px";
-
-    po.style.opacity=
-        Number(
-            document
-            .getElementById(
-                "cocoPoOpacity"
-            )
-            .value
-        )/100;
-
-    po.style.fontWeight=
-        document
-        .getElementById(
-            "cocoPoBold"
-        )
-        .classList.contains("active")
-        ? "900"
-        : "500";
-
-    po.style.fontStyle=
-        document
-        .getElementById(
-            "cocoPoItalic"
-        )
-        .classList.contains("active")
-        ? "italic"
-        : "normal";
-
-    po.style.textDecoration=
-        document
-        .getElementById(
-            "cocoPoUnderline"
-        )
-        .classList.contains("active")
-        ? "underline"
-        : "none";
+        )+
+        item.po;
 
 
     const box=
@@ -4546,57 +3707,9 @@ function makeCocoLabel(item){
                 "cocoBoxPrefix"
             )
             .value || "BOX NO."
-        )+" "+item.box;
-
-    box.style.fontFamily=
-        document
-        .getElementById(
-            "cocoBoxFont"
-        )
-        .value;
-
-    box.style.fontSize=
-        document
-        .getElementById(
-            "cocoBoxSize"
-        )
-        .value+"px";
-
-    box.style.opacity=
-        Number(
-            document
-            .getElementById(
-                "cocoBoxOpacity"
-            )
-            .value
-        )/100;
-
-    box.style.fontWeight=
-        document
-        .getElementById(
-            "cocoBoxBold"
-        )
-        .classList.contains("active")
-        ? "900"
-        : "500";
-
-    box.style.fontStyle=
-        document
-        .getElementById(
-            "cocoBoxItalic"
-        )
-        .classList.contains("active")
-        ? "italic"
-        : "normal";
-
-    box.style.textDecoration=
-        document
-        .getElementById(
-            "cocoBoxUnderline"
-        )
-        .classList.contains("active")
-        ? "underline"
-        : "none";
+        )+
+        " "+
+        item.box;
 
 
     if(
@@ -4633,25 +3746,27 @@ function makeCocoLabel(item){
     }
 
 
-    if(content==="po"){
+    if(
+        state.coco.content==="po"
+    ){
 
         label.appendChild(po);
 
     }
-
-    else if(content==="box"){
+    else if(
+        state.coco.content==="box"
+    ){
 
         label.appendChild(box);
 
     }
-
     else{
 
         const wrap=
             document.createElement("div");
 
         wrap.className=
-            layout==="same"
+            state.coco.layout==="same"
             ? "same-line"
             : "separate-line";
 
@@ -4663,22 +3778,13 @@ function makeCocoLabel(item){
     }
 
 
-    label.style.border=
-        document
-        .getElementById(
-            "cocoPageBorder"
-        )
-        .checked
-        ? "1px solid #d8e0ea"
-        : "none";
-
     return label;
 
 }
 
 
 /* =========================================================
-   RENDER COCO
+   COCO PREVIEW
 ========================================================= */
 
 function renderCoco(){
@@ -4692,105 +3798,54 @@ function renderCoco(){
     area.innerHTML="";
 
     const data=
-        makeBoxData();
-
-    document
-    .getElementById(
-        "cocoTotal"
-    )
-    .value=
-        data.length;
+        getCocoData();
 
     if(!data.length){
-
-        document
-        .getElementById(
-            "cocoPreviewCount"
-        )
-        .textContent="0";
 
         return;
 
     }
 
-    const cfg=
-        getPageConfig();
+    const per=
+        2;
 
     const total=
         Math.ceil(
-            data.length/cfg.per
+            data.length/per
         );
 
-    /*
-       ONLY FIRST 5 PAGES IN PREVIEW
-    */
-
-    document
-    .getElementById(
-        "cocoPreviewCount"
-    )
-    .textContent=
-        Math.min(total,5);
-
-
     for(
-        let p=0;
-        p<Math.min(total,5);
-        p++
+        let pageNo=0;
+        pageNo<Math.min(total,5);
+        pageNo++
     ){
 
         const page=
             document.createElement("div");
 
         page.className=
-            `preview-page ${cfg.cls}`;
-
-        page.style.width=
-            cfg.w+"px";
-
-        page.style.height=
-            cfg.h+"px";
+            "preview-page a4";
 
         page.style.gridTemplateColumns=
-            `repeat(${cfg.cols},1fr)`;
+            "1fr 1fr";
 
         page.style.gridTemplateRows=
-            `repeat(${cfg.rows},1fr)`;
+            "repeat(1,1fr)";
 
-        page.style.gap=
-            cfg.page==="70x35"
-            ? "2px"
-            : "5px";
-
-        page.style.padding=
-            cfg.page==="70x35"
-            ? "2px"
-            : "10px";
+        page.style.padding="10px";
 
 
-        const start=
-            p*cfg.per;
-
-        const end=
-            Math.min(
-                start+cfg.per,
-                data.length
-            );
-
-
-        for(
-            let i=start;
-            i<end;
-            i++
-        ){
-
+        data
+        .slice(
+            pageNo*per,
+            pageNo*per+per
+        )
+        .forEach(
+            item=>
             page.appendChild(
-                makeCocoLabel(
-                    data[i]
-                )
-            );
-
-        }
+                makeCocoLabel(item)
+            )
+        );
 
         area.appendChild(page);
 
@@ -4800,335 +3855,33 @@ function renderCoco(){
 
 
 /* =========================================================
-   COCO CONTENT
-========================================================= */
-
-document
-.querySelectorAll(
-    'input[name="cocoContent"]'
-)
-.forEach(input=>{
-
-    input.addEventListener(
-        "change",
-        ()=>{
-
-            state.coco.content=
-                input.value;
-
-            document
-            .querySelectorAll(
-                'input[name="cocoContent"]'
-            )
-            .forEach(x=>
-                x
-                .closest(".choice")
-                .classList.remove("active")
-            );
-
-            input
-            .closest(".choice")
-            .classList.add("active");
-
-
-            const combined=
-                input.value==="combined";
-
-
-            document
-            .getElementById(
-                "cocoFreeze"
-            )
-            .classList.toggle(
-                "show",
-                combined
-            );
-
-
-            toast(
-                combined
-                ? "PO Number and Box Number are frozen."
-                : "PO / Box options are unlocked.",
-                "green"
-            );
-
-            renderCoco();
-
-        }
-    );
-
-});
-
-
-/* =========================================================
-   LAYOUT
-========================================================= */
-
-document
-.querySelectorAll(
-    'input[name="cocoLayout"]'
-)
-.forEach(input=>{
-
-    input.addEventListener(
-        "change",
-        ()=>{
-
-            state.coco.layout=
-                input.value;
-
-            document
-            .querySelectorAll(
-                'input[name="cocoLayout"]'
-            )
-            .forEach(x=>
-                x
-                .closest(".choice")
-                .classList.remove("active")
-            );
-
-            input
-            .closest(".choice")
-            .classList.add("active");
-
-            toast(
-                `${input.value} line layout enabled`,
-                "green"
-            );
-
-            renderCoco();
-
-        }
-    );
-
-});
-
-
-/* =========================================================
-   CUSTOM PAGE
-========================================================= */
-
-document
-.querySelectorAll(
-    'input[name="cocoPage"]'
-)
-.forEach(input=>{
-
-    input.addEventListener(
-        "change",
-        ()=>{
-
-            document
-            .querySelectorAll(
-                'input[name="cocoPage"]'
-            )
-            .forEach(x=>
-                x
-                .closest(".choice")
-                .classList.remove("active")
-            );
-
-            input
-            .closest(".choice")
-            .classList.add("active");
-
-
-            document
-            .getElementById(
-                "cocoCustom"
-            )
-            .style.display=
-                input.value==="custom"
-                ? "grid"
-                : "none";
-
-
-            toast(
-                `${input.value} page setting enabled`,
-                "green"
-            );
-
-            renderCoco();
-
-        }
-    );
-
-});
-
-
-/* =========================================================
-   ALL BORDER
-========================================================= */
-
-document
-.getElementById(
-    "cocoAllBorder"
-)
-.addEventListener(
-    "change",
-    e=>{
-
-        [
-            "cocoPageBorder",
-            "cocoPoBorder",
-            "cocoBoxBorder"
-        ]
-        .forEach(id=>{
-
-            const x=
-                document
-                .getElementById(id);
-
-            x.checked=
-                e.target.checked;
-
-            x.disabled=
-                e.target.checked;
-
-        });
-
-        toast(
-            e.target.checked
-            ? "All borders enabled. Individual borders frozen."
-            : "All borders disabled. Individual borders unlocked.",
-            e.target.checked
-            ? "green"
-            : "red"
-        );
-
-        renderCoco();
-
-    }
-);
-
-
-/* =========================================================
-   COCO BORDER EVENTS
-========================================================= */
-
-[
-    "cocoPageBorder",
-    "cocoPoBorder",
-    "cocoBoxBorder"
-]
-.forEach(id=>{
-
-    document
-    .getElementById(id)
-    .addEventListener(
-        "change",
-        e=>{
-
-            toast(
-                e.target.checked
-                ? `${id} enabled`
-                : `${id} disabled`,
-                e.target.checked
-                ? "green"
-                : "red"
-            );
-
-            renderCoco();
-
-        }
-    );
-
-});
-
-
-/* =========================================================
-   FONT BUTTONS
-========================================================= */
-
-[
-    "cocoPoBold",
-    "cocoPoItalic",
-    "cocoPoUnderline",
-    "cocoBoxBold",
-    "cocoBoxItalic",
-    "cocoBoxUnderline"
-]
-.forEach(id=>{
-
-    document
-    .getElementById(id)
-    .addEventListener(
-        "click",
-        e=>{
-
-            e.currentTarget
-            .classList.toggle(
-                "active"
-            );
-
-            const enabled=
-                e.currentTarget
-                .classList.contains("active");
-
-            toast(
-                `${id} ${
-                    enabled
-                    ?"enabled"
-                    :"disabled"
-                }`,
-                enabled
-                ?"green"
-                :"red"
-            );
-
-            renderCoco();
-
-        }
-    );
-
-});
-
-
-/* =========================================================
-   COCO LIVE INPUTS
-========================================================= */
-
-document
-.querySelectorAll(
-    "#cocoPanel input,#cocoPanel select,#cocoPanel textarea"
-)
-.forEach(el=>{
-
-    el.addEventListener(
-        "input",
-        renderCoco
-    );
-
-    el.addEventListener(
-        "change",
-        renderCoco
-    );
-
-});
-
-
-/* =========================================================
-   OTHER PO RENDER
+   OTHER DATA
 ========================================================= */
 
 function getOtherPO(){
 
-    if(state.other.mode==="manual"){
+    if(
+        state.other.mode==="manual"
+    ){
 
-        return values(".other-manual");
+        return values(
+            ".other-manual"
+        );
 
     }
 
-    if(state.other.mode==="bulk"){
+    if(
+        state.other.mode==="bulk"
+    ){
 
         return document
-            .getElementById(
-                "otherBulkInput"
-            )
-            .value
-            .split(",")
-            .map(x=>x.trim())
-            .filter(Boolean);
+        .getElementById(
+            "otherBulkInput"
+        )
+        .value
+        .split(",")
+        .map(x=>x.trim())
+        .filter(Boolean);
 
     }
 
@@ -5148,14 +3901,10 @@ function renderOther(){
 
     area.innerHTML="";
 
-    const pos=
+    const list=
         getOtherPO();
 
-    if(!pos.length){
-
-        return;
-
-    }
+    if(!list.length)return;
 
     const page=
         document.createElement("div");
@@ -5171,19 +3920,11 @@ function renderOther(){
 
     page.style.padding="10px";
 
-    const start=
-        Number(
-            document
-            .getElementById(
-                "otherStartBox"
-            )
-            .value
-        ) || 1;
 
-
-    pos.slice(0,10)
+    list
+    .slice(0,10)
     .forEach(
-        (po,i)=>{
+        (po,index)=>{
 
             const label=
                 document.createElement("div");
@@ -5195,7 +3936,6 @@ function renderOther(){
                 <div class="separate-line">
 
                     <div
-                        class="po-value"
                         style="
                         font-size:20px;
                         font-weight:900;
@@ -5208,12 +3948,14 @@ function renderOther(){
                                 "otherPoPrefix"
                             )
                             .value
-                        )}${escapeHTML(po)}
+                        )}
+
+                        ${escapeHTML(po)}
 
                     </div>
 
+
                     <div
-                        class="box-value"
                         style="
                         font-size:15px;
                         font-weight:900;
@@ -5227,7 +3969,17 @@ function renderOther(){
                             )
                             .value
                         )}
-                        ${start+i}
+
+                        ${
+                            Number(
+                                document
+                                .getElementById(
+                                    "otherStartBox"
+                                )
+                                .value
+                            )+
+                            index
+                        }
 
                     </div>
 
@@ -5246,45 +3998,33 @@ function renderOther(){
 
 
 /* =========================================================
-   OTHER LIVE
-========================================================= */
-
-document
-.querySelectorAll(
-    "#otherPanel input,#otherPanel textarea"
-)
-.forEach(el=>{
-
-    el.addEventListener(
-        "input",
-        renderOther
-    );
-
-});
-
-
-/* =========================================================
-   ISBN DATA
+   ISBN
 ========================================================= */
 
 function getISBN(){
 
-    if(state.isbn.mode==="manual"){
+    if(
+        state.isbn.mode==="manual"
+    ){
 
-        return values(".isbn-manual");
+        return values(
+            ".isbn-manual"
+        );
 
     }
 
-    if(state.isbn.mode==="bulk"){
+    if(
+        state.isbn.mode==="bulk"
+    ){
 
         return document
-            .getElementById(
-                "isbnBulkInput"
-            )
-            .value
-            .split(",")
-            .map(x=>x.trim())
-            .filter(Boolean);
+        .getElementById(
+            "isbnBulkInput"
+        )
+        .value
+        .split(",")
+        .map(x=>x.trim())
+        .filter(Boolean);
 
     }
 
@@ -5293,86 +4033,67 @@ function getISBN(){
 }
 
 
-/* =========================================================
-   FAKE BARCODE
-   VISUAL LABEL PREVIEW
-========================================================= */
-
 function barcodeHTML(value){
 
-    let pattern="";
+    let bars="";
 
-    const str=
+    const digits=
         String(value)
         .replace(/\D/g,"");
 
     for(
         let i=0;
-        i<Math.max(70,str.length*4);
+        i<90;
         i++
     ){
 
         const digit=
             Number(
-                str[
+                digits[
                     i %
                     Math.max(
-                        str.length,
+                        digits.length,
                         1
                     )
                 ] || i
             );
 
-        pattern+=
-            (digit+i)%3===0
-            ? "3px "
-            : (digit+i)%2===0
-            ? "2px "
-            : "1px ";
+        const width=
+            ((digit+i)%3)+1;
+
+        bars+=`
+            <span
+                style="
+                display:block;
+                width:${width}px;
+                height:80px;
+                background:#111;
+                margin-right:1px;">
+            </span>
+        `;
 
     }
 
     return `
-
         <div
             style="
             display:flex;
             align-items:stretch;
             justify-content:center;
-            height:90px;
-            overflow:hidden;">
+            overflow:hidden;
+            height:80px;">
 
-            ${pattern
-                .trim()
-                .split(" ")
-                .map(
-                    w=>
-                    `<span
-                        style="
-                        display:block;
-                        width:${w};
-                        background:#111;
-                        margin-right:1px;">
-                    </span>`
-                )
-                .join("")}
+            ${bars}
 
         </div>
-
     `;
-
 }
 
-
-/* =========================================================
-   ISBN RENDER
-========================================================= */
 
 function renderISBN(){
 
     const area=
-        document
-        .getElementById(
+        document.getElementById(
             "isbnPreview"
         );
 
@@ -5390,23 +4111,20 @@ function renderISBN(){
             "preview-page four-six";
 
         page.style.display="flex";
-
-        page.style.alignItems=
-            "center";
-
-        page.style.justifyContent=
-            "center";
+        page.style.alignItems="center";
+        page.style.justifyContent="center";
 
         page.innerHTML=
-            "<strong>ISBN Preview</strong>";
+            "<strong>ISBN Barcode Preview</strong>";
 
         area.appendChild(page);
 
         return;
-
     }
 
-    list.slice(0,5)
+
+    list
+    .slice(0,5)
     .forEach(isbn=>{
 
         const page=
@@ -5415,25 +4133,16 @@ function renderISBN(){
         page.className=
             "preview-page four-six";
 
-        page.style.display=
-            "flex";
-
-        page.style.flexDirection=
-            "column";
-
-        page.style.alignItems=
-            "center";
-
-        page.style.justifyContent=
-            "center";
-
+        page.style.display="flex";
+        page.style.flexDirection="column";
+        page.style.alignItems="center";
+        page.style.justifyContent="center";
         page.style.gap="15px";
 
         page.innerHTML=`
 
             <strong
-                style="
-                font-size:22px;">
+                style="font-size:22px;">
                 ${escapeHTML(isbn)}
             </strong>
 
@@ -5467,21 +4176,185 @@ function renderISBN(){
 
 
 /* =========================================================
-   ISBN LIVE
+   EXCEL LISTENERS
+========================================================= */
+
+document
+.getElementById("cocoExcelFile")
+.addEventListener(
+    "change",
+    event=>{
+
+        const file=
+            event.target.files[0];
+
+        if(!file)return;
+
+        readExcel(
+            file,
+            "cocoExcelStatus",
+            "cocoExcelPreview",
+            "cocoExcelHead",
+            "cocoExcelBody",
+            data=>{
+
+                state.coco.excel=
+                    data
+                    .map(row=>({
+                        po:
+                            String(
+                                row[0] || ""
+                            ).trim()
+                    }))
+                    .filter(x=>x.po);
+
+                renderCoco();
+
+            }
+        );
+
+    }
+);
+
+
+document
+.getElementById("otherExcelFile")
+.addEventListener(
+    "change",
+    event=>{
+
+        const file=
+            event.target.files[0];
+
+        if(!file)return;
+
+        readExcel(
+            file,
+            "otherExcelStatus",
+            "otherExcelPreview",
+            "otherExcelHead",
+            "otherExcelBody",
+            data=>{
+
+                state.other.excel=
+                    data
+                    .map(row=>({
+                        po:
+                            String(
+                                row[0] || ""
+                            ).trim()
+                    }))
+                    .filter(x=>x.po);
+
+                renderOther();
+
+            }
+        );
+
+    }
+);
+
+
+document
+.getElementById("isbnExcelFile")
+.addEventListener(
+    "change",
+    event=>{
+
+        const file=
+            event.target.files[0];
+
+        if(!file)return;
+
+        readExcel(
+            file,
+            "isbnExcelStatus",
+            "isbnExcelPreview",
+            "isbnExcelHead",
+            "isbnExcelBody",
+            data=>{
+
+                state.isbn.excel=
+                    data
+                    .map(
+                        row=>
+                        String(
+                            row[0] || ""
+                        ).trim()
+                    )
+                    .filter(Boolean);
+
+                renderISBN();
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   LIVE COCO
+========================================================= */
+
+document
+.querySelectorAll(
+    "#cocoPanel input,#cocoPanel textarea,#cocoPanel select"
+)
+.forEach(element=>{
+
+    element.addEventListener(
+        "input",
+        renderCoco
+    );
+
+    element.addEventListener(
+        "change",
+        renderCoco
+    );
+
+});
+
+
+/* =========================================================
+   LIVE OTHER
+========================================================= */
+
+document
+.querySelectorAll(
+    "#otherPanel input,#otherPanel textarea,#otherPanel select"
+)
+.forEach(element=>{
+
+    element.addEventListener(
+        "input",
+        renderOther
+    );
+
+    element.addEventListener(
+        "change",
+        renderOther
+    );
+
+});
+
+
+/* =========================================================
+   LIVE ISBN
 ========================================================= */
 
 document
 .querySelectorAll(
     "#isbnPanel input,#isbnPanel textarea,#isbnPanel select"
 )
-.forEach(el=>{
+.forEach(element=>{
 
-    el.addEventListener(
+    element.addEventListener(
         "input",
         renderISBN
     );
 
-    el.addEventListener(
+    element.addEventListener(
         "change",
         renderISBN
     );
@@ -5490,323 +4363,64 @@ document
 
 
 /* =========================================================
-   ADDRESS DATA
+   ADDRESS DOWNLOAD PDF
 ========================================================= */
 
-function getAddresses(){
+async function downloadAddressPDF(){
 
-    if(state.address.mode==="manual"){
-
-        const name=
-            document
-            .getElementById(
-                "addressName"
-            )
-            .value
-            .trim();
-
-        const phone=
-            document
-            .getElementById(
-                "addressPhone"
-            )
-            .value
-            .trim();
-
-        const address=
-            document
-            .getElementById(
-                "addressText"
-            )
-            .value
-            .trim();
-
-        if(
-            !name &&
-            !phone &&
-            !address
-        ){
-
-            return [];
-
-        }
-
-        return [{
-            name,
-            phone,
-            address
-        }];
-
-    }
-
-
-    if(state.address.mode==="bulk"){
-
-        return document
-            .getElementById(
-                "addressBulkInput"
-            )
-            .value
-            .split(",")
-            .map(x=>x.trim())
-            .filter(Boolean)
-            .map(address=>({
-                name:"",
-                phone:"",
-                address
-            }));
-
-    }
-
-
-    return state.address.excel;
-
-}
-
-
-/* =========================================================
-   ADDRESS RENDER
-========================================================= */
-
-function renderAddress(){
-
-    const area=
-        document
-        .getElementById(
-            "addressPreview"
+    const data=
+        getAddressData()
+        .filter(
+            x=>
+            x.fromName ||
+            x.fromAddress ||
+            x.toName ||
+            x.toAddress
         );
-
-    area.innerHTML="";
-
-    const data=
-        getAddresses();
-
-    if(!data.length){
-
-        const page=
-            document.createElement("div");
-
-        page.className=
-            "preview-page four-six";
-
-        page.style.display="flex";
-
-        page.style.alignItems=
-            "center";
-
-        page.style.justifyContent=
-            "center";
-
-        page.innerHTML=
-            "<strong>Address Preview</strong>";
-
-        area.appendChild(page);
-
-        return;
-
-    }
-
-
-    data.slice(0,5)
-    .forEach(item=>{
-
-        const page=
-            document.createElement("div");
-
-        page.className=
-            "preview-page four-six";
-
-        page.style.padding="25px";
-
-        page.style.display=
-            "flex";
-
-        page.style.alignItems=
-            "center";
-
-        page.style.justifyContent=
-            "center";
-
-
-        page.innerHTML=`
-
-            <div
-                style="
-                width:100%;
-                padding:25px;
-                border:2px solid #1264d8;
-                border-radius:15px;
-                background:#f8fbff;
-                text-align:left;">
-
-                <div
-                    style="
-                    font-size:22px;
-                    font-weight:900;">
-
-                    ${escapeHTML(
-                        item.name ||
-                        "Customer Name"
-                    )}
-
-                </div>
-
-                <div
-                    style="
-                    margin-top:8px;
-                    font-size:14px;">
-
-                    ${escapeHTML(
-                        item.phone ||
-                        "Phone Number"
-                    )}
-
-                </div>
-
-                <div
-                    style="
-                    margin-top:15px;
-                    font-size:16px;
-                    line-height:1.5;
-                    white-space:pre-wrap;">
-
-                    ${escapeHTML(
-                        item.address ||
-                        "Address Preview"
-                    )}
-
-                </div>
-
-            </div>
-
-        `;
-
-        area.appendChild(page);
-
-    });
-
-}
-
-
-/* =========================================================
-   ADDRESS LIVE
-========================================================= */
-
-document
-.querySelectorAll(
-    "#addressPanel input,#addressPanel textarea"
-)
-.forEach(el=>{
-
-    el.addEventListener(
-        "input",
-        renderAddress
-    );
-
-});
-
-
-/* =========================================================
-   PDF FROM COCO
-========================================================= */
-
-async function downloadCoco(){
-
-    const data=
-        makeBoxData();
 
     if(!data.length){
 
         toast(
-            "Please enter data first.",
+            "Please enter From and To address first.",
             "red"
         );
 
         return;
-
     }
 
-    if(
-        !window.jspdf ||
-        !window.html2canvas
-    ){
-
-        toast(
-            "PDF library is not loaded.",
-            "red"
-        );
-
-        return;
-
-    }
 
     toast(
-        "Generating PDF...",
+        "Generating Address PDF...",
         "green"
     );
 
-    const cfg=
-        getPageConfig();
 
-    const total=
-        Math.ceil(
-            data.length/cfg.per
-        );
+    const {jsPDF}=
+        window.jspdf;
+
 
     const pdf=
-        new jspdf.jsPDF({
-
-            orientation:
-                cfg.w>cfg.h
-                ? "landscape"
-                : "portrait",
-
+        new jsPDF({
+            orientation:"portrait",
             unit:"px",
-
-            format:[
-                cfg.w,
-                cfg.h
-            ],
-
-            compress:true
-
+            format:[384,576]
         });
 
 
     for(
-        let p=0;
-        p<total;
-        p++
+        let i=0;
+        i<data.length;
+        i++
     ){
 
+        const item=
+            data[i];
+
         const page=
-            document
-            .createElement("div");
+            document.createElement("div");
 
         page.className=
-            `preview-page ${cfg.cls}`;
-
-        page.style.width=
-            cfg.w+"px";
-
-        page.style.height=
-            cfg.h+"px";
-
-        page.style.gridTemplateColumns=
-            `repeat(${cfg.cols},1fr)`;
-
-        page.style.gridTemplateRows=
-            `repeat(${cfg.rows},1fr)`;
-
-        page.style.gap=
-            cfg.page==="70x35"
-            ? "2px"
-            : "5px";
-
-        page.style.padding=
-            cfg.page==="70x35"
-            ? "2px"
-            : "10px";
+            "preview-page four-six";
 
         page.style.position=
             "fixed";
@@ -5816,30 +4430,93 @@ async function downloadCoco(){
 
         page.style.top="0";
 
+        page.style.padding="25px";
 
-        const start=
-            p*cfg.per;
+        page.style.display="flex";
 
-        const end=
-            Math.min(
-                start+cfg.per,
-                data.length
-            );
+        page.style.alignItems="center";
+
+        page.style.justifyContent="center";
 
 
-        for(
-            let i=start;
-            i<end;
-            i++
-        ){
+        page.innerHTML=`
 
-            page.appendChild(
-                makeCocoLabel(
-                    data[i]
-                )
-            );
+            <div
+                class="address-label-design">
 
-        }
+                <div
+                    class="address-from-preview">
+
+                    <div
+                        class="address-small-title">
+                        📤 FROM
+                    </div>
+
+                    <div
+                        class="address-person">
+                        ${escapeHTML(
+                            item.fromName ||
+                            "Sender Name"
+                        )}
+                    </div>
+
+                    <div
+                        class="address-phone">
+                        ${escapeHTML(
+                            item.fromPhone ||
+                            ""
+                        )}
+                    </div>
+
+                    <div
+                        class="address-body">
+                        ${escapeHTML(
+                            item.fromAddress ||
+                            ""
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="address-to-preview">
+
+                    <div
+                        class="address-small-title">
+                        📥 TO
+                    </div>
+
+                    <div
+                        class="address-person">
+                        ${escapeHTML(
+                            item.toName ||
+                            "Receiver Name"
+                        )}
+                    </div>
+
+                    <div
+                        class="address-phone">
+                        ${escapeHTML(
+                            item.toPhone ||
+                            ""
+                        )}
+                    </div>
+
+                    <div
+                        class="address-body">
+                        ${escapeHTML(
+                            item.toAddress ||
+                            ""
+                        )}
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
 
         document.body.appendChild(page);
 
@@ -5849,41 +4526,33 @@ async function downloadCoco(){
                 page,
                 {
                     scale:2,
-                    backgroundColor:"#fff",
-                    useCORS:true
+                    backgroundColor:"#fff"
                 }
             );
 
 
-        const image=
-            canvas.toDataURL(
-                "image/jpeg",
-                .95
-            );
-
-
-        if(p>0){
+        if(i>0){
 
             pdf.addPage(
-                [
-                    cfg.w,
-                    cfg.h
-                ],
-                cfg.w>cfg.h
-                ?"landscape"
-                :"portrait"
+                [384,576],
+                "portrait"
             );
 
         }
 
+
         pdf.addImage(
-            image,
+            canvas.toDataURL(
+                "image/jpeg",
+                .95
+            ),
             "JPEG",
             0,
             0,
-            cfg.w,
-            cfg.h
+            384,
+            576
         );
+
 
         page.remove();
 
@@ -5891,11 +4560,12 @@ async function downloadCoco(){
 
 
     pdf.save(
-        "BWG-Coco-Blue-Labels.pdf"
+        "BWG-Address-Labels.pdf"
     );
 
+
     toast(
-        `${total} PDF pages generated successfully.`,
+        `${data.length} Address PDF pages generated.`,
         "green"
     );
 
@@ -5903,23 +4573,29 @@ async function downloadCoco(){
 
 
 /* =========================================================
-   PRINT COCO
+   ADDRESS PRINT
 ========================================================= */
 
-function printCoco(){
+function printAddress(){
 
     const data=
-        makeBoxData();
+        getAddressData()
+        .filter(
+            x=>
+            x.fromName ||
+            x.fromAddress ||
+            x.toName ||
+            x.toAddress
+        );
 
     if(!data.length){
 
         toast(
-            "Please enter data first.",
+            "Please enter From and To address first.",
             "red"
         );
 
         return;
-
     }
 
 
@@ -5933,15 +4609,6 @@ function printCoco(){
     }
 
 
-    const cfg=
-        getPageConfig();
-
-    const total=
-        Math.ceil(
-            data.length/cfg.per
-        );
-
-
     const container=
         document.createElement("div");
 
@@ -5949,68 +4616,93 @@ function printCoco(){
         "printAreaHidden";
 
 
-    for(
-        let p=0;
-        p<total;
-        p++
-    ){
+    data.forEach(item=>{
 
         const page=
             document.createElement("div");
 
         page.className=
-            `preview-page ${cfg.cls}`;
+            "preview-page four-six";
 
-        page.style.width=
-            cfg.w+"px";
+        page.style.padding="25px";
 
-        page.style.height=
-            cfg.h+"px";
+        page.style.display="flex";
 
-        page.style.gridTemplateColumns=
-            `repeat(${cfg.cols},1fr)`;
+        page.style.alignItems="center";
 
-        page.style.gridTemplateRows=
-            `repeat(${cfg.rows},1fr)`;
-
-        page.style.gap=
-            cfg.page==="70x35"
-            ? "2px"
-            : "5px";
-
-        page.style.padding=
-            cfg.page==="70x35"
-            ? "2px"
-            : "10px";
+        page.style.justifyContent="center";
 
 
-        const start=
-            p*cfg.per;
+        page.innerHTML=`
 
-        const end=
-            Math.min(
-                start+cfg.per,
-                data.length
-            );
+            <div class="address-label-design">
+
+                <div class="address-from-preview">
+
+                    <div class="address-small-title">
+                        📤 FROM
+                    </div>
+
+                    <div class="address-person">
+                        ${escapeHTML(
+                            item.fromName ||
+                            "Sender Name"
+                        )}
+                    </div>
+
+                    <div class="address-phone">
+                        ${escapeHTML(
+                            item.fromPhone ||
+                            ""
+                        )}
+                    </div>
+
+                    <div class="address-body">
+                        ${escapeHTML(
+                            item.fromAddress ||
+                            ""
+                        )}
+                    </div>
+
+                </div>
 
 
-        for(
-            let i=start;
-            i<end;
-            i++
-        ){
+                <div class="address-to-preview">
 
-            page.appendChild(
-                makeCocoLabel(
-                    data[i]
-                )
-            );
+                    <div class="address-small-title">
+                        📥 TO
+                    </div>
 
-        }
+                    <div class="address-person">
+                        ${escapeHTML(
+                            item.toName ||
+                            "Receiver Name"
+                        )}
+                    </div>
+
+                    <div class="address-phone">
+                        ${escapeHTML(
+                            item.toPhone ||
+                            ""
+                        )}
+                    </div>
+
+                    <div class="address-body">
+                        ${escapeHTML(
+                            item.toAddress ||
+                            ""
+                        )}
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
 
         container.appendChild(page);
 
-    }
+    });
 
 
     document.body.appendChild(
@@ -6019,7 +4711,7 @@ function printCoco(){
 
 
     toast(
-        `Opening print dialog for ${total} pages...`,
+        `Opening print dialog for ${data.length} address labels...`,
         "green"
     );
 
@@ -6031,6 +4723,43 @@ function printCoco(){
 
 }
 
+
+/* =========================================================
+   ADDRESS BUTTONS
+========================================================= */
+
+document
+.getElementById(
+    "addressDownload"
+)
+.addEventListener(
+    "click",
+    downloadAddressPDF
+);
+
+document
+.getElementById(
+    "addressPrint"
+)
+.addEventListener(
+    "click",
+    printAddress
+);
+
+
+/* =========================================================
+   INITIAL
+========================================================= */
+
+renderCoco();
+renderOther();
+renderISBN();
+renderAddress();
+
+
+/* =========================================================
+   AFTER PRINT
+========================================================= */
 
 window.addEventListener(
     "afterprint",
@@ -6047,187 +4776,6 @@ window.addEventListener(
 
     }
 );
-
-
-/* =========================================================
-   BUTTONS
-========================================================= */
-
-document
-.getElementById(
-    "cocoDownload"
-)
-.addEventListener(
-    "click",
-    downloadCoco
-);
-
-document
-.getElementById(
-    "cocoPrint"
-)
-.addEventListener(
-    "click",
-    printCoco
-);
-
-
-/* =========================================================
-   GENERIC SIMPLE PDF
-========================================================= */
-
-async function simpleDownload(
-    tool
-){
-
-    toast(
-        `${tool} PDF generation started.`,
-        "green"
-    );
-
-    const preview=
-        document.getElementById(
-            tool==="Other PO"
-            ?"otherPreview"
-            :
-            tool==="ISBN"
-            ?"isbnPreview"
-            :
-            "addressPreview"
-        );
-
-    if(
-        !preview ||
-        !preview.children.length
-    ){
-
-        toast(
-            "Please enter data first.",
-            "red"
-        );
-
-        return;
-
-    }
-
-    const {jsPDF}=
-        window.jspdf;
-
-    const first=
-        preview.children[0];
-
-    const canvas=
-        await html2canvas(
-            first,
-            {
-                scale:2,
-                backgroundColor:"#fff"
-            }
-        );
-
-    const pdf=
-        new jsPDF({
-            orientation:"portrait",
-            unit:"px",
-            format:[
-                first.offsetWidth,
-                first.offsetHeight
-            ]
-        });
-
-    pdf.addImage(
-        canvas.toDataURL("image/jpeg",.95),
-        "JPEG",
-        0,
-        0,
-        first.offsetWidth,
-        first.offsetHeight
-    );
-
-    pdf.save(
-        `BWG-${tool.replaceAll(" ","-")}.pdf`
-    );
-
-}
-
-
-/* =========================================================
-   OTHER BUTTONS
-========================================================= */
-
-document
-.getElementById(
-    "otherDownload"
-)
-.addEventListener(
-    "click",
-    ()=>simpleDownload("Other PO")
-);
-
-document
-.getElementById(
-    "otherPrint"
-)
-.addEventListener(
-    "click",
-    ()=>window.print()
-);
-
-
-/* =========================================================
-   ISBN BUTTONS
-========================================================= */
-
-document
-.getElementById(
-    "isbnDownload"
-)
-.addEventListener(
-    "click",
-    ()=>simpleDownload("ISBN")
-);
-
-document
-.getElementById(
-    "isbnPrint"
-)
-.addEventListener(
-    "click",
-    ()=>window.print()
-);
-
-
-/* =========================================================
-   ADDRESS BUTTONS
-========================================================= */
-
-document
-.getElementById(
-    "addressDownload"
-)
-.addEventListener(
-    "click",
-    ()=>simpleDownload("Address")
-);
-
-document
-.getElementById(
-    "addressPrint"
-)
-.addEventListener(
-    "click",
-    ()=>window.print()
-);
-
-
-/* =========================================================
-   INITIAL RENDER
-========================================================= */
-
-renderCoco();
-renderOther();
-renderISBN();
-renderAddress();
 
 </script>
 
