@@ -1,47 +1,48 @@
 /* =========================================================
    BOOKS LABEL STUDIO
    FINAL APP.JS
-   Works with the latest index.html + style.css
 ========================================================= */
 
 "use strict";
 
 
 /* =========================================================
-   CONFIG
+   GLOBAL STATE
 ========================================================= */
 
-const APP = {
+const AppState = {
 
-    mapUrl:
-        "https://maps.app.goo.gl/7McYApm1u9x4QSj7A",
+    language: "en",
 
-    email:
-        "ashish.verma@bookswagon.in",
+    category: "cocoBlue",
 
-    maxPO:
-        40,
+    cocoMode: "individual",
 
-    maxFont:
-        48,
+    otherMode: "individual",
 
-    language:
-        "en",
+    addressMode: "manual",
 
-    category:
-        "cocoBlue",
+    pageSize: "4x6",
 
-    cocoMode:
-        "individual",
+    orientation: "portrait",
 
-    otherMode:
-        "individual",
+    customWidth: 70,
 
-    addressMode:
-        "manual",
+    customHeight: 35,
 
-    toastTimer:
-        null
+    labelsPerPage: 2,
+
+    cocoPOs: [],
+
+    otherPOs: [],
+
+    cocoExcelRows: [],
+
+    otherExcelRows: [],
+
+    addressExcelRows: [],
+
+    toastTimer: null
 
 };
 
@@ -50,103 +51,32 @@ const APP = {
    HELPERS
 ========================================================= */
 
-function $(id) {
-    return document.getElementById(id);
+const $ = (id) => document.getElementById(id);
+
+
+function all(selector) {
+    return Array.from(document.querySelectorAll(selector));
 }
 
 
-function $all(selector) {
-    return Array.from(
-        document.querySelectorAll(selector)
-    );
-}
+function safeNumber(value, fallback = 0) {
 
+    const number = Number(value);
 
-function getValue(id, fallback = "") {
-
-    const el = $(id);
-
-    return el
-        ? el.value
+    return Number.isFinite(number)
+        ? number
         : fallback;
-
-}
-
-
-function isChecked(id) {
-
-    const el = $(id);
-
-    return !!(
-        el &&
-        el.checked
-    );
-
-}
-
-
-function setValue(id, value) {
-
-    const el = $(id);
-
-    if (el) {
-        el.value = value;
-    }
-
-}
-
-
-function setChecked(id, value) {
-
-    const el = $(id);
-
-    if (el) {
-        el.checked = !!value;
-    }
-
-}
-
-
-function setText(id, text) {
-
-    const el = $(id);
-
-    if (el) {
-        el.textContent = text;
-    }
-
 }
 
 
 function escapeHTML(value) {
 
     return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-}
-
-
-function numberValue(
-    id,
-    fallback = 0
-) {
-
-    const n =
-        Number(
-            getValue(
-                id,
-                fallback
-            )
-        );
-
-    return Number.isFinite(n)
-        ? n
-        : fallback;
-
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 
@@ -154,171 +84,732 @@ function numberValue(
    TOAST
 ========================================================= */
 
-function showToast(
-    message,
-    type = "success"
-) {
+function showToast(message, type = "success") {
 
-    const toast =
-        $("toast");
+    const toast = $("toast");
+    const toastMessage = $("toastMessage");
+    const toastIcon = $("toastIcon");
 
-    const text =
-        $("toastMessage");
-
-    const icon =
-        $("toastIcon");
-
-
-    if (!toast || !text) {
+    if (!toast || !toastMessage) {
         return;
     }
 
-
-    clearTimeout(
-        APP.toastTimer
-    );
-
-
-    text.textContent =
-        message;
-
+    clearTimeout(AppState.toastTimer);
 
     toast.classList.remove(
         "success",
-        "warning",
         "error",
+        "warning",
         "show"
     );
 
+    if (type === "success") {
 
-    toast.classList.add(
-        type
-    );
+        toast.classList.add("success");
 
+        if (toastIcon) {
+            toastIcon.textContent = "✓";
+        }
 
-    if (icon) {
+    } else {
 
-        icon.textContent =
-            type === "error"
-                ? "!"
-                : type === "warning"
-                    ? "!"
-                    : "✓";
+        toast.classList.add("error");
+
+        if (toastIcon) {
+            toastIcon.textContent = "!";
+        }
 
     }
 
+    toastMessage.textContent = message;
 
-    requestAnimationFrame(
-        () => {
-            toast.classList.add(
-                "show"
+    requestAnimationFrame(() => {
+        toast.classList.add("show");
+    });
+
+    AppState.toastTimer = setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    }, 2600);
+}
+
+
+/* =========================================================
+   CATEGORY SWITCHING
+========================================================= */
+
+function switchCategory(category) {
+
+    AppState.category = category;
+
+    all(".category-btn").forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.category === category
+        );
+
+    });
+
+
+    all(".tool-section").forEach(section => {
+
+        section.classList.toggle(
+            "active",
+            section.dataset.tool === category
+        );
+
+    });
+
+
+    updateLivePreview();
+
+}
+
+
+function initCategoryNavigation() {
+
+    all(".category-btn").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            switchCategory(
+                button.dataset.category
             );
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+   COCO SUB CATEGORIES
+========================================================= */
+
+function switchCocoMode(mode) {
+
+    AppState.cocoMode = mode;
+
+    all("[data-coco-mode]").forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.cocoMode === mode
+        );
+
+    });
+
+
+    const panels = {
+
+        individual: "cocoIndividualPanel",
+
+        multiple: "cocoMultiplePanel",
+
+        excel: "cocoExcelPanel",
+
+        address: "cocoAddressPanel"
+
+    };
+
+
+    Object.entries(panels).forEach(
+        ([key, id]) => {
+
+            const panel = $(id);
+
+            if (!panel) {
+                return;
+            }
+
+            panel.classList.toggle(
+                "active",
+                key === mode
+            );
+
         }
     );
 
 
-    APP.toastTimer =
-        setTimeout(
-            () => {
-
-                toast.classList.remove(
-                    "show"
-                );
-
-            },
-            2300
-        );
+    updateLivePreview();
 
 }
 
 
-function featureToast(
-    name,
-    enabled
-) {
+function initCocoModes() {
 
-    showToast(
-        enabled
-            ? `${name} has been enabled`
-            : `${name} has been disabled`,
-        enabled
-            ? "success"
-            : "warning"
-    );
+    all("[data-coco-mode]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            switchCocoMode(
+                button.dataset.cocoMode
+            );
+
+        });
+
+    });
 
 }
 
 
 /* =========================================================
-   INITIALIZATION
+   OTHER PO SUB CATEGORIES
 ========================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    initApp
-);
+function switchOtherMode(mode) {
+
+    AppState.otherMode = mode;
+
+    all("[data-other-mode]").forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.otherMode === mode
+        );
+
+    });
 
 
-function initApp() {
+    const panels = {
 
-    buildPOInputs(
+        individual: "otherIndividualPanel",
+
+        multiple: "otherMultiplePanel",
+
+        excel: "otherExcelPanel",
+
+        address: "otherAddressPanel"
+
+    };
+
+
+    Object.entries(panels).forEach(
+        ([key, id]) => {
+
+            const panel = $(id);
+
+            if (!panel) {
+                return;
+            }
+
+            panel.classList.toggle(
+                "active",
+                key === mode
+            );
+
+        }
+    );
+
+}
+
+
+function initOtherModes() {
+
+    all("[data-other-mode]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            switchOtherMode(
+                button.dataset.otherMode
+            );
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+   ADDRESS MODES
+========================================================= */
+
+function switchAddressMode(mode) {
+
+    AppState.addressMode = mode;
+
+    all("[data-address-mode]").forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.addressMode === mode
+        );
+
+    });
+
+
+    const manual = $("addressManualPanel");
+    const excel = $("addressExcelPanel");
+
+    if (manual) {
+        manual.classList.toggle(
+            "active",
+            mode === "manual"
+        );
+    }
+
+    if (excel) {
+        excel.classList.toggle(
+            "active",
+            mode === "excel"
+        );
+    }
+
+}
+
+
+function initAddressModes() {
+
+    all("[data-address-mode]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            switchAddressMode(
+                button.dataset.addressMode
+            );
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+   CREATE 40 PO INPUTS
+========================================================= */
+
+function createPOInputs(containerId, prefix) {
+
+    const container = $(containerId);
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    for (let i = 1; i <= 40; i++) {
+
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "po-input-wrapper";
+
+        const label =
+            document.createElement("label");
+
+        label.textContent =
+            `PO ${i}`;
+
+        const input =
+            document.createElement("input");
+
+        input.type =
+            "text";
+
+        input.id =
+            `${prefix}${i}`;
+
+        input.placeholder =
+            `PO ${i}`;
+
+        input.autocomplete =
+            "off";
+
+        input.addEventListener(
+            "input",
+            updateLivePreview
+        );
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+
+        container.appendChild(wrapper);
+    }
+
+}
+
+
+function initPOInputs() {
+
+    createPOInputs(
         "individualPOGrid",
         "cocoPO"
     );
 
-
-    buildPOInputs(
+    createPOInputs(
         "otherIndividualPOGrid",
         "otherPO"
     );
-
-
-    bindCategoryNavigation();
-
-    bindCocoNavigation();
-
-    bindOtherNavigation();
-
-    bindAddressNavigation();
-
-    bindPOInputs();
-
-    bindBoxSettings();
-
-    bindPageSettings();
-
-    bindLabelFeatures();
-
-    bindFontSettings();
-
-    bindExcel();
-
-    bindISBN();
-
-    bindAddress();
-
-    bindButtons();
-
-    bindModal();
-
-    bindLanguage();
-
-    initializeState();
-
-    generateLocationQR();
-
-    updateAll();
 
 }
 
 
 /* =========================================================
-   BUILD 40 PO INPUTS
+   GET MANUAL PO VALUES
 ========================================================= */
 
-function buildPOInputs(
+function getManualPOValues(prefix) {
+
+    const values = [];
+
+    for (let i = 1; i <= 40; i++) {
+
+        const input =
+            $(`${prefix}${i}`);
+
+        if (!input) {
+            continue;
+        }
+
+        const value =
+            input.value.trim();
+
+        if (value) {
+            values.push(value);
+        }
+
+    }
+
+    return values;
+}
+
+
+/* =========================================================
+   MULTIPLE PO PARSER
+========================================================= */
+
+function parseMultipleValues(value) {
+
+    if (!value) {
+        return [];
+    }
+
+    return value
+        .split(/[\n,;]+/)
+        .map(item => item.trim())
+        .filter(Boolean);
+}
+
+
+/* =========================================================
+   GET COCO PO VALUES
+========================================================= */
+
+function getCocoPOValues() {
+
+    if (AppState.cocoMode === "individual") {
+
+        return getManualPOValues(
+            "cocoPO"
+        );
+
+    }
+
+
+    if (AppState.cocoMode === "multiple") {
+
+        return parseMultipleValues(
+            $("cocoMultiplePO")?.value
+        );
+
+    }
+
+
+    if (AppState.cocoMode === "excel") {
+
+        return AppState.cocoExcelRows
+            .map(row => {
+
+                if (Array.isArray(row)) {
+                    return row[0];
+                }
+
+                return Object.values(row)[0];
+
+            })
+            .map(value =>
+                String(value ?? "").trim()
+            )
+            .filter(Boolean);
+
+    }
+
+
+    return ["PO NUMBER"];
+}
+
+
+/* =========================================================
+   GET OTHER PO VALUES
+========================================================= */
+
+function getOtherPOValues() {
+
+    if (AppState.otherMode === "individual") {
+
+        return getManualPOValues(
+            "otherPO"
+        );
+
+    }
+
+
+    if (AppState.otherMode === "multiple") {
+
+        return parseMultipleValues(
+            $("otherMultiplePO")?.value
+        );
+
+    }
+
+
+    if (AppState.otherMode === "excel") {
+
+        return AppState.otherExcelRows
+            .map(row => {
+
+                if (Array.isArray(row)) {
+                    return row[0];
+                }
+
+                return Object.values(row)[0];
+
+            })
+            .map(value =>
+                String(value ?? "").trim()
+            )
+            .filter(Boolean);
+
+    }
+
+
+    return ["PO NUMBER"];
+}
+
+
+/* =========================================================
+   EXCEL FILE READER
+========================================================= */
+
+function readExcelFile(
+    file,
+    onComplete,
+    fileNameElement,
+    previewElement
+) {
+
+    if (!file) {
+        return;
+    }
+
+    if (
+        typeof XLSX === "undefined"
+    ) {
+
+        showToast(
+            "Excel library could not be loaded.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (fileNameElement) {
+
+        fileNameElement.textContent =
+            file.name;
+
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = function(event) {
+
+        try {
+
+            const data =
+                new Uint8Array(
+                    event.target.result
+                );
+
+
+            const workbook =
+                XLSX.read(
+                    data,
+                    {
+                        type: "array"
+                    }
+                );
+
+
+            const firstSheet =
+                workbook.Sheets[
+                    workbook.SheetNames[0]
+                ];
+
+
+            /*
+             * header: 1 means array-of-arrays.
+             * FIRST ROW IS HEADER.
+             */
+
+            const rows =
+                XLSX.utils.sheet_to_json(
+                    firstSheet,
+                    {
+                        header: 1,
+                        defval: ""
+                    }
+                );
+
+
+            /*
+             * IMPORTANT:
+             * First row is intentionally ignored.
+             */
+
+            const dataRows =
+                rows.slice(1);
+
+
+            onComplete(
+                dataRows,
+                rows
+            );
+
+
+            if (previewElement) {
+
+                renderExcelPreview(
+                    rows
+                );
+
+            }
+
+
+            showToast(
+                `Excel loaded. Header row ignored. ${dataRows.length} data rows found.`,
+                "success"
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            showToast(
+                "Could not read the Excel file.",
+                "error"
+            );
+
+        }
+
+    };
+
+
+    reader.onerror = function() {
+
+        showToast(
+            "Could not open the selected file.",
+            "error"
+        );
+
+    };
+
+
+    reader.readAsArrayBuffer(file);
+
+}
+
+
+/* =========================================================
+   EXCEL PREVIEW
+========================================================= */
+
+function renderExcelPreview(rows) {
+
+    if (!rows || !rows.length) {
+        return "";
+    }
+
+
+    const preview =
+        document.createElement("table");
+
+
+    const header =
+        document.createElement("thead");
+
+
+    const headerRow =
+        document.createElement("tr");
+
+
+    rows[0].forEach(cell => {
+
+        const th =
+            document.createElement("th");
+
+        th.textContent =
+            String(cell ?? "");
+
+        headerRow.appendChild(th);
+
+    });
+
+
+    header.appendChild(headerRow);
+
+
+    const body =
+        document.createElement("tbody");
+
+
+    rows.slice(1, 21).forEach(row => {
+
+        const tr =
+            document.createElement("tr");
+
+
+        row.forEach(cell => {
+
+            const td =
+                document.createElement("td");
+
+            td.textContent =
+                String(cell ?? "");
+
+            tr.appendChild(td);
+
+        });
+
+
+        body.appendChild(tr);
+
+    });
+
+
+    preview.appendChild(header);
+    preview.appendChild(body);
+
+
+    return preview;
+}
+
+
+function setExcelPreview(
     containerId,
-    prefix
+    rows
 ) {
 
     const container =
@@ -328,1208 +819,599 @@ function buildPOInputs(
         return;
     }
 
+    container.innerHTML = "";
 
-    container.innerHTML =
-        "";
+    const table =
+        renderExcelPreview(rows);
 
-
-    for (
-        let i = 1;
-        i <= APP.maxPO;
-        i++
-    ) {
-
-        const wrapper =
-            document.createElement(
-                "div"
-            );
-
-
-        wrapper.className =
-            "po-input-wrapper";
-
-
-        wrapper.innerHTML = `
-
-            <label for="${prefix}${i}">
-                PO ${i}
-            </label>
-
-            <input
-                id="${prefix}${i}"
-                class="po-input"
-                type="text"
-                autocomplete="off"
-                placeholder="PO ${i}"
-            >
-
-        `;
-
-
-        container.appendChild(
-            wrapper
-        );
-
+    if (table) {
+        container.appendChild(table);
     }
 
 }
 
 
 /* =========================================================
-   CATEGORY NAVIGATION
+   EXCEL EVENTS
 ========================================================= */
 
-function bindCategoryNavigation() {
+function initExcelUploads() {
 
-    $all(".category-btn")
-        .forEach(button => {
+    const cocoFile =
+        $("cocoExcelFile");
 
-            button.addEventListener(
-                "click",
-                () => {
+    if (cocoFile) {
 
-                    const category =
-                        button.dataset.category;
-
-
-                    if (!category) {
-                        return;
-                    }
-
-
-                    APP.category =
-                        category;
-
-
-                    $all(".category-btn")
-                        .forEach(btn => {
-
-                            btn.classList.toggle(
-                                "active",
-                                btn === button
-                            );
-
-                        });
-
-
-                    $all(".tool-section")
-                        .forEach(section => {
-
-                            section.classList.toggle(
-                                "active",
-                                section.dataset.tool ===
-                                    category
-                            );
-
-                        });
-
-
-                    updateAll();
-
-                }
-            );
-
-        });
-
-}
-
-
-/* =========================================================
-   COCO SUB NAV
-========================================================= */
-
-function bindCocoNavigation() {
-
-    $all("[data-coco-mode]")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    APP.cocoMode =
-                        button.dataset.cocoMode;
-
-
-                    $all(
-                        "[data-coco-mode]"
-                    )
-                    .forEach(btn => {
-
-                        btn.classList.toggle(
-                            "active",
-                            btn === button
-                        );
-
-                    });
-
-
-                    const panelMap = {
-
-                        individual:
-                            "cocoIndividualPanel",
-
-                        multiple:
-                            "cocoMultiplePanel",
-
-                        excel:
-                            "cocoExcelPanel",
-
-                        address:
-                            "cocoAddressPanel"
-
-                    };
-
-
-                    $all(
-                        "#cocoIndividualPanel, #cocoMultiplePanel, #cocoExcelPanel, #cocoAddressPanel"
-                    )
-                    .forEach(panel => {
-
-                        panel.classList.toggle(
-                            "active",
-                            panel.id ===
-                                panelMap[
-                                    APP.cocoMode
-                                ]
-                        );
-
-                    });
-
-
-                    updatePreview();
-
-                }
-            );
-
-        });
-
-}
-
-
-/* =========================================================
-   OTHER PO NAV
-========================================================= */
-
-function bindOtherNavigation() {
-
-    $all("[data-other-mode]")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    APP.otherMode =
-                        button.dataset.otherMode;
-
-
-                    $all(
-                        "[data-other-mode]"
-                    )
-                    .forEach(btn => {
-
-                        btn.classList.toggle(
-                            "active",
-                            btn === button
-                        );
-
-                    });
-
-
-                    const panelMap = {
-
-                        individual:
-                            "otherIndividualPanel",
-
-                        multiple:
-                            "otherMultiplePanel",
-
-                        excel:
-                            "otherExcelPanel",
-
-                        address:
-                            "otherAddressPanel"
-
-                    };
-
-
-                    $all(
-                        "#otherIndividualPanel, #otherMultiplePanel, #otherExcelPanel, #otherAddressPanel"
-                    )
-                    .forEach(panel => {
-
-                        panel.classList.toggle(
-                            "active",
-                            panel.id ===
-                                panelMap[
-                                    APP.otherMode
-                                ]
-                        );
-
-                    });
-
-
-                    updatePreview();
-
-                }
-            );
-
-        });
-
-}
-
-
-/* =========================================================
-   ADDRESS NAV
-========================================================= */
-
-function bindAddressNavigation() {
-
-    $all("[data-address-mode]")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    APP.addressMode =
-                        button.dataset.addressMode;
-
-
-                    $all(
-                        "[data-address-mode]"
-                    )
-                    .forEach(btn => {
-
-                        btn.classList.toggle(
-                            "active",
-                            btn === button
-                        );
-
-                    });
-
-
-                    const target =
-                        APP.addressMode ===
-                        "manual"
-                            ? "addressManualPanel"
-                            : "addressExcelPanel";
-
-
-                    $all(
-                        "#addressManualPanel, #addressExcelPanel"
-                    )
-                    .forEach(panel => {
-
-                        panel.classList.toggle(
-                            "active",
-                            panel.id ===
-                                target
-                        );
-
-                    });
-
-                }
-            );
-
-        });
-
-}
-
-
-/* =========================================================
-   PO INPUT EVENTS
-========================================================= */
-
-function bindPOInputs() {
-
-    $all(".po-input")
-        .forEach(input => {
-
-            input.addEventListener(
-                "input",
-                updatePreview
-            );
-
-        });
-
-
-    [
-        "cocoMultiplePO",
-        "otherMultiplePO"
-    ]
-    .forEach(id => {
-
-        const el =
-            $(id);
-
-        if (!el) {
-            return;
-        }
-
-        el.addEventListener(
-            "input",
-            updatePreview
-        );
-
-    });
-
-}
-
-
-/* =========================================================
-   GET MANUAL PO
-========================================================= */
-
-function getManualPOs(
-    prefix
-) {
-
-    const result = [];
-
-
-    for (
-        let i = 1;
-        i <= APP.maxPO;
-        i++
-    ) {
-
-        const input =
-            $(`${prefix}${i}`);
-
-
-        if (!input) {
-            continue;
-        }
-
-
-        const value =
-            input.value.trim();
-
-
-        if (value) {
-            result.push(value);
-        }
-
-    }
-
-
-    return result;
-
-}
-
-
-/* =========================================================
-   GET MULTIPLE PO
-========================================================= */
-
-function getMultiplePOs(id) {
-
-    const text =
-        getValue(id);
-
-
-    return text
-        .split(/[\n,]+/)
-        .map(value => value.trim())
-        .filter(Boolean);
-
-}
-
-
-/* =========================================================
-   GET CURRENT COCO PO
-========================================================= */
-
-function getCocoPOs() {
-
-    if (
-        APP.cocoMode ===
-        "multiple"
-    ) {
-
-        return getMultiplePOs(
-            "cocoMultiplePO"
-        );
-
-    }
-
-
-    if (
-        APP.cocoMode ===
-        "excel"
-    ) {
-
-        return APP.cocoExcelPOs || [];
-
-    }
-
-
-    return getManualPOs(
-        "cocoPO"
-    );
-
-}
-
-
-/* =========================================================
-   GET CURRENT OTHER PO
-========================================================= */
-
-function getOtherPOs() {
-
-    if (
-        APP.otherMode ===
-        "multiple"
-    ) {
-
-        return getMultiplePOs(
-            "otherMultiplePO"
-        );
-
-    }
-
-
-    if (
-        APP.otherMode ===
-        "excel"
-    ) {
-
-        return APP.otherExcelPOs || [];
-
-    }
-
-
-    return getManualPOs(
-        "otherPO"
-    );
-
-}
-
-
-/* =========================================================
-   BOX SETTINGS
-========================================================= */
-
-function bindBoxSettings() {
-
-    [
-        "startBoxNumber",
-        "endBoxNumber",
-        "boxRepeatCount",
-        "labelsPerPage",
-        "labelGap"
-    ]
-    .forEach(id => {
-
-        const input =
-            $(id);
-
-        if (!input) {
-            return;
-        }
-
-
-        input.addEventListener(
-            "input",
-            () => {
-
-                normalizeBoxSettings();
-
-                updatePreview();
-
-            }
-        );
-
-    });
-
-
-    [
-        "samePOPageFlow",
-        "halfPageFlowCheck"
-    ]
-    .forEach(id => {
-
-        const input =
-            $(id);
-
-        if (!input) {
-            return;
-        }
-
-
-        input.addEventListener(
+        cocoFile.addEventListener(
             "change",
-            () => {
+            event => {
 
-                featureToast(
-                    id === "samePOPageFlow"
-                        ? "Same PO Page Flow"
-                        : "Half Page Label Flow",
-                    input.checked
+                const file =
+                    event.target.files[0];
+
+                readExcelFile(
+                    file,
+
+                    rows => {
+
+                        AppState.cocoExcelRows =
+                            rows;
+
+                        setExcelPreview(
+                            "cocoExcelPreview",
+                            [
+                                ...[
+                                    ["PO Number"]
+                                ],
+                                ...rows
+                            ]
+                        );
+
+                        updateLivePreview();
+
+                    },
+
+                    $("cocoExcelFileName"),
+
+                    $("cocoExcelPreview")
                 );
 
-                updatePreview();
+            }
+        );
+
+    }
+
+
+    const otherFile =
+        $("otherExcelFile");
+
+    if (otherFile) {
+
+        otherFile.addEventListener(
+            "change",
+            event => {
+
+                const file =
+                    event.target.files[0];
+
+                readExcelFile(
+                    file,
+
+                    rows => {
+
+                        AppState.otherExcelRows =
+                            rows;
+
+                        setExcelPreview(
+                            "otherExcelPreview",
+                            [
+                                ...[
+                                    ["PO Number"]
+                                ],
+                                ...rows
+                            ]
+                        );
+
+                    },
+
+                    $("otherExcelFileName"),
+
+                    $("otherExcelPreview")
+                );
 
             }
         );
 
-    });
-
-}
-
-
-/* =========================================================
-   NORMALIZE BOX SETTINGS
-========================================================= */
-
-function normalizeBoxSettings() {
-
-    let start =
-        numberValue(
-            "startBoxNumber",
-            1
-        );
-
-
-    let end =
-        numberValue(
-            "endBoxNumber",
-            start
-        );
-
-
-    let repeat =
-        numberValue(
-            "boxRepeatCount",
-            1
-        );
-
-
-    if (start < 1) {
-        start = 1;
     }
 
 
-    if (end < start) {
-        end = start;
-    }
+    const addressFile =
+        $("addressExcelFile");
 
+    if (addressFile) {
 
-    if (repeat < 1) {
-        repeat = 1;
-    }
+        addressFile.addEventListener(
+            "change",
+            event => {
 
+                const file =
+                    event.target.files[0];
 
-    /*
-     * NO ARTIFICIAL LIMIT.
-     * User requested unlimited repeat count.
-     */
+                readExcelFile(
+                    file,
 
+                    rows => {
 
-    setValue(
-        "startBoxNumber",
-        start
-    );
+                        AppState.addressExcelRows =
+                            rows;
 
+                        setExcelPreview(
+                            "addressExcelPreview",
+                            [
+                                ...[
+                                    [
+                                        "From",
+                                        "To"
+                                    ]
+                                ],
+                                ...rows
+                            ]
+                        );
 
-    setValue(
-        "endBoxNumber",
-        end
-    );
+                    },
 
+                    null,
 
-    setValue(
-        "boxRepeatCount",
-        repeat
-    );
-
-}
-
-
-/* =========================================================
-   CREATE LABEL DATA
-========================================================= */
-
-function createLabels(
-    pos
-) {
-
-    const labels = [];
-
-
-    const start =
-        numberValue(
-            "startBoxNumber",
-            1
-        );
-
-
-    const end =
-        numberValue(
-            "endBoxNumber",
-            start
-        );
-
-
-    const repeat =
-        numberValue(
-            "boxRepeatCount",
-            1
-        );
-
-
-    if (!pos.length) {
-        return labels;
-    }
-
-
-    pos.forEach(po => {
-
-        for (
-            let box = start;
-            box <= end;
-            box++
-        ) {
-
-            for (
-                let copy = 1;
-                copy <= repeat;
-                copy++
-            ) {
-
-                labels.push({
-
-                    po,
-
-                    box,
-
-                    copy
-
-                });
+                    $("addressExcelPreview")
+                );
 
             }
+        );
 
-        }
-
-    });
-
-
-    return labels;
+    }
 
 }
 
 
 /* =========================================================
-   PAGE SIZE
+   PAGE SIZE CONFIG
 ========================================================= */
 
-function getPageSizeFrom(
-    sizeId,
-    orientationId,
-    widthId,
-    heightId
+function getPageDimensions(size) {
+
+    switch (size) {
+
+        case "4x6":
+
+            return {
+                width: 101.6,
+                height: 152.4,
+                label: "4 × 6 Inches"
+            };
+
+
+        case "70x35":
+
+            /*
+             * WIDTH = 70 mm
+             * HEIGHT = 35 mm
+             */
+
+            return {
+                width: 70,
+                height: 35,
+                label: "70 × 35 mm"
+            };
+
+
+        case "a4":
+
+            return {
+                width: 210,
+                height: 297,
+                label: "A4"
+            };
+
+
+        case "custom":
+
+            return {
+                width:
+                    safeNumber(
+                        $("customWidth")?.value,
+                        70
+                    ),
+
+                height:
+                    safeNumber(
+                        $("customHeight")?.value,
+                        35
+                    ),
+
+                label: "Custom Size"
+            };
+
+
+        default:
+
+            return {
+                width: 101.6,
+                height: 152.4,
+                label: "4 × 6 Inches"
+            };
+
+    }
+
+}
+
+
+/* =========================================================
+   APPLY ORIENTATION
+========================================================= */
+
+function applyOrientation(
+    dimensions,
+    orientation
 ) {
 
-    const selected =
-        getValue(
-            sizeId,
-            "4x6"
-        );
+    let width =
+        dimensions.width;
 
-
-    let width;
-    let height;
+    let height =
+        dimensions.height;
 
 
     if (
-        selected ===
-        "4x6"
+        orientation === "landscape" &&
+        height > width
     ) {
 
-        width =
-            101.6;
-
-        height =
-            152.4;
+        [width, height] =
+            [height, width];
 
     }
-
-
-    else if (
-        selected ===
-        "70x35"
-    ) {
-
-        /*
-         * Exact requested size:
-         * WIDTH 70 mm
-         * HEIGHT 35 mm
-         */
-
-        width =
-            70;
-
-        height =
-            35;
-
-    }
-
-
-    else if (
-        selected ===
-        "a4"
-    ) {
-
-        width =
-            210;
-
-        height =
-            297;
-
-    }
-
-
-    else if (
-        selected ===
-        "custom"
-    ) {
-
-        width =
-            Number(
-                getValue(
-                    widthId,
-                    0
-                )
-            );
-
-
-        height =
-            Number(
-                getValue(
-                    heightId,
-                    0
-                )
-            );
-
-
-        if (
-            !width ||
-            !height ||
-            width <= 0 ||
-            height <= 0
-        ) {
-
-            return null;
-
-        }
-
-    }
-
-
-    else {
-
-        return null;
-
-    }
-
-
-    const orientation =
-        getValue(
-            orientationId,
-            "portrait"
-        );
 
 
     if (
-        orientation ===
-        "landscape"
+        orientation === "portrait" &&
+        width > height
     ) {
 
-        const temp =
-            width;
-
-        width =
-            height;
-
-        height =
-            temp;
+        [width, height] =
+            [height, width];
 
     }
 
 
     return {
-
         width,
-
-        height,
-
-        name:
-            selected
-
+        height
     };
 
 }
 
 
 /* =========================================================
-   COCO PAGE SIZE
+   PAGE SIZE CONTROLS
 ========================================================= */
 
-function getCocoPage() {
-
-    return getPageSizeFrom(
-        "pageSize",
-        "orientation",
-        "customWidth",
-        "customHeight"
-    );
-
-}
-
-
-/* =========================================================
-   CUSTOM SIZE CONTROLS
-========================================================= */
-
-function bindPageSettings() {
-
-    bindPageSelector(
-        "pageSize",
-        "customSizePanel",
-        "customWidth",
-        "customHeight"
-    );
-
-
-    bindPageSelector(
-        "otherPageSize",
-        "otherCustomSizePanel",
-        "otherCustomWidth",
-        "otherCustomHeight"
-    );
-
-
-    bindPageSelector(
-        "isbnPageSize",
-        "isbnCustomSizePanel",
-        "isbnCustomWidth",
-        "isbnCustomHeight"
-    );
-
-
-    bindPageSelector(
-        "addressPageSize",
-        "addressCustomSizePanel",
-        "addressCustomWidth",
-        "addressCustomHeight"
-    );
-
-
-    [
-        "orientation",
-        "otherOrientation",
-        "isbnOrientation",
-        "addressOrientation",
-        "customWidth",
-        "customHeight",
-        "otherCustomWidth",
-        "otherCustomHeight",
-        "isbnCustomWidth",
-        "isbnCustomHeight",
-        "addressCustomWidth",
-        "addressCustomHeight"
-    ]
-    .forEach(id => {
-
-        const el =
-            $(id);
-
-        if (!el) {
-            return;
-        }
-
-
-        el.addEventListener(
-            "change",
-            updateAll
-        );
-
-
-        el.addEventListener(
-            "input",
-            updateAll
-        );
-
-    });
-
-}
-
-
-function bindPageSelector(
+function updateCustomSizeState(
     selectId,
     panelId,
     widthId,
-    heightId
+    heightId,
+    infoId
 ) {
 
     const select =
         $(selectId);
-
 
     if (!select) {
         return;
     }
 
 
-    const update =
-        () => {
+    const panel =
+        $(panelId);
 
-            const custom =
-                select.value ===
-                "custom";
+    const widthInput =
+        $(widthId);
 
+    const heightInput =
+        $(heightId);
 
-            const panel =
-                $(panelId);
-
-            const width =
-                $(widthId);
-
-            const height =
-                $(heightId);
+    const isCustom =
+        select.value === "custom";
 
 
-            if (panel) {
+    if (panel) {
 
-                panel.classList.toggle(
-                    "hidden",
-                    !custom
+        panel.classList.toggle(
+            "hidden",
+            !isCustom
+        );
+
+    }
+
+
+    if (widthInput) {
+
+        widthInput.disabled =
+            !isCustom;
+
+    }
+
+
+    if (heightInput) {
+
+        heightInput.disabled =
+            !isCustom;
+
+    }
+
+
+    if (infoId) {
+
+        const info =
+            $(infoId);
+
+        if (info) {
+
+            let dimensions =
+                getPageDimensions(
+                    select.value
                 );
 
+
+            if (
+                select.value !== "custom"
+            ) {
+
+                dimensions =
+                    applyOrientation(
+                        dimensions,
+                        getOrientationForSelect(
+                            selectId
+                        )
+                    );
+
             }
 
 
-            if (width) {
-                width.disabled =
-                    !custom;
-            }
+            info.textContent =
+                `${dimensions.width} × ${dimensions.height} mm`;
 
-
-            if (height) {
-                height.disabled =
-                    !custom;
-            }
-
-
-            updatePreview();
-
-        };
-
-
-    select.addEventListener(
-        "change",
-        update
-    );
-
-
-    update();
-
-}
-
-
-/* =========================================================
-   PAGE LABEL
-========================================================= */
-
-function pageSizeName(
-    value
-) {
-
-    switch (value) {
-
-        case "4x6":
-            return "4 × 6 Inches";
-
-        case "70x35":
-            return "70 × 35 mm";
-
-        case "a4":
-            return "A4";
-
-        case "custom":
-            return "Custom Size";
-
-        default:
-            return "Page";
+        }
 
     }
 
 }
 
 
+function getOrientationForSelect(
+    selectId
+) {
+
+    const map = {
+
+        pageSize:
+            "orientation",
+
+        otherPageSize:
+            "otherOrientation",
+
+        isbnPageSize:
+            "isbnOrientation",
+
+        addressPageSize:
+            "addressOrientation"
+
+    };
+
+
+    const id =
+        map[selectId];
+
+    return $(id)?.value ||
+        "portrait";
+}
+
+
 /* =========================================================
-   LABEL FEATURES
+   PAGE SETTINGS EVENTS
 ========================================================= */
 
-function bindLabelFeatures() {
+function initPageSettings() {
 
-    const simpleFeatures = [
+    const configs = [
 
-        [
-            "poNumberCheck",
-            "PO Number"
-        ],
+        {
+            size: "pageSize",
+            orientation: "orientation",
+            panel: "customSizePanel",
+            width: "customWidth",
+            height: "customHeight",
+            info: "selectedPageInfo"
+        },
 
-        [
-            "boxNumberCheck",
-            "Box Number"
-        ],
+        {
+            size: "otherPageSize",
+            orientation: "otherOrientation",
+            panel: "otherCustomSizePanel",
+            width: "otherCustomWidth",
+            height: "otherCustomHeight"
+        },
 
-        [
-            "cutLineCheck",
-            "Cut Line / Scissor Mark"
-        ],
+        {
+            size: "isbnPageSize",
+            orientation: "isbnOrientation",
+            panel: "isbnCustomSizePanel",
+            width: "isbnCustomWidth",
+            height: "isbnCustomHeight"
+        },
 
-        [
-            "pageBorderCheck",
-            "Page Border"
-        ]
+        {
+            size: "addressPageSize",
+            orientation: "addressOrientation",
+            panel: "addressCustomSizePanel",
+            width: "addressCustomWidth",
+            height: "addressCustomHeight"
+        }
 
     ];
 
 
-    simpleFeatures.forEach(
-        ([id, name]) => {
+    configs.forEach(config => {
 
-            const input =
-                $(id);
+        const size =
+            $(config.size);
 
-            if (!input) {
-                return;
-            }
+        const orientation =
+            $(config.orientation);
 
+        if (size) {
 
-            input.addEventListener(
+            size.addEventListener(
                 "change",
                 () => {
 
-                    featureToast(
-                        name,
-                        input.checked
+                    updateCustomSizeState(
+                        config.size,
+                        config.panel,
+                        config.width,
+                        config.height,
+                        config.info
                     );
 
-                    updatePreview();
+                    updateLivePreview();
 
                 }
             );
 
         }
+
+
+        if (orientation) {
+
+            orientation.addEventListener(
+                "change",
+                () => {
+
+                    updateCustomSizeState(
+                        config.size,
+                        config.panel,
+                        config.width,
+                        config.height,
+                        config.info
+                    );
+
+                    updateLivePreview();
+
+                }
+            );
+
+        }
+
+
+        const width =
+            $(config.width);
+
+        const height =
+            $(config.height);
+
+        if (width) {
+
+            width.addEventListener(
+                "input",
+                updateLivePreview
+            );
+
+        }
+
+        if (height) {
+
+            height.addEventListener(
+                "input",
+                updateLivePreview
+            );
+
+        }
+
+    });
+
+
+    updateCustomSizeState(
+        "pageSize",
+        "customSizePanel",
+        "customWidth",
+        "customHeight",
+        "selectedPageInfo"
     );
 
+    updateCustomSizeState(
+        "otherPageSize",
+        "otherCustomSizePanel",
+        "otherCustomWidth",
+        "otherCustomHeight"
+    );
 
-    const poPlus =
-        $("poPlusBoxCheck");
+    updateCustomSizeState(
+        "isbnPageSize",
+        "isbnCustomSizePanel",
+        "isbnCustomWidth",
+        "isbnCustomHeight"
+    );
 
-
-    if (poPlus) {
-
-        poPlus.addEventListener(
-            "change",
-            () => {
-
-                applyPOPlusLock();
-
-                featureToast(
-                    "PO Number + Box Number",
-                    poPlus.checked
-                );
-
-                updatePreview();
-
-            }
-        );
-
-    }
-
-
-    const combined =
-        $("combinedBorderCheck");
-
-
-    if (combined) {
-
-        combined.addEventListener(
-            "change",
-            () => {
-
-                applyCombinedBorderLock();
-
-                featureToast(
-                    "Combined Border",
-                    combined.checked
-                );
-
-                updatePreview();
-
-            }
-        );
-
-    }
-
-
-    [
-        [
-            "poBorderCheck",
-            "PO Border"
-        ],
-
-        [
-            "boxBorderCheck",
-            "Box Border"
-        ]
-
-    ]
-    .forEach(
-        ([id, name]) => {
-
-            const input =
-                $(id);
-
-            if (!input) {
-                return;
-            }
-
-
-            input.addEventListener(
-                "change",
-                () => {
-
-                    featureToast(
-                        name,
-                        input.checked
-                    );
-
-                    updatePreview();
-
-                }
-            );
-
-        }
+    updateCustomSizeState(
+        "addressPageSize",
+        "addressCustomSizePanel",
+        "addressCustomWidth",
+        "addressCustomHeight"
     );
 
 }
 
 
 /* =========================================================
-   PO + BOX LOCK
+   PO + BOX CHECKBOX LOGIC
 ========================================================= */
 
-function applyPOPlusLock() {
+function setLocked(
+    element,
+    locked
+) {
 
-    const master =
-        $("poPlusBoxCheck");
+    if (!element) {
+        return;
+    }
+
+    element.disabled =
+        locked;
+
+    const label =
+        element.closest(
+            ".feature-check"
+        );
+
+    if (label) {
+
+        label.classList.toggle(
+            "locked",
+            locked
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LABEL FEATURE LOGIC
+========================================================= */
+
+function updateLabelFeatureState(
+    showToastMessage = false
+) {
 
     const po =
         $("poNumberCheck");
@@ -1537,204 +1419,394 @@ function applyPOPlusLock() {
     const box =
         $("boxNumberCheck");
 
+    const poPlusBox =
+        $("poPlusBoxCheck");
 
-    const enabled =
-        !!(
-            master &&
-            master.checked
-        );
+    const combined =
+        $("combinedBorderCheck");
 
+    const poBorder =
+        $("poBorderCheck");
 
-    if (enabled) {
-
-        if (po) {
-
-            po.checked =
-                false;
-
-            po.disabled =
-                true;
-
-            setLocked(
-                po,
-                true
-            );
-
-        }
+    const boxBorder =
+        $("boxBorderCheck");
 
 
-        if (box) {
+    /*
+     * PO + BOX freezes individual PO and BOX.
+     */
 
-            box.checked =
-                false;
-
-            box.disabled =
-                true;
-
-            setLocked(
-                box,
-                true
-            );
-
-        }
-
-    }
-
-    else {
+    if (poPlusBox?.checked) {
 
         if (po) {
-
-            po.disabled =
-                false;
-
-            setLocked(
-                po,
-                false
-            );
-
+            po.checked = false;
         }
-
 
         if (box) {
+            box.checked = false;
+        }
 
-            box.disabled =
-                false;
+        setLocked(
+            po,
+            true
+        );
 
-            setLocked(
-                box,
-                false
-            );
+        setLocked(
+            box,
+            true
+        );
+
+    } else {
+
+        setLocked(
+            po,
+            false
+        );
+
+        setLocked(
+            box,
+            false
+        );
+
+        /*
+         * Default to both enabled when
+         * combined mode is switched off.
+         */
+
+        if (
+            po &&
+            !po.checked &&
+            !box.checked
+        ) {
+
+            po.checked = true;
+            box.checked = true;
 
         }
 
-    }
-
-}
-
-
-function setLocked(
-    input,
-    locked
-) {
-
-    const label =
-        input.closest(
-            ".feature-check"
-        );
-
-
-    if (!label) {
-        return;
     }
 
 
     /*
-     * CSS supports .locked.
+     * Combined Border freezes PO Border
+     * and Box Border.
      */
 
-    label.classList.toggle(
-        "locked",
-        locked
+    if (combined?.checked) {
+
+        if (poBorder) {
+            poBorder.checked = false;
+        }
+
+        if (boxBorder) {
+            boxBorder.checked = false;
+        }
+
+        setLocked(
+            poBorder,
+            true
+        );
+
+        setLocked(
+            boxBorder,
+            true
+        );
+
+    } else {
+
+        setLocked(
+            poBorder,
+            false
+        );
+
+        setLocked(
+            boxBorder,
+            false
+        );
+
+    }
+
+
+    if (showToastMessage) {
+
+        if (poPlusBox?.checked) {
+
+            showToast(
+                "PO Number + Box Number has been enabled.",
+                "success"
+            );
+
+        }
+
+
+        if (combined?.checked) {
+
+            showToast(
+                "Combined Border has been enabled.",
+                "success"
+            );
+
+        }
+
+    }
+
+
+    updateLivePreview();
+
+}
+
+
+/* =========================================================
+   CHECKBOX EVENT LISTENERS
+========================================================= */
+
+function initFeatureCheckboxes() {
+
+    const featureIds = [
+
+        "poNumberCheck",
+        "boxNumberCheck",
+        "poPlusBoxCheck",
+        "combinedBorderCheck",
+        "poBorderCheck",
+        "boxBorderCheck",
+        "cutLineCheck",
+        "pageBorderCheck",
+        "samePOPageFlow",
+        "halfPageFlowCheck",
+
+        "poBoldCheck",
+        "poItalicCheck",
+        "poUnderlineCheck",
+
+        "boxBoldCheck",
+        "boxItalicCheck",
+        "boxUnderlineCheck",
+
+        "fromBold",
+        "fromItalic",
+        "fromUnderline",
+        "fromBorder",
+
+        "toBold",
+        "toItalic",
+        "toUnderline",
+        "toBorder"
+
+    ];
+
+
+    featureIds.forEach(id => {
+
+        const checkbox =
+            $(id);
+
+        if (!checkbox) {
+            return;
+        }
+
+
+        checkbox.addEventListener(
+            "change",
+            () => {
+
+                /*
+                 * No confirmation modal.
+                 */
+
+                const label =
+                    checkbox.closest(
+                        ".feature-check"
+                    );
+
+
+                if (
+                    checkbox.checked
+                ) {
+
+                    if (
+                        id !== "poPlusBoxCheck" &&
+                        id !== "combinedBorderCheck"
+                    ) {
+
+                        showToast(
+                            `${getReadableFeatureName(id)} has been enabled.`,
+                            "success"
+                        );
+
+                    }
+
+                } else {
+
+                    showToast(
+                        `${getReadableFeatureName(id)} has been disabled.`,
+                        "error"
+                    );
+
+                }
+
+
+                if (
+                    id === "poPlusBoxCheck" ||
+                    id === "combinedBorderCheck"
+                ) {
+
+                    updateLabelFeatureState(
+                        true
+                    );
+
+                } else {
+
+                    updateLivePreview();
+
+                }
+
+            }
+        );
+
+    });
+
+
+    updateLabelFeatureState(
+        false
     );
 
 }
 
 
-/* =========================================================
-   COMBINED BORDER LOCK
-========================================================= */
+function getReadableFeatureName(id) {
 
-function applyCombinedBorderLock() {
+    const names = {
 
-    const master =
-        $("combinedBorderCheck");
+        poNumberCheck:
+            "PO Number",
 
-    const po =
-        $("poBorderCheck");
+        boxNumberCheck:
+            "Box Number",
 
-    const box =
-        $("boxBorderCheck");
+        poPlusBoxCheck:
+            "PO Number + Box Number",
 
+        combinedBorderCheck:
+            "Combined Border",
 
-    const enabled =
-        !!(
-            master &&
-            master.checked
-        );
+        poBorderCheck:
+            "PO Border",
 
+        boxBorderCheck:
+            "Box Border",
 
-    if (enabled) {
+        cutLineCheck:
+            "Cut Line / Scissor Mark",
 
-        if (po) {
+        pageBorderCheck:
+            "Page Border",
 
-            po.checked =
-                false;
+        samePOPageFlow:
+            "Same PO Page Flow",
 
-            po.disabled =
-                true;
+        halfPageFlowCheck:
+            "Half Page Label Flow"
 
-            setLocked(
-                po,
-                true
-            );
-
-        }
+    };
 
 
-        if (box) {
-
-            box.checked =
-                false;
-
-            box.disabled =
-                true;
-
-            setLocked(
-                box,
-                true
-            );
-
-        }
-
-    }
-
-    else {
-
-        if (po) {
-
-            po.disabled =
-                false;
-
-            setLocked(
-                po,
-                false
-            );
-
-        }
-
-
-        if (box) {
-
-            box.disabled =
-                false;
-
-            setLocked(
-                box,
-                false
-            );
-
-        }
-
-    }
+    return names[id] ||
+        "Function";
 
 }
 
 
 /* =========================================================
-   FONT SETTINGS
+   FONT CONTROL HELPERS
 ========================================================= */
 
-function bindFontSettings() {
+function getFontStyle(
+    familyId,
+    sizeId,
+    boldId,
+    italicId,
+    underlineId
+) {
+
+    const family =
+        $(familyId)?.value ||
+        "Arial";
+
+    const size =
+        safeNumber(
+            $(sizeId)?.value,
+            20
+        );
+
+    const bold =
+        $(boldId)?.checked;
+
+    const italic =
+        $(italicId)?.checked;
+
+    const underline =
+        $(underlineId)?.checked;
+
+
+    return {
+
+        family,
+
+        size,
+
+        weight:
+            bold
+                ? "700"
+                : "400",
+
+        style:
+            italic
+                ? "italic"
+                : "normal",
+
+        decoration:
+            underline
+                ? "underline"
+                : "none"
+
+    };
+
+}
+
+
+function applyTextStyle(
+    element,
+    style
+) {
+
+    if (!element) {
+        return;
+    }
+
+    element.style.fontFamily =
+        `"${style.family}"`;
+
+    element.style.fontSize =
+        `${style.size}px`;
+
+    element.style.fontWeight =
+        style.weight;
+
+    element.style.fontStyle =
+        style.style;
+
+    element.style.textDecoration =
+        style.decoration;
+
+}
+
+
+/* =========================================================
+   FONT EVENTS
+========================================================= */
+
+function initFontControls() {
 
     const ids = [
 
@@ -1769,31 +1841,21 @@ function bindFontSettings() {
 
     ids.forEach(id => {
 
-        const el =
+        const element =
             $(id);
 
-        if (!el) {
+        if (!element) {
             return;
         }
 
-
-        el.addEventListener(
-            "change",
-            () => {
-
-                updatePreview();
-
-            }
+        element.addEventListener(
+            "input",
+            updateLivePreview
         );
 
-
-        el.addEventListener(
-            "input",
-            () => {
-
-                updatePreview();
-
-            }
+        element.addEventListener(
+            "change",
+            updateLivePreview
         );
 
     });
@@ -1802,81 +1864,176 @@ function bindFontSettings() {
 
 
 /* =========================================================
-   GET FONT STYLE
+   LABEL CONTENT
 ========================================================= */
 
-function getFontStyle(
-    familyId,
-    sizeId,
-    boldId,
-    italicId,
-    underlineId
-) {
+function getCurrentPO() {
 
-    return {
+    const values =
+        getCocoPOValues();
 
-        family:
-            getValue(
-                familyId,
-                "Arial"
-            ),
+    return values[0] ||
+        "PO NUMBER";
 
-        size:
-            Math.min(
-                APP.maxFont,
-                Math.max(
-                    1,
-                    numberValue(
-                        sizeId,
-                        14
-                    )
-                )
-            ),
+}
 
-        bold:
-            isChecked(
-                boldId
-            ),
 
-        italic:
-            isChecked(
-                italicId
-            ),
+function getCurrentBoxNumber() {
 
-        underline:
-            isChecked(
-                underlineId
-            )
+    const start =
+        safeNumber(
+            $("startBoxNumber")?.value,
+            1
+        );
 
-    };
+    return start;
 
 }
 
 
 /* =========================================================
-   PREVIEW
+   PREVIEW PAGE DIMENSIONS
 ========================================================= */
 
-function updatePreview() {
+function updatePreviewPageSize() {
 
     const page =
         $("previewPage");
 
+    if (!page) {
+        return;
+    }
+
+
+    const size =
+        $("pageSize")?.value ||
+        "4x6";
+
+
+    let dimensions =
+        getPageDimensions(
+            size
+        );
+
+
+    dimensions =
+        applyOrientation(
+            dimensions,
+            $("orientation")?.value ||
+            "portrait"
+        );
+
+
+    /*
+     * Keep preview at a practical
+     * screen size while preserving ratio.
+     */
+
+    const maxWidth = 650;
+    const maxHeight = 520;
+
+
+    const ratio =
+        dimensions.width /
+        dimensions.height;
+
+
+    let width;
+    let height;
+
+
+    if (ratio >= 1) {
+
+        width =
+            Math.min(
+                maxWidth,
+                dimensions.width * 2.4
+            );
+
+        height =
+            width / ratio;
+
+    } else {
+
+        height =
+            Math.min(
+                maxHeight,
+                dimensions.height * 2.4
+            );
+
+        width =
+            height * ratio;
+
+    }
+
+
+    page.style.width =
+        `${Math.max(90, width)}px`;
+
+    page.style.height =
+        `${Math.max(90, height)}px`;
+
+
+    const pageInfo =
+        $("previewPageSize");
+
+    if (pageInfo) {
+
+        let label =
+            getPageDimensions(
+                size
+            ).label;
+
+
+        if (
+            size === "70x35"
+        ) {
+
+            label =
+                "70 × 35 mm";
+
+        }
+
+
+        pageInfo.textContent =
+            label;
+
+    }
+
+
+    const selectedInfo =
+        $("selectedPageInfo");
+
+    if (selectedInfo) {
+
+        selectedInfo.textContent =
+            `${dimensions.width.toFixed(1)} × ${dimensions.height.toFixed(1)} mm`;
+
+    }
+
+}
+
+
+/* =========================================================
+   LABEL PREVIEW
+========================================================= */
+
+function updateLabelPreview() {
+
     const label =
         $("previewLabel");
 
-    const po =
+    const poElement =
         $("previewPO");
 
-    const box =
+    const boxElement =
         $("previewBox");
 
 
     if (
-        !page ||
         !label ||
-        !po ||
-        !box
+        !poElement ||
+        !boxElement
     ) {
 
         return;
@@ -1884,162 +2041,82 @@ function updatePreview() {
     }
 
 
-    const dimensions =
-        getCocoPage();
+    const poCheck =
+        $("poNumberCheck")?.checked;
 
+    const boxCheck =
+        $("boxNumberCheck")?.checked;
 
-    if (!dimensions) {
-        return;
-    }
-
-
-    const maxWidth =
-        450;
-
-    const maxHeight =
-        480;
-
-
-    const scale =
-        Math.min(
-            maxWidth /
-                dimensions.width,
-
-            maxHeight /
-                dimensions.height
-        );
-
-
-    page.style.width =
-        `${Math.max(
-            90,
-            dimensions.width *
-                scale
-        )}px`;
-
-
-    page.style.height =
-        `${Math.max(
-            90,
-            dimensions.height *
-                scale
-        )}px`;
-
-
-    const poEnabled =
-        isChecked(
-            "poNumberCheck"
-        );
-
-
-    const boxEnabled =
-        isChecked(
-            "boxNumberCheck"
-        );
-
-
-    const combined =
-        isChecked(
-            "poPlusBoxCheck"
-        );
-
-
-    const poBorder =
-        isChecked(
-            "poBorderCheck"
-        );
-
-
-    const boxBorder =
-        isChecked(
-            "boxBorderCheck"
-        );
-
+    const poPlusBox =
+        $("poPlusBoxCheck")?.checked;
 
     const combinedBorder =
-        isChecked(
-            "combinedBorderCheck"
-        );
+        $("combinedBorderCheck")?.checked;
 
+    const poBorder =
+        $("poBorderCheck")?.checked;
+
+    const boxBorder =
+        $("boxBorderCheck")?.checked;
 
     const cutLine =
-        isChecked(
-            "cutLineCheck"
-        );
-
+        $("cutLineCheck")?.checked;
 
     const pageBorder =
-        isChecked(
-            "pageBorderCheck"
-        );
+        $("pageBorderCheck")?.checked;
 
 
-    const pos =
-        getCocoPOs();
+    const poNumber =
+        getCurrentPO();
+
+    const boxNumber =
+        getCurrentBoxNumber();
 
 
-    const samplePO =
-        pos[0] ||
-        "PO NUMBER";
+    /*
+     * PO text.
+     */
 
+    if (
+        poPlusBox
+    ) {
 
-    const sampleBox =
-        numberValue(
-            "startBoxNumber",
-            1
-        );
+        poElement.textContent =
+            `PO NUMBER ${poNumber}`;
 
+        boxElement.textContent =
+            `BOX NO. ${boxNumber}`;
 
-    if (combined) {
-
-        po.style.display =
+        poElement.style.display =
             "block";
 
-        box.style.display =
-            "none";
+        boxElement.style.display =
+            "block";
 
-        po.textContent =
-            `${samplePO} — BOX NO. ${sampleBox}`;
+    } else {
 
-    }
+        poElement.textContent =
+            poNumber;
 
-    else {
+        boxElement.textContent =
+            `BOX NO. ${boxNumber}`;
 
-        po.style.display =
-            poEnabled
+        poElement.style.display =
+            poCheck
                 ? "block"
                 : "none";
 
-
-        box.style.display =
-            boxEnabled
+        boxElement.style.display =
+            boxCheck
                 ? "block"
                 : "none";
-
-
-        po.textContent =
-            samplePO;
-
-
-        box.textContent =
-            `BOX NO. ${sampleBox}`;
 
     }
 
 
-    po.classList.toggle(
-        "with-border",
-        poBorder &&
-            !combined
-    );
-
-
-    box.classList.toggle(
-        "with-border",
-        boxBorder &&
-            !combined
-    );
-
+    /*
+     * Combined border.
+     */
 
     label.classList.toggle(
         "combined-border",
@@ -2047,29 +2124,55 @@ function updatePreview() {
     );
 
 
-    label.style.borderStyle =
-        pageBorder
-            ? "solid"
+    /*
+     * Individual borders.
+     */
+
+    poElement.classList.toggle(
+        "with-border",
+        poBorder && !combinedBorder
+    );
+
+    boxElement.classList.toggle(
+        "with-border",
+        boxBorder && !combinedBorder
+    );
+
+
+    /*
+     * Cut line.
+     */
+
+    label.style.outline =
+        cutLine
+            ? "1px dashed #64748b"
             : "none";
 
 
-    if (cutLine) {
+    /*
+     * Page border.
+     */
 
-        label.style.outline =
-            "1px dashed #94a3b8";
+    const page =
+        $("previewPage");
+
+    if (page) {
+
+        page.style.border =
+            pageBorder
+                ? "2px solid #111827"
+                : "1px solid #cbd5e1";
 
     }
 
-    else {
 
-        label.style.outline =
-            "none";
+    /*
+     * PO font.
+     */
 
-    }
+    applyTextStyle(
+        poElement,
 
-
-    applyPreviewFont(
-        po,
         getFontStyle(
             "poFontFamily",
             "poFontSize",
@@ -2080,8 +2183,13 @@ function updatePreview() {
     );
 
 
-    applyPreviewFont(
-        box,
+    /*
+     * Box font.
+     */
+
+    applyTextStyle(
+        boxElement,
+
         getFontStyle(
             "boxFontFamily",
             "boxFontSize",
@@ -2092,259 +2200,84 @@ function updatePreview() {
     );
 
 
-    setText(
-        "selectedPageInfo",
-        pageSizeName(
-            getValue(
-                "pageSize",
-                "4x6"
-            )
-        )
-    );
+    /*
+     * When PO + Box is active,
+     * stack them vertically.
+     */
+
+    label.style.flexDirection =
+        "column";
+
+    label.style.gap =
+        "10px";
 
 
-    setText(
-        "previewPageSize",
-        pageSizeName(
-            getValue(
-                "pageSize",
-                "4x6"
-            )
-        )
-    );
+    /*
+     * Labels per page affects
+     * preview layout.
+     */
+
+    const labelsPerPage =
+        safeNumber(
+            $("labelsPerPage")?.value,
+            2
+        );
+
+
+    if (
+        labelsPerPage >= 2
+    ) {
+
+        label.style.transform =
+            "scale(0.92)";
+
+    } else {
+
+        label.style.transform =
+            "scale(1)";
+
+    }
 
 }
 
 
 /* =========================================================
-   PREVIEW FONT
+   LIVE PREVIEW
 ========================================================= */
 
-function applyPreviewFont(
-    element,
-    style
-) {
+function updateLivePreview() {
 
-    if (!element) {
-        return;
-    }
+    updatePreviewPageSize();
 
-
-    element.style.fontFamily =
-        style.family;
-
-
-    element.style.fontSize =
-        `${style.size}px`;
-
-
-    element.style.fontWeight =
-        style.bold
-            ? "800"
-            : "600";
-
-
-    element.style.fontStyle =
-        style.italic
-            ? "italic"
-            : "normal";
-
-
-    element.style.textDecoration =
-        style.underline
-            ? "underline"
-            : "none";
+    updateLabelPreview();
 
 }
 
 
 /* =========================================================
-   EXCEL
+   LABELS PER PAGE
 ========================================================= */
 
-function bindExcel() {
+function initLabelsPerPage() {
 
-    bindExcelInput(
-        "cocoExcelFile",
-        "coco"
-    );
+    const select =
+        $("labelsPerPage");
 
-
-    bindExcelInput(
-        "otherExcelFile",
-        "other"
-    );
-
-
-    bindExcelInput(
-        "addressExcelFile",
-        "address"
-    );
-
-}
-
-
-function bindExcelInput(
-    inputId,
-    type
-) {
-
-    const input =
-        $(inputId);
-
-
-    if (!input) {
+    if (!select) {
         return;
     }
 
-
-    input.addEventListener(
+    select.addEventListener(
         "change",
-        async event => {
+        () => {
 
-            const file =
-                event.target.files?.[0];
-
-
-            if (!file) {
-                return;
-            }
-
-
-            setText(
-                `${type}ExcelFileName`,
-                file.name
-            );
-
-
-            if (
-                typeof XLSX ===
-                "undefined"
-            ) {
-
-                showToast(
-                    "Excel library is not loaded",
-                    "error"
+            AppState.labelsPerPage =
+                safeNumber(
+                    select.value,
+                    2
                 );
 
-                return;
-
-            }
-
-
-            try {
-
-                showToast(
-                    "Reading Excel file...",
-                    "success"
-                );
-
-
-                const data =
-                    await file.arrayBuffer();
-
-
-                const workbook =
-                    XLSX.read(
-                        data,
-                        {
-                            type: "array"
-                        }
-                    );
-
-
-                const sheet =
-                    workbook.Sheets[
-                        workbook.SheetNames[0]
-                    ];
-
-
-                const rows =
-                    XLSX.utils.sheet_to_json(
-                        sheet,
-                        {
-                            header: 1,
-                            defval: ""
-                        }
-                    );
-
-
-                if (
-                    type ===
-                    "coco"
-                ) {
-
-                    APP.cocoExcelPOs =
-                        extractPOs(
-                            rows
-                        );
-
-                    renderExcel(
-                        "cocoExcelPreview",
-                        rows
-                    );
-
-                }
-
-
-                else if (
-                    type ===
-                    "other"
-                ) {
-
-                    APP.otherExcelPOs =
-                        extractPOs(
-                            rows
-                        );
-
-                    renderExcel(
-                        "otherExcelPreview",
-                        rows
-                    );
-
-                }
-
-
-                else if (
-                    type ===
-                    "address"
-                ) {
-
-                    APP.addressExcelRows =
-                        rows;
-
-                    renderExcel(
-                        "addressExcelPreview",
-                        rows
-                    );
-
-                }
-
-
-                showToast(
-                    `${rows.length} rows loaded`,
-                    "success"
-                );
-
-
-                updatePreview();
-
-            }
-
-
-            catch (error) {
-
-                console.error(
-                    error
-                );
-
-
-                showToast(
-                    "Unable to read Excel file",
-                    "error"
-                );
-
-            }
+            updateLivePreview();
 
         }
     );
@@ -2353,275 +2286,71 @@ function bindExcelInput(
 
 
 /* =========================================================
-   EXTRACT PO
+   BOX NUMBER INPUTS
 ========================================================= */
 
-function extractPOs(
-    rows
-) {
-
-    const headers = [
-
-        "po",
-        "po number",
-        "po no",
-        "po no.",
-        "po_number",
-        "purchase order"
-
-    ];
-
-
-    const result = [];
-
-
-    rows.forEach(
-        (row, index) => {
-
-            if (
-                !Array.isArray(row) ||
-                !row.length
-            ) {
-
-                return;
-
-            }
-
-
-            const value =
-                String(
-                    row[0] ?? ""
-                ).trim();
-
-
-            if (!value) {
-                return;
-            }
-
-
-            const normalized =
-                value
-                    .toLowerCase()
-                    .replace(
-                        /\s+/g,
-                        " "
-                    )
-                    .trim();
-
-
-            if (
-                index === 0 &&
-                headers.includes(
-                    normalized
-                )
-            ) {
-
-                return;
-
-            }
-
-
-            result.push(
-                value
-            );
-
-        }
-    );
-
-
-    return [
-        ...new Set(
-            result
-        )
-    ];
-
-}
-
-
-/* =========================================================
-   EXCEL PREVIEW
-========================================================= */
-
-function renderExcel(
-    containerId,
-    rows
-) {
-
-    const container =
-        $(containerId);
-
-
-    if (!container) {
-        return;
-    }
-
-
-    container.innerHTML =
-        "";
-
-
-    if (!rows.length) {
-        return;
-    }
-
-
-    const table =
-        document.createElement(
-            "table"
-        );
-
-
-    rows
-        .slice(
-            0,
-            30
-        )
-        .forEach(
-            (row, rowIndex) => {
-
-                const tr =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                row.forEach(
-                    cell => {
-
-                        const td =
-                            document.createElement(
-                                rowIndex === 0
-                                    ? "th"
-                                    : "td"
-                            );
-
-
-                        td.textContent =
-                            cell;
-
-
-                        tr.appendChild(
-                            td
-                        );
-
-                    }
-                );
-
-
-                table.appendChild(
-                    tr
-                );
-
-            }
-        );
-
-
-    container.appendChild(
-        table
-    );
-
-}
-
-
-/* =========================================================
-   ISBN
-========================================================= */
-
-function bindISBN() {
+function initBoxSettings() {
 
     [
-        "isbnValue",
-        "isbnBookTitle",
-        "isbnEdition"
-    ]
-    .forEach(id => {
+        "startBoxNumber",
+        "endBoxNumber",
+        "boxRepeatCount",
+        "labelGap"
+    ].forEach(id => {
 
-        const el =
+        const element =
             $(id);
 
-        if (!el) {
+        if (!element) {
             return;
         }
 
-
-        el.addEventListener(
+        element.addEventListener(
             "input",
-            updateISBNPreview
+            updateLivePreview
+        );
+
+        element.addEventListener(
+            "change",
+            updateLivePreview
         );
 
     });
 
-
-    const generate =
-        $("isbnGenerateButton");
-
-
-    if (generate) {
-
-        generate.addEventListener(
-            "click",
-            generateISBNPDF
-        );
-
-    }
-
-
-    const reset =
-        $("isbnResetButton");
-
-
-    if (reset) {
-
-        reset.addEventListener(
-            "click",
-            resetISBN
-        );
-
-    }
-
 }
 
 
-function updateISBNPreview() {
+/* =========================================================
+   ISBN BARCODE
+========================================================= */
+
+function generateISBNBarcode() {
+
+    const value =
+        $("isbnValue")?.value.trim();
+
 
     const svg =
         $("isbnBarcodeSvg");
+
 
     const text =
         $("isbnBarcodeText");
 
 
-    if (!svg || !text) {
+    if (!svg) {
         return;
     }
 
 
-    const isbn =
-        getValue(
-            "isbnValue"
-        ).trim();
+    if (!value) {
 
+        svg.innerHTML = "";
 
-    const title =
-        getValue(
-            "isbnBookTitle"
-        ).trim();
-
-
-    const edition =
-        getValue(
-            "isbnEdition"
-        ).trim();
-
-
-    svg.innerHTML =
-        "";
-
-
-    if (!isbn) {
-
-        text.textContent =
-            "Enter ISBN to preview";
+        if (text) {
+            text.textContent =
+                "Enter ISBN to preview";
+        }
 
         return;
 
@@ -2633,8 +2362,10 @@ function updateISBNPreview() {
         "undefined"
     ) {
 
-        text.textContent =
-            isbn;
+        if (text) {
+            text.textContent =
+                "Barcode library not loaded.";
+        }
 
         return;
 
@@ -2645,667 +2376,446 @@ function updateISBNPreview() {
 
         JsBarcode(
             svg,
-            isbn,
+            value,
             {
 
-                format:
-                    "CODE128",
+                format: "EAN13",
 
-                width:
-                    2,
+                displayValue: true,
 
-                height:
-                    70,
+                lineColor: "#111827",
 
-                displayValue:
-                    true,
+                background: "#ffffff",
 
-                fontSize:
-                    13,
+                width: 2,
 
-                margin:
-                    10,
+                height: 70,
 
-                background:
-                    "#ffffff"
+                margin: 10,
+
+                fontSize: 14
 
             }
         );
 
 
-        text.textContent =
-            [
-                title,
-                edition
-            ]
-            .filter(Boolean)
-            .join(
-                " • "
+        if (text) {
+
+            text.textContent =
+                value;
+
+        }
+
+    } catch (error) {
+
+        /*
+         * Fallback to CODE128
+         * if ISBN/EAN validation fails.
+         */
+
+        try {
+
+            JsBarcode(
+                svg,
+                value,
+                {
+
+                    format: "CODE128",
+
+                    displayValue: true,
+
+                    lineColor: "#111827",
+
+                    background: "#ffffff",
+
+                    width: 2,
+
+                    height: 70,
+
+                    margin: 10
+
+                }
             );
 
-    }
 
+            if (text) {
 
-    catch (error) {
+                text.textContent =
+                    value;
 
-        console.error(
-            error
-        );
+            }
 
+        } catch (fallbackError) {
 
-        text.textContent =
-            "Invalid barcode value";
+            svg.innerHTML = "";
+
+            if (text) {
+
+                text.textContent =
+                    "Invalid barcode value.";
+
+            }
+
+        }
 
     }
 
 }
 
 
-/* =========================================================
-   ADDRESS
-========================================================= */
-
-function bindAddress() {
+function initISBN() {
 
     [
-        "addressFrom",
-        "addressTo",
-        "cocoFromAddress",
-        "cocoToAddress",
-        "otherFromAddress",
-        "otherToAddress"
-    ]
-    .forEach(id => {
+        "isbnValue",
+        "isbnBookTitle",
+        "isbnEdition"
+    ].forEach(id => {
 
-        const el =
+        const element =
             $(id);
 
-        if (!el) {
+        if (!element) {
             return;
         }
 
-
-        el.addEventListener(
+        element.addEventListener(
             "input",
-            updateAddressPreview
+            generateISBNBarcode
         );
 
     });
 
-
-    [
-        "fromFontFamily",
-        "fromFontSize",
-        "fromBold",
-        "fromItalic",
-        "fromUnderline",
-        "fromBorder",
-        "toFontFamily",
-        "toFontSize",
-        "toBold",
-        "toItalic",
-        "toUnderline",
-        "toBorder"
-    ]
-    .forEach(id => {
-
-        const el =
-            $(id);
-
-        if (!el) {
-            return;
-        }
-
-
-        el.addEventListener(
-            "change",
-            updateAddressPreview
-        );
-
-    });
-
-
-    const generate =
-        $("addressGenerateButton");
-
-
-    if (generate) {
-
-        generate.addEventListener(
-            "click",
-            generateAddressPDF
-        );
-
-    }
-
-
-    const reset =
-        $("addressResetButton");
-
-
-    if (reset) {
-
-        reset.addEventListener(
-            "click",
-            resetAddress
-        );
-
-    }
-
-}
-
-
-function updateAddressPreview() {
-
-    /*
-     * Address settings are applied when PDF
-     * is generated. No confirmation popup.
-     */
-
 }
 
 
 /* =========================================================
-   MAIN BUTTONS
+   QR CODE GENERATION
 ========================================================= */
 
-function bindButtons() {
-
-    const cocoGenerate =
-        $("cocoGenerateButton");
-
-
-    if (cocoGenerate) {
-
-        cocoGenerate.addEventListener(
-            "click",
-            generateCocoPDF
-        );
-
-    }
-
-
-    const cocoReset =
-        $("cocoResetButton");
-
-
-    if (cocoReset) {
-
-        cocoReset.addEventListener(
-            "click",
-            resetCoco
-        );
-
-    }
-
-
-    const otherGenerate =
-        $("otherGenerateButton");
-
-
-    if (otherGenerate) {
-
-        otherGenerate.addEventListener(
-            "click",
-            generateOtherPDF
-        );
-
-    }
-
-
-    const otherReset =
-        $("otherResetButton");
-
-
-    if (otherReset) {
-
-        otherReset.addEventListener(
-            "click",
-            resetOther
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   PDF LIBRARY
-========================================================= */
-
-function getPDFClass() {
-
-    if (
-        !window.jspdf ||
-        !window.jspdf.jsPDF
-    ) {
-
-        showToast(
-            "PDF library is not loaded",
-            "error"
-        );
-
-        return null;
-
-    }
-
-
-    return window.jspdf.jsPDF;
-
-}
-
-
-/* =========================================================
-   GENERATE COCO
-========================================================= */
-
-function generateCocoPDF() {
-
-    const JsPDF =
-        getPDFClass();
-
-
-    if (!JsPDF) {
-        return;
-    }
-
-
-    const pos =
-        getCocoPOs();
-
-
-    if (!pos.length) {
-
-        showToast(
-            "Please enter at least one PO number",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    normalizeBoxSettings();
-
-
-    const page =
-        getCocoPage();
-
-
-    if (!page) {
-
-        showToast(
-            "Please enter valid page dimensions",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    const labels =
-        createLabels(
-            pos
-        );
-
-
-    if (!labels.length) {
-
-        showToast(
-            "No labels available",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    generateLabelPDF(
-        JsPDF,
-        labels,
-        page,
-        "Coco_Blue_PO"
-    );
-
-}
-
-
-/* =========================================================
-   GENERATE OTHER PO
-========================================================= */
-
-function generateOtherPDF() {
-
-    const JsPDF =
-        getPDFClass();
-
-
-    if (!JsPDF) {
-        return;
-    }
-
-
-    const pos =
-        getOtherPOs();
-
-
-    if (!pos.length) {
-
-        showToast(
-            "Please enter at least one Other PO",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    const page =
-        getPageSizeFrom(
-            "otherPageSize",
-            "otherOrientation",
-            "otherCustomWidth",
-            "otherCustomHeight"
-        );
-
-
-    if (!page) {
-
-        showToast(
-            "Please enter valid page dimensions",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    const labels =
-        createLabels(
-            pos
-        );
-
-
-    generateLabelPDF(
-        JsPDF,
-        labels,
-        page,
-        "Other_PO"
-    );
-
-}
-
-
-/* =========================================================
-   GENERATE LABEL PDF
-========================================================= */
-
-function generateLabelPDF(
-    JsPDF,
-    labels,
-    page,
-    filename
+function generateQR(
+    container,
+    value,
+    size = 170
 ) {
 
-    const orientation =
-        page.width >
-        page.height
-            ? "landscape"
-            : "portrait";
+    if (!container) {
+        return;
+    }
 
 
-    const pdf =
-        new JsPDF({
-
-            orientation,
-
-            unit:
-                "mm",
-
-            format: [
-                page.width,
-                page.height
-            ],
-
-            compress:
-                true
-
-        });
+    container.innerHTML = "";
 
 
-    const halfFlow =
-        isChecked(
-            "halfPageFlowCheck"
+    if (
+        typeof QRCode ===
+        "undefined"
+    ) {
+
+        container.textContent =
+            "QR library not loaded.";
+
+        return;
+
+    }
+
+
+    if (!value) {
+        return;
+    }
+
+
+    const canvas =
+        document.createElement(
+            "canvas"
         );
 
 
-    const labelsPerPage =
-        halfFlow
-            ? 2
-            : Math.max(
-                1,
-                numberValue(
-                    "labelsPerPage",
-                    1
-                )
-            );
+    QRCode.toCanvas(
+        canvas,
+        value,
+        {
 
+            width: size,
 
-    labels.forEach(
-        (label, index) => {
+            margin: 2,
 
-            const slot =
-                index %
-                labelsPerPage;
+            errorCorrectionLevel:
+                "M",
 
+            color: {
 
-            if (
-                index > 0 &&
-                slot === 0
-            ) {
+                dark: "#111827",
 
-                pdf.addPage(
-                    [
-                        page.width,
-                        page.height
-                    ],
-                    orientation
-                );
+                light: "#ffffff"
 
             }
 
+        },
 
-            const slotHeight =
-                page.height /
-                labelsPerPage;
+        error => {
 
+            if (error) {
 
-            const y =
-                slot *
-                slotHeight;
+                console.error(
+                    "QR error:",
+                    error
+                );
 
+                container.textContent =
+                    "Unable to create QR code.";
 
-            drawPDFLabel(
-                pdf,
-                label,
-                0,
-                y,
-                page.width,
-                slotHeight
+                return;
+
+            }
+
+            container.appendChild(
+                canvas
             );
 
         }
     );
 
-
-    let safeName =
-        filename
-            .replace(
-                /[^a-zA-Z0-9_-]/g,
-                "_"
-            );
+}
 
 
-    const firstPO =
-        String(
-            labels[0]?.po ||
-            "Labels"
-        )
-        .replace(
-            /[^a-zA-Z0-9_-]/g,
-            "_"
-        );
+function initQRCodes() {
+
+    const mapURL =
+        "https://maps.app.goo.gl/7McYApm1u9x4QSj7A";
 
 
-    safeName +=
-        "_" +
-        firstPO;
+    const email =
+        "mailto:ashish.verma@bookswagon.in";
 
 
-    pdf.save(
-        `${safeName}_Labels.pdf`
+    generateQR(
+        $("addressQRPreview"),
+        mapURL,
+        170
     );
 
 
-    showToast(
-        `${labels.length} labels generated successfully`,
-        "success"
+    generateQR(
+        $("emailQRPreview"),
+        email,
+        170
     );
 
 }
 
 
 /* =========================================================
-   DRAW PDF LABEL
+   PDF PAGE DIMENSIONS
 ========================================================= */
 
-function drawPDFLabel(
-    pdf,
-    label,
+function getPDFPageDimensions(
+    size,
+    orientation,
+    customWidth,
+    customHeight
+) {
+
+    let dimensions;
+
+
+    switch (size) {
+
+        case "4x6":
+
+            dimensions = {
+                width: 101.6,
+                height: 152.4
+            };
+
+            break;
+
+
+        case "70x35":
+
+            dimensions = {
+                width: 70,
+                height: 35
+            };
+
+            break;
+
+
+        case "a4":
+
+            dimensions = {
+                width: 210,
+                height: 297
+            };
+
+            break;
+
+
+        case "custom":
+
+            dimensions = {
+                width:
+                    safeNumber(
+                        customWidth,
+                        70
+                    ),
+
+                height:
+                    safeNumber(
+                        customHeight,
+                        35
+                    )
+            };
+
+            break;
+
+
+        default:
+
+            dimensions = {
+                width: 101.6,
+                height: 152.4
+            };
+
+    }
+
+
+    if (
+        orientation === "landscape" &&
+        dimensions.height > dimensions.width
+    ) {
+
+        [
+            dimensions.width,
+            dimensions.height
+        ] = [
+            dimensions.height,
+            dimensions.width
+        ];
+
+    }
+
+
+    if (
+        orientation === "portrait" &&
+        dimensions.width > dimensions.height
+    ) {
+
+        [
+            dimensions.width,
+            dimensions.height
+        ] = [
+            dimensions.height,
+            dimensions.width
+        ];
+
+    }
+
+
+    return dimensions;
+
+}
+
+
+/* =========================================================
+   PDF LABEL DRAWING
+========================================================= */
+
+function drawLabelOnPDF(
+    doc,
     x,
     y,
     width,
-    height
+    height,
+    poNumber,
+    boxNumber,
+    settings
 ) {
 
-    const centerX =
-        x +
-        width / 2;
+    const {
 
+        poEnabled,
+        boxEnabled,
+        poPlusBox,
+        combinedBorder,
+        poBorder,
+        boxBorder,
+        cutLine,
+        poFont,
+        boxFont
 
-    const centerY =
-        y +
-        height / 2;
-
-
-    const poEnabled =
-        isChecked(
-            "poNumberCheck"
-        );
-
-
-    const boxEnabled =
-        isChecked(
-            "boxNumberCheck"
-        );
-
-
-    const poPlus =
-        isChecked(
-            "poPlusBoxCheck"
-        );
-
-
-    const combinedBorder =
-        isChecked(
-            "combinedBorderCheck"
-        );
-
-
-    const poBorder =
-        isChecked(
-            "poBorderCheck"
-        );
-
-
-    const boxBorder =
-        isChecked(
-            "boxBorderCheck"
-        );
-
-
-    const cutLine =
-        isChecked(
-            "cutLineCheck"
-        );
-
-
-    const pageBorder =
-        isChecked(
-            "pageBorderCheck"
-        );
+    } = settings;
 
 
     /*
-     * PAGE BORDER
+     * Label background.
      */
 
-    if (pageBorder) {
+    doc.setFillColor(
+        255,
+        255,
+        255
+    );
 
-        pdf.setDrawColor(
-            30,
-            41,
-            59
+    doc.rect(
+        x,
+        y,
+        width,
+        height,
+        "F"
+    );
+
+
+    /*
+     * Combined border.
+     */
+
+    if (combinedBorder) {
+
+        doc.setDrawColor(
+            17,
+            24,
+            39
         );
 
-        pdf.setLineWidth(
-            0.45
+        doc.setLineWidth(
+            0.6
         );
 
-        pdf.rect(
-            x + 1,
-            y + 1,
-            width - 2,
-            height - 2
+        doc.rect(
+            x,
+            y,
+            width,
+            height
         );
 
     }
 
 
     /*
-     * CUT LINE
+     * Cut line.
      */
 
     if (cutLine) {
 
-        pdf.setDrawColor(
-            120,
-            130,
-            145
+        doc.setDrawColor(
+            100,
+            116,
+            139
         );
 
-        pdf.setLineWidth(
-            0.25
-        );
-
-        pdf.setLineDashPattern(
+        doc.setLineDashPattern(
             [2, 2],
             0
         );
 
-        pdf.rect(
-            x + 2,
-            y + 2,
-            width - 4,
-            height - 4
+        doc.rect(
+            x,
+            y,
+            width,
+            height
         );
 
-        pdf.setLineDashPattern(
+        doc.setLineDashPattern(
             [],
             0
         );
@@ -3313,225 +2823,167 @@ function drawPDFLabel(
     }
 
 
+    const visiblePO =
+        poPlusBox ||
+        poEnabled;
+
+
+    const visibleBox =
+        poPlusBox ||
+        boxEnabled;
+
+
+    const centerX =
+        x + width / 2;
+
+
     /*
-     * PO + BOX COMBINED
+     * Vertical layout.
      */
 
-    if (poPlus) {
+    let currentY =
+        y + height / 2;
+
+
+    if (
+        visiblePO &&
+        visibleBox
+    ) {
+
+        currentY -= 8;
+
+    }
+
+
+    /*
+     * PO.
+     */
+
+    if (visiblePO) {
 
         const text =
-            `${label.po} — BOX NO. ${label.box}`;
+            poPlusBox
+                ? `PO NUMBER ${poNumber}`
+                : String(poNumber);
 
 
-        applyPDFFont(
-            pdf,
-            "po"
+        doc.setFont(
+            poFont.family,
+            getJSPDFFontStyle(
+                poFont
+            )
         );
 
 
-        const textWidth =
-            pdf.getTextWidth(
-                text
+        doc.setFontSize(
+            poFont.size
+        );
+
+
+        doc.setTextColor(
+            17,
+            24,
+            39
+        );
+
+
+        const lines =
+            doc.splitTextToSize(
+                text,
+                width - 10
             );
 
 
-        const boxWidth =
-            Math.min(
+        doc.text(
+            lines,
+            centerX,
+            currentY,
+            {
+                align: "center"
+            }
+        );
+
+
+        if (
+            poBorder &&
+            !combinedBorder
+        ) {
+
+            drawTextBorder(
+                doc,
+                x + 4,
+                currentY -
+                    poFont.size / 2 -
+                    2,
                 width - 8,
-                textWidth + 10
-            );
-
-
-        const boxHeight =
-            Math.max(
-                15,
-                getPDFFontSize(
-                    "po"
-                ) * 0.65
-                    + 8
-            );
-
-
-        if (combinedBorder) {
-
-            pdf.setDrawColor(
-                17,
-                24,
-                39
-            );
-
-            pdf.setLineWidth(
-                0.5
-            );
-
-            pdf.rect(
-                centerX -
-                    boxWidth / 2,
-
-                centerY -
-                    boxHeight / 2,
-
-                boxWidth,
-
-                boxHeight
+                poFont.size + 5
             );
 
         }
 
 
-        pdf.text(
+        currentY +=
+            poFont.size + 10;
+
+    }
+
+
+    /*
+     * BOX.
+     */
+
+    if (visibleBox) {
+
+        const text =
+            `BOX NO. ${boxNumber}`;
+
+
+        doc.setFont(
+            boxFont.family,
+            getJSPDFFontStyle(
+                boxFont
+            )
+        );
+
+
+        doc.setFontSize(
+            boxFont.size
+        );
+
+
+        doc.setTextColor(
+            17,
+            24,
+            39
+        );
+
+
+        doc.text(
             text,
             centerX,
-            centerY +
-                getPDFFontSize(
-                    "po"
-                ) * 0.18,
+            currentY,
             {
-                align:
-                    "center"
+                align: "center"
             }
         );
 
 
-        return;
+        if (
+            boxBorder &&
+            !combinedBorder
+        ) {
 
-    }
-
-
-    /*
-     * SEPARATE PO
-     */
-
-    let poY =
-        centerY -
-        5;
-
-
-    if (poEnabled) {
-
-        applyPDFFont(
-            pdf,
-            "po"
-        );
-
-
-        const poText =
-            String(
-                label.po
-            );
-
-
-        const poWidth =
-            pdf.getTextWidth(
-                poText
-            );
-
-
-        if (poBorder) {
-
-            pdf.setLineWidth(
-                0.45
-            );
-
-            pdf.rect(
-                centerX -
-                    poWidth / 2 -
-                    4,
-
-                poY -
-                    getPDFFontSize(
-                        "po"
-                    ) * 0.38 -
-                    3,
-
-                poWidth + 8,
-
-                getPDFFontSize(
-                    "po"
-                ) * 0.7 +
-                    7
+            drawTextBorder(
+                doc,
+                x + 4,
+                currentY -
+                    boxFont.size / 2 -
+                    2,
+                width - 8,
+                boxFont.size + 5
             );
 
         }
-
-
-        pdf.text(
-            poText,
-            centerX,
-            poY,
-            {
-                align:
-                    "center"
-            }
-        );
-
-    }
-
-
-    /*
-     * SEPARATE BOX
-     */
-
-    if (boxEnabled) {
-
-        const boxY =
-            centerY +
-            10;
-
-
-        const boxText =
-            `BOX NO. ${label.box}`;
-
-
-        applyPDFFont(
-            pdf,
-            "box"
-        );
-
-
-        const boxWidth =
-            pdf.getTextWidth(
-                boxText
-            );
-
-
-        if (boxBorder) {
-
-            pdf.setLineWidth(
-                0.45
-            );
-
-            pdf.rect(
-                centerX -
-                    boxWidth / 2 -
-                    4,
-
-                boxY -
-                    getPDFFontSize(
-                        "box"
-                    ) * 0.38 -
-                    3,
-
-                boxWidth + 8,
-
-                getPDFFontSize(
-                    "box"
-                ) * 0.7 +
-                    7
-            );
-
-        }
-
-
-        pdf.text(
-            boxText,
-            centerX,
-            boxY,
-            {
-                align:
-                    "center"
-            }
-        );
 
     }
 
@@ -3539,158 +2991,589 @@ function drawPDFLabel(
 
 
 /* =========================================================
-   PDF FONT
+   jsPDF FONT STYLE
 ========================================================= */
 
-function getPDFFontSize(
-    type
-) {
+function getJSPDFFontStyle(font) {
 
-    return type === "po"
+    if (
+        font.weight === "700" &&
+        font.style === "italic"
+    ) {
 
-        ? Math.min(
-            APP.maxFont,
-            numberValue(
-                "poFontSize",
-                24
-            )
-        )
+        return "bolditalic";
 
-        : Math.min(
-            APP.maxFont,
-            numberValue(
-                "boxFontSize",
-                20
-            )
-        );
+    }
+
+
+    if (
+        font.weight === "700"
+    ) {
+
+        return "bold";
+
+    }
+
+
+    if (
+        font.style === "italic"
+    ) {
+
+        return "italic";
+
+    }
+
+
+    return "normal";
 
 }
 
 
-function applyPDFFont(
-    pdf,
-    type
+/* =========================================================
+   TEXT BORDER
+========================================================= */
+
+function drawTextBorder(
+    doc,
+    x,
+    y,
+    width,
+    height
 ) {
 
-    const po =
-        type === "po";
+    doc.setDrawColor(
+        17,
+        24,
+        39
+    );
+
+    doc.setLineWidth(
+        0.4
+    );
+
+    doc.rect(
+        x,
+        y,
+        width,
+        height
+    );
+
+}
 
 
-    const family =
-        getValue(
-            po
-                ? "poFontFamily"
-                : "boxFontFamily",
-            "Arial"
+/* =========================================================
+   GET COCO SETTINGS
+========================================================= */
+
+function getCocoSettings() {
+
+    return {
+
+        poEnabled:
+            $("poNumberCheck")?.checked,
+
+        boxEnabled:
+            $("boxNumberCheck")?.checked,
+
+        poPlusBox:
+            $("poPlusBoxCheck")?.checked,
+
+        combinedBorder:
+            $("combinedBorderCheck")?.checked,
+
+        poBorder:
+            $("poBorderCheck")?.checked,
+
+        boxBorder:
+            $("boxBorderCheck")?.checked,
+
+        cutLine:
+            $("cutLineCheck")?.checked,
+
+        pageBorder:
+            $("pageBorderCheck")?.checked,
+
+        poFont: {
+
+            family:
+                $("poFontFamily")?.value ||
+                "Arial",
+
+            size:
+                safeNumber(
+                    $("poFontSize")?.value,
+                    24
+                ),
+
+            weight:
+                $("poBoldCheck")?.checked
+                    ? "700"
+                    : "400",
+
+            style:
+                $("poItalicCheck")?.checked
+                    ? "italic"
+                    : "normal"
+
+        },
+
+        boxFont: {
+
+            family:
+                $("boxFontFamily")?.value ||
+                "Arial",
+
+            size:
+                safeNumber(
+                    $("boxFontSize")?.value,
+                    20
+                ),
+
+            weight:
+                $("boxBoldCheck")?.checked
+                    ? "700"
+                    : "400",
+
+            style:
+                $("boxItalicCheck")?.checked
+                    ? "italic"
+                    : "normal"
+
+        }
+
+    };
+
+}
+
+
+/* =========================================================
+   GENERATE COCO PDF
+========================================================= */
+
+function generateCocoPDF() {
+
+    if (
+        typeof window.jspdf ===
+        "undefined"
+    ) {
+
+        showToast(
+            "PDF library could not be loaded.",
+            "error"
         );
+
+        return;
+
+    }
+
+
+    const {
+        jsPDF
+    } = window.jspdf;
 
 
     const size =
-        getPDFFontSize(
-            type
+        $("pageSize")?.value ||
+        "4x6";
+
+
+    const orientation =
+        $("orientation")?.value ||
+        "portrait";
+
+
+    const dimensions =
+        getPDFPageDimensions(
+            size,
+            orientation,
+            $("customWidth")?.value,
+            $("customHeight")?.value
         );
 
 
-    const bold =
-        isChecked(
-            po
-                ? "poBoldCheck"
-                : "boxBoldCheck"
+    const pdfOrientation =
+        dimensions.width >
+        dimensions.height
+            ? "landscape"
+            : "portrait";
+
+
+    const doc =
+        new jsPDF({
+
+            orientation:
+                pdfOrientation,
+
+            unit:
+                "mm",
+
+            format:
+                [
+                    dimensions.width,
+                    dimensions.height
+                ]
+
+        });
+
+
+    const settings =
+        getCocoSettings();
+
+
+    const pos =
+        getCocoPOValues();
+
+
+    const poList =
+        pos.length
+            ? pos
+            : ["PO NUMBER"];
+
+
+    const start =
+        Math.max(
+            1,
+            safeNumber(
+                $("startBoxNumber")?.value,
+                1
+            )
         );
 
 
-    const italic =
-        isChecked(
-            po
-                ? "poItalicCheck"
-                : "boxItalicCheck"
+    const end =
+        Math.max(
+            start,
+            safeNumber(
+                $("endBoxNumber")?.value,
+                start
+            )
         );
 
 
-    let pdfFont =
-        "helvetica";
+    const repeat =
+        Math.max(
+            1,
+            safeNumber(
+                $("boxRepeatCount")?.value,
+                1
+            )
+        );
 
 
-    const lower =
-        family.toLowerCase();
+    const labelsPerPage =
+        Math.max(
+            1,
+            safeNumber(
+                $("labelsPerPage")?.value,
+                2
+            )
+        );
 
 
-    if (
-        lower.includes(
-            "times"
-        ) ||
-        lower.includes(
-            "georgia"
-        ) ||
-        lower.includes(
-            "cambria"
-        ) ||
-        lower.includes(
-            "garamond"
-        ) ||
-        lower.includes(
-            "palatino"
-        )
+    const gap =
+        Math.max(
+            0,
+            safeNumber(
+                $("labelGap")?.value,
+                2
+            )
+        );
+
+
+    /*
+     * Generate label records.
+     */
+
+    const labels = [];
+
+
+    poList.forEach(po => {
+
+        for (
+            let r = 0;
+            r < repeat;
+            r++
+        ) {
+
+            for (
+                let box = start;
+                box <= end;
+                box++
+            ) {
+
+                labels.push({
+
+                    po,
+                    box
+
+                });
+
+            }
+
+        }
+
+    });
+
+
+    /*
+     * Always generate at least one.
+     */
+
+    if (!labels.length) {
+
+        labels.push({
+
+            po: "PO NUMBER",
+
+            box: start
+
+        });
+
+    }
+
+
+    let pageIndex = 0;
+
+
+    for (
+        let i = 0;
+        i < labels.length;
+        i += labelsPerPage
     ) {
 
-        pdfFont =
-            "times";
+        if (pageIndex > 0) {
+
+            doc.addPage(
+                [
+                    dimensions.width,
+                    dimensions.height
+                ],
+                pdfOrientation
+            );
+
+        }
+
+
+        pageIndex++;
+
+
+        /*
+         * Page border.
+         */
+
+        if (settings.pageBorder) {
+
+            doc.setDrawColor(
+                17,
+                24,
+                39
+            );
+
+            doc.setLineWidth(
+                0.6
+            );
+
+            doc.rect(
+                2,
+                2,
+                dimensions.width - 4,
+                dimensions.height - 4
+            );
+
+        }
+
+
+        const batch =
+            labels.slice(
+                i,
+                i + labelsPerPage
+            );
+
+
+        const availableHeight =
+            dimensions.height -
+            gap *
+                (batch.length + 1);
+
+
+        const labelHeight =
+            availableHeight /
+            batch.length;
+
+
+        batch.forEach(
+            (item, index) => {
+
+                const x =
+                    gap;
+
+                const y =
+                    gap +
+                    index *
+                    (
+                        labelHeight +
+                        gap
+                    );
+
+
+                const width =
+                    dimensions.width -
+                    gap * 2;
+
+
+                drawLabelOnPDF(
+                    doc,
+                    x,
+                    y,
+                    width,
+                    labelHeight,
+                    item.po,
+                    item.box,
+                    settings
+                );
+
+            }
+        );
 
     }
 
 
-    else if (
-        lower.includes(
-            "courier"
-        ) ||
-        lower.includes(
-            "consolas"
-        )
-    ) {
-
-        pdfFont =
-            "courier";
-
-    }
+    const filename =
+        "books-label-studio-coco-blue.pdf";
 
 
-    let style =
-        "normal";
-
-
-    if (
-        bold &&
-        italic
-    ) {
-
-        style =
-            "bolditalic";
-
-    }
-
-    else if (bold) {
-
-        style =
-            "bold";
-
-    }
-
-    else if (italic) {
-
-        style =
-            "italic";
-
-    }
-
-
-    pdf.setFont(
-        pdfFont,
-        style
+    doc.save(
+        filename
     );
 
 
-    pdf.setFontSize(
-        size
+    showToast(
+        "Coco Blue PDF generated successfully.",
+        "success"
+    );
+
+}
+
+
+/* =========================================================
+   GENERIC OTHER PO PDF
+========================================================= */
+
+function generateOtherPDF() {
+
+    if (
+        typeof window.jspdf ===
+        "undefined"
+    ) {
+
+        showToast(
+            "PDF library could not be loaded.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        jsPDF
+    } = window.jspdf;
+
+
+    const dimensions =
+        getPDFPageDimensions(
+            $("otherPageSize")?.value ||
+                "4x6",
+
+            $("otherOrientation")?.value ||
+                "portrait",
+
+            $("otherCustomWidth")?.value,
+
+            $("otherCustomHeight")?.value
+        );
+
+
+    const orientation =
+        dimensions.width >
+        dimensions.height
+            ? "landscape"
+            : "portrait";
+
+
+    const doc =
+        new jsPDF({
+
+            orientation,
+
+            unit: "mm",
+
+            format: [
+                dimensions.width,
+                dimensions.height
+            ]
+
+        });
+
+
+    const pos =
+        getOtherPOValues();
+
+
+    const list =
+        pos.length
+            ? pos
+            : ["PO NUMBER"];
+
+
+    list.forEach(
+        (po, index) => {
+
+            if (index > 0) {
+
+                doc.addPage(
+                    [
+                        dimensions.width,
+                        dimensions.height
+                    ],
+                    orientation
+                );
+
+            }
+
+
+            doc.setFont(
+                "helvetica",
+                "bold"
+            );
+
+            doc.setFontSize(
+                26
+            );
+
+
+            doc.text(
+                String(po),
+                dimensions.width / 2,
+                dimensions.height / 2,
+                {
+                    align: "center"
+                }
+            );
+
+        }
+    );
+
+
+    doc.save(
+        "books-label-studio-other-po.pdf"
+    );
+
+
+    showToast(
+        "Other PO PDF generated successfully.",
+        "success"
     );
 
 }
@@ -3702,37 +3585,13 @@ function applyPDFFont(
 
 function generateISBNPDF() {
 
-    const JsPDF =
-        getPDFClass();
-
-
-    if (!JsPDF) {
-        return;
-    }
-
-
-    const isbn =
-        getValue(
-            "isbnValue"
-        ).trim();
-
-
-    const title =
-        getValue(
-            "isbnBookTitle"
-        ).trim();
-
-
-    const edition =
-        getValue(
-            "isbnEdition"
-        ).trim();
-
-
-    if (!isbn) {
+    if (
+        typeof window.jspdf ===
+        "undefined"
+    ) {
 
         showToast(
-            "Please enter ISBN",
+            "PDF library could not be loaded.",
             "error"
         );
 
@@ -3741,136 +3600,159 @@ function generateISBNPDF() {
     }
 
 
-    const page =
-        getPageSizeFrom(
-            "isbnPageSize",
-            "isbnOrientation",
-            "isbnCustomWidth",
-            "isbnCustomHeight"
+    const {
+        jsPDF
+    } = window.jspdf;
+
+
+    const dimensions =
+        getPDFPageDimensions(
+            $("isbnPageSize")?.value ||
+                "4x6",
+
+            $("isbnOrientation")?.value ||
+                "portrait",
+
+            $("isbnCustomWidth")?.value,
+
+            $("isbnCustomHeight")?.value
         );
-
-
-    if (!page) {
-
-        showToast(
-            "Please enter valid page dimensions",
-            "error"
-        );
-
-        return;
-
-    }
 
 
     const orientation =
-        page.width >
-        page.height
+        dimensions.width >
+        dimensions.height
             ? "landscape"
             : "portrait";
 
 
-    const pdf =
-        new JsPDF({
+    const doc =
+        new jsPDF({
 
             orientation,
 
-            unit:
-                "mm",
+            unit: "mm",
 
             format: [
-                page.width,
-                page.height
+                dimensions.width,
+                dimensions.height
             ]
 
         });
 
 
-    const centerX =
-        page.width / 2;
+    const isbn =
+        $("isbnValue")?.value.trim() ||
+        "ISBN";
 
 
-    let y =
-        page.height * 0.25;
+    const title =
+        $("isbnBookTitle")?.value.trim() ||
+        "";
 
 
-    pdf.setFont(
+    const edition =
+        $("isbnEdition")?.value.trim() ||
+        "";
+
+
+    doc.setFont(
         "helvetica",
         "bold"
     );
 
 
-    pdf.setFontSize(
+    doc.setFontSize(
         18
     );
 
 
-    if (title) {
-
-        pdf.text(
-            title,
-            centerX,
-            y,
-            {
-                align:
-                    "center"
-            }
-        );
+    doc.text(
+        title ||
+            "ISBN BARCODE",
+        dimensions.width / 2,
+        20,
+        {
+            align: "center"
+        }
+    );
 
 
-        y += 10;
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
 
-    }
+
+    doc.setFontSize(
+        11
+    );
+
+
+    doc.text(
+        isbn,
+        dimensions.width / 2,
+        28,
+        {
+            align: "center"
+        }
+    );
 
 
     if (edition) {
 
-        pdf.setFont(
-            "helvetica",
-            "normal"
-        );
-
-
-        pdf.setFontSize(
-            10
-        );
-
-
-        pdf.text(
+        doc.text(
             edition,
-            centerX,
-            y,
+            dimensions.width / 2,
+            35,
             {
-                align:
-                    "center"
+                align: "center"
             }
         );
-
-
-        y += 9;
 
     }
 
 
-    drawSimpleBarcode(
-        pdf,
-        isbn,
-        centerX,
-        y,
+    /*
+     * Draw simple machine-readable
+     * barcode approximation.
+     */
+
+    const barcodeY =
+        dimensions.height / 2;
+
+
+    const barcodeWidth =
         Math.min(
-            100,
-            page.width * 0.75
-        ),
-        30
+            dimensions.width - 20,
+            100
+        );
+
+
+    const barcodeHeight =
+        30;
+
+
+    drawSimpleBarcode(
+        doc,
+        isbn,
+        (
+            dimensions.width -
+            barcodeWidth
+        ) / 2,
+        barcodeY,
+        barcodeWidth,
+        barcodeHeight
     );
 
 
-    pdf.save(
-        `ISBN_${safeFileName(isbn)}.pdf`
+    doc.save(
+        "books-label-studio-isbn.pdf"
     );
 
 
     showToast(
-        "ISBN Barcode PDF generated successfully",
+        "ISBN PDF generated successfully.",
         "success"
     );
 
@@ -3878,94 +3760,72 @@ function generateISBNPDF() {
 
 
 /* =========================================================
-   BARCODE DRAW
+   SIMPLE BARCODE DRAWING
 ========================================================= */
 
 function drawSimpleBarcode(
-    pdf,
-    text,
-    centerX,
+    doc,
+    value,
+    x,
     y,
     width,
     height
 ) {
 
-    const clean =
-        String(text)
-            .replace(
-                /\s+/g,
-                ""
-            );
+    const text =
+        String(value);
 
 
-    if (!clean) {
-        return;
-    }
+    let cursor =
+        x;
 
 
-    const bars = [];
+    const total =
+        text.length * 11;
+
+
+    const unit =
+        width / total;
 
 
     for (
         let i = 0;
-        i < clean.length;
+        i < text.length;
         i++
     ) {
 
         const code =
-            clean.charCodeAt(i);
+            text.charCodeAt(i);
 
 
-        bars.push(
-            1 + (
-                code % 3
-            ),
+        for (
+            let bit = 0;
+            bit < 8;
+            bit++
+        ) {
 
-            1 + (
-                (code >> 2) % 3
-            )
-
-        );
-
-    }
-
-
-    const total =
-        bars.reduce(
-            (sum, value) =>
-                sum + value,
-            0
-        );
+            const isBlack =
+                (
+                    code >>
+                    bit
+                ) & 1;
 
 
-    const unit =
-        width /
-        total;
+            if (isBlack) {
 
-
-    let x =
-        centerX -
-        width / 2;
-
-
-    bars.forEach(
-        (bar, index) => {
-
-            if (
-                index % 2 === 0
-            ) {
-
-                pdf.setFillColor(
+                doc.setFillColor(
                     0,
                     0,
                     0
                 );
 
-
-                pdf.rect(
-                    x,
+                doc.rect(
+                    cursor,
                     y,
-                    bar * unit,
+                    Math.max(
+                        0.25,
+                        unit
+                    ),
                     height,
                     "F"
                 );
@@ -3973,31 +3833,36 @@ function drawSimpleBarcode(
             }
 
 
-            x +=
-                bar * unit;
+            cursor +=
+                unit;
 
         }
-    );
 
 
-    pdf.setFont(
-        "helvetica",
-        "normal"
-    );
+        cursor +=
+            unit * 3;
+
+    }
 
 
-    pdf.setFontSize(
+    doc.setFontSize(
         8
     );
 
 
-    pdf.text(
+    doc.setTextColor(
+        0,
+        0,
+        0
+    );
+
+
+    doc.text(
         text,
-        centerX,
-        y + height + 6,
+        x + width / 2,
+        y + height + 5,
         {
-            align:
-                "center"
+            align: "center"
         }
     );
 
@@ -4010,65 +3875,13 @@ function drawSimpleBarcode(
 
 function generateAddressPDF() {
 
-    const JsPDF =
-        getPDFClass();
-
-
-    if (!JsPDF) {
-        return;
-    }
-
-
-    let from =
-        getValue(
-            "addressFrom"
-        ).trim();
-
-
-    let to =
-        getValue(
-            "addressTo"
-        ).trim();
-
-
-    /*
-     * Excel address mode
-     */
-
     if (
-        APP.addressMode ===
-        "excel" &&
-        APP.addressExcelRows?.length
+        typeof window.jspdf ===
+        "undefined"
     ) {
 
-        const row =
-            APP.addressExcelRows[1] ||
-            APP.addressExcelRows[0] ||
-            [];
-
-
-        from =
-            from ||
-            String(
-                row[0] ||
-                ""
-            ).trim();
-
-
-        to =
-            to ||
-            String(
-                row[1] ||
-                ""
-            ).trim();
-
-    }
-
-
-    if (!from && !to) {
-
         showToast(
-            "Please enter From or To address",
+            "PDF library could not be loaded.",
             "error"
         );
 
@@ -4077,91 +3890,239 @@ function generateAddressPDF() {
     }
 
 
-    const page =
-        getPageSizeFrom(
-            "addressPageSize",
-            "addressOrientation",
-            "addressCustomWidth",
-            "addressCustomHeight"
+    const {
+        jsPDF
+    } = window.jspdf;
+
+
+    const dimensions =
+        getPDFPageDimensions(
+            $("addressPageSize")?.value ||
+                "4x6",
+
+            $("addressOrientation")?.value ||
+                "portrait",
+
+            $("addressCustomWidth")?.value,
+
+            $("addressCustomHeight")?.value
         );
-
-
-    if (!page) {
-
-        showToast(
-            "Please enter valid page dimensions",
-            "error"
-        );
-
-        return;
-
-    }
 
 
     const orientation =
-        page.width >
-        page.height
+        dimensions.width >
+        dimensions.height
             ? "landscape"
             : "portrait";
 
 
-    const pdf =
-        new JsPDF({
+    const doc =
+        new jsPDF({
 
             orientation,
 
-            unit:
-                "mm",
+            unit: "mm",
 
             format: [
-                page.width,
-                page.height
+                dimensions.width,
+                dimensions.height
             ]
 
         });
 
 
-    const blockHeight =
-        page.height / 2;
+    let fromText =
+        $("addressFrom")?.value.trim() ||
+        "FROM ADDRESS";
 
 
-    if (from) {
+    let toText =
+        $("addressTo")?.value.trim() ||
+        "TO ADDRESS";
 
-        drawAddressBlock(
-            pdf,
-            from,
-            5,
-            5,
-            page.width - 10,
-            blockHeight - 10,
-            "from"
-        );
+
+    /*
+     * If Excel mode is selected,
+     * use first data row after header.
+     */
+
+    if (
+        AppState.addressMode ===
+        "excel" &&
+        AppState.addressExcelRows.length
+    ) {
+
+        const row =
+            AppState.addressExcelRows[0];
+
+
+        if (Array.isArray(row)) {
+
+            fromText =
+                String(
+                    row[0] ||
+                    fromText
+                );
+
+            toText =
+                String(
+                    row[1] ||
+                    toText
+                );
+
+        }
 
     }
 
 
-    if (to) {
-
-        drawAddressBlock(
-            pdf,
-            to,
-            5,
-            blockHeight + 5,
-            page.width - 10,
-            blockHeight - 10,
-            "to"
-        );
-
-    }
+    const margin =
+        8;
 
 
-    pdf.save(
-        `Address_Sticker_${timestamp()}.pdf`
+    const gap =
+        5;
+
+
+    const boxWidth =
+        (
+            dimensions.width -
+            margin * 2 -
+            gap
+        ) / 2;
+
+
+    const boxHeight =
+        dimensions.height -
+        margin * 2;
+
+
+    /*
+     * FROM
+     */
+
+    drawAddressBox(
+        doc,
+
+        fromText,
+
+        margin,
+        margin,
+
+        boxWidth,
+        boxHeight,
+
+        {
+
+            family:
+                $("fromFontFamily")?.value ||
+                "Arial",
+
+            size:
+                safeNumber(
+                    $("fromFontSize")?.value,
+                    14
+                ),
+
+            bold:
+                $("fromBold")?.checked,
+
+            italic:
+                $("fromItalic")?.checked,
+
+            underline:
+                $("fromUnderline")?.checked,
+
+            border:
+                $("fromBorder")?.checked
+
+        }
+    );
+
+
+    /*
+     * TO
+     */
+
+    drawAddressBox(
+        doc,
+
+        toText,
+
+        margin +
+            boxWidth +
+            gap,
+
+        margin,
+
+        boxWidth,
+        boxHeight,
+
+        {
+
+            family:
+                $("toFontFamily")?.value ||
+                "Arial",
+
+            size:
+                safeNumber(
+                    $("toFontSize")?.value,
+                    14
+                ),
+
+            bold:
+                $("toBold")?.checked,
+
+            italic:
+                $("toItalic")?.checked,
+
+            underline:
+                $("toUnderline")?.checked,
+
+            border:
+                $("toBorder")?.checked
+
+        }
+    );
+
+
+    /*
+     * QR codes represented as text links
+     * in the generated PDF if canvas
+     * extraction isn't available.
+     */
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+
+    doc.setFontSize(
+        6
+    );
+
+
+    doc.text(
+        "Location: https://maps.app.goo.gl/7McYApm1u9x4QSj7A",
+        margin,
+        dimensions.height - 3
+    );
+
+
+    doc.text(
+        "Email: ashish.verma@bookswagon.in",
+        dimensions.width / 2,
+        dimensions.height - 3
+    );
+
+
+    doc.save(
+        "books-label-studio-address.pdf"
     );
 
 
     showToast(
-        "Address PDF generated successfully",
+        "Address PDF generated successfully.",
         "success"
     );
 
@@ -4169,156 +4130,32 @@ function generateAddressPDF() {
 
 
 /* =========================================================
-   DRAW ADDRESS BLOCK
+   ADDRESS BOX DRAWING
 ========================================================= */
 
-function drawAddressBlock(
-    pdf,
+function drawAddressBox(
+    doc,
     text,
     x,
     y,
     width,
     height,
-    type
+    settings
 ) {
 
-    const isFrom =
-        type === "from";
+    if (settings.border) {
 
-
-    const family =
-        getValue(
-            isFrom
-                ? "fromFontFamily"
-                : "toFontFamily",
-            "Arial"
+        doc.setDrawColor(
+            17,
+            24,
+            39
         );
 
-
-    const size =
-        Math.min(
-            APP.maxFont,
-            numberValue(
-                isFrom
-                    ? "fromFontSize"
-                    : "toFontSize",
-                14
-            )
+        doc.setLineWidth(
+            0.5
         );
 
-
-    const bold =
-        isChecked(
-            isFrom
-                ? "fromBold"
-                : "toBold"
-        );
-
-
-    const italic =
-        isChecked(
-            isFrom
-                ? "fromItalic"
-                : "toItalic"
-        );
-
-
-    const underline =
-        isChecked(
-            isFrom
-                ? "fromUnderline"
-                : "toUnderline"
-        );
-
-
-    const border =
-        isChecked(
-            isFrom
-                ? "fromBorder"
-                : "toBorder"
-        );
-
-
-    let font =
-        "helvetica";
-
-
-    const lower =
-        family.toLowerCase();
-
-
-    if (
-        lower.includes("times") ||
-        lower.includes("georgia") ||
-        lower.includes("cambria") ||
-        lower.includes("garamond")
-    ) {
-
-        font =
-            "times";
-
-    }
-
-
-    else if (
-        lower.includes("courier") ||
-        lower.includes("consolas")
-    ) {
-
-        font =
-            "courier";
-
-    }
-
-
-    let style =
-        "normal";
-
-
-    if (
-        bold &&
-        italic
-    ) {
-
-        style =
-            "bolditalic";
-
-    }
-
-    else if (bold) {
-
-        style =
-            "bold";
-
-    }
-
-    else if (italic) {
-
-        style =
-            "italic";
-
-    }
-
-
-    pdf.setFont(
-        font,
-        style
-    );
-
-
-    pdf.setFontSize(
-        size
-    );
-
-
-    if (border) {
-
-        pdf.setLineWidth(
-            0.45
-        );
-
-
-        pdf.rect(
+        doc.rect(
             x,
             y,
             width,
@@ -4328,137 +4165,64 @@ function drawAddressBlock(
     }
 
 
-    const lines =
-        pdf.splitTextToSize(
-            text,
-            width - 10
-        );
-
-
-    let currentY =
-        y + 9;
-
-
-    lines.forEach(
-        line => {
-
-            if (
-                currentY >
-                y + height - 4
-            ) {
-
-                return;
-
-            }
-
-
-            pdf.text(
-                line,
-                x + 5,
-                currentY
-            );
-
-
-            if (underline) {
-
-                const lineWidth =
-                    pdf.getTextWidth(
-                        line
-                    );
-
-
-                pdf.line(
-                    x + 5,
-                    currentY + 1,
-                    x + 5 + lineWidth,
-                    currentY + 1
-                );
-
-            }
-
-
-            currentY +=
-                Math.max(
-                    5,
-                    size * 0.42
-                );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   QR CODE
-========================================================= */
-
-function generateLocationQR() {
-
-    const container =
-        $("addressQRPreview");
-
-
-    if (!container) {
-        return;
-    }
-
-
-    container.innerHTML =
-        "";
+    let style =
+        "normal";
 
 
     if (
-        typeof QRCode ===
-        "undefined"
+        settings.bold &&
+        settings.italic
     ) {
 
-        container.textContent =
-            "QR library not loaded";
+        style =
+            "bolditalic";
 
-        return;
+    } else if (
+        settings.bold
+    ) {
+
+        style =
+            "bold";
+
+    } else if (
+        settings.italic
+    ) {
+
+        style =
+            "italic";
 
     }
 
 
-    const canvas =
-        document.createElement(
-            "canvas"
-        );
-
-
-    container.appendChild(
-        canvas
+    doc.setFont(
+        settings.family,
+        style
     );
 
 
-    QRCode.toCanvas(
-        canvas,
-        APP.mapUrl,
-        {
-            width:
-                150,
+    doc.setFontSize(
+        settings.size
+    );
 
-            margin:
-                2,
 
-            errorCorrectionLevel:
-                "M"
-        },
-        error => {
+    doc.setTextColor(
+        17,
+        24,
+        39
+    );
 
-            if (error) {
 
-                console.error(
-                    error
-                );
+    const lines =
+        doc.splitTextToSize(
+            text,
+            width - 8
+        );
 
-                container.textContent =
-                    "Unable to generate QR";
 
-            }
-
-        }
+    doc.text(
+        lines,
+        x + 4,
+        y + 8
     );
 
 }
@@ -4472,162 +4236,134 @@ function resetCoco() {
 
     for (
         let i = 1;
-        i <= APP.maxPO;
+        i <= 40;
         i++
     ) {
 
-        setValue(
-            `cocoPO${i}`,
-            ""
-        );
+        const input =
+            $(`cocoPO${i}`);
+
+        if (input) {
+            input.value = "";
+        }
 
     }
 
 
-    setValue(
-        "cocoMultiplePO",
-        ""
-    );
+    if ($("cocoMultiplePO")) {
+        $("cocoMultiplePO").value = "";
+    }
 
 
-    clearFile(
-        "cocoExcelFile"
-    );
+    if ($("cocoFromAddress")) {
+        $("cocoFromAddress").value = "";
+    }
 
 
-    setText(
-        "cocoExcelFileName",
-        "No file selected"
-    );
+    if ($("cocoToAddress")) {
+        $("cocoToAddress").value = "";
+    }
 
 
-    APP.cocoExcelPOs =
-        [];
+    if ($("startBoxNumber")) {
+        $("startBoxNumber").value = "1";
+    }
 
 
-    setValue(
-        "startBoxNumber",
-        1
-    );
+    if ($("endBoxNumber")) {
+        $("endBoxNumber").value = "10";
+    }
 
 
-    setValue(
-        "endBoxNumber",
-        10
-    );
+    if ($("boxRepeatCount")) {
+        $("boxRepeatCount").value = "1";
+    }
 
 
-    setValue(
-        "boxRepeatCount",
-        1
-    );
+    if ($("labelsPerPage")) {
+        $("labelsPerPage").value = "2";
+    }
 
 
-    setValue(
-        "labelsPerPage",
-        2
-    );
+    if ($("pageSize")) {
+        $("pageSize").value = "4x6";
+    }
 
 
-    setValue(
-        "labelGap",
-        2
-    );
+    if ($("orientation")) {
+        $("orientation").value = "portrait";
+    }
 
 
-    setChecked(
-        "samePOPageFlow",
-        false
-    );
+    /*
+     * Restore feature defaults.
+     */
 
-
-    setChecked(
-        "halfPageFlowCheck",
-        true
-    );
-
-
-    setValue(
-        "pageSize",
-        "4x6"
-    );
-
-
-    setValue(
-        "orientation",
-        "portrait"
-    );
-
-
-    setValue(
-        "customWidth",
-        ""
-    );
-
-
-    setValue(
-        "customHeight",
-        ""
-    );
-
-
-    setChecked(
+    setCheckbox(
         "poNumberCheck",
         true
     );
 
-
-    setChecked(
+    setCheckbox(
         "boxNumberCheck",
         true
     );
 
-
-    setChecked(
+    setCheckbox(
         "poPlusBoxCheck",
         false
     );
 
-
-    setChecked(
+    setCheckbox(
         "combinedBorderCheck",
         false
     );
 
-
-    setChecked(
+    setCheckbox(
         "poBorderCheck",
         false
     );
 
-
-    setChecked(
+    setCheckbox(
         "boxBorderCheck",
         false
     );
 
-
-    setChecked(
+    setCheckbox(
         "cutLineCheck",
         false
     );
 
-
-    setChecked(
+    setCheckbox(
         "pageBorderCheck",
         false
     );
 
 
-    applyPOPlusLock();
+    updateLabelFeatureState(
+        false
+    );
 
-    applyCombinedBorderLock();
 
-    updateAll();
+    switchCocoMode(
+        "individual"
+    );
+
+
+    updateCustomSizeState(
+        "pageSize",
+        "customSizePanel",
+        "customWidth",
+        "customHeight",
+        "selectedPageInfo"
+    );
+
+
+    updateLivePreview();
 
 
     showToast(
-        "Coco Blue settings reset",
+        "Coco Blue settings reset.",
         "success"
     );
 
@@ -4642,68 +4378,52 @@ function resetOther() {
 
     for (
         let i = 1;
-        i <= APP.maxPO;
+        i <= 40;
         i++
     ) {
 
-        setValue(
-            `otherPO${i}`,
-            ""
-        );
+        const input =
+            $(`otherPO${i}`);
+
+        if (input) {
+            input.value = "";
+        }
 
     }
 
 
-    setValue(
-        "otherMultiplePO",
-        ""
+    if ($("otherMultiplePO")) {
+        $("otherMultiplePO").value = "";
+    }
+
+
+    if ($("otherPageSize")) {
+        $("otherPageSize").value =
+            "4x6";
+    }
+
+
+    if ($("otherOrientation")) {
+        $("otherOrientation").value =
+            "portrait";
+    }
+
+
+    switchOtherMode(
+        "individual"
     );
 
 
-    clearFile(
-        "otherExcelFile"
-    );
-
-
-    setText(
-        "otherExcelFileName",
-        "No file selected"
-    );
-
-
-    APP.otherExcelPOs =
-        [];
-
-
-    setValue(
+    updateCustomSizeState(
         "otherPageSize",
-        "4x6"
-    );
-
-
-    setValue(
-        "otherOrientation",
-        "portrait"
-    );
-
-
-    setValue(
+        "otherCustomSizePanel",
         "otherCustomWidth",
-        ""
+        "otherCustomHeight"
     );
-
-
-    setValue(
-        "otherCustomHeight",
-        ""
-    );
-
-
-    updateAll();
 
 
     showToast(
-        "Other PO settings reset",
+        "Other PO settings reset.",
         "success"
     );
 
@@ -4716,53 +4436,45 @@ function resetOther() {
 
 function resetISBN() {
 
-    setValue(
+    [
         "isbnValue",
-        ""
-    );
-
-
-    setValue(
         "isbnBookTitle",
-        ""
-    );
+        "isbnEdition"
+    ].forEach(id => {
+
+        if ($(id)) {
+            $(id).value = "";
+        }
+
+    });
 
 
-    setValue(
-        "isbnEdition",
-        ""
-    );
+    if ($("isbnPageSize")) {
+        $("isbnPageSize").value =
+            "4x6";
+    }
 
 
-    setValue(
-        "isbnPageSize",
-        "4x6"
-    );
+    if ($("isbnOrientation")) {
+        $("isbnOrientation").value =
+            "portrait";
+    }
 
 
-    setValue(
-        "isbnOrientation",
-        "portrait"
-    );
+    if ($("isbnBarcodeSvg")) {
+        $("isbnBarcodeSvg").innerHTML =
+            "";
+    }
 
 
-    setValue(
-        "isbnCustomWidth",
-        ""
-    );
-
-
-    setValue(
-        "isbnCustomHeight",
-        ""
-    );
-
-
-    updateISBNPreview();
+    if ($("isbnBarcodeText")) {
+        $("isbnBarcodeText").textContent =
+            "Enter ISBN to preview";
+    }
 
 
     showToast(
-        "ISBN settings reset",
+        "ISBN settings reset.",
         "success"
     );
 
@@ -4775,47 +4487,45 @@ function resetISBN() {
 
 function resetAddress() {
 
-    setValue(
+    [
         "addressFrom",
-        ""
+        "addressTo"
+    ].forEach(id => {
+
+        if ($(id)) {
+            $(id).value = "";
+        }
+
+    });
+
+
+    if ($("addressPageSize")) {
+        $("addressPageSize").value =
+            "4x6";
+    }
+
+
+    if ($("addressOrientation")) {
+        $("addressOrientation").value =
+            "portrait";
+    }
+
+
+    switchAddressMode(
+        "manual"
     );
 
 
-    setValue(
-        "addressTo",
-        ""
-    );
-
-
-    setValue(
+    updateCustomSizeState(
         "addressPageSize",
-        "4x6"
-    );
-
-
-    setValue(
-        "addressOrientation",
-        "portrait"
-    );
-
-
-    setValue(
+        "addressCustomSizePanel",
         "addressCustomWidth",
-        ""
+        "addressCustomHeight"
     );
-
-
-    setValue(
-        "addressCustomHeight",
-        ""
-    );
-
-
-    updateAddressPreview();
 
 
     showToast(
-        "Address settings reset",
+        "Address settings reset.",
         "success"
     );
 
@@ -4823,19 +4533,131 @@ function resetAddress() {
 
 
 /* =========================================================
-   FILE CLEAR
+   SET CHECKBOX
 ========================================================= */
 
-function clearFile(id) {
+function setCheckbox(
+    id,
+    value
+) {
 
-    const input =
+    const element =
         $(id);
 
+    if (element) {
+        element.checked =
+            Boolean(value);
+    }
 
-    if (input) {
+}
 
-        input.value =
-            "";
+
+/* =========================================================
+   BUTTON EVENTS
+========================================================= */
+
+function initActionButtons() {
+
+    const cocoReset =
+        $("cocoResetButton");
+
+    if (cocoReset) {
+
+        cocoReset.addEventListener(
+            "click",
+            resetCoco
+        );
+
+    }
+
+
+    const cocoGenerate =
+        $("cocoGenerateButton");
+
+    if (cocoGenerate) {
+
+        cocoGenerate.addEventListener(
+            "click",
+            generateCocoPDF
+        );
+
+    }
+
+
+    const otherReset =
+        $("otherResetButton");
+
+    if (otherReset) {
+
+        otherReset.addEventListener(
+            "click",
+            resetOther
+        );
+
+    }
+
+
+    const otherGenerate =
+        $("otherGenerateButton");
+
+    if (otherGenerate) {
+
+        otherGenerate.addEventListener(
+            "click",
+            generateOtherPDF
+        );
+
+    }
+
+
+    const isbnReset =
+        $("isbnResetButton");
+
+    if (isbnReset) {
+
+        isbnReset.addEventListener(
+            "click",
+            resetISBN
+        );
+
+    }
+
+
+    const isbnGenerate =
+        $("isbnGenerateButton");
+
+    if (isbnGenerate) {
+
+        isbnGenerate.addEventListener(
+            "click",
+            generateISBNPDF
+        );
+
+    }
+
+
+    const addressReset =
+        $("addressResetButton");
+
+    if (addressReset) {
+
+        addressReset.addEventListener(
+            "click",
+            resetAddress
+        );
+
+    }
+
+
+    const addressGenerate =
+        $("addressGenerateButton");
+
+    if (addressGenerate) {
+
+        addressGenerate.addEventListener(
+            "click",
+            generateAddressPDF
+        );
 
     }
 
@@ -4846,11 +4668,79 @@ function clearFile(id) {
    LANGUAGE
 ========================================================= */
 
-function bindLanguage() {
+const translations = {
+
+    en: {
+
+        title:
+            "Books Label Studio",
+
+        subtitle:
+            "Professional Label & Barcode Generator"
+
+    },
+
+    hi: {
+
+        title:
+            "बुक्स लेबल स्टूडियो",
+
+        subtitle:
+            "प्रोफेशनल लेबल और बारकोड जनरेटर"
+
+    }
+
+};
+
+
+function applyLanguage(language) {
+
+    AppState.language =
+        language;
+
+
+    const translation =
+        translations[language] ||
+        translations.en;
+
+
+    const title =
+        document.querySelector(
+            ".brand-text h1"
+        );
+
+
+    const subtitle =
+        document.querySelector(
+            ".brand-text p"
+        );
+
+
+    if (title) {
+        title.textContent =
+            translation.title;
+    }
+
+
+    if (subtitle) {
+        subtitle.textContent =
+            translation.subtitle;
+    }
+
+
+    /*
+     * Keep HTML functional.
+     * Main UI text can be expanded
+     * here without changing IDs.
+     */
+
+}
+
+
+function initLanguage() {
 
     const select =
         $("languageSelect");
-
 
     if (!select) {
         return;
@@ -4861,349 +4751,195 @@ function bindLanguage() {
         "change",
         () => {
 
-            APP.language =
-                select.value;
-
-
-            applyLanguage();
+            applyLanguage(
+                select.value
+            );
 
         }
     );
-
-}
-
-
-const translations = {
-
-    en: {
-
-        coco:
-            "Coco Blue PO Labels",
-
-        other:
-            "Other PO",
-
-        isbn:
-            "ISBN Barcode Generator",
-
-        address:
-            "Address Sticker"
-
-    },
-
-
-    hi: {
-
-        coco:
-            "कोको ब्लू पीओ लेबल",
-
-        other:
-            "अन्य पीओ",
-
-        isbn:
-            "आईएसबीएन बारकोड जनरेटर",
-
-        address:
-            "एड्रेस स्टिकर"
-
-    }
-
-};
-
-
-function applyLanguage() {
-
-    const t =
-        translations[
-            APP.language
-        ] ||
-        translations.en;
-
-
-    const sections = {
-
-        cocoBlue:
-            t.coco,
-
-        otherPO:
-            t.other,
-
-        isbnBarcode:
-            t.isbn,
-
-        addressSticker:
-            t.address
-
-    };
-
-
-    Object.entries(
-        sections
-    )
-    .forEach(
-        ([category, text]) => {
-
-            const section =
-                document.querySelector(
-                    `.tool-section[data-tool="${category}"]`
-                );
-
-
-            if (!section) {
-                return;
-            }
-
-
-            const heading =
-                section.querySelector(
-                    ".section-heading h2"
-                );
-
-
-            if (heading) {
-                heading.textContent =
-                    text;
-            }
-
-        }
-    );
-
-
-    if (
-        APP.language ===
-        "hi"
-    ) {
-
-        translateBasicHindi();
-
-    }
-
-    else {
-
-        restoreEnglish();
-
-    }
-
-}
-
-
-/*
- * Main platform labels.
- * Controls remain functional in both languages.
- */
-
-const originalText =
-    new Map();
-
-
-function rememberText(
-    element
-) {
-
-    if (
-        !originalText.has(
-            element
-        )
-    ) {
-
-        originalText.set(
-            element,
-            element.textContent
-        );
-
-    }
-
-}
-
-
-function translateBasicHindi() {
-
-    const replacements = {
-
-        "Generate PDF":
-            "PDF बनाएं",
-
-        "Reset":
-            "रीसेट",
-
-        "Individual":
-            "इंडिविजुअल",
-
-        "Multiple":
-            "मल्टीपल",
-
-        "Excel Upload":
-            "Excel अपलोड",
-
-        "Manual":
-            "मैनुअल",
-
-        "From / To Address":
-            "From / To एड्रेस",
-
-        "Page Settings":
-            "पेज सेटिंग्स",
-
-        "Orientation":
-            "ओरिएंटेशन",
-
-        "Portrait":
-            "पोर्ट्रेट",
-
-        "Landscape":
-            "लैंडस्केप",
-
-        "Custom Size":
-            "कस्टम साइज",
-
-        "Box Repeat Settings":
-            "बॉक्स रिपीट सेटिंग्स",
-
-        "Label Features":
-            "लेबल फीचर्स",
-
-        "PO Number":
-            "पीओ नंबर",
-
-        "Box Number":
-            "बॉक्स नंबर",
-
-        "PO Number + Box Number":
-            "पीओ नंबर + बॉक्स नंबर",
-
-        "Combined Border":
-            "कम्बाइंड बॉर्डर",
-
-        "PO Border":
-            "पीओ बॉर्डर",
-
-        "Box Border":
-            "बॉक्स बॉर्डर",
-
-        "Page Border":
-            "पेज बॉर्डर",
-
-        "Cut Line / Scissor Mark":
-            "कट लाइन / सिजर मार्क",
-
-        "Live Preview":
-            "लाइव प्रीव्यू",
-
-        "From Address":
-            "फ्रॉम एड्रेस",
-
-        "To Address":
-            "टू एड्रेस"
-
-    };
-
-
-    $all(
-        "button, label, h3, p, span"
-    )
-    .forEach(
-        element => {
-
-            const text =
-                element.textContent.trim();
-
-
-            if (
-                replacements[
-                    text
-                ]
-            ) {
-
-                rememberText(
-                    element
-                );
-
-
-                element.textContent =
-                    replacements[
-                        text
-                    ];
-
-            }
-
-        }
-    );
-
-}
-
-
-function restoreEnglish() {
-
-    originalText
-        .forEach(
-            (text, element) => {
-
-                element.textContent =
-                    text;
-
-            }
-        );
-
-
-    originalText.clear();
 
 }
 
 
 /* =========================================================
-   MODAL
+   GENERIC LIVE INPUT LISTENER
 ========================================================= */
 
-function bindModal() {
+function initLiveInputs() {
+
+    all(
+        "input, textarea, select"
+    ).forEach(element => {
+
+        /*
+         * Avoid duplicate behaviour
+         * on file inputs.
+         */
+
+        if (
+            element.type ===
+            "file"
+        ) {
+            return;
+        }
+
+
+        element.addEventListener(
+            "input",
+            () => {
+
+                if (
+                    element.id ===
+                    "isbnValue"
+                ) {
+
+                    generateISBNBarcode();
+
+                }
+
+
+                updateLivePreview();
+
+            }
+        );
+
+
+        element.addEventListener(
+            "change",
+            () => {
+
+                updateLivePreview();
+
+            }
+        );
+
+    });
+
+}
+
+
+/* =========================================================
+   MODAL COMPATIBILITY
+========================================================= */
+
+function initModal() {
+
+    const modal =
+        $("confirmationModal");
+
 
     const close =
         $("modalCloseButton");
-
 
     const cancel =
         $("modalCancelButton");
 
 
-    const modal =
-        $("confirmationModal");
+    const closeModal =
+        () => {
+
+            if (!modal) {
+                return;
+            }
+
+            modal.classList.remove(
+                "show"
+            );
+
+            modal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+        };
 
 
     if (close) {
-
         close.addEventListener(
             "click",
             closeModal
         );
-
     }
 
 
     if (cancel) {
-
         cancel.addEventListener(
             "click",
             closeModal
         );
+    }
+
+
+    /*
+     * Feature changes do not call this
+     * modal. Kept only for compatibility.
+     */
+
+}
+
+
+/* =========================================================
+   CHECK REQUIRED LIBRARIES
+========================================================= */
+
+function checkLibraries() {
+
+    const missing = [];
+
+
+    if (
+        typeof XLSX ===
+        "undefined"
+    ) {
+
+        missing.push(
+            "Excel"
+        );
 
     }
 
 
-    if (modal) {
+    if (
+        typeof window.jspdf ===
+        "undefined"
+    ) {
 
-        modal.addEventListener(
-            "click",
-            event => {
+        missing.push(
+            "PDF"
+        );
 
-                if (
-                    event.target ===
-                    modal
-                ) {
+    }
 
-                    closeModal();
 
-                }
+    if (
+        typeof JsBarcode ===
+        "undefined"
+    ) {
 
-            }
+        missing.push(
+            "Barcode"
+        );
+
+    }
+
+
+    if (
+        typeof QRCode ===
+        "undefined"
+    ) {
+
+        missing.push(
+            "QR"
+        );
+
+    }
+
+
+    if (missing.length) {
+
+        console.warn(
+            "Missing libraries:",
+            missing
         );
 
     }
@@ -5211,379 +4947,101 @@ function bindModal() {
 }
 
 
-function closeModal() {
-
-    const modal =
-        $("confirmationModal");
-
-
-    if (modal) {
-
-        modal.classList.remove(
-            "show"
-        );
-
-        modal.setAttribute(
-            "aria-hidden",
-            "true"
-        );
-
-    }
-
-}
-
-
-/*
- * Kept only for compatibility.
- * Feature toggles do NOT call this.
- */
-
-function openModal(
-    title,
-    message,
-    callback
-) {
-
-    const modal =
-        $("confirmationModal");
-
-
-    if (!modal) {
-        return;
-    }
-
-
-    setText(
-        "modalTitle",
-        title
-    );
-
-
-    setText(
-        "modalMessage",
-        message
-    );
-
-
-    modal.classList.add(
-        "show"
-    );
-
-
-    modal.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-
-    const confirm =
-        $("modalConfirmButton");
-
-
-    if (confirm) {
-
-        confirm.onclick =
-            () => {
-
-                if (
-                    typeof callback ===
-                    "function"
-                ) {
-
-                    callback();
-
-                }
-
-
-                closeModal();
-
-            };
-
-    }
-
-}
-
-
 /* =========================================================
-   UTILITY
+   INITIALIZATION
 ========================================================= */
 
-function safeFileName(
-    value
-) {
+function initApp() {
 
-    return String(
-        value || "file"
-    )
-    .replace(
-        /[^a-zA-Z0-9_-]/g,
-        "_"
-    );
+    try {
 
-}
+        initCategoryNavigation();
 
+        initCocoModes();
 
-function timestamp() {
+        initOtherModes();
 
-    const d =
-        new Date();
+        initAddressModes();
 
+        initPOInputs();
 
-    const pad =
-        value =>
-            String(value)
-                .padStart(
-                    2,
-                    "0"
-                );
+        initExcelUploads();
 
+        initPageSettings();
 
-    return (
+        initFeatureCheckboxes();
 
-        d.getFullYear() +
-        "-" +
-        pad(
-            d.getMonth() + 1
-        ) +
-        "-" +
-        pad(
-            d.getDate()
-        ) +
-        "_" +
-        pad(
-            d.getHours()
-        ) +
-        "-" +
-        pad(
-            d.getMinutes()
-        ) +
-        "-" +
-        pad(
-            d.getSeconds()
-        )
+        initFontControls();
 
-    );
+        initLabelsPerPage();
 
-}
+        initBoxSettings();
+
+        initISBN();
+
+        initQRCodes();
+
+        initActionButtons();
+
+        initLanguage();
+
+        initLiveInputs();
+
+        initModal();
+
+        checkLibraries();
 
 
-/* =========================================================
-   UPDATE ALL
-========================================================= */
-
-function updateAll() {
-
-    bindPageVisibility();
-
-    applyPOPlusLock();
-
-    applyCombinedBorderLock();
-
-    updatePreview();
-
-    updateISBNPreview();
-
-    updateAddressPreview();
-
-}
-
-
-/* =========================================================
-   PAGE VISIBILITY
-========================================================= */
-
-function bindPageVisibility() {
-
-    const configs = [
-
-        [
+        updateCustomSizeState(
             "pageSize",
             "customSizePanel",
             "customWidth",
-            "customHeight"
-        ],
-
-        [
-            "otherPageSize",
-            "otherCustomSizePanel",
-            "otherCustomWidth",
-            "otherCustomHeight"
-        ],
-
-        [
-            "isbnPageSize",
-            "isbnCustomSizePanel",
-            "isbnCustomWidth",
-            "isbnCustomHeight"
-        ],
-
-        [
-            "addressPageSize",
-            "addressCustomSizePanel",
-            "addressCustomWidth",
-            "addressCustomHeight"
-        ]
-
-    ];
-
-
-    configs.forEach(
-        config => {
-
-            const [
-                selectId,
-                panelId,
-                widthId,
-                heightId
-            ] = config;
-
-
-            const select =
-                $(selectId);
-
-
-            if (!select) {
-                return;
-            }
-
-
-            const custom =
-                select.value ===
-                "custom";
-
-
-            const panel =
-                $(panelId);
-
-
-            const width =
-                $(widthId);
-
-
-            const height =
-                $(heightId);
-
-
-            if (panel) {
-
-                panel.classList.toggle(
-                    "hidden",
-                    !custom
-                );
-
-            }
-
-
-            if (width) {
-                width.disabled =
-                    !custom;
-            }
-
-
-            if (height) {
-                height.disabled =
-                    !custom;
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   INITIAL DEFAULTS
-========================================================= */
-
-function initializeState() {
-
-    APP.language =
-        getValue(
-            "languageSelect",
-            "en"
+            "customHeight",
+            "selectedPageInfo"
         );
 
 
-    APP.category =
-        "cocoBlue";
+        updateLivePreview();
 
 
-    APP.cocoMode =
-        "individual";
+        console.log(
+            "Books Label Studio initialized successfully."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Application initialization error:",
+            error
+        );
 
 
-    APP.otherMode =
-        "individual";
+        showToast(
+            "Application initialization failed. Check the browser console.",
+            "error"
+        );
 
-
-    APP.addressMode =
-        "manual";
-
-
-    setChecked(
-        "poNumberCheck",
-        true
-    );
-
-
-    setChecked(
-        "boxNumberCheck",
-        true
-    );
-
-
-    setChecked(
-        "poPlusBoxCheck",
-        false
-    );
-
-
-    setChecked(
-        "combinedBorderCheck",
-        false
-    );
-
-
-    applyPOPlusLock();
-
-    applyCombinedBorderLock();
+    }
 
 }
 
 
 /* =========================================================
-   GLOBAL API
+   START
 ========================================================= */
 
-window.BooksLabelStudio = {
+if (
+    document.readyState ===
+    "loading"
+) {
 
-    getCocoPOs,
+    document.addEventListener(
+        "DOMContentLoaded",
+        initApp
+    );
 
-    getOtherPOs,
+} else {
 
-    createLabels,
+    initApp();
 
-    updatePreview,
-
-    generateCocoPDF,
-
-    generateOtherPDF,
-
-    generateISBNPDF,
-
-    generateAddressPDF,
-
-    resetCoco,
-
-    resetOther,
-
-    resetISBN,
-
-    resetAddress,
-
-    showToast,
-
-    state:
-        APP
-
-};
+}
