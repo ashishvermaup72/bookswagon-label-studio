@@ -6,9 +6,14 @@
 
 <title>BooksWagon Label Creations Studio</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Barcode -->
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
+<!-- Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
 *{
@@ -22,7 +27,7 @@ html,body{
 
 body{
     font-family:"Segoe UI",Arial,sans-serif;
-    background:#f4f7fb;
+    background:#f3f6fa;
     color:#14233b;
 }
 
@@ -33,33 +38,31 @@ textarea{
     font:inherit;
 }
 
+button{
+    cursor:pointer;
+}
 
-/* =========================
-   APP
-========================= */
+/* ================= SIDEBAR ================= */
 
 .app{
     min-height:100vh;
     display:flex;
 }
 
-
-/* =========================
-   SIDEBAR
-========================= */
-
 .sidebar{
     position:fixed;
-    inset:0 auto 0 0;
-    width:265px;
-    background:linear-gradient(180deg,#102640,#091a2d);
-    color:white;
-    z-index:20;
+    left:0;
+    top:0;
+    bottom:0;
+    width:260px;
+    background:linear-gradient(180deg,#102b4a,#081a2e);
+    color:#fff;
+    z-index:50;
 }
 
 .brand{
-    height:92px;
-    padding:20px;
+    height:90px;
+    padding:18px;
     display:flex;
     align-items:center;
     gap:12px;
@@ -67,11 +70,11 @@ textarea{
 }
 
 .brand-icon{
-    font-size:32px;
+    font-size:30px;
 }
 
 .brand-title{
-    font-size:22px;
+    font-size:21px;
     font-weight:800;
 }
 
@@ -81,33 +84,32 @@ textarea{
 
 .brand-sub{
     display:block;
-    margin-top:5px;
+    margin-top:4px;
+    color:#aebed0;
     font-size:9px;
-    color:#b9c6d5;
 }
 
 .sidebar-nav{
-    padding:20px 12px;
+    padding:18px 12px;
 }
 
 .nav-btn{
     width:100%;
-    height:50px;
+    height:48px;
     margin-bottom:7px;
     border:0;
-    border-radius:10px;
+    border-radius:9px;
     background:transparent;
-    color:#dbe5ef;
+    color:#d7e1ec;
     text-align:left;
-    padding:0 17px;
-    cursor:pointer;
+    padding:0 15px;
     transition:.2s;
 }
 
 .nav-btn:hover,
 .nav-btn.active{
-    background:#244f95;
-    color:white;
+    background:#24579a;
+    color:#fff;
 }
 
 .nav-btn span{
@@ -116,72 +118,69 @@ textarea{
 
 .powered{
     position:absolute;
-    left:20px;
-    right:20px;
-    bottom:20px;
-    padding:18px;
-    background:rgba(255,255,255,.035);
+    left:18px;
+    right:18px;
+    bottom:18px;
+    padding:16px;
     border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.035);
     border-radius:12px;
 }
 
 .powered strong{
     display:block;
-    font-size:17px;
+    font-size:16px;
 }
 
 .powered small{
-    color:#b9c6d5;
+    color:#9fb1c5;
 }
 
 .powered p{
-    color:#aebdce;
-    font-size:11px;
+    color:#aebed0;
+    font-size:10px;
     line-height:1.5;
 }
 
 .powered-line{
-    width:42px;
+    width:40px;
     height:3px;
     background:#f97316;
 }
 
-
-/* =========================
-   MAIN
-========================= */
+/* ================= MAIN ================= */
 
 .main{
-    margin-left:265px;
-    width:calc(100% - 265px);
+    margin-left:260px;
+    width:calc(100% - 260px);
     min-height:100vh;
 }
 
 .topbar{
-    height:92px;
-    background:white;
-    border-bottom:1px solid #e2e8f0;
-    padding:0 28px;
+    min-height:88px;
+    padding:16px 25px;
+    background:#fff;
+    border-bottom:1px solid #e1e7ef;
     display:flex;
-    align-items:center;
     justify-content:space-between;
+    align-items:center;
 }
 
 .topbar h1{
     margin:0;
-    font-size:25px;
+    font-size:24px;
 }
 
 .topbar p{
     margin:4px 0 0;
     color:#64748b;
-    font-size:13px;
+    font-size:12px;
 }
 
 .user{
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:10px;
 }
 
 .avatar{
@@ -191,27 +190,10 @@ textarea{
     place-items:center;
     border-radius:50%;
     background:#172b43;
-    color:white;
+    color:#fff;
 }
 
-.user-name b,
-.user-name small{
-    display:block;
-}
-
-.user-name b{
-    font-size:13px;
-}
-
-.user-name small{
-    font-size:10px;
-    color:#64748b;
-}
-
-
-/* =========================
-   CONTENT
-========================= */
+/* ================= CONTENT ================= */
 
 .content{
     padding:20px;
@@ -219,130 +201,119 @@ textarea{
     margin:auto;
 }
 
-
-/* =========================
-   HERO
-========================= */
+/* ================= HERO ================= */
 
 .hero{
-    min-height:190px;
     position:relative;
+    min-height:175px;
+    padding:28px 32px;
     overflow:hidden;
-    padding:30px 34px;
-    border:1px solid #e2e8f0;
+    border:1px solid #e0e7ef;
     border-radius:15px;
-    background:linear-gradient(105deg,#fff,#f5f9ff);
-    box-shadow:0 5px 20px rgba(15,23,42,.05);
+    background:linear-gradient(110deg,#fff,#f3f8ff);
+    box-shadow:0 6px 22px rgba(15,23,42,.05);
 }
 
 .hero-text{
-    max-width:600px;
     position:relative;
     z-index:2;
+    max-width:650px;
 }
 
 .hero h2{
     margin:5px 0 8px;
-    font-size:34px;
+    font-size:32px;
 }
 
 .hero p{
-    max-width:580px;
     color:#475569;
-    font-size:14px;
+    font-size:13px;
     line-height:1.55;
 }
 
-
-/* =========================
-   HERO GRAPHIC
-========================= */
-
 .hero-art{
     position:absolute;
-    right:35px;
+    right:30px;
     bottom:0;
-    width:430px;
-    height:160px;
+    width:360px;
+    height:150px;
+    opacity:.9;
 }
 
 .carton{
     position:absolute;
-    right:80px;
+    right:60px;
     bottom:10px;
-    width:245px;
-    height:125px;
-    background:linear-gradient(90deg,#bd8140,#d59b57,#b97939);
-    border-radius:4px;
+    width:220px;
+    height:110px;
+    background:linear-gradient(90deg,#bd8140,#d49a57,#b87839);
 }
 
 .carton-label{
     position:absolute;
-    right:80px;
-    top:25px;
-    width:75px;
-    height:70px;
-    padding:8px;
-    background:white;
-    font-size:9px;
+    top:20px;
+    right:55px;
+    width:70px;
+    height:65px;
+    padding:7px;
+    background:#fff;
+    font-size:8px;
 }
 
-.hero-art .book{
+.book{
     position:absolute;
     border-radius:4px 4px 0 0;
 }
 
 .book1{
-    right:15px;
+    right:0;
     bottom:0;
-    width:100px;
-    height:55px;
+    width:85px;
+    height:45px;
     background:#0875ad;
 }
 
 .book2{
     right:0;
-    bottom:50px;
-    width:100px;
-    height:42px;
+    bottom:43px;
+    width:90px;
+    height:38px;
     background:#ef4444;
 }
 
 .book3{
-    right:80px;
-    bottom:48px;
-    width:120px;
-    height:36px;
+    right:70px;
+    bottom:40px;
+    width:105px;
+    height:35px;
     background:#f59e0b;
 }
 
-
-/* =========================
-   CATEGORY CARDS
-========================= */
+/* ================= CATEGORY ================= */
 
 .feature-grid{
     display:grid;
     grid-template-columns:repeat(4,1fr);
-    gap:18px;
+    gap:16px;
     margin-top:18px;
 }
 
 .feature{
-    min-height:150px;
-    padding:20px;
-    position:relative;
-    overflow:hidden;
-    border:1px solid #e2e8f0;
+    min-height:145px;
+    padding:19px;
+    border:1px solid #e1e7ef;
     border-radius:13px;
     text-align:left;
-    cursor:pointer;
     transition:.25s;
 }
 
 .feature:hover{
-    transform:translateY(-4px) scale(1.01);
-    box-shadow:0 15px 35px rgba(15,23,42,.10);
+    transform:translateY(-4px) scale(1.015);
+    box-shadow:0 15px 30px rgba(15,23,42,.1);
+}
+
+.feature:active{
+    transform:scale(.98);
 }
 
 .feature.blue{
@@ -362,14 +333,14 @@ textarea{
 }
 
 .feature-icon{
-    width:52px;
-    height:52px;
+    width:48px;
+    height:48px;
     display:grid;
     place-items:center;
-    margin-bottom:13px;
+    margin-bottom:12px;
     border-radius:50%;
-    color:white;
-    font-size:22px;
+    color:#fff;
+    font-size:21px;
 }
 
 .blue .feature-icon{
@@ -377,7 +348,7 @@ textarea{
 }
 
 .green .feature-icon{
-    background:#22b35d;
+    background:#16a34a;
 }
 
 .orange .feature-icon{
@@ -390,90 +361,87 @@ textarea{
 
 .feature h3{
     margin:0;
-    font-size:16px;
+    font-size:15px;
 }
 
 .feature p{
     color:#475569;
-    font-size:11px;
+    font-size:10px;
     line-height:1.5;
 }
 
-
-/* =========================
-   WORKSPACE
-========================= */
+/* ================= WORKSPACE ================= */
 
 .workspace{
     margin-top:18px;
     overflow:hidden;
-    background:white;
-    border:1px solid #e2e8f0;
+    background:#fff;
+    border:1px solid #e1e7ef;
     border-radius:14px;
     box-shadow:0 5px 20px rgba(15,23,42,.05);
 }
 
 .workspace-header{
-    padding:20px 22px;
+    padding:19px 22px;
     display:flex;
     justify-content:space-between;
-    border-bottom:1px solid #e2e8f0;
+    border-bottom:1px solid #e1e7ef;
 }
 
 .workspace-header h2{
     margin:0;
-    font-size:20px;
+    font-size:19px;
 }
 
 .workspace-header p{
     margin:5px 0 0;
     color:#64748b;
-    font-size:11px;
+    font-size:10px;
 }
 
 .phase{
     height:max-content;
-    padding:7px 13px;
+    padding:6px 12px;
     border-radius:20px;
     background:#eaf2ff;
     color:#1769e0;
-    font-size:10px;
-    font-weight:bold;
+    font-size:9px;
+    font-weight:800;
 }
 
-
-/* =========================
-   TABS
-========================= */
+/* ================= TABS ================= */
 
 .tabs{
-    padding:15px 22px;
+    padding:13px 20px;
     display:flex;
     gap:8px;
+    overflow-x:auto;
     background:#f8fafc;
-    border-bottom:1px solid #e2e8f0;
+    border-bottom:1px solid #e1e7ef;
 }
 
 .tab{
-    padding:9px 16px;
-    border:1px solid #dce3eb;
+    padding:9px 15px;
+    border:1px solid #d8e0e9;
     border-radius:8px;
-    background:white;
-    cursor:pointer;
-    font-size:11px;
+    background:#fff;
+    font-size:10px;
     font-weight:700;
+    white-space:nowrap;
+    transition:.2s;
+}
+
+.tab:hover{
+    transform:translateY(-1px);
 }
 
 .tab.active{
     background:#1769e0;
-    color:white;
+    color:#fff;
     border-color:#1769e0;
 }
 
-
-/* =========================
-   PANELS
-========================= */
+/* ================= PANEL ================= */
 
 .panel{
     display:none;
@@ -481,34 +449,30 @@ textarea{
 
 .panel.active{
     display:block;
-    animation:panelIn .3s ease;
+    animation:panelIn .28s ease;
 }
 
 @keyframes panelIn{
     from{
         opacity:0;
-        transform:translateY(10px);
+        transform:translateY(8px);
     }
-
     to{
         opacity:1;
         transform:none;
     }
 }
 
-
-/* =========================
-   FORM LAYOUT
-========================= */
+/* ================= LAYOUT ================= */
 
 .layout{
     display:grid;
-    grid-template-columns:1.1fr .9fr;
+    grid-template-columns:1.08fr .92fr;
 }
 
 .form{
     padding:22px;
-    border-right:1px solid #e2e8f0;
+    border-right:1px solid #e1e7ef;
 }
 
 .preview{
@@ -517,8 +481,8 @@ textarea{
 }
 
 .section{
-    margin-bottom:20px;
-    padding-bottom:20px;
+    margin-bottom:19px;
+    padding-bottom:19px;
     border-bottom:1px solid #e5e9ef;
 }
 
@@ -537,10 +501,49 @@ textarea{
     font-size:10px;
 }
 
+/* ================= FORM ================= */
 
-/* =========================
-   MODE
-========================= */
+label{
+    display:block;
+    margin-bottom:9px;
+    color:#475569;
+    font-size:10px;
+    font-weight:700;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    min-height:39px;
+    padding:9px 10px;
+    border:1px solid #d8e0e9;
+    border-radius:8px;
+    outline:none;
+    background:#fff;
+    color:#172033;
+    font-size:11px;
+}
+
+textarea{
+    min-height:100px;
+    resize:vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#1769e0;
+    box-shadow:0 0 0 3px rgba(23,105,224,.09);
+}
+
+.grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+/* ================= INPUT MODE ================= */
 
 .mode-grid{
     display:grid;
@@ -549,11 +552,10 @@ textarea{
 }
 
 .mode{
-    padding:13px;
-    border:1px solid #dce3eb;
+    padding:12px;
+    border:1px solid #d8e0e9;
     border-radius:9px;
-    background:white;
-    cursor:pointer;
+    background:#fff;
     transition:.2s;
 }
 
@@ -583,66 +585,7 @@ textarea{
     font-size:8px;
 }
 
-
-/* =========================
-   INPUTS
-========================= */
-
-label{
-    display:block;
-    margin-bottom:9px;
-    color:#475569;
-    font-size:10px;
-    font-weight:700;
-}
-
-input,
-select,
-textarea{
-    width:100%;
-    min-height:39px;
-    padding:10px;
-    border:1px solid #dce3eb;
-    border-radius:8px;
-    outline:none;
-    background:white;
-    color:#172033;
-    font-size:11px;
-}
-
-textarea{
-    min-height:110px;
-    resize:vertical;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-    border-color:#1769e0;
-    box-shadow:0 0 0 3px rgba(23,105,224,.09);
-}
-
-
-/* =========================
-   GRID
-========================= */
-
-.grid2{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-}
-
-.border-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:9px;
-}
-
-
-/* =========================
-   PAGE SETTINGS
-========================= */
+/* ================= PAGE SIZE ================= */
 
 .page-size-grid{
     display:grid;
@@ -651,12 +594,10 @@ textarea:focus{
 }
 
 .page-size-btn{
-    min-height:55px;
-    padding:8px;
-    border:1px solid #dce3eb;
-    border-radius:9px;
-    background:white;
-    cursor:pointer;
+    min-height:52px;
+    border:1px solid #d8e0e9;
+    border-radius:8px;
+    background:#fff;
     font-size:10px;
     font-weight:700;
     transition:.2s;
@@ -667,9 +608,9 @@ textarea:focus{
 }
 
 .page-size-btn.active{
-    color:#1769e0;
     background:#edf5ff;
     border-color:#1769e0;
+    color:#1769e0;
 }
 
 .custom-page-fields{
@@ -683,50 +624,30 @@ textarea:focus{
     display:none;
 }
 
-
-/* =========================
-   LABELS PER PAGE
-========================= */
+/* ================= LABEL COUNT ================= */
 
 .label-count-grid{
     display:grid;
     grid-template-columns:repeat(6,1fr);
-    gap:7px;
+    gap:6px;
 }
 
 .label-count-btn{
-    min-height:38px;
-    border:1px solid #dce3eb;
+    min-height:37px;
+    border:1px solid #d8e0e9;
     border-radius:7px;
-    background:white;
-    cursor:pointer;
+    background:#fff;
     font-size:10px;
     font-weight:700;
-    transition:.2s;
-}
-
-.label-count-btn:hover{
-    transform:translateY(-1px);
 }
 
 .label-count-btn.active{
-    color:white;
     background:#1769e0;
     border-color:#1769e0;
+    color:#fff;
 }
 
-.custom-label-count{
-    margin-top:10px;
-}
-
-.custom-label-count.hidden{
-    display:none;
-}
-
-
-/* =========================
-   BARCODE PO
-========================= */
+/* ================= BARCODE ================= */
 
 .barcode-toggle{
     display:flex;
@@ -736,31 +657,26 @@ textarea:focus{
 .toggle-btn{
     flex:1;
     min-height:40px;
-    border:1px solid #dce3eb;
+    border:1px solid #d8e0e9;
     border-radius:8px;
-    background:white;
-    cursor:pointer;
+    background:#fff;
     font-size:10px;
     font-weight:700;
-    transition:.2s;
 }
 
 .toggle-btn.active.on{
     background:#16a34a;
-    color:white;
+    color:#fff;
     border-color:#16a34a;
 }
 
 .toggle-btn.active.off{
     background:#dc2626;
-    color:white;
+    color:#fff;
     border-color:#dc2626;
 }
 
-
-/* =========================
-   FONT SETTINGS
-========================= */
+/* ================= FONT ================= */
 
 .font-grid{
     display:grid;
@@ -777,40 +693,104 @@ textarea:focus{
 .font-style-btn{
     flex:1;
     min-height:35px;
-    border:1px solid #dce3eb;
+    border:1px solid #d8e0e9;
     border-radius:7px;
-    background:white;
-    cursor:pointer;
+    background:#fff;
     font-size:10px;
 }
 
 .font-style-btn.active{
     background:#172b43;
-    color:white;
+    color:#fff;
     border-color:#172b43;
 }
 
-.style-bold{
-    font-weight:800;
+/* ================= BORDER ================= */
+
+.border-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
 }
 
-.style-italic{
-    font-style:italic;
+.border-preview{
+    margin-top:10px;
+    min-height:50px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff;
+    border-radius:8px;
 }
 
-.style-underline{
-    text-decoration:underline;
+/* ================= PAGE BORDER ================= */
+
+.page-border-preview{
+    padding:12px;
+    background:#fff;
+    border-radius:8px;
 }
 
+.page-border-preview.none{
+    border:0;
+}
 
-/* =========================
-   PREVIEW
-========================= */
+.page-border-preview.solid{
+    border:2px solid #172033;
+}
+
+.page-border-preview.dashed{
+    border:2px dashed #172033;
+}
+
+.page-border-preview.dotted{
+    border:2px dotted #172033;
+}
+
+.page-border-preview.double{
+    border:4px double #172033;
+}
+
+.page-border-preview.groove{
+    border:4px groove #172033;
+}
+
+.page-border-preview.ridge{
+    border:4px ridge #172033;
+}
+
+.page-border-preview.inset{
+    border:4px inset #172033;
+}
+
+.page-border-preview.outset{
+    border:4px outset #172033;
+}
+
+/* ================= ADDRESS ================= */
+
+.address-required{
+    margin-top:8px;
+    padding:10px;
+    border-radius:8px;
+    background:#fff7ed;
+    border:1px solid #fed7aa;
+    color:#c2410c;
+    font-size:9px;
+    font-weight:700;
+}
+
+.required-star{
+    color:#dc2626;
+}
+
+/* ================= PREVIEW ================= */
 
 .preview-head{
     display:flex;
     justify-content:space-between;
-    margin-bottom:13px;
+    align-items:flex-start;
+    margin-bottom:12px;
 }
 
 .preview-head h3{
@@ -829,30 +809,31 @@ textarea:focus{
     background:#eaf8ef;
     color:#16a34a;
     font-size:8px;
-    font-weight:bold;
+    font-weight:800;
 }
 
 .preview-canvas{
-    min-height:520px;
-    padding:25px;
+    min-height:530px;
+    padding:24px;
     display:flex;
-    justify-content:center;
     align-items:center;
+    justify-content:center;
     overflow:auto;
-    background:#e9eef4;
-    border:1px solid #dde4ec;
+    background:#e7edf4;
+    border:1px solid #dbe3eb;
     border-radius:10px;
 }
 
 .label-page{
     width:380px;
     min-height:480px;
-    padding:14px;
+    padding:13px;
     display:grid;
     grid-template-columns:repeat(2,1fr);
     gap:8px;
-    background:white;
-    box-shadow:0 15px 35px rgba(15,23,42,.18);
+    background:#fff;
+    box-shadow:0 15px 35px rgba(15,23,42,.17);
+    transition:.25s;
 }
 
 .preview-label{
@@ -863,7 +844,7 @@ textarea:focus{
     justify-content:center;
     flex-direction:column;
     text-align:center;
-    background:white;
+    background:#fff;
     border:1px solid #cbd5e1;
     overflow:hidden;
 }
@@ -881,20 +862,20 @@ textarea:focus{
 }
 
 .preview-barcode{
-    max-width:90%;
+    display:block;
+    max-width:95%;
+    width:150px;
+    height:auto;
     margin-top:8px;
 }
 
-
-/* =========================
-   INFO
-========================= */
+/* ================= INFO ================= */
 
 .info{
     margin-top:8px;
     padding:9px;
     background:#f8fafc;
-    border:1px solid #e2e8f0;
+    border:1px solid #e1e7ef;
     border-radius:8px;
     color:#64748b;
     font-size:9px;
@@ -902,39 +883,46 @@ textarea:focus{
 
 .warning{
     margin-top:8px;
-    padding:9px;
-    border:1px solid #fecaca;
+    padding:10px;
     border-radius:8px;
     background:#fff1f2;
+    border:1px solid #fecaca;
     color:#dc2626;
     font-size:9px;
     font-weight:700;
 }
 
-.hidden{
-    display:none!important;
+.success{
+    margin-top:8px;
+    padding:10px;
+    border-radius:8px;
+    background:#f0fdf4;
+    border:1px solid #bbf7d0;
+    color:#15803d;
+    font-size:9px;
+    font-weight:700;
 }
 
+.hidden{
+    display:none !important;
+}
 
-/* =========================
-   ACTIONS
-========================= */
+/* ================= ACTIONS ================= */
 
 .actions{
     display:flex;
     justify-content:flex-end;
     gap:8px;
     padding:15px 22px;
-    border-top:1px solid #e2e8f0;
+    border-top:1px solid #e1e7ef;
 }
 
 .actions button{
     min-height:40px;
     padding:0 17px;
-    border:1px solid #dce3eb;
+    border:1px solid #d8e0e9;
     border-radius:8px;
-    background:white;
-    cursor:pointer;
+    background:#fff;
     font-size:10px;
     font-weight:700;
     transition:.2s;
@@ -945,26 +933,48 @@ textarea:focus{
     box-shadow:0 7px 16px rgba(15,23,42,.08);
 }
 
-.actions button:active{
-    transform:scale(.97);
-}
-
 .actions .dark{
     background:#172b43;
-    color:white;
+    color:#fff;
     border-color:#172b43;
 }
 
 .actions .primary{
     background:#1769e0;
-    color:white;
+    color:#fff;
     border-color:#1769e0;
 }
 
+/* ================= TOAST ================= */
 
-/* =========================
-   FOOTER
-========================= */
+.toast{
+    position:fixed;
+    top:105px;
+    right:25px;
+    min-width:260px;
+    max-width:400px;
+    padding:15px 18px;
+    background:#fff;
+    border-left:5px solid #16a34a;
+    border-radius:10px;
+    box-shadow:0 15px 35px rgba(15,23,42,.16);
+    opacity:0;
+    transform:translateX(30px);
+    pointer-events:none;
+    transition:.3s;
+    z-index:200;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateX(0);
+}
+
+.toast.bad{
+    border-left-color:#dc2626;
+}
+
+/* ================= FOOTER ================= */
 
 footer{
     padding:22px;
@@ -977,41 +987,7 @@ footer b{
     color:#172033;
 }
 
-
-/* =========================
-   TOAST
-========================= */
-
-.toast{
-    position:fixed;
-    top:105px;
-    right:25px;
-    max-width:380px;
-    padding:15px 18px;
-    background:white;
-    border-left:5px solid #16a34a;
-    border-radius:10px;
-    box-shadow:0 15px 35px rgba(15,23,42,.15);
-    opacity:0;
-    transform:translateX(30px);
-    pointer-events:none;
-    transition:.3s;
-    z-index:100;
-}
-
-.toast.show{
-    opacity:1;
-    transform:translateX(0);
-}
-
-.toast.bad{
-    border-left-color:#dc2626;
-}
-
-
-/* =========================
-   RESPONSIVE
-========================= */
+/* ================= RESPONSIVE ================= */
 
 @media(max-width:1150px){
 
@@ -1025,40 +1001,44 @@ footer b{
 
     .form{
         border-right:0;
-        border-bottom:1px solid #e2e8f0;
+        border-bottom:1px solid #e1e7ef;
     }
-
-    .page-size-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-
 }
 
-@media(max-width:800px){
+@media(max-width:850px){
 
     .sidebar{
-        width:70px;
+        width:72px;
     }
 
     .brand-title,
     .brand-sub,
-    .nav-btn span,
-    .powered{
+    .powered,
+    .nav-btn span{
         display:none;
     }
 
+    .brand{
+        justify-content:center;
+        padding:10px;
+    }
+
+    .nav-btn{
+        text-align:center;
+        padding:0;
+    }
+
     .main{
-        margin-left:70px;
-        width:calc(100% - 70px);
+        margin-left:72px;
+        width:calc(100% - 72px);
     }
 
     .hero-art{
         opacity:.15;
     }
-
 }
 
-@media(max-width:600px){
+@media(max-width:650px){
 
     .content{
         padding:10px;
@@ -1068,29 +1048,34 @@ footer b{
         grid-template-columns:1fr;
     }
 
-    .mode-grid,
     .grid2,
-    .border-grid,
     .font-grid,
-    .page-size-grid{
+    .border-grid{
         grid-template-columns:1fr;
+    }
+
+    .mode-grid{
+        grid-template-columns:1fr;
+    }
+
+    .page-size-grid{
+        grid-template-columns:repeat(2,1fr);
     }
 
     .label-count-grid{
         grid-template-columns:repeat(3,1fr);
     }
 
+    .barcode-toggle{
+        flex-direction:column;
+    }
+
     .hero{
-        padding:22px;
+        padding:20px;
     }
 
     .hero h2{
-        font-size:27px;
-    }
-
-    .label-page{
-        width:290px;
-        min-height:380px;
+        font-size:25px;
     }
 
     .actions{
@@ -1098,11 +1083,92 @@ footer b{
     }
 
     .actions button{
-        flex:1;
+        flex:1 1 140px;
     }
 
+    .toast{
+        left:12px;
+        right:12px;
+        top:90px;
+    }
+}
+
+/* ================= PRINT ================= */
+
+@media print{
+
+    .sidebar,
+    .topbar,
+    .hero,
+    .feature-grid,
+    .workspace-header,
+    .tabs,
+    .form,
+    .actions,
+    footer,
+    .toast{
+        display:none !important;
+    }
+
+    .main{
+        margin:0;
+        width:100%;
+    }
+
+    .content{
+        padding:0;
+    }
+
+    .workspace{
+        margin:0;
+        border:0;
+        box-shadow:none;
+    }
+
+    .panel{
+        display:none !important;
+    }
+
+    .panel.active{
+        display:block !important;
+    }
+
+    .layout{
+        display:block;
+    }
+
+    .preview{
+        padding:0;
+        background:#fff;
+    }
+
+    .preview-head,
+    .info{
+        display:none;
+    }
+
+    .preview-canvas{
+        padding:0;
+        min-height:0;
+        background:#fff;
+        border:0;
+        overflow:visible;
+    }
+
+    .label-page{
+        width:100%;
+        min-height:0;
+        box-shadow:none;
+    }
+
+    .preview-label{
+        page-break-inside:avoid;
+        break-inside:avoid;
+    }
 }
 </style>
+
+
 </head>
 
 <body>
@@ -1117,7 +1183,7 @@ footer b{
 
     <div class="brand">
 
-        <div class="brand-icon">🛒</div>
+        <div class="brand-icon">📚</div>
 
         <div>
 
@@ -1125,9 +1191,9 @@ footer b{
                 Books<span>Wagon</span>
             </div>
 
-            <div class="brand-sub">
-                Books | Distribution | Fulfillment
-            </div>
+            <span class="brand-sub">
+                LABEL CREATIONS STUDIO
+            </span>
 
         </div>
 
@@ -1153,10 +1219,6 @@ footer b{
         </button>
 
         <button class="nav-btn">
-            ◴ <span>History</span>
-        </button>
-
-        <button class="nav-btn">
             ⚙ <span>Settings</span>
         </button>
 
@@ -1164,8 +1226,6 @@ footer b{
 
 
     <div class="powered">
-
-        <div style="font-size:30px">📚</div>
 
         <small>Powered by</small>
 
@@ -1209,19 +1269,11 @@ footer b{
         🔔
 
         <div class="avatar">
-            ♙
+            A
         </div>
 
-        <div class="user-name">
-
-            <b>
-                Admin
-            </b>
-
-            <small>
-                Label Studio
-            </small>
-
+        <div>
+            <b>Admin</b>
         </div>
 
     </div>
@@ -1230,7 +1282,6 @@ footer b{
 
 
 <div class="content">
-
 
 <!-- =====================================================
      HERO
@@ -1249,9 +1300,8 @@ footer b{
         </h2>
 
         <p>
-            Professional PO, Box, Barcode and Address label
-            creation workspace. Create, preview and print
-            labels quickly and accurately.
+            Professional PO, Box, Barcode and Address
+            label creation workspace.
         </p>
 
     </div>
@@ -1262,20 +1312,16 @@ footer b{
         <div class="carton">
 
             <div class="carton-label">
-
                 ▬▬▬<br>
                 ▬▬▬<br>
                 ▬▬▬<br>
                 ▬▬▬
-
             </div>
 
         </div>
 
         <div class="book book1"></div>
-
         <div class="book book2"></div>
-
         <div class="book book3"></div>
 
     </div>
@@ -1289,24 +1335,17 @@ footer b{
 
 <section class="feature-grid">
 
-
 <button
     class="feature blue"
     data-tool="coco"
 >
+    <div class="feature-icon">◈</div>
 
-    <div class="feature-icon">
-        ◈
-    </div>
-
-    <h3>
-        CocoBlu PO
-    </h3>
+    <h3>CocoBlu PO</h3>
 
     <p>
-        Create CocoBlu PO and Box labels.
+        PO and Box label creation.
     </p>
-
 </button>
 
 
@@ -1314,19 +1353,13 @@ footer b{
     class="feature green"
     data-tool="other"
 >
+    <div class="feature-icon">▤</div>
 
-    <div class="feature-icon">
-        ▤
-    </div>
-
-    <h3>
-        Others PO
-    </h3>
+    <h3>Others PO</h3>
 
     <p>
-        Create labels for other PO operations.
+        Other PO label creation.
     </p>
-
 </button>
 
 
@@ -1334,19 +1367,13 @@ footer b{
     class="feature orange"
     data-tool="isbn"
 >
+    <div class="feature-icon">▥</div>
 
-    <div class="feature-icon">
-        ▥
-    </div>
-
-    <h3>
-        ISBN Barcode Maker
-    </h3>
+    <h3>ISBN Barcode Maker</h3>
 
     <p>
-        Generate ISBN barcode labels.
+        ISBN barcode label generation.
     </p>
-
 </button>
 
 
@@ -1354,21 +1381,14 @@ footer b{
     class="feature purple"
     data-tool="address"
 >
+    <div class="feature-icon">▣</div>
 
-    <div class="feature-icon">
-        ▣
-    </div>
-
-    <h3>
-        Address Label Maker
-    </h3>
+    <h3>Address Label Maker</h3>
 
     <p>
-        Create professional address labels.
+        From and To address labels.
     </p>
-
 </button>
-
 
 </section>
 
@@ -1379,7 +1399,6 @@ footer b{
 
 <section class="workspace">
 
-
 <div class="workspace-header">
 
     <div>
@@ -1389,22 +1408,17 @@ footer b{
         </h2>
 
         <p id="workspaceDescription">
-            Create PO and Box labels using Manual,
-            Bulk or Excel / CSV.
+            Create professional PO and Box labels.
         </p>
 
     </div>
 
     <div class="phase">
-        PHASE 1
+        LIVE
     </div>
 
 </div>
 
-
-<!-- =====================================================
-     TABS
-===================================================== -->
 
 <div class="tabs">
 
@@ -1440,7 +1454,7 @@ footer b{
 
 
 <!-- =====================================================
-     COCOBLU PANEL
+     COCOBLU
 ===================================================== -->
 
 <div
@@ -1450,878 +1464,130 @@ footer b{
 
 <div class="layout">
 
-
 <div class="form">
-
-
-<!-- INPUT METHOD -->
 
 <section class="section">
 
-    <h3>
-        PO Input Method
-    </h3>
+<h3>PO Input Method</h3>
 
-    <p>
-        Choose Manual, Bulk or Excel / CSV.
-    </p>
+<p>
+Choose how PO numbers will be entered.
+</p>
 
+<div class="mode-grid">
 
-    <div class="mode-grid">
+<button
+    class="mode active"
+    data-mode="manual"
+>
+    ✎
+    <b>Manual</b>
+    <small>Enter PO</small>
+</button>
 
-        <button
-            class="mode active"
-            data-mode="manual"
-        >
-            ✎
-            <b>Manual</b>
-            <small>
-                Enter PO numbers
-            </small>
-        </button>
+<button
+    class="mode"
+    data-mode="bulk"
+>
+    ≡
+    <b>Bulk</b>
+    <small>Unlimited comma/new line</small>
+</button>
 
+<button
+    class="mode"
+    data-mode="excel"
+>
+    ▦
+    <b>Excel / CSV</b>
+    <small>Column A • A1 Header</small>
+</button>
 
-        <button
-            class="mode"
-            data-mode="bulk"
-        >
-            ≡
-            <b>Bulk</b>
-            <small>
-                Unlimited text
-            </small>
-        </button>
-
-
-        <button
-            class="mode"
-            data-mode="excel"
-        >
-            ▦
-            <b>Excel / CSV</b>
-            <small>
-                Column A • A1 Header
-            </small>
-        </button>
-
-    </div>
+</div>
 
 </section>
 
-
-<!-- MANUAL -->
 
 <section
     class="section"
     id="manualArea"
 >
 
-    <h3>
-        Manual PO Entry
-    </h3>
+<h3>Manual PO</h3>
 
-    <p>
-        Enter PO number.
-    </p>
-
-    <input
-        id="manualPO"
-        placeholder="Example: BW_DOMESTIC_123"
-    >
+<input
+    id="manualPO"
+    placeholder="Example: BW12345"
+>
 
 </section>
 
-
-<!-- BULK -->
 
 <section
     class="section hidden"
     id="bulkArea"
 >
 
-    <h3>
-        Bulk PO Entry
-    </h3>
+<h3>Bulk PO</h3>
 
-    <p>
-        Unlimited PO numbers separated by comma
-        or new line.
-    </p>
+<textarea
+    id="bulkPO"
+    placeholder="PO001, PO002, PO003..."
+></textarea>
 
-    <textarea
-        id="bulkPO"
-        placeholder="PO001, PO002, PO003..."
-    ></textarea>
-
-    <div
-        class="info"
-        id="bulkCount"
-    >
-        0 PO numbers detected.
-    </div>
+<div
+    class="info"
+    id="bulkCount"
+>
+0 PO numbers detected.
+</div>
 
 </section>
 
-
-<!-- EXCEL -->
 
 <section
     class="section hidden"
     id="excelArea"
 >
 
-    <h3>
-        Excel / CSV Upload
-    </h3>
-
-    <p>
-        First column is used. A1 is treated as header.
-    </p>
-
-    <input
-        id="excelFile"
-        type="file"
-        accept=".xlsx,.xls,.csv"
-    >
-
-    <div
-        class="info"
-        id="excelCount"
-    >
-        No file selected.
-    </div>
-
-</section>
-
-
-<!-- PO -->
-
-<section class="section">
-
-    <h3>
-        PO Number
-    </h3>
-
-    <p>
-        Optional prefix and PO number.
-    </p>
-
-    <div class="grid2">
-
-        <label>
-            PO Prefix
-
-            <input
-                id="poPrefix"
-                placeholder="PO"
-            >
-
-        </label>
-
-
-        <label>
-            PO Number
-
-            <input
-                id="poNumber"
-                placeholder="12345"
-            >
-
-        </label>
-
-    </div>
-
-</section>
-
-
-<!-- BOX RANGE -->
-
-<section class="section">
-
-    <h3>
-        Box Number Range
-    </h3>
-
-    <p>
-        Start and End Box numbers are completely free.
-    </p>
-
-
-    <div class="grid2">
-
-        <label>
-            Start Box No.
-
-            <input
-                id="startBox"
-                type="number"
-                placeholder="121"
-            >
-
-        </label>
-
-
-        <label>
-            End Box No.
-
-            <input
-                id="endBox"
-                type="number"
-                placeholder="250"
-            >
-
-        </label>
-
-    </div>
-
-
-    <div
-        id="rangeWarning"
-        class="warning hidden"
-    >
-        Start Box Number cannot be greater than
-        End Box Number.
-    </div>
-
-</section>
-
-
-<!-- BOX PREFIX -->
-
-<section class="section">
-
-    <h3>
-        Box Prefix
-    </h3>
-
-    <label>
-
-        Box Prefix
-
-        <input
-            id="boxPrefix"
-            placeholder="BOX"
-        >
-
-    </label>
-
-</section>
-
-
-<!-- LABEL CONTENT -->
-
-<section class="section">
-
-    <h3>
-        Label Content
-    </h3>
-
-    <p>
-        Select what should be printed.
-    </p>
-
-
-    <select id="contentType">
-
-        <option value="po">
-            PO Number Only
-        </option>
-
-        <option value="box">
-            Box Number Only
-        </option>
-
-        <option value="both">
-            Combined PO + Box
-        </option>
-
-    </select>
-
-</section>
-
-
-<!-- PAGE SIZE -->
-
-<section class="section">
-
-    <h3>
-        Page Size
-    </h3>
-
-    <p>
-        Select the printing page size.
-    </p>
-
-
-    <div class="page-size-grid">
-
-        <button
-            class="page-size-btn active"
-            data-size="a4"
-        >
-            A4
-        </button>
-
-
-        <button
-            class="page-size-btn"
-            data-size="70x35"
-        >
-            70 × 35 mm
-        </button>
-
-
-        <button
-            class="page-size-btn"
-            data-size="4x6"
-        >
-            4 × 6 inch
-        </button>
-
-
-        <button
-            class="page-size-btn"
-            data-size="custom"
-        >
-            Custom
-        </button>
-
-    </div>
-
-
-    <div
-        id="customPageFields"
-        class="custom-page-fields hidden"
-    >
-
-        <label>
-            Custom Width
-
-            <input
-                id="customWidth"
-                type="number"
-                min="1"
-                step="0.1"
-                placeholder="100"
-            >
-
-        </label>
-
-
-        <label>
-            Custom Height
-
-            <input
-                id="customHeight"
-                type="number"
-                min="1"
-                step="0.1"
-                placeholder="150"
-            >
-
-        </label>
-
-    </div>
-
-</section>
-
-
-<!-- LABEL PER PAGE -->
-
-<section class="section">
-
-    <h3>
-        Labels Per Page
-    </h3>
-
-    <p>
-        Choose how many labels should appear on one page.
-    </p>
-
-
-    <div class="label-count-grid">
-
-        <button
-            class="label-count-btn active"
-            data-count="1"
-        >
-            1
-        </button>
-
-        <button
-            class="label-count-btn"
-            data-count="2"
-        >
-            2
-        </button>
-
-        <button
-            class="label-count-btn"
-            data-count="4"
-        >
-            4
-        </button>
-
-        <button
-            class="label-count-btn"
-            data-count="6"
-        >
-            6
-        </button>
-
-        <button
-            class="label-count-btn"
-            data-count="8"
-        >
-            8
-        </button>
-
-        <button
-            class="label-count-btn"
-            data-count="10"
-        >
-            10
-        </button>
-
-        <button
-            class="label-count-btn"
-            data-count="12"
-        >
-            12
-        </button>
-
-        <button
-            class="label-count-btn"
-            data-count="15"
-        >
-            15
-        </button>
-
-        <button
-            class="label-count-btn"
-            data-count="16"
-        >
-            16
-        </button>
-
-        <button
-            class="label-count-btn"
-            data-count="20"
-        >
-            20
-        </button>
-
-        <button
-            class="label-count-btn"
-            data-count="custom"
-        >
-            Custom
-        </button>
-
-    </div>
-
-
-    <div
-        id="customLabelCountArea"
-        class="custom-label-count hidden"
-    >
-
-        <label>
-
-            Custom Labels Per Page
-
-            <input
-                id="customLabelCount"
-                type="number"
-                min="1"
-                placeholder="Enter number"
-            >
-
-        </label>
-
-    </div>
-
-</section>
-
-
-<!-- BARCODE PO -->
-
-<section class="section">
-
-    <h3>
-        Barcode PO
-    </h3>
-
-    <p>
-        Generate a barcode from the PO number.
-    </p>
-
-
-    <div class="barcode-toggle">
-
-        <button
-            class="toggle-btn active on"
-            data-barcode="on"
-        >
-            ✓ Barcode PO ON
-        </button>
-
-
-        <button
-            class="toggle-btn"
-            data-barcode="off"
-        >
-            Barcode PO OFF
-        </button>
-
-    </div>
-
-</section>
-
-
-<!-- FONT -->
-
-<section class="section">
-
-    <h3>
-        Font Setting
-    </h3>
-
-    <p>
-        Font family, size and style.
-    </p>
-
-
-    <div class="font-grid">
-
-        <label>
-
-            Font Family
-
-            <select id="fontFamily">
-
-                <option value="Arial">
-                    Arial
-                </option>
-
-                <option value="Verdana">
-                    Verdana
-                </option>
-
-                <option value="Tahoma">
-                    Tahoma
-                </option>
-
-                <option value="Georgia">
-                    Georgia
-                </option>
-
-                <option value="Times New Roman">
-                    Times New Roman
-                </option>
-
-                <option value="Trebuchet MS">
-                    Trebuchet MS
-                </option>
-
-                <option value="Courier New">
-                    Courier New
-                </option>
-
-                <option value="Impact">
-                    Impact
-                </option>
-
-            </select>
-
-        </label>
-
-
-        <label>
-
-            Font Size
-
-            <select id="fontSize">
-
-                <option value="10">
-                    10 px
-                </option>
-
-                <option value="12">
-                    12 px
-                </option>
-
-                <option value="14">
-                    14 px
-                </option>
-
-                <option value="16">
-                    16 px
-                </option>
-
-                <option value="18" selected>
-                    18 px
-                </option>
-
-                <option value="20">
-                    20 px
-                </option>
-
-                <option value="24">
-                    24 px
-                </option>
-
-                <option value="28">
-                    28 px
-                </option>
-
-                <option value="32">
-                    32 px
-                </option>
-
-                <option value="36">
-                    36 px
-                </option>
-
-            </select>
-
-        </label>
-
-    </div>
-
-
-    <div class="font-style-buttons">
-
-        <button
-            class="font-style-btn active"
-            data-style="normal"
-        >
-            Normal
-        </button>
-
-        <button
-            class="font-style-btn"
-            data-style="bold"
-        >
-            <b>Bold</b>
-        </button>
-
-        <button
-            class="font-style-btn"
-            data-style="italic"
-        >
-            <i>Italic</i>
-        </button>
-
-        <button
-            class="font-style-btn"
-            data-style="underline"
-        >
-            <u>Underline</u>
-        </button>
-
-    </div>
-
-</section>
-
-
-<!-- BORDER -->
-
-<section class="section">
-
-    <h3>
-        Border Setting
-    </h3>
-
-    <p>
-        Choose PO Border, Box Border or Both Border.
-    </p>
-
-
-    <div class="border-grid">
-
-        <label>
-
-            PO Border
-
-            <select id="poBorder"></select>
-
-        </label>
-
-
-        <label>
-
-            Box Border
-
-            <select id="boxBorder"></select>
-
-        </label>
-
-
-        <label>
-
-            Both Border
-
-            <select id="bothBorder"></select>
-
-        </label>
-
-    </div>
-
-</section>
-
-
-</div>
-
-
-<!-- =====================================================
-     PREVIEW
-===================================================== -->
-
-<div class="preview">
-
-<div class="preview-head">
-
-    <div>
-
-        <h3>
-            Live Label Preview
-        </h3>
-
-        <small>
-            All selected settings update live.
-        </small>
-
-    </div>
-
-    <div class="live">
-        ● LIVE
-    </div>
-
-</div>
-
-
-<div class="preview-canvas">
-
-    <div
-        id="labelPage"
-        class="label-page"
-    ></div>
-
-</div>
-
+<h3>Excel / CSV</h3>
+
+<input
+    id="excelFile"
+    type="file"
+    accept=".xlsx,.xls,.csv"
+>
 
 <div
     class="info"
-    id="previewStatus"
+    id="excelCount"
 >
-    Ready. Enter PO and Box range.
+Column A will be used. A1 is treated as header.
 </div>
 
-</div>
-
-</div>
-
-
-<div class="actions">
-
-<button id="clearCoco">
-    Clear
-</button>
-
-<button
-    id="printCoco"
-    class="dark"
->
-    🖨 Print PDF
-</button>
-
-<button
-    id="generateCoco"
-    class="primary"
->
-    ⬇ Generate PDF
-</button>
-
-</div>
-
-</div>
-
-
-<!-- =====================================================
-     OTHER PO
-===================================================== -->
-
-<div
-    class="panel"
-    id="otherPanel"
->
-
-<div class="layout">
-
-<div class="form">
+</section>
 
 
 <section class="section">
 
-<h3>
-    Other PO
-</h3>
-
-<p>
-    PO and Box label configuration.
-</p>
-
-
-<label>
-
-PO Prefix
-
-<input
-    id="otherPOPrefix"
-    placeholder="PO"
->
-
-</label>
-
-
-<label>
-
-PO Number
-
-<input
-    id="otherPO"
-    placeholder="Enter PO number"
->
-
-</label>
-
+<h3>PO Number</h3>
 
 <div class="grid2">
 
 <label>
-
-Start Box No.
-
+PO Prefix
 <input
-    id="otherStartBox"
-    type="number"
-    placeholder="1"
+    id="poPrefix"
+    placeholder="PO"
 >
-
 </label>
 
-
 <label>
-
-End Box No.
-
+PO Number
 <input
-    id="otherEndBox"
-    type="number"
-    placeholder="10"
+    id="poNumber"
+    placeholder="12345"
 >
-
 </label>
 
 </div>
@@ -2331,31 +1597,57 @@ End Box No.
 
 <section class="section">
 
-<h3>
-    Box Prefix
-</h3>
+<h3>Box Range</h3>
+
+<div class="grid2">
 
 <label>
-
-Box Prefix
-
+Start Box No.
 <input
-    id="otherBoxPrefix"
-    placeholder="BOX"
+    id="startBox"
+    type="number"
+    placeholder="121"
 >
-
 </label>
+
+<label>
+End Box No.
+<input
+    id="endBox"
+    type="number"
+    placeholder="200"
+>
+</label>
+
+</div>
+
+<div
+    id="rangeWarning"
+    class="warning hidden"
+>
+Start Box Number cannot be greater than End Box Number.
+</div>
 
 </section>
 
 
 <section class="section">
 
-<h3>
-    Label Content
-</h3>
+<h3>Box Prefix</h3>
 
-<select id="otherContentType">
+<input
+    id="boxPrefix"
+    placeholder="BOX"
+>
+
+</section>
+
+
+<section class="section">
+
+<h3>Label Content</h3>
+
+<select id="contentType">
 
 <option value="po">
 PO Number Only
@@ -2374,15 +1666,134 @@ Combined PO + Box
 </section>
 
 
-<!-- COMMON PAGE SIZE -->
+<!-- PAGE BORDER -->
 
 <section class="section">
 
-<h3>
-    Page Size
-</h3>
+<h3>Page Border</h3>
 
-<div class="page-size-grid other-page-size">
+<p>
+Select page border style.
+</p>
+
+<select id="pageBorder">
+
+<option value="none">
+No Border
+</option>
+
+<option value="solid">
+Solid
+</option>
+
+<option value="dashed">
+Dashed
+</option>
+
+<option value="dotted">
+Dotted
+</option>
+
+<option value="double">
+Double
+</option>
+
+<option value="groove">
+Groove
+</option>
+
+<option value="ridge">
+Ridge
+</option>
+
+<option value="inset">
+Inset
+</option>
+
+<option value="outset">
+Outset
+</option>
+
+<option value="thick">
+Thick
+</option>
+
+</select>
+
+</section>
+
+
+<!-- PO BORDER -->
+
+<section class="section">
+
+<h3>PO / Box Border</h3>
+
+<div class="border-grid">
+
+<label>
+PO Border
+
+<select id="poBorder">
+
+<option value="none">No Border</option>
+<option value="solid">Solid</option>
+<option value="dashed">Dashed</option>
+<option value="dotted">Dotted</option>
+<option value="double">Double</option>
+<option value="groove">Groove</option>
+<option value="ridge">Ridge</option>
+
+</select>
+
+</label>
+
+
+<label>
+Box Border
+
+<select id="boxBorder">
+
+<option value="none">No Border</option>
+<option value="solid">Solid</option>
+<option value="dashed">Dashed</option>
+<option value="dotted">Dotted</option>
+<option value="double">Double</option>
+<option value="groove">Groove</option>
+<option value="ridge">Ridge</option>
+
+</select>
+
+</label>
+
+
+<label>
+Both Border
+
+<select id="bothBorder">
+
+<option value="none">No Border</option>
+<option value="solid">Solid</option>
+<option value="dashed">Dashed</option>
+<option value="dotted">Dotted</option>
+<option value="double">Double</option>
+
+</select>
+
+</label>
+
+</div>
+
+</section>
+
+
+<!-- PAGE SIZE -->
+
+<section class="section">
+
+<h3>Page Size</h3>
+
+<div class="page-size-grid">
 
 <button
     class="page-size-btn active"
@@ -2416,33 +1827,26 @@ Custom
 
 
 <div
+    id="customPageFields"
     class="custom-page-fields hidden"
-    id="otherCustomPageFields"
 >
 
 <label>
-
-Custom Width
-
+Width
 <input
-    id="otherCustomWidth"
+    id="customWidth"
     type="number"
-    placeholder="100"
+    min="1"
 >
-
 </label>
 
-
 <label>
-
-Custom Height
-
+Height
 <input
-    id="otherCustomHeight"
+    id="customHeight"
     type="number"
-    placeholder="150"
+    min="1"
 >
-
 </label>
 
 </div>
@@ -2450,15 +1854,13 @@ Custom Height
 </section>
 
 
-<!-- COMMON LABEL COUNT -->
+<!-- LABEL COUNT -->
 
 <section class="section">
 
-<h3>
-    Labels Per Page
-</h3>
+<h3>Labels Per Page</h3>
 
-<div class="label-count-grid other-label-count">
+<div class="label-count-grid">
 
 <button
     class="label-count-btn active"
@@ -2539,9 +1941,7 @@ Custom Height
 
 <section class="section">
 
-<h3>
-    Barcode PO
-</h3>
+<h3>PO Barcode</h3>
 
 <div class="barcode-toggle">
 
@@ -2549,14 +1949,14 @@ Custom Height
     class="toggle-btn active on"
     data-barcode="on"
 >
-✓ Barcode PO ON
+✓ Barcode ON
 </button>
 
 <button
     class="toggle-btn"
     data-barcode="off"
 >
-Barcode PO OFF
+Barcode OFF
 </button>
 
 </div>
@@ -2568,17 +1968,14 @@ Barcode PO OFF
 
 <section class="section">
 
-<h3>
-    Font Setting
-</h3>
+<h3>Font Setting</h3>
 
 <div class="font-grid">
 
 <label>
-
 Font Family
 
-<select id="otherFontFamily">
+<select id="fontFamily">
 
 <option>Arial</option>
 <option>Verdana</option>
@@ -2595,10 +1992,9 @@ Font Family
 
 
 <label>
-
 Font Size
 
-<select id="otherFontSize">
+<select id="fontSize">
 
 <option>10</option>
 <option>12</option>
@@ -2622,24 +2018,28 @@ Font Size
 
 <button
     class="font-style-btn active"
+    data-style="normal"
 >
 Normal
 </button>
 
 <button
     class="font-style-btn"
+    data-style="bold"
 >
 <b>Bold</b>
 </button>
 
 <button
     class="font-style-btn"
+    data-style="italic"
 >
 <i>Italic</i>
 </button>
 
 <button
     class="font-style-btn"
+    data-style="underline"
 >
 <u>Underline</u>
 </button>
@@ -2648,62 +2048,18 @@ Normal
 
 </section>
 
-
-<section class="section">
-
-<h3>
-    Border Setting
-</h3>
-
-<div class="border-grid">
-
-<label>
-
-PO Border
-
-<select id="otherPOBorder"></select>
-
-</label>
-
-
-<label>
-
-Box Border
-
-<select id="otherBoxBorder"></select>
-
-</label>
-
-
-<label>
-
-Both Border
-
-<select id="otherBothBorder"></select>
-
-</label>
-
 </div>
 
-</section>
 
-</div>
-
+<!-- PREVIEW -->
 
 <div class="preview">
 
 <div class="preview-head">
 
 <div>
-
-<h3>
-Live Label Preview
-</h3>
-
-<small>
-Other PO live preview
-</small>
-
+<h3>Live Preview</h3>
+<small>PO barcode is generated live.</small>
 </div>
 
 <div class="live">
@@ -2716,18 +2072,19 @@ Other PO live preview
 <div class="preview-canvas">
 
 <div
-    id="otherLabelPage"
+    id="labelPage"
     class="label-page"
-></div>
+>
+</div>
 
 </div>
 
 
 <div
+    id="previewStatus"
     class="info"
-    id="otherStatus"
 >
-Ready.
+Enter PO and Box range.
 </div>
 
 </div>
@@ -2737,19 +2094,19 @@ Ready.
 
 <div class="actions">
 
-<button id="clearOther">
+<button id="clearCoco">
 Clear
 </button>
 
 <button
-    id="printOther"
+    id="printCoco"
     class="dark"
 >
 🖨 Print PDF
 </button>
 
 <button
-    id="generateOther"
+    id="generateCoco"
     class="primary"
 >
 ⬇ Generate PDF
@@ -2761,12 +2118,12 @@ Clear
 
 
 <!-- =====================================================
-     ISBN PANEL
+     OTHER PO
 ===================================================== -->
 
 <div
     class="panel"
-    id="isbnPanel"
+    id="otherPanel"
 >
 
 <div class="layout">
@@ -2775,96 +2132,132 @@ Clear
 
 <section class="section">
 
-<h3>
-ISBN Barcode Maker
-</h3>
-
-<p>
-Enter ISBN and generate barcode labels.
-</p>
+<h3>Other PO</h3>
 
 <label>
-
-ISBN
-
+PO Prefix
 <input
-    id="isbnNumber"
-    placeholder="978XXXXXXXXXX"
+    id="otherPOPrefix"
+    placeholder="PO"
 >
-
 </label>
+
+<label>
+PO Number
+<input
+    id="otherPO"
+    placeholder="Enter PO"
+>
+</label>
+
+<div class="grid2">
+
+<label>
+Start Box
+<input
+    id="otherStartBox"
+    type="number"
+>
+</label>
+
+<label>
+End Box
+<input
+    id="otherEndBox"
+    type="number"
+>
+</label>
+
+</div>
 
 </section>
 
 
 <section class="section">
 
-<h3>
-Page Size
-</h3>
+<h3>Label Content</h3>
 
-<div class="page-size-grid isbn-page-size">
+<select id="otherContentType">
 
-<button
-    class="page-size-btn active"
-    data-size="a4"
->
+<option value="po">
+PO Number Only
+</option>
+
+<option value="box">
+Box Number Only
+</option>
+
+<option value="both">
+Combined PO + Box
+</option>
+
+</select>
+
+</section>
+
+
+<section class="section">
+
+<h3>Page Border</h3>
+
+<select id="otherPageBorder">
+
+<option value="none">No Border</option>
+<option value="solid">Solid</option>
+<option value="dashed">Dashed</option>
+<option value="dotted">Dotted</option>
+<option value="double">Double</option>
+<option value="groove">Groove</option>
+<option value="ridge">Ridge</option>
+
+</select>
+
+</section>
+
+
+<section class="section">
+
+<h3>Page Size</h3>
+
+<div class="page-size-grid">
+
+<button class="page-size-btn active" data-size="a4">
 A4
 </button>
 
-<button
-    class="page-size-btn"
-    data-size="70x35"
->
+<button class="page-size-btn" data-size="70x35">
 70 × 35 mm
 </button>
 
-<button
-    class="page-size-btn"
-    data-size="4x6"
->
+<button class="page-size-btn" data-size="4x6">
 4 × 6 inch
 </button>
 
-<button
-    class="page-size-btn"
-    data-size="custom"
->
+<button class="page-size-btn" data-size="custom">
 Custom
 </button>
 
 </div>
 
-
-<div
-    class="custom-page-fields hidden"
-    id="isbnCustomPageFields"
->
-
-<label>
-
-Custom Width
-
-<input
-    id="isbnCustomWidth"
-    type="number"
-    placeholder="100"
->
-
-</label>
+</section>
 
 
-<label>
+<section class="section">
 
-Custom Height
+<h3>Labels Per Page</h3>
 
-<input
-    id="isbnCustomHeight"
-    type="number"
-    placeholder="150"
->
+<div class="label-count-grid">
 
-</label>
+<button class="label-count-btn active" data-count="1">1</button>
+<button class="label-count-btn" data-count="2">2</button>
+<button class="label-count-btn" data-count="4">4</button>
+<button class="label-count-btn" data-count="6">6</button>
+<button class="label-count-btn" data-count="8">8</button>
+<button class="label-count-btn" data-count="10">10</button>
+<button class="label-count-btn" data-count="12">12</button>
+<button class="label-count-btn" data-count="15">15</button>
+<button class="label-count-btn" data-count="16">16</button>
+<button class="label-count-btn" data-count="20">20</button>
 
 </div>
 
@@ -2873,183 +2266,23 @@ Custom Height
 
 <section class="section">
 
-<h3>
-Labels Per Page
-</h3>
+<h3>PO Barcode</h3>
 
-<div class="label-count-grid isbn-label-count">
+<div class="barcode-toggle">
 
 <button
-    class="label-count-btn active"
-    data-count="1"
+    class="toggle-btn active on"
+    data-barcode="on"
 >
-1
+✓ Barcode ON
 </button>
 
 <button
-    class="label-count-btn"
-    data-count="2"
+    class="toggle-btn"
+    data-barcode="off"
 >
-2
+Barcode OFF
 </button>
-
-<button
-    class="label-count-btn"
-    data-count="4"
->
-4
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="6"
->
-6
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="8"
->
-8
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="10"
->
-10
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="12"
->
-12
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="15"
->
-15
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="16"
->
-16
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="20"
->
-20
-</button>
-
-</div>
-
-</section>
-
-
-<section class="section">
-
-<h3>
-Font Setting
-</h3>
-
-<div class="font-grid">
-
-<label>
-
-Font Family
-
-<select id="isbnFontFamily">
-
-<option>Arial</option>
-<option>Verdana</option>
-<option>Tahoma</option>
-<option>Georgia</option>
-<option>Times New Roman</option>
-<option>Trebuchet MS</option>
-<option>Courier New</option>
-<option>Impact</option>
-
-</select>
-
-</label>
-
-
-<label>
-
-Font Size
-
-<select id="isbnFontSize">
-
-<option>10</option>
-<option>12</option>
-<option>14</option>
-<option>16</option>
-<option selected>18</option>
-<option>20</option>
-<option>24</option>
-<option>28</option>
-<option>32</option>
-
-</select>
-
-</label>
-
-</div>
-
-
-<div class="font-style-buttons">
-
-<button class="font-style-btn active">
-Normal
-</button>
-
-<button class="font-style-btn">
-<b>Bold</b>
-</button>
-
-<button class="font-style-btn">
-<i>Italic</i>
-</button>
-
-<button class="font-style-btn">
-<u>Underline</u>
-</button>
-
-</div>
-
-</section>
-
-
-<section class="section">
-
-<h3>
-Border Setting
-</h3>
-
-<div class="border-grid">
-
-<label>
-Page Border
-<select id="isbnPageBorder"></select>
-</label>
-
-<label>
-Barcode Border
-<select id="isbnBarcodeBorder"></select>
-</label>
-
-<label>
-Both Border
-<select id="isbnBothBorder"></select>
-</label>
 
 </div>
 
@@ -3062,17 +2295,7 @@ Both Border
 
 <div class="preview-head">
 
-<div>
-
-<h3>
-Live ISBN Preview
-</h3>
-
-<small>
-Barcode preview
-</small>
-
-</div>
+<h3>Live Preview</h3>
 
 <div class="live">
 ● LIVE
@@ -3080,13 +2303,13 @@ Barcode preview
 
 </div>
 
-
 <div class="preview-canvas">
 
 <div
+    id="otherLabelPage"
     class="label-page"
-    id="isbnLabelPage"
-></div>
+>
+</div>
 
 </div>
 
@@ -3101,11 +2324,17 @@ Barcode preview
 Clear
 </button>
 
-<button class="dark">
+<button
+    class="dark"
+    id="printOther"
+>
 🖨 Print PDF
 </button>
 
-<button class="primary">
+<button
+    class="primary"
+    id="generateOther"
+>
 ⬇ Generate PDF
 </button>
 
@@ -3115,7 +2344,202 @@ Clear
 
 
 <!-- =====================================================
-     ADDRESS PANEL
+     ISBN
+===================================================== -->
+
+<div
+    class="panel"
+    id="isbnPanel"
+>
+
+<div class="layout">
+
+<div class="form">
+
+<section class="section">
+
+<h3>ISBN Barcode Maker</h3>
+
+<label>
+ISBN
+
+<input
+    id="isbnNumber"
+    placeholder="978XXXXXXXXXX"
+>
+</label>
+
+</section>
+
+
+<section class="section">
+
+<h3>Page Border</h3>
+
+<select id="isbnPageBorder">
+
+<option value="none">No Border</option>
+<option value="solid">Solid</option>
+<option value="dashed">Dashed</option>
+<option value="dotted">Dotted</option>
+<option value="double">Double</option>
+<option value="groove">Groove</option>
+<option value="ridge">Ridge</option>
+
+</select>
+
+</section>
+
+
+<section class="section">
+
+<h3>Page Size</h3>
+
+<div class="page-size-grid">
+
+<button class="page-size-btn active" data-size="a4">
+A4
+</button>
+
+<button class="page-size-btn" data-size="70x35">
+70 × 35 mm
+</button>
+
+<button class="page-size-btn" data-size="4x6">
+4 × 6 inch
+</button>
+
+<button class="page-size-btn" data-size="custom">
+Custom
+</button>
+
+</div>
+
+</section>
+
+
+<section class="section">
+
+<h3>Labels Per Page</h3>
+
+<div class="label-count-grid">
+
+<button class="label-count-btn active" data-count="1">1</button>
+<button class="label-count-btn" data-count="2">2</button>
+<button class="label-count-btn" data-count="4">4</button>
+<button class="label-count-btn" data-count="6">6</button>
+<button class="label-count-btn" data-count="8">8</button>
+<button class="label-count-btn" data-count="10">10</button>
+<button class="label-count-btn" data-count="12">12</button>
+<button class="label-count-btn" data-count="15">15</button>
+<button class="label-count-btn" data-count="16">16</button>
+<button class="label-count-btn" data-count="20">20</button>
+
+</div>
+
+</section>
+
+
+<section class="section">
+
+<h3>Font</h3>
+
+<div class="font-grid">
+
+<label>
+Font Family
+
+<select id="isbnFontFamily">
+<option>Arial</option>
+<option>Verdana</option>
+<option>Tahoma</option>
+<option>Georgia</option>
+<option>Times New Roman</option>
+<option>Courier New</option>
+</select>
+
+</label>
+
+<label>
+Font Size
+
+<select id="isbnFontSize">
+<option>10</option>
+<option>12</option>
+<option>14</option>
+<option>16</option>
+<option selected>18</option>
+<option>20</option>
+<option>24</option>
+<option>28</option>
+<option>32</option>
+</select>
+
+</label>
+
+</div>
+
+</section>
+
+</div>
+
+
+<div class="preview">
+
+<div class="preview-head">
+
+<h3>Live ISBN Preview</h3>
+
+<div class="live">
+● LIVE
+</div>
+
+</div>
+
+<div class="preview-canvas">
+
+<div
+    id="isbnLabelPage"
+    class="label-page"
+>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="actions">
+
+<button
+    id="isbnClear"
+>
+Clear
+</button>
+
+<button
+    id="isbnPrint"
+    class="dark"
+>
+🖨 Print PDF
+</button>
+
+<button
+    id="isbnGenerate"
+    class="primary"
+>
+⬇ Generate PDF
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     ADDRESS LABEL
 ===================================================== -->
 
 <div
@@ -3129,84 +2553,142 @@ Clear
 
 <section class="section">
 
-<h3>
-Address Label Maker
-</h3>
+<h3>Address Label Maker</h3>
 
 <p>
-Create professional address labels.
+Both From and To addresses are mandatory.
 </p>
 
 
 <label>
-
-Name
+From Name
+<span class="required-star">*</span>
 
 <input
-    id="addressName"
-    placeholder="Customer / Company Name"
+    id="fromName"
+    placeholder="Sender name"
 >
-
 </label>
 
 
 <label>
-
-Address
+From Address
+<span class="required-star">*</span>
 
 <textarea
-    id="addressText"
-    placeholder="Enter complete address..."
+    id="fromAddress"
+    placeholder="Sender complete address"
 ></textarea>
-
 </label>
 
 
 <label>
-
-City
+From City / State / PIN
+<span class="required-star">*</span>
 
 <input
-    id="addressCity"
-    placeholder="City"
+    id="fromLocation"
+    placeholder="City, State - PIN"
 >
-
 </label>
 
 
 <label>
-
-State
+To Name
+<span class="required-star">*</span>
 
 <input
-    id="addressState"
-    placeholder="State"
+    id="toName"
+    placeholder="Receiver name"
 >
-
 </label>
 
 
 <label>
+To Address
+<span class="required-star">*</span>
 
-PIN Code
+<textarea
+    id="toAddress"
+    placeholder="Receiver complete address"
+></textarea>
+</label>
+
+
+<label>
+To City / State / PIN
+<span class="required-star">*</span>
 
 <input
-    id="addressPin"
-    placeholder="PIN Code"
+    id="toLocation"
+    placeholder="City, State - PIN"
 >
-
 </label>
+
+
+<div
+    id="addressWarning"
+    class="warning hidden"
+>
+    From and To details are mandatory.
+    Please complete all required fields.
+</div>
+
+
+<div
+    id="addressSuccess"
+    class="success hidden"
+>
+    From and To details are complete.
+</div>
 
 </section>
 
 
 <section class="section">
 
-<h3>
-Page Size
-</h3>
+<h3>Page Border</h3>
 
-<div class="page-size-grid address-page-size">
+<select id="addressPageBorder">
+
+<option value="none">
+No Border
+</option>
+
+<option value="solid">
+Solid
+</option>
+
+<option value="dashed">
+Dashed
+</option>
+
+<option value="dotted">
+Dotted
+</option>
+
+<option value="double">
+Double
+</option>
+
+<option value="groove">
+Groove
+</option>
+
+<option value="ridge">
+Ridge
+</option>
+
+</select>
+
+</section>
+
+
+<section class="section">
+
+<h3>Page Size</h3>
+
+<div class="page-size-grid">
 
 <button
     class="page-size-btn active"
@@ -3238,36 +2720,25 @@ Custom
 
 </div>
 
-
-<div
-    class="custom-page-fields hidden"
-    id="addressCustomPageFields"
->
-
-<label>
-
-Custom Width
-
-<input
-    id="addressCustomWidth"
-    type="number"
-    placeholder="100"
->
-
-</label>
+</section>
 
 
-<label>
+<section class="section">
 
-Custom Height
+<h3>Labels Per Page</h3>
 
-<input
-    id="addressCustomHeight"
-    type="number"
-    placeholder="150"
->
+<div class="label-count-grid">
 
-</label>
+<button class="label-count-btn active" data-count="1">1</button>
+<button class="label-count-btn" data-count="2">2</button>
+<button class="label-count-btn" data-count="4">4</button>
+<button class="label-count-btn" data-count="6">6</button>
+<button class="label-count-btn" data-count="8">8</button>
+<button class="label-count-btn" data-count="10">10</button>
+<button class="label-count-btn" data-count="12">12</button>
+<button class="label-count-btn" data-count="15">15</button>
+<button class="label-count-btn" data-count="16">16</button>
+<button class="label-count-btn" data-count="20">20</button>
 
 </div>
 
@@ -3276,97 +2747,11 @@ Custom Height
 
 <section class="section">
 
-<h3>
-Labels Per Page
-</h3>
-
-<div class="label-count-grid address-label-count">
-
-<button
-    class="label-count-btn active"
-    data-count="1"
->
-1
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="2"
->
-2
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="4"
->
-4
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="6"
->
-6
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="8"
->
-8
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="10"
->
-10
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="12"
->
-12
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="15"
->
-15
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="16"
->
-16
-</button>
-
-<button
-    class="label-count-btn"
-    data-count="20"
->
-20
-</button>
-
-</div>
-
-</section>
-
-
-<section class="section">
-
-<h3>
-Font Setting
-</h3>
+<h3>Font Setting</h3>
 
 <div class="font-grid">
 
 <label>
-
 Font Family
 
 <select id="addressFontFamily">
@@ -3378,7 +2763,6 @@ Font Family
 <option>Times New Roman</option>
 <option>Trebuchet MS</option>
 <option>Courier New</option>
-<option>Impact</option>
 
 </select>
 
@@ -3386,7 +2770,6 @@ Font Family
 
 
 <label>
-
 Font Size
 
 <select id="addressFontSize">
@@ -3407,64 +2790,6 @@ Font Size
 
 </div>
 
-
-<div class="font-style-buttons">
-
-<button class="font-style-btn active">
-Normal
-</button>
-
-<button class="font-style-btn">
-<b>Bold</b>
-</button>
-
-<button class="font-style-btn">
-<i>Italic</i>
-</button>
-
-<button class="font-style-btn">
-<u>Underline</u>
-</button>
-
-</div>
-
-</section>
-
-
-<section class="section">
-
-<h3>
-Border Setting
-</h3>
-
-<div class="border-grid">
-
-<label>
-
-Page Border
-
-<select id="addressPageBorder"></select>
-
-</label>
-
-<label>
-
-Address Border
-
-<select id="addressLabelBorder"></select>
-
-</label>
-
-<label>
-
-Both Border
-
-<select id="addressBothBorder"></select>
-
-</label>
-
-</div>
-
 </section>
 
 </div>
@@ -3474,17 +2799,7 @@ Both Border
 
 <div class="preview-head">
 
-<div>
-
-<h3>
-Live Address Preview
-</h3>
-
-<small>
-Address label preview
-</small>
-
-</div>
+<h3>Live Address Preview</h3>
 
 <div class="live">
 ● LIVE
@@ -3496,9 +2811,10 @@ Address label preview
 <div class="preview-canvas">
 
 <div
-    class="label-page"
     id="addressLabelPage"
-></div>
+    class="label-page"
+>
+</div>
 
 </div>
 
@@ -3509,22 +2825,29 @@ Address label preview
 
 <div class="actions">
 
-<button>
+<button
+    id="addressClear"
+>
 Clear
 </button>
 
-<button class="dark">
+<button
+    id="addressPrint"
+    class="dark"
+>
 🖨 Print PDF
 </button>
 
-<button class="primary">
+<button
+    id="addressGenerate"
+    class="primary"
+>
 ⬇ Generate PDF
 </button>
 
 </div>
 
 </div>
-
 
 </section>
 
@@ -3536,7 +2859,7 @@ Created by
 •
 2026
 •
-All rights reserved by Ashish Verma
+All Rights Reserved by Ashish Verma
 
 </footer>
 
@@ -3556,1291 +2879,332 @@ All rights reserved by Ashish Verma
 <script>
 
 /* =========================================================
-   GLOBAL HELPERS
+   HELPERS
 ========================================================= */
 
-const $ = id =>
-    document.getElementById(id);
+const $ = id => document.getElementById(id);
 
-const $$ = selector =>
-    [...document.querySelectorAll(selector)];
+const $$ = selector => [...document.querySelectorAll(selector)];
 
 
 /* =========================================================
    TOAST
 ========================================================= */
 
-function toast(
-    message,
-    type="ok"
-){
+function showToast(message,type="ok"){
 
-    const el =
-        $("toast");
+    const toast=$("toast");
 
-    if(!el) return;
+    toast.textContent=message;
 
-    el.textContent =
-        message;
+    toast.className=
+        "toast show"+
+        (type==="bad" ? " bad" : "");
 
-    el.className =
-        "toast show " +
-        (
-            type === "bad"
-            ? "bad"
-            : ""
-        );
+    clearTimeout(window.__toastTimer);
 
-    clearTimeout(
-        window.__toastTimer
-    );
-
-    window.__toastTimer =
-        setTimeout(
-            ()=>{
-                el.className =
-                    "toast";
-            },
-            2800
-        );
-
+    window.__toastTimer=setTimeout(()=>{
+        toast.className="toast";
+    },3000);
 }
 
 
 /* =========================================================
-   BORDER OPTIONS
+   STATE
 ========================================================= */
 
-const borders = [
+let currentMode="manual";
 
-    ["none","No Border"],
-    ["solid","Solid"],
-    ["dashed","Dashed"],
-    ["dotted","Dotted"],
-    ["double","Double"],
-    ["groove","Groove"],
-    ["ridge","Ridge"],
-    ["inset","Inset"],
-    ["outset","Outset"],
-    ["bold","Bold"],
-    ["thin","Thin"],
-    ["medium","Medium"],
-    ["thick","Thick"],
-    ["dashdot","Dash-Dot"],
-    ["longdash","Long Dash"]
+let cocoPageSize="a4";
+let otherPageSize="a4";
+let isbnPageSize="a4";
+let addressPageSize="a4";
 
-];
+let cocoLabels=1;
+let otherLabels=1;
+let isbnLabels=1;
+let addressLabels=1;
 
+let cocoBarcode=true;
+let otherBarcode=true;
 
-function loadBorderSelects(){
-
-    const ids=[
-
-        "poBorder",
-        "boxBorder",
-        "bothBorder",
-
-        "otherPOBorder",
-        "otherBoxBorder",
-        "otherBothBorder",
-
-        "isbnPageBorder",
-        "isbnBarcodeBorder",
-        "isbnBothBorder",
-
-        "addressPageBorder",
-        "addressLabelBorder",
-        "addressBothBorder"
-
-    ];
-
-
-    ids.forEach(id=>{
-
-        const select =
-            $(id);
-
-        if(!select) return;
-
-        select.innerHTML =
-            borders
-            .map(item=>`
-
-                <option value="${item[0]}">
-                    ${item[1]}
-                </option>
-
-            `)
-            .join("");
-
-    });
-
-}
-
-loadBorderSelects();
+let excelPOs=[];
 
 
 /* =========================================================
    PANEL SWITCH
 ========================================================= */
 
-function activatePanel(
-    panelId
-){
+const panelNames={
+    cocoPanel:"CocoBlu PO Label Maker",
+    otherPanel:"Others PO Label Maker",
+    isbnPanel:"ISBN Barcode Maker",
+    addressPanel:"Address Label Maker"
+};
 
-    $$(".tab").forEach(
-        tab=>{
+$$(".tab").forEach(tab=>{
 
-            tab.classList.toggle(
-                "active",
-                tab.dataset.panel ===
-                panelId
+    tab.addEventListener("click",()=>{
+
+        $$(".tab").forEach(t=>t.classList.remove("active"));
+
+        $$(".panel").forEach(p=>p.classList.remove("active"));
+
+        tab.classList.add("active");
+
+        const panel=$(tab.dataset.panel);
+
+        if(panel){
+
+            panel.classList.add("active");
+
+            $("workspaceTitle").textContent=
+                panelNames[tab.dataset.panel];
+
+            showToast(
+                panelNames[tab.dataset.panel]+" enabled."
             );
 
         }
-    );
+
+    });
+
+});
 
 
-    $$(".panel").forEach(
-        panel=>{
+$$(".feature").forEach(card=>{
 
-            panel.classList.toggle(
-                "active",
-                panel.id === panelId
+    card.addEventListener("click",()=>{
+
+        const target={
+            coco:"cocoPanel",
+            other:"otherPanel",
+            isbn:"isbnPanel",
+            address:"addressPanel"
+        }[card.dataset.tool];
+
+        if(!target)return;
+
+        const tab=
+            document.querySelector(
+                `.tab[data-panel="${target}"]`
             );
 
-        }
-    );
+        if(tab)tab.click();
 
+        document.querySelector(".workspace")
+            ?.scrollIntoView({
+                behavior:"smooth",
+                block:"start"
+            });
 
-    const names={
+    });
 
-        cocoPanel:
-            "CocoBlu PO Label Maker",
-
-        otherPanel:
-            "Others PO Label Maker",
-
-        isbnPanel:
-            "ISBN Barcode Maker",
-
-        addressPanel:
-            "Address Label Maker"
-
-    };
-
-
-    $("workspaceTitle").textContent =
-        names[panelId] ||
-        "Label Maker";
-
-
-    toast(
-        names[panelId] +
-        " enabled."
-    );
-
-}
-
-
-$$(".tab").forEach(
-    tab=>{
-
-        tab.addEventListener(
-            "click",
-            ()=>{
-                activatePanel(
-                    tab.dataset.panel
-                );
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   CATEGORY CARDS
-========================================================= */
-
-$$(".feature").forEach(
-    card=>{
-
-        card.addEventListener(
-            "click",
-            ()=>{
-
-                const tool =
-                    card.dataset.tool;
-
-                const map={
-
-                    coco:
-                        "cocoPanel",
-
-                    other:
-                        "otherPanel",
-
-                    isbn:
-                        "isbnPanel",
-
-                    address:
-                        "addressPanel"
-
-                };
-
-
-                if(map[tool]){
-
-                    activatePanel(
-                        map[tool]
-                    );
-
-                }
-
-            }
-        );
-
-    }
-);
+});
 
 
 /* =========================================================
    MODE
 ========================================================= */
 
-let currentMode =
-    "manual";
+$$(".mode").forEach(btn=>{
 
+    btn.addEventListener("click",()=>{
 
-$$(".mode").forEach(
-    button=>{
+        $$(".mode").forEach(x=>x.classList.remove("active"));
 
-        button.addEventListener(
-            "click",
-            ()=>{
+        btn.classList.add("active");
 
-                $$(".mode").forEach(
-                    x =>
-                    x.classList.remove(
-                        "active"
-                    )
-                );
+        currentMode=btn.dataset.mode;
 
-
-                button.classList.add(
-                    "active"
-                );
-
-
-                currentMode =
-                    button.dataset.mode;
-
-
-                $("manualArea")
-                    .classList.toggle(
-                        "hidden",
-                        currentMode !==
-                        "manual"
-                    );
-
-
-                $("bulkArea")
-                    .classList.toggle(
-                        "hidden",
-                        currentMode !==
-                        "bulk"
-                    );
-
-
-                $("excelArea")
-                    .classList.toggle(
-                        "hidden",
-                        currentMode !==
-                        "excel"
-                    );
-
-
-                toast(
-                    currentMode
-                    .toUpperCase() +
-                    " mode enabled."
-                );
-
-
-                renderCoco();
-
-            }
+        $("manualArea").classList.toggle(
+            "hidden",
+            currentMode!=="manual"
         );
 
-    }
-);
+        $("bulkArea").classList.toggle(
+            "hidden",
+            currentMode!=="bulk"
+        );
+
+        $("excelArea").classList.toggle(
+            "hidden",
+            currentMode!=="excel"
+        );
+
+        showToast(
+            btn.querySelector("b").textContent+
+            " mode enabled."
+        );
+
+        renderCoco();
+
+    });
+
+});
 
 
 /* =========================================================
-   EXCEL
+   PO LIST
 ========================================================= */
-
-let excelPOs=[];
-
-
-if($("bulkPO")){
-
-    $("bulkPO")
-    .addEventListener(
-        "input",
-        ()=>{
-
-            const count =
-                getPOList()
-                .length;
-
-
-            $("bulkCount")
-                .textContent =
-                `${count} PO number${count===1?"":"s"} detected.`;
-
-            renderCoco();
-
-        }
-    );
-
-}
-
 
 function getPOList(){
 
-    if(currentMode === "bulk"){
+    if(currentMode==="bulk"){
 
-        return $("bulkPO")
-            .value
+        return $("bulkPO").value
             .split(/[\n,\r]+/)
             .map(x=>x.trim())
             .filter(Boolean);
 
     }
 
-
-    if(currentMode === "excel"){
+    if(currentMode==="excel"){
 
         return excelPOs;
 
     }
 
+    const value=
+        $("manualPO").value.trim();
 
-    const manual =
-        $("manualPO")
-        .value
-        .trim();
-
-
-    return manual
-        ? [manual]
-        : [];
-
+    return value ? [value] : [];
 }
 
 
-if($("excelFile")){
+$("bulkPO").addEventListener("input",()=>{
 
-    $("excelFile")
-    .addEventListener(
-        "change",
-        async e=>{
+    const count=getPOList().length;
 
-            const file =
-                e.target.files[0];
+    $("bulkCount").textContent=
+        `${count} PO number${count===1?"":"s"} detected.`;
 
-            if(!file) return;
+    renderCoco();
 
-
-            try{
-
-                const name =
-                    file.name
-                    .toLowerCase();
+});
 
 
-                if(
-                    name.endsWith(".csv")
-                ){
+/* =========================================================
+   EXCEL
+========================================================= */
 
-                    const text =
-                        await file.text();
+$("excelFile").addEventListener("change",async e=>{
 
+    const file=e.target.files[0];
 
-                    const rows =
-                        text
-                        .split(/\r?\n/)
-                        .map(
-                            row =>
-                            row
-                            .split(",")[0]
-                            .trim()
-                        )
-                        .filter(Boolean);
+    if(!file)return;
 
+    try{
 
-                    excelPOs =
-                        rows.slice(1);
+        const name=file.name.toLowerCase();
 
-                }
-                else{
+        if(name.endsWith(".csv")){
 
-                    const buffer =
-                        await file.arrayBuffer();
+            const text=await file.text();
 
+            excelPOs=text
+                .split(/\r?\n/)
+                .map(row=>row.split(",")[0].trim())
+                .filter(Boolean)
+                .slice(1);
 
-                    const workbook =
-                        XLSX.read(
-                            buffer,
-                            {
-                                type:"array"
-                            }
-                        );
+        }else{
 
+            if(typeof XLSX==="undefined"){
 
-                    const sheet =
-                        workbook.Sheets[
-                            workbook.SheetNames[0]
-                        ];
+                throw new Error(
+                    "Excel library unavailable"
+                );
 
+            }
 
-                    const rows =
-                        XLSX.utils.sheet_to_json(
-                            sheet,
-                            {
-                                header:1,
-                                defval:""
-                            }
-                        );
+            const buffer=
+                await file.arrayBuffer();
 
+            const workbook=
+                XLSX.read(
+                    buffer,
+                    {type:"array"}
+                );
 
-                    excelPOs =
-                        rows
-                        .slice(1)
-                        .map(
-                            row =>
-                            String(
-                                row[0] || ""
-                            ).trim()
-                        )
-                        .filter(Boolean);
-
-                }
-
-
-                excelPOs=[
-                    ...new Set(
-                        excelPOs
-                    )
+            const sheet=
+                workbook.Sheets[
+                    workbook.SheetNames[0]
                 ];
 
-
-                $("excelCount")
-                    .textContent =
-                    `${excelPOs.length} PO numbers loaded from Column A.`;
-
-                toast(
-                    "Excel / CSV loaded successfully."
-                );
-
-
-                renderCoco();
-
-            }
-            catch(error){
-
-                console.error(error);
-
-                excelPOs=[];
-
-                $("excelCount")
-                    .textContent =
-                    "Unable to read file.";
-
-                toast(
-                    "Could not read the file.",
-                    "bad"
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   COCO RANGE
-========================================================= */
-
-function getRange(){
-
-    return {
-
-        start:
-            Number(
-                $("startBox")
-                .value
-            ),
-
-        end:
-            Number(
-                $("endBox")
-                .value
-            )
-
-    };
-
-}
-
-
-function validRange(){
-
-    const {
-        start,
-        end
-    } =
-        getRange();
-
-
-    const valid =
-        Number.isFinite(start) &&
-        Number.isFinite(end) &&
-        start <= end;
-
-
-    const empty =
-        !Number.isFinite(start) &&
-        !Number.isFinite(end);
-
-
-    $("rangeWarning")
-        .classList.toggle(
-            "hidden",
-            valid || empty
-        );
-
-
-    return valid;
-
-}
-
-
-/* =========================================================
-   PAGE SIZE SYSTEM
-========================================================= */
-
-let cocoPageSize =
-    "a4";
-
-let otherPageSize =
-    "a4";
-
-let isbnPageSize =
-    "a4";
-
-let addressPageSize =
-    "a4";
-
-
-function setupPageSizes(
-    containerSelector,
-    customFieldsId,
-    setter
-){
-
-    const buttons =
-        $$(containerSelector +
-        " .page-size-btn");
-
-
-    buttons.forEach(
-        button=>{
-
-            button.addEventListener(
-                "click",
-                ()=>{
-
-                    buttons.forEach(
-                        x =>
-                        x.classList.remove(
-                            "active"
-                        )
-                    );
-
-
-                    button.classList.add(
-                        "active"
-                    );
-
-
-                    const size =
-                        button.dataset.size;
-
-
-                    setter(size);
-
-
-                    const fields =
-                        $(customFieldsId);
-
-
-                    if(fields){
-
-                        fields.classList.toggle(
-                            "hidden",
-                            size !==
-                            "custom"
-                        );
-
+            const rows=
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    {
+                        header:1,
+                        defval:""
                     }
-
-
-                    toast(
-                        "Page size: " +
-                        button.textContent.trim()
-                    );
-
-
-                    renderAllPreviews();
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-setupPageSizes(
-    ".page-size-grid:not(.other-page-size):not(.isbn-page-size):not(.address-page-size)",
-    "customPageFields",
-    value=>{
-        cocoPageSize=value;
-    }
-);
-
-
-setupPageSizes(
-    ".other-page-size",
-    "otherCustomPageFields",
-    value=>{
-        otherPageSize=value;
-    }
-);
-
-
-setupPageSizes(
-    ".isbn-page-size",
-    "isbnCustomPageFields",
-    value=>{
-        isbnPageSize=value;
-    }
-);
-
-
-setupPageSizes(
-    ".address-page-size",
-    "addressCustomPageFields",
-    value=>{
-        addressPageSize=value;
-    }
-);
-
-
-/* =========================================================
-   LABELS PER PAGE
-========================================================= */
-
-let cocoLabelsPerPage=1;
-let otherLabelsPerPage=1;
-let isbnLabelsPerPage=1;
-let addressLabelsPerPage=1;
-
-
-function setupLabelCount(
-    selector,
-    setter,
-    customAreaId,
-    customInputId
-){
-
-    $$(selector)
-    .forEach(
-        button=>{
-
-            button.addEventListener(
-                "click",
-                ()=>{
-
-                    $$(selector)
-                    .forEach(
-                        x =>
-                        x.classList.remove(
-                            "active"
-                        )
-                    );
-
-
-                    button.classList.add(
-                        "active"
-                    );
-
-
-                    const value =
-                        button.dataset.count;
-
-
-                    if(value==="custom"){
-
-                        $(customAreaId)
-                        .classList.remove(
-                            "hidden"
-                        );
-
-                        setter(
-                            Number(
-                                $(customInputId)
-                                .value
-                            ) || 1
-                        );
-
-                    }
-                    else{
-
-                        $(customAreaId)
-                        .classList.add(
-                            "hidden"
-                        );
-
-                        setter(
-                            Number(value)
-                        );
-
-                    }
-
-
-                    toast(
-                        "Labels per page: " +
-                        value
-                    );
-
-
-                    renderAllPreviews();
-
-                }
-            );
-
-        }
-    );
-
-
-    if($(customInputId)){
-
-        $(customInputId)
-        .addEventListener(
-            "input",
-            ()=>{
-
-                setter(
-                    Math.max(
-                        1,
-                        Number(
-                            $(customInputId)
-                            .value
-                        ) || 1
-                    )
                 );
 
-                renderAllPreviews();
-
-            }
-        );
-
-    }
-
-}
-
-
-setupLabelCount(
-    "#cocoPanel .label-count-btn",
-    value=>{
-        cocoLabelsPerPage=value;
-    },
-    "customLabelCountArea",
-    "customLabelCount"
-);
-
-
-setupLabelCount(
-    "#otherPanel .label-count-btn",
-    value=>{
-        otherLabelsPerPage=value;
-    },
-    "otherCustomLabelCount",
-    "otherCustomLabelCountInput"
-);
-
-
-/* =========================================================
-   OTHER LABEL COUNT FALLBACK
-========================================================= */
-
-$$(
-    "#otherPanel .label-count-btn"
-).forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                if(
-                    button.dataset.count !==
-                    "custom"
-                ){
-
-                    otherLabelsPerPage =
-                        Number(
-                            button.dataset.count
-                        );
-
-                    renderOther();
-
-                }
-
-            }
-        );
-
-    }
-);
-
-
-/* ISBN */
-
-$$(
-    "#isbnPanel .label-count-btn"
-).forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                $$("#isbnPanel .label-count-btn")
-                .forEach(
-                    x =>
-                    x.classList.remove(
-                        "active"
-                    )
-                );
-
-                button.classList.add(
-                    "active"
-                );
-
-                isbnLabelsPerPage =
-                    Number(
-                        button.dataset.count
-                    );
-
-                renderISBN();
-
-            }
-        );
-
-    }
-);
-
-
-/* ADDRESS */
-
-$$(
-    "#addressPanel .label-count-btn"
-).forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                $$("#addressPanel .label-count-btn")
-                .forEach(
-                    x =>
-                    x.classList.remove(
-                        "active"
-                    )
-                );
-
-                button.classList.add(
-                    "active"
-                );
-
-                addressLabelsPerPage =
-                    Number(
-                        button.dataset.count
-                    );
-
-                renderAddress();
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   BARCODE TOGGLE
-========================================================= */
-
-let barcodeEnabled=true;
-
-
-$$(".barcode-toggle .toggle-btn")
-.forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                const parent =
-                    button.parentElement;
-
-
-                parent
-                .querySelectorAll(
-                    ".toggle-btn"
-                )
-                .forEach(
-                    x =>
-                    x.classList.remove(
-                        "active"
-                    )
-                );
-
-
-                button.classList.add(
-                    "active"
-                );
-
-
-                barcodeEnabled =
-                    button.dataset.barcode ===
-                    "on";
-
-
-                toast(
-                    barcodeEnabled
-                    ? "Barcode PO enabled."
-                    : "Barcode PO disabled.",
-                    barcodeEnabled
-                    ? "ok"
-                    : "bad"
-                );
-
-
-                renderAllPreviews();
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   FONT STYLE
-========================================================= */
-
-let cocoFontStyle =
-    "normal";
-
-
-$$(
-    "#cocoPanel .font-style-btn"
-)
-.forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                $$("#cocoPanel .font-style-btn")
-                .forEach(
-                    x =>
-                    x.classList.remove(
-                        "active"
-                    )
-                );
-
-
-                button.classList.add(
-                    "active"
-                );
-
-
-                cocoFontStyle =
-                    button.dataset.style ||
-                    "normal";
-
-
-                renderCoco();
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   COCO FONT EVENTS
-========================================================= */
-
-[
-    "fontFamily",
-    "fontSize",
-    "poPrefix",
-    "poNumber",
-    "boxPrefix",
-    "contentType",
-    "poBorder",
-    "boxBorder",
-    "bothBorder"
-].forEach(
-    id=>{
-
-        if($(id)){
-
-            $(id).addEventListener(
-                "input",
-                renderCoco
-            );
-
-            $(id).addEventListener(
-                "change",
-                renderCoco
-            );
+            excelPOs=
+                rows
+                .slice(1)
+                .map(row=>String(row[0]||"").trim())
+                .filter(Boolean);
 
         }
 
+        excelPOs=[
+            ...new Set(excelPOs)
+        ];
+
+        $("excelCount").textContent=
+            `${excelPOs.length} PO numbers loaded from Column A.`;
+
+        showToast("Excel / CSV loaded successfully.");
+
+        renderCoco();
+
+    }catch(error){
+
+        console.error(error);
+
+        excelPOs=[];
+
+        $("excelCount").textContent=
+            "Unable to read file.";
+
+        showToast(
+            "Unable to read Excel / CSV.",
+            "bad"
+        );
+
     }
-);
+
+});
 
 
 /* =========================================================
-   FONT STYLE CSS
+   RANGE VALIDATION
 ========================================================= */
 
-function applyFontStyle(
-    element,
-    style
-){
+function validateRange(){
 
-    element.style.fontWeight =
-        "400";
+    const start=
+        Number($("startBox").value);
 
-    element.style.fontStyle =
-        "normal";
+    const end=
+        Number($("endBox").value);
 
-    element.style.textDecoration =
-        "none";
+    const empty=
+        $("startBox").value==="" ||
+        $("endBox").value==="";
 
+    const invalid=
+        !empty &&
+        start>end;
 
-    if(style==="bold"){
-
-        element.style.fontWeight =
-            "800";
-
-    }
-
-
-    if(style==="italic"){
-
-        element.style.fontStyle =
-            "italic";
-
-    }
-
-
-    if(style==="underline"){
-
-        element.style.textDecoration =
-            "underline";
-
-    }
-
-}
-
-
-/* =========================================================
-   PREVIEW LABEL CREATOR
-========================================================= */
-
-function createLabelElement(
-    po,
-    box,
-    settings
-){
-
-    const label =
-        document.createElement(
-            "div"
-        );
-
-
-    label.className =
-        "preview-label";
-
-
-    const poElement =
-        document.createElement(
-            "div"
-        );
-
-
-    poElement.className =
-        "preview-po";
-
-
-    const boxElement =
-        document.createElement(
-            "div"
-        );
-
-
-    boxElement.className =
-        "preview-box";
-
-
-    poElement.textContent =
-        po;
-
-
-    boxElement.textContent =
-        (
-            settings.boxPrefix ||
-            "BOX"
-        ) +
-        " NO. " +
-        box;
-
-
-    if(settings.content==="po"){
-
-        boxElement.style.display =
-            "none";
-
-    }
-
-
-    if(settings.content==="box"){
-
-        poElement.style.display =
-            "none";
-
-    }
-
-
-    poElement.style.fontFamily =
-        settings.fontFamily;
-
-
-    boxElement.style.fontFamily =
-        settings.fontFamily;
-
-
-    poElement.style.fontSize =
-        settings.fontSize +
-        "px";
-
-
-    boxElement.style.fontSize =
-        Math.max(
-            12,
-            Number(settings.fontSize)-2
-        ) +
-        "px";
-
-
-    applyFontStyle(
-        poElement,
-        settings.fontStyle
+    $("rangeWarning").classList.toggle(
+        "hidden",
+        !invalid
     );
 
-
-    applyFontStyle(
-        boxElement,
-        settings.fontStyle
-    );
-
-
-    if(
-        settings.bothBorder !==
-        "none"
-    ){
-
-        label.style.border =
-            getBorderCSS(
-                settings.bothBorder
-            );
-
-    }
-    else{
-
-        if(
-            settings.poBorder !==
-            "none"
-        ){
-
-            poElement.style.border =
-                getBorderCSS(
-                    settings.poBorder
-                );
-
-            poElement.style.padding =
-                "4px 8px";
-
-        }
-
-
-        if(
-            settings.boxBorder !==
-            "none"
-        ){
-
-            boxElement.style.border =
-                getBorderCSS(
-                    settings.boxBorder
-                );
-
-            boxElement.style.padding =
-                "4px 8px";
-
-        }
-
-    }
-
-
-    label.appendChild(
-        poElement
-    );
-
-
-    label.appendChild(
-        boxElement
-    );
-
-
-    return label;
-
+    return !empty && !invalid;
 }
 
 
@@ -4848,45 +3212,552 @@ function createLabelElement(
    BORDER CSS
 ========================================================= */
 
-function getBorderCSS(value){
+function borderCSS(value){
 
-    const map={
-
+    const styles={
         none:"none",
-
-        solid:"1px solid #172033",
-
-        dashed:"1px dashed #172033",
-
-        dotted:"1px dotted #172033",
-
-        double:"3px double #172033",
-
-        groove:"3px groove #172033",
-
-        ridge:"3px ridge #172033",
-
-        inset:"3px inset #172033",
-
-        outset:"3px outset #172033",
-
-        bold:"3px solid #172033",
-
-        thin:"1px solid #172033",
-
-        medium:"2px solid #172033",
-
-        thick:"4px solid #172033",
-
-        dashdot:"1px dashed #172033",
-
-        longdash:"2px dashed #172033"
-
+        solid:"2px solid #172033",
+        dashed:"2px dashed #172033",
+        dotted:"2px dotted #172033",
+        double:"4px double #172033",
+        groove:"4px groove #172033",
+        ridge:"4px ridge #172033",
+        inset:"4px inset #172033",
+        outset:"4px outset #172033"
     };
 
+    return styles[value]||"none";
+}
 
-    return map[value] ||
-        "none";
+
+/* =========================================================
+   PAGE SIZE
+========================================================= */
+
+function setupPageSize(panelSelector,setter,customFields){
+
+    const panel=document.querySelector(panelSelector);
+
+    if(!panel)return;
+
+    panel.querySelectorAll(".page-size-btn")
+        .forEach(btn=>{
+
+            btn.addEventListener("click",()=>{
+
+                panel
+                    .querySelectorAll(".page-size-btn")
+                    .forEach(x=>x.classList.remove("active"));
+
+                btn.classList.add("active");
+
+                setter(btn.dataset.size);
+
+                if(customFields){
+
+                    $(customFields)
+                        ?.classList.toggle(
+                            "hidden",
+                            btn.dataset.size!=="custom"
+                        );
+
+                }
+
+                showToast(
+                    "Page size: "+
+                    btn.textContent.trim()
+                );
+
+                renderAll();
+
+            });
+
+        });
+
+}
+
+
+/* Coco */
+
+setupPageSize(
+    "#cocoPanel",
+    v=>cocoPageSize=v,
+    "customPageFields"
+);
+
+
+/* Other */
+
+setupPageSize(
+    "#otherPanel",
+    v=>otherPageSize=v,
+    null
+);
+
+
+/* ISBN */
+
+setupPageSize(
+    "#isbnPanel",
+    v=>isbnPageSize=v,
+    null
+);
+
+
+/* Address */
+
+setupPageSize(
+    "#addressPanel",
+    v=>addressPageSize=v,
+    null
+);
+
+
+/* =========================================================
+   LABEL COUNT
+========================================================= */
+
+function setupLabelCount(panelSelector,setter){
+
+    const panel=document.querySelector(panelSelector);
+
+    if(!panel)return;
+
+    panel.querySelectorAll(".label-count-btn")
+        .forEach(btn=>{
+
+            btn.addEventListener("click",()=>{
+
+                panel
+                    .querySelectorAll(".label-count-btn")
+                    .forEach(x=>x.classList.remove("active"));
+
+                btn.classList.add("active");
+
+                setter(
+                    Number(btn.dataset.count)
+                );
+
+                renderAll();
+
+            });
+
+        });
+
+}
+
+
+setupLabelCount(
+    "#cocoPanel",
+    v=>cocoLabels=v
+);
+
+setupLabelCount(
+    "#otherPanel",
+    v=>otherLabels=v
+);
+
+setupLabelCount(
+    "#isbnPanel",
+    v=>isbnLabels=v
+);
+
+setupLabelCount(
+    "#addressPanel",
+    v=>addressLabels=v
+);
+
+
+/* =========================================================
+   BARCODE TOGGLE
+========================================================= */
+
+function setupBarcode(panelSelector,setter){
+
+    const panel=document.querySelector(panelSelector);
+
+    if(!panel)return;
+
+    panel.querySelectorAll(".toggle-btn")
+        .forEach(btn=>{
+
+            btn.addEventListener("click",()=>{
+
+                panel
+                    .querySelectorAll(".toggle-btn")
+                    .forEach(x=>x.classList.remove("active"));
+
+                btn.classList.add("active");
+
+                const enabled=
+                    btn.dataset.barcode==="on";
+
+                setter(enabled);
+
+                showToast(
+                    enabled
+                    ? "PO Barcode enabled."
+                    : "PO Barcode disabled.",
+                    enabled ? "ok" : "bad"
+                );
+
+                renderAll();
+
+            });
+
+        });
+
+}
+
+
+setupBarcode(
+    "#cocoPanel",
+    v=>cocoBarcode=v
+);
+
+setupBarcode(
+    "#otherPanel",
+    v=>otherBarcode=v
+);
+
+
+/* =========================================================
+   LIVE EVENTS
+========================================================= */
+
+[
+    "manualPO",
+    "poPrefix",
+    "poNumber",
+    "startBox",
+    "endBox",
+    "boxPrefix",
+    "contentType",
+    "pageBorder",
+    "poBorder",
+    "boxBorder",
+    "bothBorder",
+    "fontFamily",
+    "fontSize",
+
+    "otherPOPrefix",
+    "otherPO",
+    "otherStartBox",
+    "otherEndBox",
+    "otherContentType",
+    "otherPageBorder",
+
+    "isbnNumber",
+    "isbnPageBorder",
+    "isbnFontFamily",
+    "isbnFontSize",
+
+    "fromName",
+    "fromAddress",
+    "fromLocation",
+    "toName",
+    "toAddress",
+    "toLocation",
+    "addressPageBorder",
+    "addressFontFamily",
+    "addressFontSize"
+
+].forEach(id=>{
+
+    const el=$(id);
+
+    if(!el)return;
+
+    el.addEventListener("input",renderAll);
+
+    el.addEventListener("change",renderAll);
+
+});
+
+
+/* =========================================================
+   FONT STYLE
+========================================================= */
+
+let cocoFontStyle="normal";
+
+$("#cocoPanel")
+.querySelectorAll(".font-style-btn")
+.forEach(btn=>{
+
+    btn.addEventListener("click",()=>{
+
+        $("#cocoPanel")
+            .querySelectorAll(".font-style-btn")
+            .forEach(x=>x.classList.remove("active"));
+
+        btn.classList.add("active");
+
+        cocoFontStyle=
+            btn.dataset.style||"normal";
+
+        renderCoco();
+
+    });
+
+});
+
+
+/* =========================================================
+   FONT STYLE APPLY
+========================================================= */
+
+function applyFontStyle(el,style){
+
+    el.style.fontWeight="400";
+    el.style.fontStyle="normal";
+    el.style.textDecoration="none";
+
+    if(style==="bold")
+        el.style.fontWeight="800";
+
+    if(style==="italic")
+        el.style.fontStyle="italic";
+
+    if(style==="underline")
+        el.style.textDecoration="underline";
+}
+
+
+/* =========================================================
+   BARCODE SVG CREATOR
+========================================================= */
+
+function makeBarcodeSVG(value){
+
+    const svg=
+        document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "svg"
+        );
+
+    svg.classList.add("preview-barcode");
+
+    if(
+        !value ||
+        typeof JsBarcode==="undefined"
+    ){
+
+        return svg;
+
+    }
+
+    try{
+
+        JsBarcode(
+            svg,
+            String(value),
+            {
+                format:"CODE128",
+                width:1.7,
+                height:42,
+                displayValue:true,
+                fontSize:10,
+                margin:4,
+                background:"#ffffff",
+                lineColor:"#111827"
+            }
+        );
+
+    }catch(error){
+
+        console.error(
+            "Barcode generation failed:",
+            error
+        );
+
+    }
+
+    return svg;
+}
+
+
+/* =========================================================
+   CREATE COCO LABEL
+========================================================= */
+
+function createCocoLabel(po,box){
+
+    const label=
+        document.createElement("div");
+
+    label.className="preview-label";
+
+    /* PAGE CONTENT */
+
+    const content=
+        $("contentType").value;
+
+
+    /* Page-level border is handled by label page.
+       PO and Box borders are handled individually. */
+
+    const poEl=
+        document.createElement("div");
+
+    poEl.className="preview-po";
+
+    poEl.textContent=po;
+
+    poEl.style.fontFamily=
+        $("fontFamily").value;
+
+    poEl.style.fontSize=
+        $("fontSize").value+"px";
+
+    applyFontStyle(
+        poEl,
+        cocoFontStyle
+    );
+
+
+    const boxEl=
+        document.createElement("div");
+
+    boxEl.className="preview-box";
+
+    boxEl.textContent=
+        (
+            $("boxPrefix").value ||
+            "BOX"
+        )+
+        " NO. "+
+        box;
+
+    boxEl.style.fontFamily=
+        $("fontFamily").value;
+
+    boxEl.style.fontSize=
+        Math.max(
+            12,
+            Number($("fontSize").value)-2
+        )+"px";
+
+    applyFontStyle(
+        boxEl,
+        cocoFontStyle
+    );
+
+
+    /* PO ONLY */
+
+    if(content==="po"){
+
+        label.appendChild(poEl);
+
+    }
+
+
+    /* BOX ONLY */
+
+    if(content==="box"){
+
+        label.appendChild(boxEl);
+
+    }
+
+
+    /* BOTH */
+
+    if(content==="both"){
+
+        label.appendChild(poEl);
+
+        label.appendChild(boxEl);
+
+    }
+
+
+    /* PO BORDER */
+
+    if(
+        content!=="box" &&
+        $("poBorder").value!=="none"
+    ){
+
+        poEl.style.border=
+            borderCSS(
+                $("poBorder").value
+            );
+
+        poEl.style.padding="4px 7px";
+
+    }
+
+
+    /* BOX BORDER */
+
+    if(
+        content!=="po" &&
+        $("boxBorder").value!=="none"
+    ){
+
+        boxEl.style.border=
+            borderCSS(
+                $("boxBorder").value
+            );
+
+        boxEl.style.padding="4px 7px";
+
+    }
+
+
+    /* BOTH BORDER */
+
+    if(
+        $("bothBorder").value!=="none"
+    ){
+
+        label.style.border=
+            borderCSS(
+                $("bothBorder").value
+            );
+
+    }
+
+
+    /* BARCODE */
+
+    if(
+        cocoBarcode &&
+        po &&
+        content!=="box"
+    ){
+
+        const barcode=
+            makeBarcodeSVG(po);
+
+        label.appendChild(
+            barcode
+        );
+
+    }
+
+
+    return label;
+}
+
+
+/* =========================================================
+   PAGE BORDER
+========================================================= */
+
+function applyPageBorder(page,borderId){
+
+    if(!$(borderId))return;
+
+    page.style.border=
+        borderCSS(
+            $(borderId).value
+        );
+
+    page.style.borderRadius=
+        "0";
 
 }
 
@@ -4897,24 +3768,19 @@ function getBorderCSS(value){
 
 function renderCoco(){
 
-    const page =
-        $("labelPage");
+    const page=$("labelPage");
 
-    if(!page) return;
-
+    if(!page)return;
 
     page.innerHTML="";
 
+    const pos=getPOList();
 
-    const pos =
-        getPOList();
+    const start=
+        Number($("startBox").value);
 
-
-    const {
-        start,
-        end
-    } =
-        getRange();
+    const end=
+        Number($("endBox").value);
 
 
     if(
@@ -4923,6 +3789,11 @@ function renderCoco(){
         !Number.isFinite(end) ||
         start>end
     ){
+
+        applyPageBorder(
+            page,
+            "pageBorder"
+        );
 
         page.innerHTML=`
 
@@ -4933,9 +3804,10 @@ function renderCoco(){
                 place-items:center;
                 text-align:center;
                 color:#94a3b8;
+                font-size:11px;
             ">
 
-                Enter PO number and Box range
+                Enter PO and valid Box range<br>
                 to see live preview.
 
             </div>
@@ -4947,120 +3819,61 @@ function renderCoco(){
     }
 
 
-    const poPrefix =
-        $("poPrefix")
-        ? $("poPrefix").value
-        : "";
+    applyPageBorder(
+        page,
+        "pageBorder"
+    );
 
 
-    const poNumber =
-        $("poNumber")
-        ? $("poNumber").value
-        : "";
-
-
-    const boxPrefix =
-        $("boxPrefix")
-        ? $("boxPrefix").value
-        : "BOX";
-
-
-    const po =
-        (
-            poPrefix +
-            poNumber
-        ).trim()
-        ||
-        pos[0];
-
-
-    const settings={
-
-        content:
-            $("contentType").value,
-
-        boxPrefix,
-
-        poBorder:
-            $("poBorder").value,
-
-        boxBorder:
-            $("boxBorder").value,
-
-        bothBorder:
-            $("bothBorder").value,
-
-        fontFamily:
-            $("fontFamily").value,
-
-        fontSize:
-            Number(
-                $("fontSize").value
-            ),
-
-        fontStyle:
-            cocoFontStyle
-
-    };
-
-
-    const count =
-        Math.max(
-            1,
-            cocoLabelsPerPage
-        );
-
-
-    const columns =
-        count <= 1
+    const columns=
+        cocoLabels<=1
         ? 1
-        : count <= 4
+        : cocoLabels<=4
         ? 2
         : 3;
 
 
-    page.style.gridTemplateColumns =
+    page.style.gridTemplateColumns=
         `repeat(${columns},1fr)`;
 
 
-    let box =
-        start;
+    let index=0;
 
 
     for(
-        let i=0;
-        i<count;
-        i++
+        let p=0;
+        p<pos.length && index<cocoLabels;
+        p++
     ){
 
-        page.appendChild(
+        for(
+            let box=start;
+            box<=end &&
+            index<cocoLabels;
+            box++
+        ){
 
-            createLabelElement(
-                po,
-                Math.min(
-                    box,
-                    end
-                ),
-                settings
-            )
+            page.appendChild(
+                createCocoLabel(
+                    (
+                        $("poPrefix").value+
+                        $("poNumber").value
+                    ).trim() ||
+                    pos[p],
+                    box
+                )
+            );
 
-        );
-
-
-        if(box<end){
-
-            box++;
+            index++;
 
         }
 
     }
 
 
-    $("previewStatus")
-    .textContent =
-        `${count} label${count===1?"":"s"} per page • ` +
-        `${pos.length} PO number${pos.length===1?"":"s"} • ` +
-        `Box ${start}–${end}.`;
+    $("previewStatus").textContent=
+        `${cocoLabels} label${cocoLabels===1?"":"s"} per page • `+
+        `PO Barcode: ${cocoBarcode?"ON":"OFF"}`;
 
 }
 
@@ -5071,44 +3884,33 @@ function renderCoco(){
 
 function renderOther(){
 
-    const page =
-        $("otherLabelPage");
+    const page=$("otherLabelPage");
 
-    if(!page) return;
-
+    if(!page)return;
 
     page.innerHTML="";
 
-
-    const po =
+    const po=
         (
-            $("otherPOPrefix")
-            ? $("otherPOPrefix").value
-            : ""
-        ) +
-        (
-            $("otherPO")
-            ? $("otherPO").value
-            : ""
-        );
+            $("otherPOPrefix").value+
+            $("otherPO").value
+        ).trim();
+
+    const start=
+        Number($("otherStartBox").value);
+
+    const end=
+        Number($("otherEndBox").value);
 
 
-    const start =
-        Number(
-            $("otherStartBox")
-            .value
-        );
-
-
-    const end =
-        Number(
-            $("otherEndBox")
-            .value
-        );
+    applyPageBorder(
+        page,
+        "otherPageBorder"
+    );
 
 
     if(
-        !po.trim() ||
+        !po ||
         !Number.isFinite(start) ||
         !Number.isFinite(end) ||
         start>end
@@ -5122,11 +3924,8 @@ function renderOther(){
                 display:grid;
                 place-items:center;
                 color:#94a3b8;
-                text-align:center;
             ">
-
-                Enter PO and Box range.
-
+                Enter PO and valid Box range.
             </div>
 
         `;
@@ -5136,87 +3935,81 @@ function renderOther(){
     }
 
 
-    const settings={
-
-        content:
-            $("otherContentType").value,
-
-        boxPrefix:
-            $("otherBoxPrefix").value ||
-            "BOX",
-
-        poBorder:
-            $("otherPOBorder").value,
-
-        boxBorder:
-            $("otherBoxBorder").value,
-
-        bothBorder:
-            $("otherBothBorder").value,
-
-        fontFamily:
-            $("otherFontFamily").value,
-
-        fontSize:
-            Number(
-                $("otherFontSize").value
-            ),
-
-        fontStyle:
-            "normal"
-
-    };
-
-
-    const count =
-        Math.max(
-            1,
-            otherLabelsPerPage
-        );
-
-
-    const columns =
-        count<=1
+    const columns=
+        otherLabels<=1
         ? 1
-        : count<=4
+        : otherLabels<=4
         ? 2
         : 3;
 
 
-    page.style.gridTemplateColumns =
+    page.style.gridTemplateColumns=
         `repeat(${columns},1fr)`;
 
 
     for(
         let i=0;
-        i<count;
+        i<otherLabels;
         i++
     ){
 
-        page.appendChild(
+        const label=
+            document.createElement("div");
 
-            createLabelElement(
+        label.className="preview-label";
 
-                po,
+        const content=
+            $("otherContentType").value;
 
+
+        if(content!=="box"){
+
+            const poEl=
+                document.createElement("div");
+
+            poEl.className="preview-po";
+
+            poEl.textContent=po;
+
+            label.appendChild(poEl);
+
+        }
+
+
+        if(content!=="po"){
+
+            const boxEl=
+                document.createElement("div");
+
+            boxEl.className="preview-box";
+
+            boxEl.textContent=
+                "BOX NO. "+
                 Math.min(
                     start+i,
                     end
-                ),
+                );
 
-                settings
+            label.appendChild(boxEl);
 
-            )
+        }
 
-        );
+
+        if(
+            otherBarcode &&
+            content!=="box"
+        ){
+
+            label.appendChild(
+                makeBarcodeSVG(po)
+            );
+
+        }
+
+
+        page.appendChild(label);
 
     }
-
-
-    $("otherStatus")
-    .textContent =
-        `${count} label${count===1?"":"s"} per page • ` +
-        `Box ${start}–${end}.`;
 
 }
 
@@ -5227,19 +4020,20 @@ function renderOther(){
 
 function renderISBN(){
 
-    const page =
-        $("isbnLabelPage");
+    const page=$("isbnLabelPage");
 
-    if(!page) return;
-
+    if(!page)return;
 
     page.innerHTML="";
 
+    applyPageBorder(
+        page,
+        "isbnPageBorder"
+    );
 
-    const isbn =
-        $("isbnNumber")
-        ? $("isbnNumber").value.trim()
-        : "";
+
+    const isbn=
+        $("isbnNumber").value.trim();
 
 
     if(!isbn){
@@ -5251,12 +4045,10 @@ function renderISBN(){
                 min-height:350px;
                 display:grid;
                 place-items:center;
-                text-align:center;
                 color:#94a3b8;
+                text-align:center;
             ">
-
-                Enter ISBN to preview barcode.
-
+                Enter ISBN to generate barcode.
             </div>
 
         `;
@@ -5266,157 +4058,82 @@ function renderISBN(){
     }
 
 
-    const count =
-        Math.max(
-            1,
-            isbnLabelsPerPage
-        );
-
-
-    const columns =
-        count<=1
+    const columns=
+        isbnLabels<=1
         ? 1
-        : count<=4
+        : isbnLabels<=4
         ? 2
         : 3;
 
 
-    page.style.gridTemplateColumns =
+    page.style.gridTemplateColumns=
         `repeat(${columns},1fr)`;
 
 
     for(
         let i=0;
-        i<count;
+        i<isbnLabels;
         i++
     ){
 
-        const label =
-            document.createElement(
-                "div"
+        const label=
+            document.createElement("div");
+
+        label.className="preview-label";
+
+
+        const number=
+            document.createElement("div");
+
+        number.textContent=isbn;
+
+        number.style.fontFamily=
+            $("isbnFontFamily").value;
+
+        number.style.fontSize=
+            $("isbnFontSize").value+"px";
+
+
+        const barcode=
+            makeBarcodeSVG(
+                isbn.replace(
+                    /[^0-9Xx]/g,
+                    ""
+                )
             );
 
 
-        label.className =
-            "preview-label";
+        label.appendChild(number);
 
+        label.appendChild(barcode);
 
-        const title =
-            document.createElement(
-                "div"
-            );
-
-
-        title.textContent =
-            "ISBN";
-
-
-        title.style.fontWeight =
-            "800";
-
-
-        const number =
-            document.createElement(
-                "div"
-            );
-
-
-        number.textContent =
-            isbn;
-
-
-        number.style.fontSize =
-            (
-                $("isbnFontSize")
-                ? $("isbnFontSize").value
-                : 18
-            ) +
-            "px";
-
-
-        const barcode =
-            document.createElement(
-                "svg"
-            );
-
-
-        barcode.className =
-            "preview-barcode";
-
-
-        label.appendChild(
-            title
-        );
-
-        label.appendChild(
-            number
-        );
-
-        label.appendChild(
-            barcode
-        );
-
-
-        page.appendChild(
-            label
-        );
-
-
-        if(
-            typeof JsBarcode !==
-            "undefined"
-        ){
-
-            try{
-
-                JsBarcode(
-                    barcode,
-                    isbn.replace(
-                        /[^0-9Xx]/g,
-                        ""
-                    ),
-                    {
-                        format:"EAN13",
-                        width:1.5,
-                        height:45,
-                        displayValue:true,
-                        fontSize:10,
-                        margin:4
-                    }
-                );
-
-            }
-            catch(error){
-
-                console.warn(
-                    "Barcode format issue",
-                    error
-                );
-
-                try{
-
-                    JsBarcode(
-                        barcode,
-                        isbn.replace(
-                            /[^0-9]/g,
-                            ""
-                        ),
-                        {
-                            format:"CODE128",
-                            width:1.5,
-                            height:45,
-                            displayValue:true
-                        }
-                    );
-
-                }
-                catch(e){}
-
-            }
-
-        }
+        page.appendChild(label);
 
     }
+
+}
+
+
+/* =========================================================
+   ADDRESS VALIDATION
+========================================================= */
+
+function addressIsValid(){
+
+    const required=[
+        "fromName",
+        "fromAddress",
+        "fromLocation",
+        "toName",
+        "toAddress",
+        "toLocation"
+    ];
+
+    return required.every(
+        id=>
+            $(id) &&
+            $(id).value.trim()!==""
+    );
 
 }
 
@@ -5427,52 +4144,37 @@ function renderISBN(){
 
 function renderAddress(){
 
-    const page =
-        $("addressLabelPage");
+    const page=$("addressLabelPage");
 
-    if(!page) return;
-
+    if(!page)return;
 
     page.innerHTML="";
 
-
-    const name =
-        $("addressName")
-        ? $("addressName").value.trim()
-        : "";
-
-
-    const address =
-        $("addressText")
-        ? $("addressText").value.trim()
-        : "";
+    applyPageBorder(
+        page,
+        "addressPageBorder"
+    );
 
 
-    const city =
-        $("addressCity")
-        ? $("addressCity").value.trim()
-        : "";
+    const valid=
+        addressIsValid();
 
 
-    const state =
-        $("addressState")
-        ? $("addressState").value.trim()
-        : "";
+    $("addressWarning")
+        .classList.toggle(
+            "hidden",
+            valid
+        );
 
 
-    const pin =
-        $("addressPin")
-        ? $("addressPin").value.trim()
-        : "";
+    $("addressSuccess")
+        .classList.toggle(
+            "hidden",
+            !valid
+        );
 
 
-    if(
-        !name &&
-        !address &&
-        !city &&
-        !state &&
-        !pin
-    ){
+    if(!valid){
 
         page.innerHTML=`
 
@@ -5481,12 +4183,31 @@ function renderAddress(){
                 min-height:350px;
                 display:grid;
                 place-items:center;
-                color:#94a3b8;
                 text-align:center;
+                color:#94a3b8;
             ">
 
-                Enter address details
-                to see live preview.
+                <div>
+
+                    <div style="
+                        font-size:35px;
+                        margin-bottom:10px;
+                    ">
+                        📦
+                    </div>
+
+                    <b>
+                        From + To required
+                    </b>
+
+                    <br>
+
+                    <small>
+                        Complete both addresses
+                        for live preview.
+                    </small>
+
+                </div>
 
             </div>
 
@@ -5497,103 +4218,141 @@ function renderAddress(){
     }
 
 
-    const count =
-        Math.max(
-            1,
-            addressLabelsPerPage
-        );
-
-
-    const columns =
-        count<=1
+    const columns=
+        addressLabels<=1
         ? 1
-        : count<=4
+        : addressLabels<=4
         ? 2
         : 3;
 
 
-    page.style.gridTemplateColumns =
+    page.style.gridTemplateColumns=
         `repeat(${columns},1fr)`;
 
 
     for(
         let i=0;
-        i<count;
+        i<addressLabels;
         i++
     ){
 
-        const label =
-            document.createElement(
-                "div"
+        const label=
+            document.createElement("div");
+
+        label.className="preview-label";
+
+        label.style.alignItems="flex-start";
+
+        label.style.textAlign="left";
+
+        label.style.padding="14px";
+
+
+        const family=
+            $("addressFontFamily").value;
+
+        const size=
+            $("addressFontSize").value;
+
+
+        label.style.fontFamily=family;
+
+
+        const title=
+            document.createElement("div");
+
+        title.textContent="FROM";
+
+        title.style.fontSize=
+            "9px";
+
+        title.style.fontWeight=
+            "800";
+
+        title.style.color=
+            "#64748b";
+
+
+        const from=
+            document.createElement("div");
+
+        from.style.fontSize=
+            size+"px";
+
+        from.style.fontWeight=
+            "700";
+
+        from.innerHTML=
+            escapeHTML(
+                $("fromName").value
+            )+
+            "<br>"+
+            escapeHTML(
+                $("fromAddress").value
+            )+
+            "<br>"+
+            escapeHTML(
+                $("fromLocation").value
             );
 
 
-        label.className =
-            "preview-label";
+        const divider=
+            document.createElement("hr");
+
+        divider.style.width="100%";
+
+        divider.style.border="0";
+
+        divider.style.borderTop=
+            "1px solid #cbd5e1";
 
 
-        label.style.alignItems =
-            "flex-start";
+        const toTitle=
+            document.createElement("div");
+
+        toTitle.textContent="TO";
+
+        toTitle.style.fontSize="9px";
+
+        toTitle.style.fontWeight="800";
+
+        toTitle.style.color="#1769e0";
 
 
-        label.style.textAlign =
-            "left";
+        const to=
+            document.createElement("div");
+
+        to.style.fontSize=
+            size+"px";
+
+        to.style.fontWeight=
+            "800";
+
+        to.innerHTML=
+            escapeHTML(
+                $("toName").value
+            )+
+            "<br>"+
+            escapeHTML(
+                $("toAddress").value
+            )+
+            "<br>"+
+            escapeHTML(
+                $("toLocation").value
+            );
 
 
-        label.style.padding =
-            "15px";
+        label.appendChild(title);
 
+        label.appendChild(from);
 
-        const fontFamily =
-            $("addressFontFamily")
-            ? $("addressFontFamily").value
-            : "Arial";
+        label.appendChild(divider);
 
+        label.appendChild(toTitle);
 
-        const fontSize =
-            $("addressFontSize")
-            ? $("addressFontSize").value
-            : 18;
+        label.appendChild(to);
 
-
-        label.style.fontFamily =
-            fontFamily;
-
-
-        label.style.fontSize =
-            fontSize + "px";
-
-
-        label.innerHTML=`
-
-            <div
-                style="
-                    font-weight:800;
-                    margin-bottom:8px;
-                "
-            >
-                ${escapeHTML(name)}
-            </div>
-
-            <div>
-                ${escapeHTML(address)}
-            </div>
-
-            <div style="margin-top:5px">
-                ${escapeHTML(city)}
-            </div>
-
-            <div>
-                ${escapeHTML(state)}
-                ${pin ? " - "+escapeHTML(pin) : ""}
-            </div>
-
-        `;
-
-
-        page.appendChild(
-            label
-        );
+        page.appendChild(label);
 
     }
 
@@ -5601,38 +4360,17 @@ function renderAddress(){
 
 
 /* =========================================================
-   ESCAPE HTML
+   ESCAPE
 ========================================================= */
 
 function escapeHTML(value){
 
     return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 }
 
 
@@ -5640,7 +4378,7 @@ function escapeHTML(value){
    RENDER ALL
 ========================================================= */
 
-function renderAllPreviews(){
+function renderAll(){
 
     renderCoco();
 
@@ -5654,103 +4392,588 @@ function renderAllPreviews(){
 
 
 /* =========================================================
-   COMMON LIVE EVENTS
+   PDF FORMAT
 ========================================================= */
 
-[
-    "manualPO",
-    "poPrefix",
-    "poNumber",
-    "boxPrefix",
-    "startBox",
-    "endBox",
-    "contentType",
-    "fontFamily",
-    "fontSize",
-    "poBorder",
-    "boxBorder",
-    "bothBorder",
+function getFormat(type,w,h){
 
-    "otherPOPrefix",
-    "otherPO",
-    "otherStartBox",
-    "otherEndBox",
-    "otherBoxPrefix",
-    "otherContentType",
-    "otherFontFamily",
-    "otherFontSize",
-    "otherPOBorder",
-    "otherBoxBorder",
-    "otherBothBorder",
-
-    "isbnNumber",
-    "isbnFontFamily",
-    "isbnFontSize",
-
-    "addressName",
-    "addressText",
-    "addressCity",
-    "addressState",
-    "addressPin",
-    "addressFontFamily",
-    "addressFontSize"
-
-].forEach(id=>{
-
-    if($(id)){
-
-        $(id).addEventListener(
-            "input",
-            renderAllPreviews
-        );
-
-
-        $(id).addEventListener(
-            "change",
-            renderAllPreviews
-        );
-
+    if(type==="70x35"){
+        return {
+            width:70,
+            height:35
+        };
     }
 
-});
+    if(type==="4x6"){
+        return {
+            width:101.6,
+            height:152.4
+        };
+    }
+
+    if(type==="custom"){
+        return {
+            width:Number(w)||100,
+            height:Number(h)||150
+        };
+    }
+
+    return {
+        width:210,
+        height:297
+    };
+}
 
 
 /* =========================================================
-   GENERIC FONT BUTTONS
+   ADD BARCODE TO PDF
 ========================================================= */
 
-$$(".font-style-btn")
-.forEach(
-    button=>{
+function addBarcodeToPDF(
+    pdf,
+    value,
+    x,
+    y,
+    width,
+    height
+){
 
-        button.addEventListener(
-            "click",
-            ()=>{
+    if(
+        !value ||
+        typeof JsBarcode==="undefined"
+    ){
+        return false;
+    }
 
-                const parent =
-                    button.parentElement;
+
+    try{
+
+        const canvas=
+            document.createElement("canvas");
+
+        JsBarcode(
+            canvas,
+            String(value),
+            {
+                format:"CODE128",
+                width:2,
+                height:60,
+                displayValue:true,
+                fontSize:14,
+                margin:5,
+                background:"#ffffff",
+                lineColor:"#000000"
+            }
+        );
 
 
-                parent
-                .querySelectorAll(
-                    ".font-style-btn"
-                )
-                .forEach(
-                    x =>
-                    x.classList.remove(
-                        "active"
+        const data=
+            canvas.toDataURL(
+                "image/png"
+            );
+
+
+        pdf.addImage(
+            data,
+            "PNG",
+            x,
+            y,
+            width,
+            height
+        );
+
+
+        return true;
+
+    }catch(error){
+
+        console.error(
+            "PDF barcode error:",
+            error
+        );
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   COCO PDF
+========================================================= */
+
+function generateCocoPDF(){
+
+    if(
+        typeof window.jspdf==="undefined"
+    ){
+
+        showToast(
+            "PDF library not loaded. Check internet connection.",
+            "bad"
+        );
+
+        return;
+
+    }
+
+
+    const poList=
+        getPOList();
+
+
+    if(!poList.length){
+
+        showToast(
+            "Please enter PO number.",
+            "bad"
+        );
+
+        return;
+
+    }
+
+
+    if(!validateRange()){
+
+        showToast(
+            "Please enter a valid Box range.",
+            "bad"
+        );
+
+        return;
+
+    }
+
+
+    const format=
+        getFormat(
+            cocoPageSize,
+            $("customWidth")?.value,
+            $("customHeight")?.value
+        );
+
+
+    const {
+        jsPDF
+    }=window.jspdf;
+
+
+    const pdf=
+        new jsPDF({
+            orientation:
+                format.width>format.height
+                ? "landscape"
+                : "portrait",
+            unit:"mm",
+            format:[
+                format.width,
+                format.height
+            ]
+        });
+
+
+    const perPage=
+        Math.max(
+            1,
+            cocoLabels
+        );
+
+
+    const cols=
+        perPage<=1
+        ? 1
+        : perPage<=4
+        ? 2
+        : 3;
+
+
+    const rows=
+        Math.ceil(
+            perPage/cols
+        );
+
+
+    const cellW=
+        format.width/cols;
+
+    const cellH=
+        format.height/rows;
+
+
+    let pageIndex=0;
+
+    let labelIndex=0;
+
+
+    const content=
+        $("contentType").value;
+
+
+    for(
+        const poRaw of poList
+    ){
+
+        const po=
+            (
+                $("poPrefix").value+
+                $("poNumber").value
+            ).trim()
+            ||poRaw;
+
+
+        for(
+            let box=
+                Number($("startBox").value);
+
+            box<=
+                Number($("endBox").value);
+
+            box++
+        ){
+
+            if(
+                labelIndex>0 &&
+                labelIndex%perPage===0
+            ){
+
+                pdf.addPage(
+                    [
+                        format.width,
+                        format.height
+                    ]
+                );
+
+                pageIndex++;
+
+            }
+
+
+            const slot=
+                labelIndex%perPage;
+
+
+            const col=
+                slot%cols;
+
+            const row=
+                Math.floor(slot/cols);
+
+
+            const x=
+                col*cellW;
+
+            const y=
+                row*cellH;
+
+
+            /* PAGE BORDER */
+
+            if(
+                $("pageBorder").value!=="none"
+            ){
+
+                pdf.setDrawColor(
+                    20,
+                    32,
+                    51
+                );
+
+                pdf.setLineWidth(.45);
+
+                pdf.rect(
+                    .8,
+                    .8,
+                    format.width-1.6,
+                    format.height-1.6
+                );
+
+            }
+
+
+            /* LABEL BORDER */
+
+            if(
+                $("bothBorder").value!=="none"
+            ){
+
+                pdf.setDrawColor(
+                    20,
+                    32,
+                    51
+                );
+
+                pdf.setLineWidth(.35);
+
+                pdf.rect(
+                    x+2,
+                    y+2,
+                    cellW-4,
+                    cellH-4
+                );
+
+            }
+
+
+            const fontSize=
+                Number(
+                    $("fontSize").value
+                );
+
+
+            let textY=
+                y+
+                cellH*.42;
+
+
+            if(
+                content!=="box"
+            ){
+
+                pdf.setFont(
+                    "helvetica",
+                    cocoFontStyle==="bold"
+                    ? "bold"
+                    : cocoFontStyle==="italic"
+                    ? "italic"
+                    : "normal"
+                );
+
+                pdf.setFontSize(
+                    Math.max(
+                        8,
+                        fontSize*.55
                     )
                 );
 
 
-                button.classList.add(
-                    "active"
+                pdf.text(
+                    po,
+                    x+cellW/2,
+                    textY,
+                    {
+                        align:"center"
+                    }
                 );
 
 
-                renderAllPreviews();
+                if(
+                    $("poBorder").value!=="none"
+                ){
+
+                    pdf.setDrawColor(
+                        30,
+                        41,
+                        59
+                    );
+
+                    pdf.rect(
+                        x+8,
+                        textY-7,
+                        cellW-16,
+                        10
+                    );
+
+                }
 
             }
+
+
+            if(
+                content!=="po"
+            ){
+
+                const boxText=
+                    (
+                        $("boxPrefix").value||
+                        "BOX"
+                    )+
+                    " NO. "+
+                    box;
+
+
+                pdf.setFont(
+                    "helvetica",
+                    "bold"
+                );
+
+                pdf.setFontSize(
+                    Math.max(
+                        8,
+                        fontSize*.48
+                    )
+                );
+
+
+                pdf.text(
+                    boxText,
+                    x+cellW/2,
+                    y+
+                    cellH*.60,
+                    {
+                        align:"center"
+                    }
+                );
+
+
+                if(
+                    $("boxBorder").value!=="none"
+                ){
+
+                    pdf.rect(
+                        x+8,
+                        y+
+                        cellH*.60-7,
+                        cellW-16,
+                        10
+                    );
+
+                }
+
+            }
+
+
+            /* REAL PO BARCODE */
+
+            if(
+                cocoBarcode &&
+                content!=="box"
+            ){
+
+                const barcodeWidth=
+                    Math.min(
+                        cellW-16,
+                        45
+                    );
+
+                const barcodeHeight=
+                    Math.min(
+                        16,
+                        cellH*.18
+                    );
+
+
+                addBarcodeToPDF(
+                    pdf,
+                    po,
+                    x+
+                    (
+                        cellW-
+                        barcodeWidth
+                    )/2,
+                    y+
+                    cellH*.68,
+                    barcodeWidth,
+                    barcodeHeight
+                );
+
+            }
+
+
+            labelIndex++;
+
+        }
+
+    }
+
+
+    pdf.save(
+        "BooksWagon_CocoBlu_PO_Labels.pdf"
+    );
+
+
+    showToast(
+        "CocoBlu PDF generated successfully."
+    );
+
+}
+
+
+/* =========================================================
+   PRINT COCO
+========================================================= */
+
+function printCoco(){
+
+    if(!getPOList().length){
+
+        showToast(
+            "Please enter PO number.",
+            "bad"
+        );
+
+        return;
+
+    }
+
+
+    if(!validateRange()){
+
+        showToast(
+            "Please correct Box range.",
+            "bad"
+        );
+
+        return;
+
+    }
+
+
+    window.print();
+
+}
+
+
+/* =========================================================
+   COCO BUTTONS
+========================================================= */
+
+$("generateCoco")
+.addEventListener(
+    "click",
+    generateCocoPDF
+);
+
+
+$("printCoco")
+.addEventListener(
+    "click",
+    printCoco
+);
+
+
+$("clearCoco")
+.addEventListener(
+    "click",
+    ()=>{
+
+        [
+            "manualPO",
+            "poPrefix",
+            "poNumber",
+            "startBox",
+            "endBox",
+            "boxPrefix",
+            "bulkPO"
+        ].forEach(id=>{
+
+            if($(id))
+                $(id).value="";
+
+        });
+
+        excelPOs=[];
+
+        $("excelFile").value="";
+
+        $("rangeWarning")
+            .classList.add("hidden");
+
+        renderCoco();
+
+        showToast(
+            "CocoBlu form cleared."
         );
 
     }
@@ -5758,169 +4981,49 @@ $$(".font-style-btn")
 
 
 /* =========================================================
-   CLEAR COCO
+   ADDRESS PDF VALIDATION
 ========================================================= */
 
-if($("clearCoco")){
+function validateAddressBeforeAction(){
 
-    $("clearCoco")
-    .addEventListener(
-        "click",
-        ()=>{
+    if(!addressIsValid()){
 
-            [
-                "manualPO",
-                "poPrefix",
-                "poNumber",
-                "boxPrefix",
-                "startBox",
-                "endBox"
-            ]
-            .forEach(
-                id=>{
-                    if($(id))
-                        $(id).value="";
-                }
-            );
+        $("addressWarning")
+            .classList.remove("hidden");
 
+        $("addressSuccess")
+            .classList.add("hidden");
 
-            $("bulkPO").value="";
+        showToast(
+            "From and To are mandatory.",
+            "bad"
+        );
 
-            $("excelFile").value="";
+        return false;
 
-            excelPOs=[];
+    }
 
-
-            $("contentType").value="po";
-
-            $("poBorder").value="none";
-
-            $("boxBorder").value="none";
-
-            $("bothBorder").value="none";
-
-
-            renderCoco();
-
-
-            toast(
-                "CocoBlu form cleared."
-            );
-
-        }
-    );
+    return true;
 
 }
 
 
 /* =========================================================
-   PDF PAGE FORMAT
+   ADDRESS PDF
 ========================================================= */
 
-function getPageFormat(
-    type,
-    customWidth,
-    customHeight
-){
+function generateAddressPDF(){
 
-    if(type==="70x35"){
-
-        return {
-            width:70,
-            height:35
-        };
-
-    }
-
-
-    if(type==="4x6"){
-
-        return {
-            width:101.6,
-            height:152.4
-        };
-
-    }
-
-
-    if(type==="custom"){
-
-        const width =
-            Number(customWidth) ||
-            100;
-
-
-        const height =
-            Number(customHeight) ||
-            150;
-
-
-        return {
-            width,
-            height
-        };
-
-    }
-
-
-    return {
-        width:210,
-        height:297
-    };
-
-}
-
-
-/* =========================================================
-   PDF GENERATOR
-========================================================= */
-
-function generatePDF(){
-
-    if(
-        typeof window.jspdf ===
-        "undefined"
-    ){
-
-        toast(
-            "PDF engine is not loaded.",
-            "bad"
-        );
-
+    if(!validateAddressBeforeAction())
         return;
-
-    }
-
-
-    const poList =
-        getPOList();
-
-
-    const {
-        start,
-        end
-    } =
-        getRange();
-
-
-    if(!poList.length){
-
-        toast(
-            "Please enter PO number.",
-            "bad"
-        );
-
-        return;
-
-    }
 
 
     if(
-        !validRange()
+        typeof window.jspdf==="undefined"
     ){
 
-        toast(
-            "Please correct Box range.",
+        showToast(
+            "PDF library not loaded.",
             "bad"
         );
 
@@ -5929,822 +5032,648 @@ function generatePDF(){
     }
 
 
-    const format =
-        getPageFormat(
-            cocoPageSize,
-            $("customWidth")
-                ? $("customWidth").value
-                : 100,
-            $("customHeight")
-                ? $("customHeight").value
-                : 150
+    const format=
+        getFormat(
+            addressPageSize
         );
 
 
     const {
         jsPDF
-    } =
-        window.jspdf;
+    }=window.jspdf;
 
 
-    const pdf =
+    const pdf=
         new jsPDF({
-
             orientation:
-                format.height >= format.width
-                ? "portrait"
-                : "landscape",
-
+                format.width>format.height
+                ?"landscape"
+                :"portrait",
             unit:"mm",
-
             format:[
                 format.width,
                 format.height
             ]
-
         });
 
 
-    let first=true;
+    if(
+        $("addressPageBorder").value!=="none"
+    ){
 
+        pdf.setLineWidth(.5);
 
-    const labels =
-        Math.max(
+        pdf.rect(
             1,
-            cocoLabelsPerPage
+            1,
+            format.width-2,
+            format.height-2
+        );
+
+    }
+
+
+    const margin=12;
+
+    const center=
+        format.width/2;
+
+
+    pdf.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    pdf.setFontSize(9);
+
+    pdf.text(
+        "FROM",
+        margin,
+        18
+    );
+
+
+    pdf.setFontSize(14);
+
+    pdf.text(
+        $("fromName").value,
+        margin,
+        27
+    );
+
+
+    pdf.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    pdf.setFontSize(10);
+
+
+    const fromLines=
+        pdf.splitTextToSize(
+            $("fromAddress").value+
+            "\n"+
+            $("fromLocation").value,
+            format.width-
+            margin*2
         );
 
 
-    let generated=0;
-
-
-    poList.forEach(
-        po=>{
-
-            for(
-                let box=start;
-                box<=end;
-                box++
-            ){
-
-                if(!first){
-
-                    if(
-                        generated %
-                        labels ===
-                        0
-                    ){
-
-                        pdf.addPage(
-                            [
-                                format.width,
-                                format.height
-                            ]
-                        );
-
-                    }
-
-                }
-
-
-                first=false;
-
-
-                const cellIndex =
-                    generated %
-                    labels;
-
-
-                const cols =
-                    labels<=1
-                    ? 1
-                    : labels<=4
-                    ? 2
-                    : 3;
-
-
-                const rows =
-                    Math.ceil(
-                        labels /
-                        cols
-                    );
-
-
-                const cellWidth =
-                    format.width /
-                    cols;
-
-
-                const cellHeight =
-                    format.height /
-                    rows;
-
-
-                const col =
-                    cellIndex %
-                    cols;
-
-
-                const row =
-                    Math.floor(
-                        cellIndex /
-                        cols
-                    );
-
-
-                const x =
-                    col *
-                    cellWidth;
-
-
-                const y =
-                    row *
-                    cellHeight;
-
-
-                pdf.setDrawColor(
-                    180,
-                    190,
-                    200
-                );
-
-
-                if(
-                    $("bothBorder").value !==
-                    "none"
-                ){
-
-                    pdf.setLineWidth(
-                        .5
-                    );
-
-                    pdf.rect(
-                        x+2,
-                        y+2,
-                        cellWidth-4,
-                        cellHeight-4
-                    );
-
-                }
-
-
-                const content =
-                    $("contentType").value;
-
-
-                const fontFamily =
-                    $("fontFamily").value;
-
-
-                const fontSize =
-                    Number(
-                        $("fontSize").value
-                    );
-
-
-                let style="normal";
-
-
-                const activeStyle =
-                    document.querySelector(
-                        "#cocoPanel .font-style-btn.active"
-                    );
-
-
-                if(
-                    activeStyle &&
-                    activeStyle.dataset.style
-                ){
-
-                    style =
-                        activeStyle.dataset.style;
-
-                }
-
-
-                if(
-                    content==="po" ||
-                    content==="both"
-                ){
-
-                    pdf.setFont(
-                        "helvetica",
-                        style==="italic"
-                        ? "italic"
-                        : style==="bold"
-                        ? "bold"
-                        : "normal"
-                    );
-
-
-                    pdf.setFontSize(
-                        fontSize / 1.3
-                    );
-
-
-                    pdf.text(
-                        po,
-                        x +
-                        cellWidth/2,
-                        y +
-                        cellHeight *
-                        (
-                            content==="both"
-                            ? .42
-                            : .52
-                        ),
-                        {
-                            align:"center"
-                        }
-                    );
-
-                }
-
-
-                if(
-                    content==="box" ||
-                    content==="both"
-                ){
-
-                    pdf.setFont(
-                        "helvetica",
-                        "bold"
-                    );
-
-
-                    pdf.setFontSize(
-                        Math.max(
-                            10,
-                            fontSize/1.5
-                        )
-                    );
-
-
-                    const boxText =
-                        (
-                            $("boxPrefix")
-                            .value ||
-                            "BOX"
-                        ) +
-                        " NO. " +
-                        box;
-
-
-                    pdf.text(
-                        boxText,
-                        x +
-                        cellWidth/2,
-                        y +
-                        cellHeight *
-                        (
-                            content==="both"
-                            ? .62
-                            : .55
-                        ),
-                        {
-                            align:"center"
-                        }
-                    );
-
-                }
-
-
-                generated++;
-
-            }
-
-        }
+    pdf.text(
+        fromLines,
+        margin,
+        36
+    );
+
+
+    pdf.setDrawColor(
+        180,
+        190,
+        200
+    );
+
+    pdf.line(
+        margin,
+        format.height*.48,
+        format.width-margin,
+        format.height*.48
+    );
+
+
+    pdf.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    pdf.setTextColor(
+        23,
+        105,
+        224
+    );
+
+    pdf.setFontSize(9);
+
+    pdf.text(
+        "TO",
+        margin,
+        format.height*.48+12
+    );
+
+
+    pdf.setTextColor(
+        20,
+        32,
+        51
+    );
+
+    pdf.setFontSize(17);
+
+    pdf.text(
+        $("toName").value,
+        margin,
+        format.height*.48+23
+    );
+
+
+    pdf.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    pdf.setFontSize(11);
+
+
+    const toLines=
+        pdf.splitTextToSize(
+            $("toAddress").value+
+            "\n"+
+            $("toLocation").value,
+            format.width-
+            margin*2
+        );
+
+
+    pdf.text(
+        toLines,
+        margin,
+        format.height*.48+33
     );
 
 
     pdf.save(
-        "BooksWagon_Labels.pdf"
+        "BooksWagon_Address_Labels.pdf"
     );
 
 
-    toast(
-        "PDF generated successfully."
+    showToast(
+        "Address PDF generated successfully."
     );
 
 }
 
 
+$("addressGenerate")
+.addEventListener(
+    "click",
+    generateAddressPDF
+);
+
+
+$("addressPrint")
+.addEventListener(
+    "click",
+    ()=>{
+
+        if(
+            validateAddressBeforeAction()
+        ){
+
+            window.print();
+
+        }
+
+    }
+);
+
+
+$("addressClear")
+.addEventListener(
+    "click",
+    ()=>{
+
+        [
+            "fromName",
+            "fromAddress",
+            "fromLocation",
+            "toName",
+            "toAddress",
+            "toLocation"
+        ].forEach(id=>{
+            $(id).value="";
+        });
+
+        renderAddress();
+
+        showToast(
+            "Address form cleared."
+        );
+
+    }
+);
+
+
 /* =========================================================
-   PRINT
+   ISBN PDF
 ========================================================= */
 
-function printPDF(){
+function generateISBNPDF(){
 
-    const poList =
-        getPOList();
+    const isbn=
+        $("isbnNumber").value.trim();
+
+
+    if(!isbn){
+
+        showToast(
+            "Please enter ISBN.",
+            "bad"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        typeof window.jspdf==="undefined"
+    ){
+
+        showToast(
+            "PDF library not loaded.",
+            "bad"
+        );
+
+        return;
+
+    }
 
 
     const {
-        start,
-        end
-    } =
-        getRange();
+        jsPDF
+    }=window.jspdf;
 
 
-    if(!poList.length){
-
-        toast(
-            "Please enter PO number.",
-            "bad"
-        );
-
-        return;
-
-    }
-
-
-    if(!validRange()){
-
-        toast(
-            "Please correct Box range.",
-            "bad"
-        );
-
-        return;
-
-    }
-
-
-    const printWindow =
-        window.open(
-            "",
-            "_blank"
+    const format=
+        getFormat(
+            isbnPageSize
         );
 
 
-    if(!printWindow){
-
-        toast(
-            "Please allow popups for printing.",
-            "bad"
-        );
-
-        return;
-
-    }
-
-
-    const labels=[];
-
-
-    poList.forEach(
-        po=>{
-
-            for(
-                let box=start;
-                box<=end;
-                box++
-            ){
-
-                labels.push({
-                    po,
-                    box
-                });
-
-            }
-
-        }
-    );
+    const pdf=
+        new jsPDF({
+            orientation:
+                format.width>format.height
+                ?"landscape"
+                :"portrait",
+            unit:"mm",
+            format:[
+                format.width,
+                format.height
+            ]
+        });
 
 
-    const labelsPerPage =
+    const perPage=
         Math.max(
             1,
-            cocoLabelsPerPage
+            isbnLabels
         );
 
 
-    let htmlLabels="";
+    const cols=
+        perPage<=1
+        ?1
+        :perPage<=4
+        ?2
+        :3;
 
 
-    labels.forEach(
-        item=>{
-
-            htmlLabels += `
-
-                <div class="print-label">
-
-                    ${
-                        $("contentType").value !==
-                        "box"
-
-                        ?
-
-                        `<div class="print-po">
-                            ${escapeHTML(item.po)}
-                        </div>`
-
-                        :
-
-                        ""
-                    }
+    const rows=
+        Math.ceil(
+            perPage/cols
+        );
 
 
-                    ${
-                        $("contentType").value !==
-                        "po"
+    const cellW=
+        format.width/cols;
 
-                        ?
+    const cellH=
+        format.height/rows;
 
-                        `<div class="print-box">
-                            ${
-                                escapeHTML(
-                                    $("boxPrefix").value ||
-                                    "BOX"
-                                )
-                            }
-                            NO. ${item.box}
-                        </div>`
 
-                        :
+    for(
+        let i=0;
+        i<perPage;
+        i++
+    ){
 
-                        ""
-                    }
+        if(i>0)
+            pdf.addPage(
+                [
+                    format.width,
+                    format.height
+                ]
+            );
 
-                </div>
 
-            `;
+        const col=i%cols;
+
+        const row=Math.floor(i/cols);
+
+        const x=col*cellW;
+
+        const y=row*cellH;
+
+
+        if(
+            $("isbnPageBorder").value!=="none"
+        ){
+
+            pdf.rect(
+                .8,
+                .8,
+                format.width-1.6,
+                format.height-1.6
+            );
 
         }
-    );
 
 
-    printWindow.document.write(`
-
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<title>
-BooksWagon Labels
-</title>
-
-<style>
-
-@page{
-    size:A4;
-    margin:8mm;
-}
-
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-}
-
-.print-grid{
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(
-            ${
-                labelsPerPage<=1
-                ? 1
-                : labelsPerPage<=4
-                ? 2
-                : 3
-            },
-            1fr
+        pdf.setFont(
+            "helvetica",
+            "bold"
         );
 
-    gap:4mm;
+        pdf.setFontSize(12);
 
-}
-
-.print-label{
-
-    min-height:40mm;
-
-    border:
-        1px solid #172033;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    flex-direction:column;
-
-    text-align:center;
-
-    page-break-inside:avoid;
-
-    padding:5mm;
-
-}
-
-.print-po{
-
-    font-size:
-        ${
-            Number(
-                $("fontSize").value
-            )
-        }pt;
-
-    font-weight:800;
-
-}
-
-.print-box{
-
-    margin-top:4mm;
-
-    font-size:
-        ${
-            Math.max(
-                10,
-                Number(
-                    $("fontSize").value
-                )-2
-            )
-        }pt;
-
-    font-weight:700;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="print-grid">
-
-${htmlLabels}
-
-</div>
-
-<script>
-
-window.onload=function(){
-
-    setTimeout(
-        function(){
-            window.print();
-        },
-        500
-    );
-
-};
-
-<\/script>
-
-</body>
-
-</html>
-
-    `);
-
-
-    printWindow.document.close();
-
-}
-
-
-/* =========================================================
-   BUTTONS
-========================================================= */
-
-if($("generateCoco")){
-
-    $("generateCoco")
-    .addEventListener(
-        "click",
-        generatePDF
-    );
-
-}
-
-
-if($("printCoco")){
-
-    $("printCoco")
-    .addEventListener(
-        "click",
-        printPDF
-    );
-
-}
-
-
-/* =========================================================
-   OTHER PO BUTTONS
-========================================================= */
-
-if($("generateOther")){
-
-    $("generateOther")
-    .addEventListener(
-        "click",
-        ()=>{
-
-            const po =
-                (
-                    $("otherPOPrefix").value +
-                    $("otherPO").value
-                ).trim();
-
-
-            const start =
-                Number(
-                    $("otherStartBox").value
-                );
-
-
-            const end =
-                Number(
-                    $("otherEndBox").value
-                );
-
-
-            if(
-                !po ||
-                !Number.isFinite(start) ||
-                !Number.isFinite(end) ||
-                start>end
-            ){
-
-                toast(
-                    "Enter valid Other PO and Box range.",
-                    "bad"
-                );
-
-                return;
-
+        pdf.text(
+            isbn,
+            x+cellW/2,
+            y+cellH*.25,
+            {
+                align:"center"
             }
+        );
 
 
-            toast(
-                "Other PO PDF generation ready."
-            );
+        addBarcodeToPDF(
+            pdf,
+            isbn,
+            x+cellW*.15,
+            y+cellH*.35,
+            cellW*.7,
+            Math.min(
+                22,
+                cellH*.28
+            )
+        );
 
-        }
+    }
+
+
+    pdf.save(
+        "BooksWagon_ISBN_Barcode.pdf"
+    );
+
+
+    showToast(
+        "ISBN barcode PDF generated."
     );
 
 }
 
 
-if($("printOther")){
+$("isbnGenerate")
+.addEventListener(
+    "click",
+    generateISBNPDF
+);
 
-    $("printOther")
-    .addEventListener(
-        "click",
-        ()=>{
 
-            toast(
-                "Other PO Print PDF ready."
-            );
+$("isbnPrint")
+.addEventListener(
+    "click",
+    ()=>window.print()
+);
 
-        }
-    );
 
-}
+$("isbnClear")
+.addEventListener(
+    "click",
+    ()=>{
+
+        $("isbnNumber").value="";
+
+        renderISBN();
+
+        showToast(
+            "ISBN form cleared."
+        );
+
+    }
+);
 
 
 /* =========================================================
-   CLEAR OTHER
+   OTHER PO PDF
 ========================================================= */
 
-if($("clearOther")){
+function generateOtherPDF(){
 
-    $("clearOther")
-    .addEventListener(
-        "click",
-        ()=>{
+    const po=
+        (
+            $("otherPOPrefix").value+
+            $("otherPO").value
+        ).trim();
 
-            [
-                "otherPOPrefix",
-                "otherPO",
-                "otherStartBox",
-                "otherEndBox",
-                "otherBoxPrefix"
-            ]
-            .forEach(
-                id=>{
-                    if($(id))
-                        $(id).value="";
+
+    const start=
+        Number($("otherStartBox").value);
+
+    const end=
+        Number($("otherEndBox").value);
+
+
+    if(
+        !po ||
+        !Number.isFinite(start) ||
+        !Number.isFinite(end) ||
+        start>end
+    ){
+
+        showToast(
+            "Enter valid Other PO and Box range.",
+            "bad"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        typeof window.jspdf==="undefined"
+    ){
+
+        showToast(
+            "PDF library not loaded.",
+            "bad"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        jsPDF
+    }=window.jspdf;
+
+
+    const pdf=
+        new jsPDF({
+            unit:"mm",
+            format:"a4"
+        });
+
+
+    const perPage=
+        Math.max(
+            1,
+            otherLabels
+        );
+
+
+    const cols=
+        perPage<=1
+        ?1
+        :perPage<=4
+        ?2
+        :3;
+
+
+    const rows=
+        Math.ceil(perPage/cols);
+
+
+    const cellW=
+        210/cols;
+
+    const cellH=
+        297/rows;
+
+
+    let count=0;
+
+
+    for(
+        let box=start;
+        box<=end;
+        box++
+    ){
+
+        if(
+            count>0 &&
+            count%perPage===0
+        ){
+
+            pdf.addPage();
+
+        }
+
+
+        const slot=
+            count%perPage;
+
+        const col=
+            slot%cols;
+
+        const row=
+            Math.floor(slot/cols);
+
+
+        const x=
+            col*cellW;
+
+        const y=
+            row*cellH;
+
+
+        pdf.setFont(
+            "helvetica",
+            "bold"
+        );
+
+        pdf.setFontSize(14);
+
+
+        if(
+            $("otherContentType").value!=="box"
+        ){
+
+            pdf.text(
+                po,
+                x+cellW/2,
+                y+cellH*.40,
+                {
+                    align:"center"
                 }
             );
 
 
-            $("otherContentType")
-                .value="po";
+            if(otherBarcode){
+
+                addBarcodeToPDF(
+                    pdf,
+                    po,
+                    x+cellW*.2,
+                    y+cellH*.47,
+                    cellW*.6,
+                    16
+                );
+
+            }
+
+        }
 
 
-            $("otherPOBorder")
-                .value="none";
+        if(
+            $("otherContentType").value!=="po"
+        ){
 
+            pdf.setFontSize(12);
 
-            $("otherBoxBorder")
-                .value="none";
-
-
-            $("otherBothBorder")
-                .value="none";
-
-
-            renderOther();
-
-
-            toast(
-                "Other PO form cleared."
+            pdf.text(
+                "BOX NO. "+box,
+                x+cellW/2,
+                y+cellH*.68,
+                {
+                    align:"center"
+                }
             );
 
         }
-    );
-
-}
 
 
-/* =========================================================
-   ISBN / ADDRESS CLEAR-LIKE LIVE
-========================================================= */
-
-if($("isbnNumber")){
-
-    $("isbnNumber")
-    .addEventListener(
-        "input",
-        renderISBN
-    );
-
-}
-
-
-if($("addressName")){
-
-    [
-        "addressName",
-        "addressText",
-        "addressCity",
-        "addressState",
-        "addressPin"
-    ]
-    .forEach(
-        id=>{
-
-            if($(id)){
-
-                $(id)
-                .addEventListener(
-                    "input",
-                    renderAddress
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
-$$(".nav-btn")
-.forEach(
-    button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                $$(".nav-btn")
-                .forEach(
-                    x =>
-                    x.classList.remove(
-                        "active"
-                    )
-                );
-
-
-                button.classList.add(
-                    "active"
-                );
-
-
-                toast(
-                    button.textContent
-                    .trim() +
-                    " selected."
-                );
-
-            }
-        );
+        count++;
 
     }
+
+
+    pdf.save(
+        "BooksWagon_Other_PO_Labels.pdf"
+    );
+
+
+    showToast(
+        "Other PO PDF generated."
+    );
+
+}
+
+
+$("generateOther")
+.addEventListener(
+    "click",
+    generateOtherPDF
+);
+
+
+$("printOther")
+.addEventListener(
+    "click",
+    ()=>window.print()
 );
 
 
@@ -6752,31 +5681,7 @@ $$(".nav-btn")
    INITIAL
 ========================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    ()=>{
-
-        loadBorderSelects();
-
-        renderCoco();
-
-        renderOther();
-
-        renderISBN();
-
-        renderAddress();
-
-    }
-);
-
-
-renderCoco();
-
-renderOther();
-
-renderISBN();
-
-renderAddress();
+renderAll();
 
 </script>
 
