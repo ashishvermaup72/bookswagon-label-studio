@@ -214,6 +214,14 @@ footer{text-align:center;padding:22px;color:var(--muted);font-size:9px}
 <h3>Labels Per Page</h3>
 <div class="count-grid" id="countGrid"></div>
 </section>
+<section class="section">
+<h3>Label Flow / Order</h3>
+<div class="grid2">
+<label>Flow Direction<select id="flowDirection"><option value="top-bottom">Top to Bottom</option><option value="left-right">Left to Right</option></select></label>
+<label>Secondary Order<select id="readingOrder"><option value="top-bottom">Top to Bottom</option><option value="left-right">Left to Right</option></select></label>
+</div>
+<div class="info">Top to Bottom fills the first column downward. Left to Right fills each row across.</div>
+</section>
 
 <section class="section">
 <h3>Barcode</h3>
@@ -225,13 +233,13 @@ footer{text-align:center;padding:22px;color:var(--muted);font-size:9px}
 
 <section class="section">
 <h3>Border Setting</h3>
-<select id="borderMode">
-<option value="zero">Zero Border</option>
-<option value="outer">Outer / Page Border</option>
-<option value="box">Box Border</option>
-<option value="combine">Combined: Page + Box Border</option>
-</select>
-<div class="info">Combined mode applies both page-level and label/box borders.</div>
+<div class="grid3">
+<label>Page Border<select id="pageBorder"><option value="none">No Border</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option></select></label>
+<label>PO Border<select id="poBorder"><option value="none">No Border</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option></select></label>
+<label>Box Number Border<select id="boxBorder"><option value="none">No Border</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option></select></label>
+</div>
+<div class="toggle-row" style="margin-top:8px"><button id="allBorder" class="toggle">✓ All Borders</button><button id="zeroBorder" class="toggle">Zero Borders</button></div>
+<div class="info">Page Border, PO Border and Box Number Border are independent. All Borders enables all three.</div>
 </section>
 
 <section class="section">
@@ -374,7 +382,9 @@ function bindCount(container, setter){
   container.addEventListener("click",e=>{
     const b=e.target.closest("[data-count]"); if(!b)return;
     container.querySelectorAll("[data-count]").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active"); setter(+b.dataset.count); renderAll();
+    b.classList.add("active"); setter(+b.dataset.count); $("allBorder").onclick=()=>{["pageBorder","poBorder","boxBorder"].forEach(id=>$(id).value="solid");toast("All borders enabled.");renderCoco();};
+$("zeroBorder").onclick=()=>{["pageBorder","poBorder","boxBorder"].forEach(id=>$(id).value="none");toast("All borders disabled.",true);renderCoco();};
+renderAll();
   });
 }
 bindCount($("countGrid"),v=>labels=v);
@@ -470,7 +480,10 @@ function renderCoco(){
   const page=$("cocoPage"); page.innerHTML="";
   const pos=poList(), start=+$("startBox").value, end=+$("endBox").value;
   $("rangeWarning").classList.toggle("hidden",!(Number.isFinite(start)&&Number.isFinite(end)&&start>end));
-  page.style.border=(document.getElementById("borderMode").value==="outer"||document.getElementById("borderMode").value==="combine")?"2px solid #111827":"0";
+  const pageBorder = $("pageBorder") ? $("pageBorder").value : "none";
+  const poBorder = $("poBorder") ? $("poBorder").value : "none";
+  const boxBorder = $("boxBorder") ? $("boxBorder").value : "none";
+  page.style.border = pageBorder==="none" ? "0" : "2px "+pageBorder+" #111827";
   page.style.gridTemplateColumns=labels<=1?"1fr":labels<=4?"repeat(2,1fr)":"repeat(3,1fr)";
   if(!pos.length || !Number.isFinite(start)||!Number.isFinite(end)||start>end){
     page.innerHTML=`<div style="grid-column:1/-1;display:grid;place-items:center;min-height:350px;color:#94a3b8;text-align:center">Enter PO numbers and a valid Box range.</div>`; return;
@@ -489,8 +502,8 @@ function renderCoco(){
         if(layout==="same"){const line=document.createElement("div");line.append(po,document.createTextNode("  "),bx);l.appendChild(line)}
         else l.append(po,bx);
       }
-      const bm=$("borderMode").value;
-      if(bm==="box"||bm==="combine")l.style.border="1.5px solid #111827";
+      if(poBorder!=="none") po.style.border="1px "+poBorder+" #111827";
+      if(boxBorder!=="none") bx.style.border="1px "+boxBorder+" #111827";
       if(cutting){l.insertAdjacentHTML("beforeend",'<span class="cut"></span><span class="scissor">✂</span>')}
       if(barcode&&content!=="box")l.appendChild(barcodeSVG(( $("poPrefix").value||"" )+raw));
       page.appendChild(l); n++;
@@ -499,8 +512,8 @@ function renderCoco(){
   $("cocoStatus").textContent=`${n} label(s) shown • ${pos.length} PO(s) loaded • Barcode: ${barcode?"ON":"OFF"}`;
 }
 
-["poPrefix","boxPrefix","startBox","endBox","contentType","lineLayout","fontFamily","fontSize","borderMode","customW","customH"].forEach(id=>$(id).addEventListener("input",renderCoco));
-["poPrefix","boxPrefix","startBox","endBox","contentType","lineLayout","fontFamily","fontSize","borderMode"].forEach(id=>$(id).addEventListener("change",renderCoco));
+["poPrefix","boxPrefix","startBox","endBox","contentType","lineLayout","fontFamily","fontSize","pageBorder","poBorder","boxBorder","flowDirection","readingOrder","customW","customH"].forEach(id=>$(id).addEventListener("input",renderCoco));
+["poPrefix","boxPrefix","startBox","endBox","contentType","lineLayout","fontFamily","fontSize","pageBorder","poBorder","boxBorder","flowDirection","readingOrder"].forEach(id=>$(id).addEventListener("change",renderCoco));
 
 function validateCoco(){
   const p=poList(), s=+$("startBox").value, e=+$("endBox").value;
@@ -510,7 +523,8 @@ function validateCoco(){
 }
 
 function drawPdfLabel(pdf,x,y,w,h,po,box,content,doBarcode,borderMode){
-  if(borderMode==="box"||borderMode==="combine")pdf.rect(x+2,y+2,w-4,h-4);
+  if($("poBorder").value!=="none")pdf.rect(x+3,y+3,w-6,h-6);
+  if($("boxBorder").value!=="none")pdf.rect(x+5,y+h*.50,w-10,h*.23);
   pdf.setTextColor(20,32,51); pdf.setFont("helvetica",fontStyle==="bold"?"bold":fontStyle==="italic"?"italic":"normal");
   pdf.setFontSize(Math.max(8,+$("fontSize").value*.55));
   let yy=y+h*.38;
@@ -535,8 +549,13 @@ function buildCocoPdf(){
   for(const raw of poList()){
     for(let box=s;box<=e;box++){
       if(count>0&&count%per===0)pdf.addPage([W,H]);
-      if($("borderMode").value==="outer"||$("borderMode").value==="combine")pdf.rect(.8,.8,W-1.6,H-1.6);
-      const slot=count%per,x=(slot%cols)*cw,y=Math.floor(slot/cols)*ch;
+      if($("pageBorder").value!=="none")pdf.rect(.8,.8,W-1.6,H-1.6);
+      const slot=count%per;
+      let col,row;
+      if($("flowDirection")?.value==="top-bottom"){ row=slot%rows; col=Math.floor(slot/rows); }
+      else { row=Math.floor(slot/cols); col=slot%cols; }
+      if(col>=cols){ row=Math.floor(slot/cols); col=slot%cols; }
+      const x=col*cw,y=row*ch;
       drawPdfLabel(pdf,x,y,cw,ch,( $("poPrefix").value||"" )+raw,box,content,barcode,$("borderMode").value);
       count++;
     }
