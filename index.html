@@ -7,7 +7,6 @@
 
 <!-- External libraries. Keep internet ON while using PDF functions on GitHub Pages. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -571,38 +570,193 @@ $$(".controls input,.controls select,.controls textarea").forEach(el=>{
  el.addEventListener("change",renderCoco);
 });
 
-/* ---------- robust PDF: capture the same DOM shown in preview ---------- */
-async function renderPageToCanvas(pageEl){
- if(!window.html2canvas)throw new Error("html2canvas library not loaded");
- /* Clone so the visible UI is never changed during export. */
- const clone=pageEl.cloneNode(true);
- clone.style.position="absolute";
- clone.style.left="-100000px";
- clone.style.top="0";
- clone.style.margin="0";
- clone.style.boxShadow="none";
- clone.style.transform="none";
- clone.style.background="#fff";
- clone.style.width=pageEl.offsetWidth+"px";
- clone.style.height=pageEl.offsetHeight+"px";
- document.body.appendChild(clone);
- await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
- const canvas=await html2canvas(clone,{
-  scale:2,
-  backgroundColor:"#fff",
-  useCORS:true,
-  allowTaint:false,
-  logging:false
- });
- clone.remove();
- return canvas;
-}
-async function buildPDFFromPreview(){
- if(!window.jspdf?.jsPDF)throw new Error("jsPDF library not loaded");
- if(!window.html2canvas)throw new Error("html2canvas library not loaded");
+/* ---------- VECTOR PDF ENGINE ----------
+   PDF is drawn directly with jsPDF. No html2canvas, no screenshot conversion,
+   so the PDF cannot turn into the black/grey broken image shown in the previous version.
+*/
+const CODE128_PATTERNS=[
+"212222","222122","222221","121223","121322","131222","122213","122312","132212","221213",
+"221312","231212","112232","122132","122231","113222","123122","123221","223211","221132",
+"221231","213212","223112","312131","311222","321122","321221","312212","322112","322211",
+"212123","212321","232121","111323","131123","131321","112313","132113","132311","211313",
+"231113","231311","112133","112331","132131","113123","113321","133121","313121","211331",
+"231131","213113","213311","213131","311123","311321","331121","312113","312311","332111",
+"314111","221411","431111","111224","111422","121124","121421","141122","141221","112214",
+"112412","122114","122411","142112","142211","241211","221114","413111","241112","134111",
+"111242","121142","121241","114212","124112","124211","411212","421112","421211","212141",
+"214121","412121","111143","111341","131141","114113","114311","411113","411311","113141",
+"114131","311141","411131","211412","211214","211232","2331112"
+];
 
+function code128BValues(value){
+ const s=String(value??"");
+ let vals=[104];
+ for(const ch of s){
+   const n=ch.charCodeAt(0)-32;
+   if(n<0||n>95) return null;
+   vals.push(n);
+ }
+ let sum=104;
+ for(let i=1;i<vals.length;i++) sum+=vals[i]*i;
+ vals.push(sum%103,106);
+ return vals;
+}
+function drawCode128(pdf,value,x,y,w,h,fontSize=7){
+ const vals=code128BValues(value);
+ if(!vals)return false;
+ const patterns=vals.map(v=>CODE128_PATTERNS[v]).join("");
+ const modules=[...patterns].reduce((a,b)=>a+Number(b),0);
+ const mw=w/modules;
+ let cursor=x;
+ let black=true;
+ for(const d of patterns){
+   const width=Number(d)*mw;
+   if(black)pdf.rect(cursor,y,width,h,"F");
+   cursor+=width;black=!black;
+ }
+ pdf.setFont("helvetica","normal");
+ pdf.setFontSize(fontSize);
+ pdf.text(String(value),x+w/2,y+h+3,{align:"center"});
+ return true;
+}
+function pdfBorder(pdf,x,y,w,h,style){
+ if(style==="none")return;
+ const lw=style==="double"?0.7:0.45;
+ pdf.setLineWidth(lw);pdf.setDrawColor(0,0,0);
+ if(style==="dashed")pdf.setLineDashPattern([2,1],0);
+ else if(style==="dotted")pdf.setLineDashPattern([0.7,1],0);
+ else pdf.setLineDashPattern([],0);
+ pdf.rect(x,y,w,h,"S");
+ if(style==="double"){pdf.setLineWidth(.35);pdf.rect(x+1.4,y+1.4,w-2.8,h-2.8,"S")}
+ pdf.setLineDashPattern([],0);
+}
+function pdfFontName(){
+ const f=$("fontFamily").value;
+ if(f==="Times New Roman")return"times";
+ if(f==="Courier New")return"courier";
+ if(f==="Georgia")return"times";
+ return"helvetica";
+}
+function pdfPageSize(){
+ return pageDimensions();
+}
+function pdfGridSpec(){
+ return gridSpec();
+}
+function drawLabelPDF(pdf,item,x,y,w,h){
+ const content=$("contentType").value;
+ const layout=$("layoutType").value;
+ const fs=+($("fontSize").value)||32;
+ const font=pdfFontName();
+ const boxPrefix=$("boxPrefix").value||"BOX";
+
+ pdf.setTextColor(0,0,0);
+ pdf.setFillColor(255,255,255);
+ pdf.rect(x,y,w,h,"F");
+
+ /* Outer label cell: PO / Box borders are independent. */
+ const pad=Math.max(4,Math.min(10,w*.055));
+ let centerY=y+h/2;
+ const poText=item.po;
+ const boxText=boxPrefix+" NO. "+item.box;
+
+ const poSize=Math.max(9,Math.min(fs*.38,w*.13));
+ const boxSize=Math.max(8,Math.min(fs*.23,w*.09));
+
+ const poH=poSize*.42;
+ const boxH=boxSize*.42;
+ const gap=layout==="same"?2:5;
+ let barcodeH=barcodeEnabled?Math.min(27,h*.20):0;
+ let totalH;
+ if(content==="po") totalH=poH+(barcodeEnabled?barcodeH+7:0);
+ else if(content==="box") totalH=boxH+(barcodeEnabled?barcodeH+7:0);
+ else if(layout==="same") totalH=Math.max(poH,boxH)+(barcodeEnabled?barcodeH+7:0);
+ else totalH=poH+boxH+gap+(barcodeEnabled?barcodeH+7:0);
+
+ let top=centerY-totalH/2;
+ const poW=Math.min(w-pad*2,w*.90);
+ const boxW=Math.min(w-pad*2,w*.62);
+
+ function textBox(txt,tx,ty,tw,th,size,border){
+   pdf.setFont(font,"bold");pdf.setFontSize(size);pdf.setTextColor(0,0,0);
+   if(border!=="none")pdfBorder(pdf,tx,ty,tw,th,border);
+   pdf.text(txt,tx+tw/2,ty+th*.70,{align:"center",maxWidth:tw-pad});
+ }
+
+ if(content==="po"){
+   textBox(poText,x+(w-poW)/2,top,poW,poH,poSize,$("poBorder").value);
+   top+=poH;
+ } else if(content==="box"){
+   textBox(boxText,x+(w-boxW)/2,top,boxW,boxH,boxSize,$("boxBorder").value);
+   top+=boxH;
+ } else if(layout==="same"){
+   const rowW=Math.min(w-pad*2,w*.94);
+   const poPart=rowW*.58,boxPart=rowW-poPart-gap;
+   const rowX=x+(w-rowW)/2;
+   textBox(poText,rowX,top,poPart,poH,poSize,$("poBorder").value);
+   textBox(boxText,rowX+poPart+gap,top,boxPart,boxH,boxSize,$("boxBorder").value);
+   top+=Math.max(poH,boxH);
+ } else {
+   textBox(poText,x+(w-poW)/2,top,poW,poH,poSize,$("poBorder").value);
+   top+=poH+gap;
+   textBox(boxText,x+(w-boxW)/2,top,boxW,boxH,boxSize,$("boxBorder").value);
+   top+=boxH;
+ }
+
+ if(barcodeEnabled){
+   const bw=Math.min(w*.82,w-pad*2);
+   const bh=Math.min(25,h*.18);
+   const bx=x+(w-bw)/2;
+   const bp=$("barcodePosition").value;
+   let by;
+   if(bp==="top")by=y+pad+2;
+   else if(bp==="middle")by=y+(h-bh)/2;
+   else by=Math.min(y+h-bh-8,top+5);
+   drawCode128(pdf,poText,bx,by,bw,bh,Math.max(5,Math.min(8,w*.018)));
+ }
+}
+
+function drawCocoPDFPage(pdf,pageItems,wmm,hmm){
+ const [cols,rows]=pdfGridSpec();
+ const cellW=wmm/cols,cellH=hmm/rows;
+ pdf.setFillColor(255,255,255);pdf.rect(0,0,wmm,hmm,"F");
+ pdfBorder(pdf,0,0,wmm,hmm,$("pageBorder").value);
+
+ const flow=$("flowType").value;
+ let order=pageItems.map((_,i)=>i);
+ /* Top->Bottom: row-major is normal for one column; Left->Right is row-major.
+    For multi-column pages, top-bottom means column-major. */
+ if(flow==="top-bottom" && cols>1){
+   order=[];
+   for(let c=0;c<cols;c++)for(let r=0;r<rows;r++){
+     const i=r*cols+c;if(i<pageItems.length)order.push(i);
+   }
+ }
+ order.forEach((itemIndex,slot)=>{
+   const item=pageItems[itemIndex];
+   let r=Math.floor(slot/cols),c=slot%cols;
+   if(flow==="top-bottom"&&cols>1){c=Math.floor(slot/rows);r=slot%rows}
+   const x=c*cellW,y=r*cellH;
+   drawLabelPDF(pdf,item,x,y,cellW,cellH);
+   if(cuttingEnabled && slot>0){
+     pdf.setLineWidth(.6);pdf.setDrawColor(0,0,0);pdf.setLineDashPattern([2,1.5],0);
+     if(flow==="top-bottom"){
+       pdf.line(2,y,wmm-2,y);
+       pdf.setLineDashPattern([],0);pdf.setFont("helvetica","normal");pdf.setFontSize(11);
+       pdf.setFillColor(255,255,255);pdf.rect(wmm/2-5,y-3,10,6,"F");
+       pdf.text("✂",wmm/2,y+1,{align:"center"});
+     }else{
+       pdf.line(x,2,x,hmm-2);
+       pdf.setLineDashPattern([],0);
+     }
+   }
+ });
+}
+
+function buildCocoVectorPDF(){
+ if(!window.jspdf?.jsPDF)throw new Error("jsPDF library not loaded");
  const pos=getPOs();
- const s=+($("startBox").value), e=+($("endBox").value);
+ const s=+($("startBox").value),e=+($("endBox").value);
  if(!pos.length)throw new Error("Enter at least one PO number");
  if(!Number.isFinite(s)||!Number.isFinite(e)||s>e)throw new Error("Invalid Box Range");
 
@@ -610,127 +764,38 @@ async function buildPDFFromPreview(){
  pos.forEach(po=>{for(let n=s;n<=e;n++)items.push({po:($("poPrefix").value||"")+po,box:n});});
  if(!items.length)throw new Error("No labels to generate");
 
- const [wmm,hmm]=pageDimensions();
+ const [wmm,hmm]=pdfPageSize();
  const pdf=new jspdf.jsPDF({orientation:"portrait",unit:"mm",format:[wmm,hmm],compress:true});
  const perPage=Math.max(1,labelsPerPage);
 
- /* Generate EVERY PO/Box label page, not only the first preview page. */
  for(let offset=0;offset<items.length;offset+=perPage){
-   const pageItems=items.slice(offset,offset+perPage);
-   const source=buildCocoPageFromItems(pageItems);
-   const canvas=await renderPageToCanvas(source);
-   const img=canvas.toDataURL("image/jpeg",.96);
    if(offset>0)pdf.addPage([wmm,hmm],"portrait");
-   pdf.addImage(img,"JPEG",0,0,wmm,hmm,undefined,"FAST");
+   drawCocoPDFPage(pdf,items.slice(offset,offset+perPage),wmm,hmm);
  }
  return pdf;
 }
-
-function buildCocoPageFromItems(pageItems){
- const page=document.createElement("div");
- page.className="label-page "+pageClass();
- page.style.border=borderStyle($("pageBorder").value);
-
- const grid=document.createElement("div");
- grid.className="label-grid";
- const [cols,rows]=gridSpec();
- grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;
- grid.style.gridTemplateRows=`repeat(${rows},1fr)`;
-
- const content=$("contentType").value;
- const layout=$("layoutType").value;
- const fs=+($("fontSize").value)||32;
- const family=$("fontFamily").value;
- const boxPrefix=$("boxPrefix").value||"BOX";
-
- pageItems.forEach((item,i)=>{
-   const cell=document.createElement("div");
-   cell.className="label-cell";
-   if(cuttingEnabled&&i>0){
-     cell.classList.add("cut");
-     const line=document.createElement("div");line.className="cutline";
-     const sc=document.createElement("div");sc.className="scissor";sc.textContent="✂️";
-     cell.append(line,sc);
-   }
-
-   const wrap=document.createElement("div");wrap.className="cell-content";
-   const po=document.createElement("div");
-   po.className="po-box po-text";
-   po.style.fontFamily=family;po.style.fontSize=fs+"px";po.style.border=borderStyle($("poBorder").value);
-   po.textContent=item.po;
-
-   const box=document.createElement("div");
-   box.className="po-box box-text";
-   box.style.fontFamily=family;box.style.fontSize=Math.max(20,Math.round(fs*.58))+"px";
-   box.style.border=borderStyle($("boxBorder").value);
-   box.textContent=boxPrefix+" NO. "+item.box;
-
-   if(content==="po")wrap.appendChild(po);
-   else if(content==="box")wrap.appendChild(box);
-   else if(layout==="same"){
-     const row=document.createElement("div");row.className="same-line";row.append(po,box);wrap.appendChild(row);
-   }else wrap.append(po,box);
-
-   if(barcodeEnabled){
-     const svg=makeBarcodeSVG(item.po);
-     if(svg){
-       const bw=document.createElement("div");bw.className="barcode-wrap";bw.appendChild(svg);
-       const bp=$("barcodePosition").value;
-       if(bp==="top")wrap.insertBefore(bw,wrap.firstChild);
-       else wrap.appendChild(bw);
-     }
-   }
-   cell.appendChild(wrap);
-   grid.appendChild(cell);
- });
- page.appendChild(grid);
- return page;
-}
-function triggerBlobDownload(pdf,name){
- const blob=pdf.output("blob");
- const url=URL.createObjectURL(blob);
- const a=document.createElement("a");
- a.href=url;a.download=name;a.style.display="none";
- document.body.appendChild(a);a.click();a.remove();
- setTimeout(()=>URL.revokeObjectURL(url),5000);
-}
 async function generateCoco(mode){
  try{
-  toast(mode==="print"?"🖨️ Preparing print...":"⚙️ Preparing PDF...");
-  const pdf=await buildPDFFromPreview();
-  if(mode==="download"){
-   triggerBlobDownload(pdf,"BooksWagon_CocoBlu_Labels.pdf");
-   toast("⬇️ All PO label pages downloaded successfully");
-  }else if(mode==="print"){
-   /* Blob URL gives the browser its own PDF viewer/print pipeline. */
-   const blob=pdf.output("blob"),url=URL.createObjectURL(blob);
-   const win=window.open(url,"_blank");
-   if(!win){
-    URL.revokeObjectURL(url);
-    toast("⚠️ Popup blocked. Allow popups and click Print PDF again.",true);
-    return;
+   toast(mode==="print"?"🖨️ Preparing ALL label pages...":"⚙️ Generating ALL label pages...");
+   const pdf=buildCocoVectorPDF();
+   if(mode==="download"){
+     triggerBlobDownload(pdf,"BooksWagon_CocoBlu_ALL_Labels.pdf");
+     toast("⬇️ ALL PO/Box label pages downloaded");
+   }else{
+     const url=URL.createObjectURL(pdf.output("blob"));
+     const win=window.open(url,"_blank");
+     if(!win){
+       triggerBlobDownload(pdf,"BooksWagon_CocoBlu_ALL_Labels.pdf");
+       toast("📄 PDF generated and downloaded — popup was blocked");
+     }else{
+       toast(mode==="print"?"🖨️ ALL pages opened in PDF viewer":"📄 ALL pages generated");
+     }
    }
-   toast("🖨️ PDF opened — use Print in the PDF viewer.");
-  }else{
-   const blob=pdf.output("blob"),url=URL.createObjectURL(blob);
-   const win=window.open(url,"_blank");
-   if(!win){triggerBlobDownload(pdf,"BooksWagon_CocoBlu_Labels.pdf");toast("📄 PDF generated and downloaded");}
-   else toast("📄 All PO label pages generated successfully");
-  }
- }catch(err){
-  console.error(err);
-  toast("❌ PDF failed: "+err.message,true);
- }
+ }catch(err){console.error(err);toast("❌ PDF failed: "+err.message,true)}
 }
 $("generateBtn").onclick=()=>generateCoco("generate");
 $("downloadBtn").onclick=()=>generateCoco("download");
 $("printBtn").onclick=()=>generateCoco("print");
-
-$("clearBtn").onclick=()=>{
- $$(".poInput").forEach(x=>x.value="");
- $("bulkInput").value="";excelPO=[];$("excelInfo").textContent="Column A is used. A1 is treated as the header.";
- $("startBox").value=1;$("endBox").value=2;renderCoco();toast("🧹 Form cleared");
-};
 
 /* ---------- Other PO preview/PDF ---------- */
 function buildOtherPage(){
@@ -754,25 +819,21 @@ async function simpleOther(mode){
   const po=$("otherPO").value.trim(),s=+($("otherStart").value),e=+($("otherEnd").value);
   if(!po){toast("⚠️ Enter Other PO number.",true);return}
   if(!Number.isFinite(s)||!Number.isFinite(e)||s>e){toast("⚠️ Invalid Other PO box range.",true);return}
-
   const items=[];for(let n=s;n<=e;n++)items.push(n);
   const pdf=new jspdf.jsPDF({unit:"mm",format:[101.6,152.4],orientation:"portrait"});
   for(let i=0;i<items.length;i++){
-    const holder=document.createElement("div");
-    holder.className="label-page page-4x6";
-    holder.style.border="2px solid #000";
-    holder.innerHTML=`<div class="label-grid" style="grid-template-columns:1fr;grid-template-rows:1fr"><div class="label-cell"><div class="cell-content"><div class="po-box" style="font-size:34px;font-weight:900;border:2px solid #000">${safeText(po)}</div><div class="po-box box-text" style="font-size:21px;border:2px solid #000">BOX NO. ${items[i]}</div></div></div></div>`;
-    document.body.appendChild(holder);
-    const c=await renderPageToCanvas(holder);holder.remove();
     if(i>0)pdf.addPage([101.6,152.4],"portrait");
-    pdf.addImage(c.toDataURL("image/jpeg",.96),"JPEG",0,0,101.6,152.4,"","FAST");
+    pdf.setFillColor(255,255,255);pdf.rect(0,0,101.6,152.4,"F");pdfBorder(pdf,1,1,99.6,150.4,"solid");
+    pdf.setFont("helvetica","bold");pdf.setFontSize(34);pdf.text(po,50.8,55,{align:"center"});
+    pdfBorder(pdf,10,30,81.6,35,"solid");
+    pdf.setFontSize(23);pdf.text("BOX NO. "+items[i],50.8,90,{align:"center"});
+    pdfBorder(pdf,25,72,51.6,23,"solid");
   }
-  if(mode==="download")triggerBlobDownload(pdf,"BooksWagon_Other_PO_All_Labels.pdf");
+  if(mode==="download")triggerBlobDownload(pdf,"BooksWagon_Other_PO_ALL_Labels.pdf");
   else window.open(URL.createObjectURL(pdf.output("blob")),"_blank");
   toast("📄 "+items.length+" Other PO label page(s) ready");
  }catch(e){console.error(e);toast("❌ Other PO PDF failed: "+e.message,true)}
 }
-$("otherGenerate").onclick=()=>simpleOther("generate");$("otherDownload").onclick=()=>simpleOther("download");$("otherPrint").onclick=()=>simpleOther("print");
 
 /* ---------- ISBN ---------- */
 function renderISBN(){
@@ -796,14 +857,14 @@ $("isbnBarNo").onclick=()=>{$("isbnBarNo").classList.add("off");$("isbnBarYes").
 async function simpleISBN(mode){
  const v=$("isbnInput").value.trim();if(!v){toast("⚠️ Enter ISBN.",true);return}
  try{
-  const c=await renderPageToCanvas($("isbnPreview"));
   const pdf=new jspdf.jsPDF({unit:"mm",format:[101.6,152.4],orientation:"portrait"});
-  pdf.addImage(c.toDataURL("image/jpeg",.96),"JPEG",0,0,101.6,152.4,"","FAST");
+  pdf.setFillColor(255,255,255);pdf.rect(0,0,101.6,152.4,"F");pdfBorder(pdf,1,1,99.6,150.4,"solid");
+  pdf.setFont("helvetica","bold");pdf.setFontSize(24);pdf.text(v,50.8,55,{align:"center"});
+  if($("isbnBarYes").classList.contains("on"))drawCode128(pdf,v,10,72,81.6,28,7);
   if(mode==="download")triggerBlobDownload(pdf,"BooksWagon_ISBN.pdf");else window.open(URL.createObjectURL(pdf.output("blob")),"_blank");
   toast("📄 ISBN PDF ready");
- }catch(e){console.error(e);toast("❌ ISBN PDF failed",true)}
+ }catch(e){console.error(e);toast("❌ ISBN PDF failed: "+e.message,true)}
 }
-$("isbnGenerate").onclick=()=>simpleISBN("generate");$("isbnDownload").onclick=()=>simpleISBN("download");$("isbnPrint").onclick=()=>simpleISBN("print");
 
 /* ---------- Address ---------- */
 function addressBorderStyle(v){
@@ -843,18 +904,26 @@ async function simpleAddress(mode){
  if(!f||!t){$("addressWarning").classList.remove("hidden");toast("⚠️ From and To are required.",true);return}
  $("addressWarning").classList.add("hidden");
  try{
-  const c=await renderPageToCanvas($("addressPreview"));
   const pdf=new jspdf.jsPDF({unit:"mm",format:[101.6,152.4],orientation:"portrait"});
-  pdf.addImage(c.toDataURL("image/jpeg",.96),"JPEG",0,0,101.6,152.4,"","FAST");
-  if(mode==="download")triggerBlobDownload(pdf,"BooksWagon_Address_Label.pdf");
-  else window.open(URL.createObjectURL(pdf.output("blob")),"_blank");
+  pdf.setFillColor(255,255,255);pdf.rect(0,0,101.6,152.4,"F");
+  pdfBorder(pdf,3,3,95.6,146.4,addressValue("addressBorder")||"solid");
+  const from=[f,addressValue("fromState"),addressValue("fromCountry"),addressValue("fromPin")].filter(Boolean).join(" • ");
+  const to=[t,addressValue("toState"),addressValue("toCountry"),addressValue("toPin")].filter(Boolean).join(" • ");
+  pdf.setFont("helvetica","bold");pdf.setFontSize(13);pdf.text("🏢 FROM / SENDER",8,20);
+  pdf.setFont("helvetica","normal");pdf.setFontSize(10);pdf.text(from,8,28,{maxWidth:86});
+  if(addressValue("addressCut")!=="off"){
+    pdf.setLineDashPattern([2,1.5],0);pdf.line(7,75,94,75);pdf.setLineDashPattern([],0);
+    pdf.setFontSize(14);pdf.text("✂",50.8,78,{align:"center"});
+  }
+  pdf.setFont("helvetica","bold");pdf.setFontSize(13);pdf.text("🏠 TO / RECEIVER",8,90);
+  pdf.setFont("helvetica","normal");pdf.setFontSize(10);pdf.text(to,8,98,{maxWidth:86});
+  if(mode==="download")triggerBlobDownload(pdf,"BooksWagon_Address_Label.pdf");else window.open(URL.createObjectURL(pdf.output("blob")),"_blank");
   toast("📮 Address PDF ready");
- }catch(e){console.error(e);toast("❌ Address PDF failed",true)}
+ }catch(e){console.error(e);toast("❌ Address PDF failed: "+e.message,true)}
 }
-$("addressGenerate").onclick=()=>simpleAddress("generate");$("addressDownload").onclick=()=>simpleAddress("download");$("addressPrint").onclick=()=>simpleAddress("print");
 
 /* initial */
-$("pdfStatus").textContent=(window.jspdf&&window.html2canvas)?"● PDF READY":"● PDF LIBRARY WAITING";
+$("pdfStatus").textContent=window.jspdf?"● PDF READY":"● PDF LIBRARY WAITING";
 renderCoco();renderOther();renderISBN();renderAddress();
 </script>
 </body>
