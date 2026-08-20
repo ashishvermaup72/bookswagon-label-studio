@@ -61,6 +61,13 @@ input,select,textarea{width:100%;min-height:38px;border:1px solid var(--line);bo
 .actions{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap;padding:13px 18px;border-top:1px solid var(--line)}.actions button{border:1px solid var(--line);background:var(--card);color:var(--text);padding:10px 14px;border-radius:8px;font-size:9px;font-weight:900}.actions .blue{background:var(--blue);color:#fff;border-color:var(--blue)}.actions .dark{background:#10233f;color:#fff;border-color:#10233f}
 .toast{position:fixed;right:18px;top:92px;z-index:100;background:var(--card);border-left:5px solid var(--green);padding:12px 15px;border-radius:9px;box-shadow:0 18px 40px #0003;font-size:10px;font-weight:900;opacity:0;transform:translateX(30px);transition:.2s}.toast.show{opacity:1;transform:none}.toast.bad{border-left-color:var(--red)}
 footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
+.address-card{width:100%;border:2px solid #000;padding:12px 14px;text-align:left;line-height:1.35;background:#fff;color:#000}
+.address-block{border:1px solid #000;border-radius:8px;padding:10px;margin:6px 0}
+.address-title{font-size:12px;font-weight:900;margin-bottom:4px}
+.address-meta{font-size:10px;color:#222}
+.address-cut{border-top:3px dashed #000;margin:12px 0 8px;text-align:center;position:relative}
+.address-cut span{position:relative;top:-14px;background:#fff;padding:0 8px;font-size:22px}
+.pdf-page-break{page-break-after:always}
 
 @media(max-width:1050px){.category-grid{grid-template-columns:repeat(2,1fr)}.editor{grid-template-columns:1fr}.controls{border-right:0;border-bottom:1px solid var(--line)}}
 @media(max-width:700px){.sidebar{width:64px;padding:10px}.brand,.brand-sub,.nav span,.side-foot{display:none}.main{margin-left:64px}.content{padding:9px}.category-grid{grid-template-columns:1fr}.grid2,.grid3,.po-grid{grid-template-columns:1fr}.choicegrid{grid-template-columns:repeat(2,1fr)}.page-4x6{width:305px;height:457px}}
@@ -283,8 +290,25 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
 <div class="editor">
 <div class="controls">
 <div class="section"><h3>📮 Address Label</h3>
-<label>📤 From<input id="fromAddress" placeholder="From address"></label>
-<label>📥 To<input id="toAddress" placeholder="To address"></label>
+<label>🏢 From / Sender<input id="fromAddress" placeholder="Business / House name & address"></label>
+<div class="grid3">
+<label>🌎 Country<input id="fromCountry" placeholder="Country"></label>
+<label>🗺️ State<input id="fromState" placeholder="State"></label>
+<label>📍 PIN Code<input id="fromPin" placeholder="PIN / ZIP"></label>
+</div>
+<label>🏠 To / Receiver<input id="toAddress" placeholder="House / Receiver address"></label>
+<div class="grid3">
+<label>🌎 Country<input id="toCountry" placeholder="Country"></label>
+<label>🗺️ State<input id="toState" placeholder="State"></label>
+<label>📍 PIN Code<input id="toPin" placeholder="PIN / ZIP"></label>
+</div>
+<div class="grid2">
+<label>🖼️ Label Border<select id="addressBorder">
+<option value="solid">━ Solid</option><option value="double">Double</option>
+<option value="dashed">╌ Dashed</option><option value="dotted">⋯ Dotted</option><option value="none">🚫 None</option>
+</select></label>
+<label>✂️ Cutting<select id="addressCut"><option value="on">✂️ ON</option><option value="off">🚫 OFF</option></select></label>
+</div>
 <div id="addressWarning" class="warning hidden">⚠️ From and To are required.</div>
 </div>
 </div>
@@ -574,16 +598,93 @@ async function renderPageToCanvas(pageEl){
  return canvas;
 }
 async function buildPDFFromPreview(){
- if(!window.jspdf?.jsPDF){throw new Error("jsPDF library not loaded")}
- if(!window.html2canvas){throw new Error("html2canvas library not loaded")}
- const source=$("previewPage");
- if(!source)throw new Error("Preview element not found");
- const canvas=await renderPageToCanvas(source);
+ if(!window.jspdf?.jsPDF)throw new Error("jsPDF library not loaded");
+ if(!window.html2canvas)throw new Error("html2canvas library not loaded");
+
+ const pos=getPOs();
+ const s=+($("startBox").value), e=+($("endBox").value);
+ if(!pos.length)throw new Error("Enter at least one PO number");
+ if(!Number.isFinite(s)||!Number.isFinite(e)||s>e)throw new Error("Invalid Box Range");
+
+ const items=[];
+ pos.forEach(po=>{for(let n=s;n<=e;n++)items.push({po:($("poPrefix").value||"")+po,box:n});});
+ if(!items.length)throw new Error("No labels to generate");
+
  const [wmm,hmm]=pageDimensions();
  const pdf=new jspdf.jsPDF({orientation:"portrait",unit:"mm",format:[wmm,hmm],compress:true});
- const img=canvas.toDataURL("image/jpeg",.96);
- pdf.addImage(img,"JPEG",0,0,wmm,hmm,undefined,"FAST");
+ const perPage=Math.max(1,labelsPerPage);
+
+ /* Generate EVERY PO/Box label page, not only the first preview page. */
+ for(let offset=0;offset<items.length;offset+=perPage){
+   const pageItems=items.slice(offset,offset+perPage);
+   const source=buildCocoPageFromItems(pageItems);
+   const canvas=await renderPageToCanvas(source);
+   const img=canvas.toDataURL("image/jpeg",.96);
+   if(offset>0)pdf.addPage([wmm,hmm],"portrait");
+   pdf.addImage(img,"JPEG",0,0,wmm,hmm,undefined,"FAST");
+ }
  return pdf;
+}
+
+function buildCocoPageFromItems(pageItems){
+ const page=document.createElement("div");
+ page.className="label-page "+pageClass();
+ page.style.border=borderStyle($("pageBorder").value);
+
+ const grid=document.createElement("div");
+ grid.className="label-grid";
+ const [cols,rows]=gridSpec();
+ grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+ grid.style.gridTemplateRows=`repeat(${rows},1fr)`;
+
+ const content=$("contentType").value;
+ const layout=$("layoutType").value;
+ const fs=+($("fontSize").value)||32;
+ const family=$("fontFamily").value;
+ const boxPrefix=$("boxPrefix").value||"BOX";
+
+ pageItems.forEach((item,i)=>{
+   const cell=document.createElement("div");
+   cell.className="label-cell";
+   if(cuttingEnabled&&i>0){
+     cell.classList.add("cut");
+     const line=document.createElement("div");line.className="cutline";
+     const sc=document.createElement("div");sc.className="scissor";sc.textContent="✂️";
+     cell.append(line,sc);
+   }
+
+   const wrap=document.createElement("div");wrap.className="cell-content";
+   const po=document.createElement("div");
+   po.className="po-box po-text";
+   po.style.fontFamily=family;po.style.fontSize=fs+"px";po.style.border=borderStyle($("poBorder").value);
+   po.textContent=item.po;
+
+   const box=document.createElement("div");
+   box.className="po-box box-text";
+   box.style.fontFamily=family;box.style.fontSize=Math.max(20,Math.round(fs*.58))+"px";
+   box.style.border=borderStyle($("boxBorder").value);
+   box.textContent=boxPrefix+" NO. "+item.box;
+
+   if(content==="po")wrap.appendChild(po);
+   else if(content==="box")wrap.appendChild(box);
+   else if(layout==="same"){
+     const row=document.createElement("div");row.className="same-line";row.append(po,box);wrap.appendChild(row);
+   }else wrap.append(po,box);
+
+   if(barcodeEnabled){
+     const svg=makeBarcodeSVG(item.po);
+     if(svg){
+       const bw=document.createElement("div");bw.className="barcode-wrap";bw.appendChild(svg);
+       const bp=$("barcodePosition").value;
+       if(bp==="top")wrap.insertBefore(bw,wrap.firstChild);
+       else wrap.appendChild(bw);
+     }
+   }
+   cell.appendChild(wrap);
+   grid.appendChild(cell);
+ });
+ page.appendChild(grid);
+ return page;
 }
 function triggerBlobDownload(pdf,name){
  const blob=pdf.output("blob");
@@ -599,7 +700,7 @@ async function generateCoco(mode){
   const pdf=await buildPDFFromPreview();
   if(mode==="download"){
    triggerBlobDownload(pdf,"BooksWagon_CocoBlu_Labels.pdf");
-   toast("⬇️ PDF downloaded successfully");
+   toast("⬇️ All PO label pages downloaded successfully");
   }else if(mode==="print"){
    /* Blob URL gives the browser its own PDF viewer/print pipeline. */
    const blob=pdf.output("blob"),url=URL.createObjectURL(blob);
@@ -614,7 +715,7 @@ async function generateCoco(mode){
    const blob=pdf.output("blob"),url=URL.createObjectURL(blob);
    const win=window.open(url,"_blank");
    if(!win){triggerBlobDownload(pdf,"BooksWagon_CocoBlu_Labels.pdf");toast("📄 PDF generated and downloaded");}
-   else toast("📄 PDF generated successfully");
+   else toast("📄 All PO label pages generated successfully");
   }
  }catch(err){
   console.error(err);
@@ -650,15 +751,26 @@ function renderOther(){
 
 async function simpleOther(mode){
  try{
-  if(!$("otherPO").value.trim()){toast("⚠️ Enter Other PO number.",true);return}
-  const p=$("otherPreview"),c=await renderPageToCanvas(p);
+  const po=$("otherPO").value.trim(),s=+($("otherStart").value),e=+($("otherEnd").value);
+  if(!po){toast("⚠️ Enter Other PO number.",true);return}
+  if(!Number.isFinite(s)||!Number.isFinite(e)||s>e){toast("⚠️ Invalid Other PO box range.",true);return}
+
+  const items=[];for(let n=s;n<=e;n++)items.push(n);
   const pdf=new jspdf.jsPDF({unit:"mm",format:[101.6,152.4],orientation:"portrait"});
-  pdf.addImage(c.toDataURL("image/jpeg",.96),"JPEG",0,0,101.6,152.4,"","FAST");
-  if(mode==="download")triggerBlobDownload(pdf,"BooksWagon_Other_PO.pdf");
-  else if(mode==="print"){const u=URL.createObjectURL(pdf.output("blob"));window.open(u,"_blank");}
-  else{const u=URL.createObjectURL(pdf.output("blob"));window.open(u,"_blank");}
-  toast(mode==="download"?"⬇️ Download complete":"📄 PDF ready");
- }catch(e){console.error(e);toast("❌ Other PO PDF failed",true)}
+  for(let i=0;i<items.length;i++){
+    const holder=document.createElement("div");
+    holder.className="label-page page-4x6";
+    holder.style.border="2px solid #000";
+    holder.innerHTML=`<div class="label-grid" style="grid-template-columns:1fr;grid-template-rows:1fr"><div class="label-cell"><div class="cell-content"><div class="po-box" style="font-size:34px;font-weight:900;border:2px solid #000">${safeText(po)}</div><div class="po-box box-text" style="font-size:21px;border:2px solid #000">BOX NO. ${items[i]}</div></div></div></div>`;
+    document.body.appendChild(holder);
+    const c=await renderPageToCanvas(holder);holder.remove();
+    if(i>0)pdf.addPage([101.6,152.4],"portrait");
+    pdf.addImage(c.toDataURL("image/jpeg",.96),"JPEG",0,0,101.6,152.4,"","FAST");
+  }
+  if(mode==="download")triggerBlobDownload(pdf,"BooksWagon_Other_PO_All_Labels.pdf");
+  else window.open(URL.createObjectURL(pdf.output("blob")),"_blank");
+  toast("📄 "+items.length+" Other PO label page(s) ready");
+ }catch(e){console.error(e);toast("❌ Other PO PDF failed: "+e.message,true)}
 }
 $("otherGenerate").onclick=()=>simpleOther("generate");$("otherDownload").onclick=()=>simpleOther("download");$("otherPrint").onclick=()=>simpleOther("print");
 
@@ -694,25 +806,48 @@ async function simpleISBN(mode){
 $("isbnGenerate").onclick=()=>simpleISBN("generate");$("isbnDownload").onclick=()=>simpleISBN("download");$("isbnPrint").onclick=()=>simpleISBN("print");
 
 /* ---------- Address ---------- */
-function renderAddress(){
- const p=$("addressPreview"),from=$("fromAddress").value.trim(),to=$("toAddress").value.trim();
- p.innerHTML="";
- const grid=document.createElement("div");grid.className="label-grid";grid.style.gridTemplateColumns="1fr";grid.style.gridTemplateRows="1fr";
- const c=document.createElement("div");c.className="label-cell";c.style.alignItems="flex-start";c.style.textAlign="left";c.style.padding="25px";
- if(!from&&!to)c.innerHTML="<div style='margin:auto;color:#64748b'>📮 Enter From and To address</div>";
- else c.innerHTML=`<div style="width:100%;font-size:13px;line-height:1.5"><b>📤 FROM</b><div style="margin:6px 0 20px">${safeText(from)}</div><hr><b>📥 TO</b><div style="margin-top:6px">${safeText(to)}</div></div>`;
- grid.appendChild(c);p.appendChild(grid);
+function addressBorderStyle(v){
+ return borderStyle(v);
 }
-$("fromAddress").oninput=renderAddress;$("toAddress").oninput=renderAddress;
+function addressValue(id){return $(id)?.value.trim()||""}
+function renderAddress(){
+ const p=$("addressPreview");
+ const from=addressValue("fromAddress"),to=addressValue("toAddress");
+ const fc=addressValue("fromCountry"),fs=addressValue("fromState"),fp=addressValue("fromPin");
+ const tc=addressValue("toCountry"),ts=addressValue("toState"),tp=addressValue("toPin");
+ p.innerHTML="";
+ const grid=document.createElement("div");grid.className="label-grid";
+ grid.style.gridTemplateColumns="1fr";grid.style.gridTemplateRows="1fr";
+ const c=document.createElement("div");c.className="label-cell";c.style.padding="18px";
+ const card=document.createElement("div");card.className="address-card";
+ card.style.border=addressBorderStyle(addressValue("addressBorder")||"solid");
+ card.innerHTML=`
+   <div class="address-block">
+     <div class="address-title">🏢 📤 FROM / SENDER</div>
+     <div>${safeText(from)}</div>
+     <div class="address-meta">🗺️ ${safeText(fc)} &nbsp; • &nbsp; 🌎 ${safeText(fs)} &nbsp; • &nbsp; 📍 ${safeText(fp)}</div>
+   </div>
+   <div class="address-cut" style="${addressValue("addressCut")==="off"?"display:none":""}"><span>✂️</span></div>
+   <div class="address-block">
+     <div class="address-title">🏠 📥 TO / RECEIVER</div>
+     <div>${safeText(to)}</div>
+     <div class="address-meta">🗺️ ${safeText(tc)} &nbsp; • &nbsp; 🌎 ${safeText(ts)} &nbsp; • &nbsp; 📍 ${safeText(tp)}</div>
+   </div>`;
+ c.appendChild(card);grid.appendChild(c);p.appendChild(grid);
+}
+["fromAddress","fromCountry","fromState","fromPin","toAddress","toCountry","toState","toPin","addressBorder","addressCut"].forEach(id=>{
+ $(id).addEventListener("input",renderAddress);$(id).addEventListener("change",renderAddress);
+});
 async function simpleAddress(mode){
- const f=$("fromAddress").value.trim(),t=$("toAddress").value.trim();
+ const f=addressValue("fromAddress"),t=addressValue("toAddress");
  if(!f||!t){$("addressWarning").classList.remove("hidden");toast("⚠️ From and To are required.",true);return}
  $("addressWarning").classList.add("hidden");
  try{
   const c=await renderPageToCanvas($("addressPreview"));
   const pdf=new jspdf.jsPDF({unit:"mm",format:[101.6,152.4],orientation:"portrait"});
   pdf.addImage(c.toDataURL("image/jpeg",.96),"JPEG",0,0,101.6,152.4,"","FAST");
-  if(mode==="download")triggerBlobDownload(pdf,"BooksWagon_Address_Label.pdf");else window.open(URL.createObjectURL(pdf.output("blob")),"_blank");
+  if(mode==="download")triggerBlobDownload(pdf,"BooksWagon_Address_Label.pdf");
+  else window.open(URL.createObjectURL(pdf.output("blob")),"_blank");
   toast("📮 Address PDF ready");
  }catch(e){console.error(e);toast("❌ Address PDF failed",true)}
 }
