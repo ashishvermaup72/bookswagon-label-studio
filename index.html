@@ -5,81 +5,181 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>BooksWagon Label Creations Studio</title>
 
+<!-- PDF/Barcode/Excel libraries -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
 :root{
- --bg:#f3f6fa;--card:#fff;--text:#10233f;--muted:#64748b;--line:#d7e0ea;
+ --bg:#eef3f8;--card:#fff;--text:#10233f;--muted:#64748b;--line:#d7e0ea;
  --blue:#1769e0;--green:#16a34a;--red:#dc2626;--nav:#0b2038;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Segoe UI,sans-serif}
+html,body{margin:0;min-height:100%;font-family:Arial,Segoe UI,sans-serif}
+body{background:var(--bg);color:var(--text)}
 body.dark{--bg:#08111e;--card:#101c2d;--text:#f5f7fa;--muted:#a9b6c8;--line:#2a3a50;--nav:#050d17}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
-.app{min-height:100vh}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:235px;background:var(--nav);color:#fff;padding:18px;z-index:5}
-.logo{font-size:23px;font-weight:900;margin-bottom:5px}.logo span{color:#ff6b19}
-.sublogo{font-size:9px;color:#aebdce;margin-bottom:25px}
+.hidden{display:none!important}
+
+.sidebar{position:fixed;inset:0 auto 0 0;width:235px;background:var(--nav);color:#fff;padding:18px;z-index:20}
+.logo{font-size:23px;font-weight:900}.logo span{color:#ff6b19}
+.sublogo{font-size:9px;color:#aebdce;margin:4px 0 25px}
 .nav button{width:100%;border:0;background:transparent;color:#dce6f0;text-align:left;padding:12px;border-radius:9px;margin:3px 0}
 .nav button:hover,.nav button.active{background:#1b5da6}
 .footerSide{position:absolute;bottom:18px;font-size:9px;color:#9db0c5}
-.main{margin-left:235px}
+.main{margin-left:235px;min-height:100vh}
 .topbar{height:78px;background:var(--card);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:15px 24px}
-.topbar h1{margin:0;font-size:21px}.topbar p{margin:4px 0 0;font-size:10px;color:var(--muted)}
-.theme{display:flex;gap:5px;background:var(--bg);padding:5px;border-radius:10px}.theme button{border:0;background:transparent;padding:8px 11px;border-radius:7px;color:var(--muted);font-size:10px;font-weight:800}.theme .active{background:var(--blue);color:#fff}
+.topbar h1{margin:0;font-size:21px}.topbar p{margin:4px 0 0;color:var(--muted);font-size:10px}
+.theme{display:flex;gap:5px;background:var(--bg);padding:5px;border-radius:10px}.theme button{border:0;background:transparent;padding:8px 11px;border-radius:7px;color:var(--muted);font-size:10px;font-weight:800}.theme button.active{background:var(--blue);color:#fff}
+
 .content{padding:18px;max-width:1550px;margin:auto}
 .hero{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:22px;margin-bottom:15px}
 .hero h2{margin:0 0 6px;font-size:27px}.hero p{margin:0;color:var(--muted);font-size:11px}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:15px}
-.card{border:1px solid var(--line);background:var(--card);border-radius:13px;padding:16px;transition:.2s}.card:hover{transform:translateY(-3px) scale(1.01);box-shadow:0 15px 35px #0002}
+.card{border:1px solid var(--line);background:var(--card);border-radius:13px;padding:16px;text-align:left;color:var(--text);transition:.2s}
+.card:hover{transform:translateY(-3px) scale(1.015);box-shadow:0 15px 35px #0002}
 .card .icon{font-size:25px}.card h3{margin:9px 0 4px;font-size:14px}.card p{margin:0;color:var(--muted);font-size:9px}
+
 .workspace{background:var(--card);border:1px solid var(--line);border-radius:15px;overflow:hidden}
-.wh{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.wh h2{margin:0;font-size:17px}.wh p{margin:4px 0 0;color:var(--muted);font-size:9px}
+.wh{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.wh h2{margin:0;font-size:17px}.wh p{margin:4px 0 0;color:var(--muted);font-size:9px}
 .badge{padding:6px 9px;border-radius:15px;background:#e8f8ed;color:#15803d;font-size:8px;font-weight:900}
-.tabs{display:flex;gap:7px;padding:10px;background:var(--bg);border-bottom:1px solid var(--line)}.tab{border:1px solid var(--line);background:var(--card);color:var(--text);padding:9px 13px;border-radius:8px;font-size:9px;font-weight:900}.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.tabs{display:flex;gap:7px;padding:10px;background:var(--bg);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--text);padding:9px 13px;border-radius:8px;font-size:9px;font-weight:900}.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
 .panel{display:none}.panel.active{display:block}
 .editor{display:grid;grid-template-columns:1fr 1fr}.controls{padding:18px;border-right:1px solid var(--line)}.preview{padding:18px;background:var(--bg)}
-.section{padding-bottom:15px;margin-bottom:15px;border-bottom:1px solid var(--line)}.section:last-child{border-bottom:0}.section h3{margin:0 0 9px;font-size:12px}.section p{font-size:9px;color:var(--muted)}
+.section{padding-bottom:15px;margin-bottom:15px;border-bottom:1px solid var(--line)}.section:last-child{border-bottom:0}.section h3{margin:0 0 9px;font-size:12px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 label{display:block;color:var(--muted);font-size:9px;font-weight:800;margin-bottom:8px}
 input,select,textarea{width:100%;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:8px;padding:9px;min-height:37px;font-size:10px}
-textarea{min-height:80px}
+textarea{min-height:90px}
 .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.mode{border:1px solid var(--line);background:var(--card);color:var(--text);padding:10px;border-radius:8px;text-align:left}.mode.active{border-color:var(--blue);background:#1769e012;color:var(--blue)}.mode small{display:block;color:var(--muted);font-size:8px;margin-top:3px}
 .po-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.po-row{display:flex;gap:5px;align-items:center}.po-row b{width:20px;font-size:8px;color:var(--muted)}
 .choicegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.choice{border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 4px;border-radius:7px;font-size:9px;font-weight:800}.choice.active{background:var(--blue);color:#fff;border-color:var(--blue)}
 .toggle-row{display:flex;gap:7px}.toggle{flex:1;border:1px solid var(--line);background:var(--card);color:var(--text);padding:9px;border-radius:8px;font-size:9px;font-weight:900}.toggle.on{background:var(--green);color:#fff;border-color:var(--green)}.toggle.off{background:var(--red);color:#fff;border-color:var(--red)}
-.hidden{display:none!important}.warning{margin-top:7px;padding:9px;background:#fff1f2;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;font-size:9px}
-.custom{display:none;margin-top:8px}.custom.show{display:grid}
+.warning{margin-top:7px;padding:9px;background:#fff1f2;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;font-size:9px}
 .preview-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.preview-head h3{font-size:12px;margin:0}
-.preview-area{min-height:570px;background:#dce5ef;border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
-
-/* IMPORTANT: 4x6 reference layout. The preview is built with real DOM cells, never canvas. */
-.label-page{background:#fff;color:#000;position:relative;overflow:hidden;display:grid;box-shadow:0 14px 35px #0003}
-.page-4x6{width:304.8px;height:457.2px;grid-template-columns:1fr;grid-template-rows:repeat(2,1fr);border:5px solid #000}
-.page-a4{width:390px;height:552px;grid-template-columns:repeat(2,1fr);grid-auto-rows:1fr;border:3px solid #000}
-.page-70x35{width:390px;height:196px;grid-template-columns:repeat(2,1fr);grid-auto-rows:1fr;border:3px solid #000}
-.page-custom{width:390px;height:520px;grid-template-columns:repeat(2,1fr);grid-auto-rows:1fr;border:3px solid #000}
-.label-cell{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;min-width:0;overflow:hidden;background:#fff}
-.po-text,.box-text{display:block;max-width:100%;word-break:break-word;line-height:.98;color:#000}
-.po-text{font-weight:900}.box-text{font-weight:900;margin-top:12px}
-.same-line{display:flex;align-items:baseline;justify-content:center;gap:8px;max-width:100%}
-.same-line .box-text{margin-top:0}
-.cutline{position:absolute;left:2%;right:2%;top:0;border-top:3px dashed #000;display:none}.scissor{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:26px;background:#fff;padding:0 6px;display:none;z-index:2}
-.cut .cutline,.cut .scissor{display:block}
-.border-solid{border:2px solid #000}.border-dashed{border:2px dashed #000}.border-dotted{border:2px dotted #000}.border-double{border:4px double #000}
-.barcode{display:block;max-width:90%;height:auto;margin-top:11px}.barcode svg{max-width:100%;height:auto;display:block}
+.preview-area{min-height:650px;background:#dce5ef;border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto}
 .preview-note{margin-top:8px;padding:8px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:9px}
-.actions{display:flex;justify-content:flex-end;gap:7px;padding:13px 18px;border-top:1px solid var(--line);flex-wrap:wrap}.actions button{border:1px solid var(--line);background:var(--card);color:var(--text);padding:10px 14px;border-radius:8px;font-size:9px;font-weight:900}.actions .primary{background:var(--blue);color:#fff;border-color:var(--blue)}.actions .darkbtn{background:#10233f;color:#fff;border-color:#10233f}
-.toast{position:fixed;right:18px;top:90px;background:var(--card);border-left:5px solid var(--green);padding:12px 15px;border-radius:8px;box-shadow:0 15px 35px #0003;font-size:10px;font-weight:900;opacity:0;transform:translateX(30px);transition:.2s;z-index:50}.toast.show{opacity:1;transform:none}.toast.bad{border-left-color:var(--red)}
+
+.actions{display:flex;justify-content:flex-end;gap:7px;padding:13px 18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.actions button{border:1px solid var(--line);background:var(--card);color:var(--text);padding:10px 14px;border-radius:8px;font-size:9px;font-weight:900}
+.actions .primary{background:var(--blue);color:#fff;border-color:var(--blue)}.actions .darkbtn{background:#10233f;color:#fff;border-color:#10233f}
+
+.toast{position:fixed;right:18px;top:90px;background:var(--card);border-left:5px solid var(--green);padding:12px 15px;border-radius:8px;box-shadow:0 15px 35px #0003;font-size:10px;font-weight:900;opacity:0;transform:translateX(30px);transition:.2s;z-index:100}
+.toast.show{opacity:1;transform:none}.toast.bad{border-left-color:var(--red)}
+
 footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
 
-@media(max-width:1050px){.cards{grid-template-columns:repeat(2,1fr)}.editor{grid-template-columns:1fr}.controls{border-right:0;border-bottom:1px solid var(--line)}}
-@media(max-width:700px){.sidebar{width:62px;padding:10px}.logo,.sublogo,.nav span,.footerSide{display:none}.main{margin-left:62px}.content{padding:9px}.cards{grid-template-columns:1fr}.grid2,.grid3,.po-grid{grid-template-columns:1fr}.choicegrid{grid-template-columns:repeat(2,1fr)}.page-4x6{width:250px;height:375px}}
+/* =========================================================
+   LABEL ENGINE
+   The same .label-page DOM is used for preview AND PDF.
+   This is the important fix: PDF is captured from this exact
+   visual DOM, so it cannot have a different layout.
+   ========================================================= */
+.label-page{
+ background:#fff;color:#000;position:relative;overflow:hidden;display:grid;
+ box-shadow:0 14px 35px #0003;flex:none;
+}
+.label-page.capture{box-shadow:none!important}
+.size-4x6{width:384px;height:576px}
+.size-a4{width:794px;height:1123px}
+.size-70x35{width:265px;height:132px}
+.size-custom{width:384px;height:576px}
+
+.label-page.page-border-none{border:0}
+.label-page.page-border-solid{border:4px solid #000}
+.label-page.page-border-dashed{border:4px dashed #000}
+.label-page.page-border-dotted{border:4px dotted #000}
+.label-page.page-border-double{border:7px double #000}
+.label-page.page-border-groove{border:7px groove #000}
+.label-page.page-border-ridge{border:7px ridge #000}
+.label-page.page-border-inset{border:7px inset #000}
+.label-page.page-border-outset{border:7px outset #000}
+
+.label-cell{
+ position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ text-align:center;padding:18px;min-width:0;overflow:hidden;background:#fff;
+}
+.label-cell.cut-top:before{
+ content:"";position:absolute;left:2%;right:2%;top:0;border-top:3px dashed #000;z-index:4;
+}
+.label-cell.cut-top:after{
+ content:"✂";position:absolute;left:50%;top:-17px;transform:translateX(-50%);
+ background:#fff;padding:0 8px;font-size:28px;line-height:30px;z-index:5;
+}
+.po-box,.box-box{max-width:92%;word-break:break-word;color:#000;background:#fff;display:block}
+.border-none{border:0!important}
+.border-solid{border:2px solid #000}
+.border-dashed{border:2px dashed #000}
+.border-dotted{border:2px dotted #000}
+.border-double{border:4px double #000}
+.border-groove{border:4px groove #000}
+.border-ridge{border:4px ridge #000}
+.border-inset{border:4px inset #000}
+.border-outset{border:4px outset #000}
+.border-thin{border:1px solid #000}
+.border-thick{border:4px solid #000}
+.border-dashdot{border:2px dashed #000}
+.border-round{border:2px solid #000;border-radius:10px}
+.border-pill{border:2px solid #000;border-radius:999px}
+.border-shadow{border:2px solid #000;box-shadow:4px 4px 0 #000}
+.border-underline{border:0;border-bottom:3px solid #000}
+.border-top{border:0;border-top:3px solid #000}
+.border-bottom{border:0;border-bottom:3px solid #000}
+.border-left{border:0;border-left:3px solid #000}
+.border-right{border:0;border-right:3px solid #000}
+.border-cross{border:2px solid #000}
+.border-heavy{border:6px solid #000}
+.border-light{border:1px solid #000}
+.border-double-thin{border:3px double #000}
+.border-double-heavy{border:7px double #000}
+.border-dotted-heavy{border:4px dotted #000}
+.border-dashed-heavy{border:4px dashed #000}
+.border-groove-heavy{border:7px groove #000}
+.border-ridge-heavy{border:7px ridge #000}
+
+.po-box{font-weight:900;line-height:.95;padding:7px 9px}
+.box-box{font-weight:900;line-height:1;padding:6px 9px;margin-top:18px}
+.same-line{display:flex;align-items:center;justify-content:center;gap:12px;max-width:96%}
+.same-line .box-box{margin-top:0}
+
+.barcode-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:18px;max-width:90%;flex:none}
+.barcode-wrap svg{display:block;max-width:100%;height:auto}
+.barcode-wrap canvas{display:block;max-width:100%;height:auto}
+.barcode-label{font-family:Arial,sans-serif;font-size:10px;margin-top:3px;color:#000}
+
+/* Screenshot-like 4x6 geometry */
+.size-4x6 .label-cell{padding:18px 22px}
+.size-4x6 .po-box{font-size:34px}
+.size-4x6 .box-box{font-size:25px}
+.size-4x6 .barcode-wrap{margin-top:20px}
+
+.address-card{width:100%;height:100%;padding:30px;text-align:left;display:flex;flex-direction:column;justify-content:center}
+.address-card .from,.address-card .to{font-size:18px;line-height:1.3}.address-card h4{margin:0 0 8px;font-size:12px}.address-card hr{width:100%;border:0;border-top:2px solid #000;margin:22px 0}
+
+#pdfRenderHost{
+ position:fixed;left:-100000px;top:0;opacity:1;pointer-events:none;background:#fff;z-index:-1;
+}
+.pdf-page-copy{margin:0!important}
+
+@media(max-width:1050px){
+ .cards{grid-template-columns:repeat(2,1fr)}.editor{grid-template-columns:1fr}
+ .controls{border-right:0;border-bottom:1px solid var(--line)}
+}
+@media(max-width:700px){
+ .sidebar{width:62px;padding:10px}.logo,.sublogo,.nav span,.footerSide{display:none}
+ .main{margin-left:62px}.content{padding:9px}.cards{grid-template-columns:1fr}
+ .grid2,.grid3,.po-grid{grid-template-columns:1fr}.choicegrid{grid-template-columns:repeat(2,1fr)}
+}
 @media print{
- body{background:#fff!important}.sidebar,.topbar,.hero,.cards,.wh,.tabs,.controls,.actions,footer,.toast{display:none!important}.main{margin:0}.content{padding:0}.workspace{border:0}.panel{display:none!important}.panel.active{display:block!important}.preview{padding:0;background:#fff}.preview-area{padding:0;background:#fff;border:0;min-height:0}.label-page{box-shadow:none}
+ body{background:#fff!important}.sidebar,.topbar,.hero,.cards,.wh,.tabs,.controls,.actions,footer,.toast{display:none!important}
+ .main{margin:0}.content{padding:0}.workspace{border:0}.panel{display:none!important}
+ .panel.active{display:block!important}.preview{padding:0;background:#fff}.preview-area{padding:0;background:#fff;border:0;min-height:0}
+ .label-page{box-shadow:none!important}
 }
 </style>
 </head>
@@ -99,22 +199,29 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
 
 <main class="main">
 <header class="topbar">
- <div><h1>BooksWagon Label Creations Studio</h1><p>Professional label creation, PDF generation and printing.</p></div>
+ <div><h1>BooksWagon Label Creations Studio</h1><p>Professional label creation, preview, PDF and printing.</p></div>
  <div class="theme"><button id="lightBtn">☀ Light</button><button id="darkBtn">🌙 Dark</button></div>
 </header>
 
 <div class="content">
-<section class="hero"><h2>Label Printing Studio</h2><p>CocoBlu PO • Others PO • ISBN Barcode Maker • Address Label Maker</p></section>
+<section class="hero">
+ <h2>Label Printing Studio</h2>
+ <p>CocoBlu PO • Others PO • ISBN Barcode Maker • Address Label Maker</p>
+</section>
 
 <section class="cards">
- <button class="card openPanel" data-panel="coco"><div class="icon">📦</div><h3>CocoBlu PO</h3><p>PO number + box number labels.</p></button>
- <button class="card openPanel" data-panel="other"><div class="icon">▤</div><h3>Others PO</h3><p>Other PO labels.</p></button>
+ <button class="card openPanel" data-panel="coco"><div class="icon">📦</div><h3>CocoBlu PO</h3><p>PO number + Box number labels.</p></button>
+ <button class="card openPanel" data-panel="other"><div class="icon">▤</div><h3>Others PO</h3><p>Other PO label workflow.</p></button>
  <button class="card openPanel" data-panel="isbn"><div class="icon">▥</div><h3>ISBN Barcode</h3><p>ISBN barcode labels.</p></button>
- <button class="card openPanel" data-panel="address"><div class="icon">▣</div><h3>Address Label</h3><p>From and To address labels.</p></button>
+ <button class="card openPanel" data-panel="address"><div class="icon">▣</div><h3>Address Label</h3><p>From / To address labels.</p></button>
 </section>
 
 <section class="workspace">
-<div class="wh"><div><h2 id="title">CocoBlu PO Label Maker</h2><p>Live preview and PDF output</p></div><div><span class="badge">● LIVE</span> <span class="badge" id="pdfStatus">PDF CHECKING</span></div></div>
+<div class="wh">
+ <div><h2 id="title">CocoBlu PO Label Maker</h2><p>Preview and PDF use the same label renderer.</p></div>
+ <div><span class="badge">● LIVE</span> <span class="badge" id="pdfStatus">PDF READY</span></div>
+</div>
+
 <div class="tabs">
  <button class="tab active" data-panel="coco">CocoBlu PO</button>
  <button class="tab" data-panel="other">Others PO</button>
@@ -122,6 +229,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
  <button class="tab" data-panel="address">Address Label</button>
 </div>
 
+<!-- COCOBLU -->
 <div class="panel active" id="coco">
 <div class="editor">
 <div class="controls">
@@ -131,35 +239,34 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
 <div class="modes">
 <button class="mode active" data-mode="manual"><b>Manual</b><small>10 PO numbers</small></button>
 <button class="mode" data-mode="bulk"><b>Bulk</b><small>Unlimited</small></button>
-<button class="mode" data-mode="excel"><b>Excel / CSV</b><small>Column A, A1 header</small></button>
+<button class="mode" data-mode="excel"><b>Excel / CSV</b><small>Column A • A1 header</small></button>
 </div>
 </div>
 
-<div class="section" id="manualSection">
-<h3>Manual PO Numbers</h3>
-<div id="poInputs" class="po-grid"></div>
-</div>
+<div class="section" id="manualSection"><h3>Manual PO Numbers</h3><div id="poInputs" class="po-grid"></div></div>
 
 <div class="section hidden" id="bulkSection">
-<h3>Bulk PO Numbers</h3>
-<textarea id="bulkInput" placeholder="PO001, PO002, PO003..."></textarea>
-<div id="bulkInfo" class="preview-note">0 PO numbers</div>
+ <h3>Bulk PO Numbers</h3>
+ <textarea id="bulkInput" placeholder="PO001, PO002, PO003..."></textarea>
+ <div id="bulkInfo" class="preview-note">0 PO numbers</div>
 </div>
 
 <div class="section hidden" id="excelSection">
-<h3>Excel / CSV</h3>
-<input type="file" id="excelInput" accept=".xlsx,.xls,.csv">
-<div id="excelInfo" class="preview-note">Column A is used. A1 is skipped as header.</div>
+ <h3>Excel / CSV</h3>
+ <input type="file" id="excelInput" accept=".xlsx,.xls,.csv">
+ <div id="excelInfo" class="preview-note">Column A is used. A1 is skipped as header.</div>
 </div>
 
 <div class="section">
-<h3>PO & Box Range</h3>
-<div class="grid3">
-<label>PO Prefix<input id="poPrefix" placeholder=""></label>
-<label>Box Prefix<input id="boxPrefix" value="BOX"></label>
-<label>Start Box No.<input id="startBox" type="number" value="1"></label>
+<h3>PO / Box Range</h3>
+<div class="grid2">
+ <label>PO Prefix<input id="poPrefix" placeholder=""></label>
+ <label>Box Prefix<input id="boxPrefix" value="BOX"></label>
 </div>
-<label>End Box No.<input id="endBox" type="number" value="2"></label>
+<div class="grid2">
+ <label>Start Box Number<input id="startBox" type="number" value="1"></label>
+ <label>End Box Number<input id="endBox" type="number" value="2"></label>
+</div>
 <div id="rangeWarning" class="warning hidden">Start Box Number must be less than or equal to End Box Number.</div>
 </div>
 
@@ -178,9 +285,11 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
 </div>
 
 <div class="section">
-<h3>Label Flow</h3>
-<select id="flowType"><option value="top-bottom">Top to Bottom</option><option value="left-right">Left to Right</option></select>
-<div class="preview-note">Top to Bottom = fill the first column from top to bottom. Left to Right = fill each row from left to right.</div>
+<h3>Flow Direction</h3>
+<select id="flowType">
+ <option value="top-bottom">Top to Bottom</option>
+ <option value="left-right">Left to Right</option>
+</select>
 </div>
 
 <div class="section">
@@ -191,9 +300,9 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
  <button class="choice" data-size="70x35">70 × 35 mm</button>
  <button class="choice" data-size="custom">Custom</button>
 </div>
-<div class="custom grid2" id="customSize">
-<label>Width mm<input id="customW" type="number" value="101.6"></label>
-<label>Height mm<input id="customH" type="number" value="152.4"></label>
+<div class="grid2 hidden" id="customSize">
+ <label>Width mm<input id="customW" type="number" value="101.6"></label>
+ <label>Height mm<input id="customH" type="number" value="152.4"></label>
 </div>
 </div>
 
@@ -203,63 +312,97 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
 </div>
 
 <div class="section">
-<h3>Barcode</h3>
+<h3>PO Number Barcode</h3>
 <div class="toggle-row">
-<button id="barcodeYes" class="toggle on">✓ Barcode चाहिए</button>
-<button id="barcodeNo" class="toggle">Barcode नहीं चाहिए</button>
+ <button id="barcodeYes" class="toggle on">✓ Barcode चाहिए</button>
+ <button id="barcodeNo" class="toggle">Barcode नहीं चाहिए</button>
 </div>
-<label style="margin-top:8px">Barcode Position<select id="barcodePosition"><option value="bottom">Bottom</option><option value="top">Top</option><option value="middle">Below Box</option></select></label>
+<label style="margin-top:8px">Barcode Position
+ <select id="barcodePosition">
+  <option value="bottom">Bottom</option>
+  <option value="middle">Below Box</option>
+  <option value="top">Top</option>
+ </select>
+</label>
+<div class="preview-note">Barcode OFF means no barcode element, no empty barcode box, and no reserved barcode space.</div>
 </div>
 
 <div class="section">
 <h3>Border Settings</h3>
 <div class="grid3">
-<label>Page Border<select id="pageBorder"><option value="none">No Border</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option></select></label>
-<label>PO Border<select id="poBorder"><option value="none">No Border</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option></select></label>
-<label>Box Border<select id="boxBorder"><option value="none">No Border</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option></select></label>
+ <label>Page Border
+  <select id="pageBorder">
+   <option value="none">No Border</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option><option value="groove">Groove</option><option value="ridge">Ridge</option><option value="inset">Inset</option><option value="outset">Outset</option>
+  </select>
+ </label>
+ <label>PO Border
+  <select id="poBorder">
+   <option value="none">No Border</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option><option value="groove">Groove</option><option value="ridge">Ridge</option><option value="inset">Inset</option><option value="outset">Outset</option><option value="thick">Thick</option><option value="shadow">Shadow</option><option value="round">Rounded</option>
+  </select>
+ </label>
+ <label>Box Border
+  <select id="boxBorder">
+   <option value="none">No Border</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option><option value="groove">Groove</option><option value="ridge">Ridge</option><option value="inset">Inset</option><option value="outset">Outset</option><option value="thick">Thick</option><option value="shadow">Shadow</option><option value="round">Rounded</option>
+  </select>
+ </label>
 </div>
-<div class="toggle-row" style="margin-top:8px"><button class="toggle" id="allBorder">✓ All Borders</button><button class="toggle" id="zeroBorder">Zero Border</button></div>
+<div class="toggle-row" style="margin-top:8px">
+ <button class="toggle" id="allBorder">✓ All Borders</button>
+ <button class="toggle" id="zeroBorder">Zero Border</button>
+</div>
 </div>
 
 <div class="section">
 <h3>Cutting Guide</h3>
-<div class="toggle-row"><button id="cutYes" class="toggle on">✂ Cutting ON</button><button id="cutNo" class="toggle">Cutting OFF</button></div>
+<div class="toggle-row">
+ <button id="cutYes" class="toggle on">✂ Cutting ON</button>
+ <button id="cutNo" class="toggle">Cutting OFF</button>
+</div>
 </div>
 
 <div class="section">
-<h3>Font</h3>
+<h3>Font Settings</h3>
 <div class="grid2">
-<label>Font<select id="fontFamily"><option>Arial</option><option>Verdana</option><option>Tahoma</option><option>Georgia</option><option>Times New Roman</option><option>Trebuchet MS</option><option>Courier New</option><option>Impact</option></select></label>
-<label>Font Size<select id="fontSize"><option>18</option><option>24</option><option selected>32</option><option>40</option><option>48</option><option>56</option><option>64</option><option>72</option></select></label>
+ <label>Font
+  <select id="fontFamily"><option>Arial</option><option>Verdana</option><option>Tahoma</option><option>Georgia</option><option>Times New Roman</option><option>Trebuchet MS</option><option>Courier New</option><option>Impact</option></select>
+ </label>
+ <label>Font Size
+  <select id="fontSize"><option>18</option><option>24</option><option selected>32</option><option>40</option><option>48</option><option>56</option><option>64</option><option>72</option></select>
+ </label>
 </div>
-<div class="toggle-row" style="margin-top:8px"><button id="normalBtn" class="toggle">Normal</button><button id="boldBtn" class="toggle on">Bold</button><button id="italicBtn" class="toggle">Italic</button><button id="underlineBtn" class="toggle">Underline</button></div>
+<div class="toggle-row" style="margin-top:8px">
+ <button id="normalBtn" class="toggle">Normal</button><button id="boldBtn" class="toggle on">Bold</button>
+ <button id="italicBtn" class="toggle">Italic</button><button id="underlineBtn" class="toggle">Underline</button>
+</div>
 </div>
 
 </div>
 
 <div class="preview">
-<div class="preview-head"><h3>Live Preview</h3><span class="badge">● LIVE</span></div>
-<div class="preview-area"><div id="previewPage" class="label-page page-4x6"></div></div>
+<div class="preview-head"><h3>Live Print Preview</h3><span class="badge">● SAME DOM → PDF</span></div>
+<div class="preview-area"><div id="previewPage" class="label-page size-4x6 page-border-solid"></div></div>
 <div id="previewInfo" class="preview-note"></div>
 </div>
 </div>
 
 <div class="actions">
-<button id="clearBtn">Clear</button>
-<button id="generateBtn" class="primary">⚙ Generate PDF</button>
-<button id="downloadBtn" class="primary">⬇ Download PDF</button>
-<button id="printBtn" class="darkbtn">🖨 Print PDF</button>
+ <button id="clearBtn">Clear</button>
+ <button id="generateBtn" class="primary">⚙ Generate PDF</button>
+ <button id="downloadBtn" class="primary">⬇ Download PDF</button>
+ <button id="printBtn" class="darkbtn">🖨 Print PDF</button>
 </div>
 </div>
 
-<!-- OTHER -->
+<!-- OTHER PO -->
 <div class="panel" id="other">
 <div class="editor">
 <div class="controls">
-<div class="section"><h3>Other PO</h3><label>PO Number<input id="otherPO"></label><div class="grid2"><label>Start Box<input id="otherStart" type="number" value="1"></label><label>End Box<input id="otherEnd" type="number" value="1"></label></div></div>
-<div class="section"><h3>Page Size</h3><select id="otherSize"><option value="4x6">4 × 6 inch</option><option value="a4">A4</option><option value="70x35">70 × 35 mm</option></select></div>
+<div class="section"><h3>Other PO</h3><label>PO Number<input id="otherPO"></label>
+ <div class="grid2"><label>Start Box<input id="otherStart" type="number" value="1"></label><label>End Box<input id="otherEnd" type="number" value="2"></label></div>
 </div>
-<div class="preview"><div class="preview-head"><h3>Live Preview</h3></div><div class="preview-area"><div id="otherPreview" class="label-page page-4x6"></div></div></div>
+<div class="section"><h3>Barcode</h3><div class="toggle-row"><button id="otherBarYes" class="toggle on">✓ Barcode ON</button><button id="otherBarNo" class="toggle">Barcode OFF</button></div></div>
+</div>
+<div class="preview"><div class="preview-head"><h3>Live Print Preview</h3></div><div class="preview-area"><div id="otherPreview" class="label-page size-4x6 page-border-solid"></div></div></div>
 </div>
 <div class="actions"><button id="otherGenerate" class="primary">⚙ Generate PDF</button><button id="otherDownload" class="primary">⬇ Download PDF</button><button id="otherPrint" class="darkbtn">🖨 Print PDF</button></div>
 </div>
@@ -268,10 +411,10 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
 <div class="panel" id="isbn">
 <div class="editor">
 <div class="controls">
-<div class="section"><h3>ISBN</h3><label>ISBN<input id="isbnInput" placeholder="978..."></label></div>
+<div class="section"><h3>ISBN Barcode</h3><label>ISBN<input id="isbnInput" placeholder="978..."></label></div>
 <div class="section"><h3>Barcode</h3><div class="toggle-row"><button id="isbnBarYes" class="toggle on">✓ Barcode ON</button><button id="isbnBarNo" class="toggle">Barcode OFF</button></div></div>
 </div>
-<div class="preview"><div class="preview-head"><h3>ISBN Preview</h3></div><div class="preview-area"><div id="isbnPreview" class="label-page page-4x6"></div></div></div>
+<div class="preview"><div class="preview-head"><h3>Live Print Preview</h3></div><div class="preview-area"><div id="isbnPreview" class="label-page size-4x6 page-border-solid"></div></div></div>
 </div>
 <div class="actions"><button id="isbnGenerate" class="primary">⚙ Generate PDF</button><button id="isbnDownload" class="primary">⬇ Download PDF</button><button id="isbnPrint" class="darkbtn">🖨 Print PDF</button></div>
 </div>
@@ -280,9 +423,13 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
 <div class="panel" id="address">
 <div class="editor">
 <div class="controls">
-<div class="section"><h3>Address</h3><label>From<input id="fromAddress"></label><label>To<input id="toAddress"></label><div id="addressWarning" class="warning hidden">From and To are required.</div></div>
+<div class="section"><h3>Address Label</h3>
+<label>From<input id="fromAddress"></label>
+<label>To<input id="toAddress"></label>
+<div id="addressWarning" class="warning hidden">From and To are required.</div>
 </div>
-<div class="preview"><div class="preview-head"><h3>Address Preview</h3></div><div class="preview-area"><div id="addressPreview" class="label-page page-4x6"></div></div></div>
+</div>
+<div class="preview"><div class="preview-head"><h3>Live Print Preview</h3></div><div class="preview-area"><div id="addressPreview" class="label-page size-4x6 page-border-solid"></div></div></div>
 </div>
 <div class="actions"><button id="addressGenerate" class="primary">⚙ Generate PDF</button><button id="addressDownload" class="primary">⬇ Download PDF</button><button id="addressPrint" class="darkbtn">🖨 Print PDF</button></div>
 </div>
@@ -292,13 +439,12 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:9px}
 </div>
 </main>
 
+<div id="pdfRenderHost"></div>
 <div id="toast" class="toast"></div>
 
 <script>
-/* =========================
-   BOOKSWAGON LABEL STUDIO
-   Blank-preview-safe rebuild
-   ========================= */
+"use strict";
+
 const $=id=>document.getElementById(id);
 const $$=sel=>Array.from(document.querySelectorAll(sel));
 
@@ -312,12 +458,9 @@ let fontStyle="normal";
 let textDecoration="none";
 let excelPO=[];
 
-function toast(message,bad=false){
- const el=$("toast");
- el.textContent=message;
- el.className="toast show"+(bad?" bad":"");
- clearTimeout(window.__toast);
- window.__toast=setTimeout(()=>el.className="toast",2600);
+function toast(msg,bad=false){
+ const el=$("toast");el.textContent=msg;el.className="toast show"+(bad?" bad":"");
+ clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.className="toast",2600);
 }
 
 function setTheme(theme){
@@ -330,36 +473,25 @@ setTheme(localStorage.getItem("bw_theme")==="dark"?"dark":"light");
 $("lightBtn").onclick=()=>setTheme("light");
 $("darkBtn").onclick=()=>setTheme("dark");
 
-/* ---------- navigation ---------- */
 function openPanel(id){
  $$(".tab").forEach(b=>b.classList.toggle("active",b.dataset.panel===id));
  $$(".panel").forEach(p=>p.classList.toggle("active",p.id===id));
- $("title").textContent={
-  coco:"CocoBlu PO Label Maker",
-  other:"Others PO Label Maker",
-  isbn:"ISBN Barcode Maker",
-  address:"Address Label Maker"
- }[id];
+ $("title").textContent={coco:"CocoBlu PO Label Maker",other:"Others PO Label Maker",isbn:"ISBN Barcode Maker",address:"Address Label Maker"}[id];
 }
 $$(".tab").forEach(b=>b.onclick=()=>openPanel(b.dataset.panel));
 $$(".openPanel").forEach(b=>b.onclick=()=>{openPanel(b.dataset.panel);document.querySelector(".workspace").scrollIntoView({behavior:"smooth"})});
 
-/* ---------- PO inputs ---------- */
-$("poInputs").innerHTML=Array.from({length:10},(_,i)=>
- `<div class="po-row"><b>${i+1}</b><input class="poInput" placeholder="PO Number ${i+1}"></div>`
-).join("");
+/* Manual 10 PO inputs */
+$("poInputs").innerHTML=Array.from({length:10},(_,i)=>`<div class="po-row"><b>${i+1}</b><input class="poInput" placeholder="PO Number ${i+1}"></div>`).join("");
 
 function getPOs(){
- if(inputMode==="bulk"){
-  return $("bulkInput").value.split(/[\n,]+/).map(x=>x.trim()).filter(Boolean);
- }
- if(inputMode==="excel") return excelPO.slice();
- return $$(".poInput").map(x=>x.value.trim()).filter(Boolean);
+ if(inputMode==="bulk")return $("bulkInput").value.split(/[\n,]+/).map(v=>v.trim()).filter(Boolean);
+ if(inputMode==="excel")return excelPO.slice();
+ return $$(".poInput").map(v=>v.value.trim()).filter(Boolean);
 }
 
 $$(".mode").forEach(btn=>btn.onclick=()=>{
- $$(".mode").forEach(x=>x.classList.remove("active"));
- btn.classList.add("active");
+ $$(".mode").forEach(x=>x.classList.remove("active"));btn.classList.add("active");
  inputMode=btn.dataset.mode;
  $("manualSection").classList.toggle("hidden",inputMode!=="manual");
  $("bulkSection").classList.toggle("hidden",inputMode!=="bulk");
@@ -368,21 +500,16 @@ $$(".mode").forEach(btn=>btn.onclick=()=>{
  renderCoco();
 });
 
-$("bulkInput").oninput=()=>{
- $("bulkInfo").textContent=getPOs().length+" PO numbers detected.";
- renderCoco();
-};
+$("bulkInput").oninput=()=>{ $("bulkInfo").textContent=getPOs().length+" PO numbers";renderCoco(); };
 
-$("excelInput").onchange=async event=>{
- const file=event.target.files[0];
- if(!file)return;
+$("excelInput").onchange=async e=>{
+ const file=e.target.files[0];if(!file)return;
  try{
   if(file.name.toLowerCase().endsWith(".csv")){
    const text=await file.text();
-   const rows=text.split(/\r?\n/).map(r=>r.split(",")[0].trim()).filter(Boolean);
-   excelPO=rows.slice(1);
+   excelPO=text.split(/\r?\n/).map(r=>r.split(",")[0].trim()).filter(Boolean).slice(1);
   }else{
-   if(!window.XLSX){toast("Excel library is not loaded.",true);return}
+   if(!window.XLSX)throw new Error("Excel library unavailable");
    const data=await file.arrayBuffer();
    const wb=XLSX.read(data,{type:"array"});
    const ws=wb.Sheets[wb.SheetNames[0]];
@@ -390,74 +517,57 @@ $("excelInput").onchange=async event=>{
    excelPO=rows.slice(1).map(r=>String(r[0]??"").trim()).filter(Boolean);
   }
   $("excelInfo").textContent=excelPO.length+" PO numbers loaded from Column A.";
-  toast("Excel / CSV loaded");
-  renderCoco();
- }catch(err){
-  console.error(err);toast("Excel / CSV could not be read.",true);
- }
+  toast("Excel / CSV loaded");renderCoco();
+ }catch(err){console.error(err);toast("Excel / CSV could not be read.",true)}
 };
 
-/* ---------- page options ---------- */
+/* labels per page */
 [1,2,3,4,6,8,10,12,14,15,16,18,20].forEach(n=>{
- const b=document.createElement("button");
- b.className="choice"+(n===2?" active":"");
- b.textContent=n;
- b.dataset.n=n;
+ const b=document.createElement("button");b.className="choice"+(n===2?" active":"");b.textContent=n;b.dataset.n=n;
  $("labelsChoices").appendChild(b);
 });
 $("labelsChoices").onclick=e=>{
- const b=e.target.closest("[data-n]");
- if(!b)return;
+ const b=e.target.closest("[data-n]");if(!b)return;
  labelsPerPage=Number(b.dataset.n);
- $$("#labelsChoices .choice").forEach(x=>x.classList.remove("active"));
- b.classList.add("active");
+ $$("#labelsChoices .choice").forEach(x=>x.classList.remove("active"));b.classList.add("active");
  renderCoco();
 };
 
+/* page size */
 $("pageChoices").onclick=e=>{
- const b=e.target.closest("[data-size]");
- if(!b)return;
+ const b=e.target.closest("[data-size]");if(!b)return;
  pageSize=b.dataset.size;
  $$("#pageChoices .choice").forEach(x=>x.classList.toggle("active",x===b));
- $("customSize").classList.toggle("show",pageSize==="custom");
+ $("customSize").classList.toggle("hidden",pageSize!=="custom");
  renderCoco();
 };
 
-/* ---------- toggles ---------- */
+/* barcode: IMPORTANT - disabled means element does not exist */
 $("barcodeYes").onclick=()=>{
- barcodeEnabled=true;
- $("barcodeYes").classList.add("on");$("barcodeNo").classList.remove("off");
- toast("Barcode enabled");renderCoco();
+ barcodeEnabled=true;$("barcodeYes").classList.add("on");$("barcodeNo").classList.remove("off");
+ toast("PO barcode enabled");renderCoco();
 };
 $("barcodeNo").onclick=()=>{
- barcodeEnabled=false;
- $("barcodeNo").classList.add("off");$("barcodeYes").classList.remove("on");
- toast("Barcode disabled",true);renderCoco();
+ barcodeEnabled=false;$("barcodeNo").classList.add("off");$("barcodeYes").classList.remove("on");
+ toast("PO barcode disabled");renderCoco();
 };
-$("cutYes").onclick=()=>{
- cuttingEnabled=true;$("cutYes").classList.add("on");$("cutNo").classList.remove("off");
- renderCoco();
-};
-$("cutNo").onclick=()=>{
- cuttingEnabled=false;$("cutNo").classList.add("off");$("cutYes").classList.remove("on");
- renderCoco();
-};
+
+$("cutYes").onclick=()=>{cuttingEnabled=true;$("cutYes").classList.add("on");$("cutNo").classList.remove("off");renderCoco()};
+$("cutNo").onclick=()=>{cuttingEnabled=false;$("cutNo").classList.add("off");$("cutYes").classList.remove("on");renderCoco()};
 
 $("allBorder").onclick=()=>{
- ["pageBorder","poBorder","boxBorder"].forEach(id=>$(id).value="solid");
- toast("All borders enabled");renderCoco();
+ $("pageBorder").value="solid";$("poBorder").value="solid";$("boxBorder").value="solid";toast("All borders enabled");renderCoco();
 };
 $("zeroBorder").onclick=()=>{
- ["pageBorder","poBorder","boxBorder"].forEach(id=>$(id).value="none");
- toast("All borders disabled",true);renderCoco();
+ $("pageBorder").value="none";$("poBorder").value="none";$("boxBorder").value="none";toast("All borders disabled");renderCoco();
 };
 
-function setTextStyle(which){
- fontWeight=which==="bold"?"900":"400";
- fontStyle=which==="italic"?"italic":"normal";
- textDecoration=which==="underline"?"underline":"none";
+function setTextStyle(type){
+ fontWeight=type==="bold"?"900":"400";
+ fontStyle=type==="italic"?"italic":"normal";
+ textDecoration=type==="underline"?"underline":"none";
  ["normalBtn","boldBtn","italicBtn","underlineBtn"].forEach(id=>$(id).classList.remove("on"));
- $(which==="normal"?"normalBtn":which==="bold"?"boldBtn":which==="italic"?"italicBtn":"underlineBtn").classList.add("on");
+ $(type==="normal"?"normalBtn":type==="bold"?"boldBtn":type==="italic"?"italicBtn":"underlineBtn").classList.add("on");
  renderCoco();
 }
 $("normalBtn").onclick=()=>setTextStyle("normal");
@@ -465,385 +575,337 @@ $("boldBtn").onclick=()=>setTextStyle("bold");
 $("italicBtn").onclick=()=>setTextStyle("italic");
 $("underlineBtn").onclick=()=>setTextStyle("underline");
 
-/* ---------- helpers ---------- */
-function borderClass(value){
- if(value==="solid")return"border-solid";
- if(value==="dashed")return"border-dashed";
- if(value==="dotted")return"border-dotted";
- if(value==="double")return"border-double";
- return"";
-}
-function pageClass(){
- if(pageSize==="a4")return"page-a4";
- if(pageSize==="70x35")return"page-70x35";
- if(pageSize==="custom")return"page-custom";
- return"page-4x6";
-}
-function pageMM(){
+function pageSizeMM(){
  if(pageSize==="a4")return[210,297];
  if(pageSize==="70x35")return[70,35];
- if(pageSize==="custom")return[
-  Number($("customW").value)||101.6,
-  Number($("customH").value)||152.4
- ];
+ if(pageSize==="custom")return[Math.max(20,Number($("customW").value)||101.6),Math.max(20,Number($("customH").value)||152.4)];
  return[101.6,152.4];
 }
-function borderPdf(pdf,value,x,y,w,h){
- if(value==="none")return;
- pdf.setLineWidth(value==="double"?1.0:.5);
- if(value==="dashed")pdf.setLineDashPattern([3,2],0);
- else if(value==="dotted")pdf.setLineDashPattern([1,2],0);
- else pdf.setLineDashPattern([],0);
- pdf.rect(x,y,w,h);
- if(value==="double"){
-  pdf.setLineWidth(.35);pdf.rect(x+1.3,y+1.3,w-2.6,h-2.6);
- }
- pdf.setLineDashPattern([],0);
-}
-function barcodeData(value){
- if(!window.JsBarcode)throw new Error("Barcode library unavailable");
- const canvas=document.createElement("canvas");
- JsBarcode(canvas,String(value),{
-  format:"CODE128",width:2,height:42,displayValue:true,fontSize:10,margin:2,
-  background:"#fff",lineColor:"#000"
- });
- return canvas.toDataURL("image/png");
-}
+function cssSizeClass(){return pageSize==="a4"?"size-a4":pageSize==="70x35"?"size-70x35":pageSize==="custom"?"size-custom":"size-4x6"}
+function borderClass(v){return "border-"+v}
+function pageBorderClass(v){return "page-border-"+v}
 
-/* Correct slot ordering:
-   top-bottom: rows first, then columns
-   left-right: columns first within each row */
-function slotPosition(slot,per,flow){
- let cols,rows;
- if(pageSize==="4x6"){cols=1;rows=per}
- else{
-  cols=per<=1?1:per<=4?2:3;
-  rows=Math.ceil(per/cols);
- }
- if(flow==="top-bottom"){
-  const row=slot%rows;
-  const col=Math.floor(slot/rows);
-  if(col<cols)return[row,col,rows,cols];
- }
- return[Math.floor(slot/cols),slot%cols,rows,cols];
-}
-
-function makeBarcodeElement(value){
- const holder=document.createElement("div");
- holder.className="barcode";
+function makeBarcodeSVG(value){
  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
  try{
   JsBarcode(svg,String(value),{
-   format:"CODE128",width:1.6,height:42,displayValue:true,fontSize:9,
+   format:"CODE128",width:2,height:54,displayValue:true,fontSize:12,
    margin:2,background:"#fff",lineColor:"#000"
   });
-  holder.appendChild(svg);
- }catch(err){console.warn(err)}
- return holder;
+  return svg;
+ }catch(e){console.warn("Barcode error",e);return null}
 }
 
-/* ---------- live CocoBlu preview ---------- */
+function makeBarcode(value){
+ const wrap=document.createElement("div");wrap.className="barcode-wrap";
+ const svg=makeBarcodeSVG(value);
+ if(svg)wrap.appendChild(svg);
+ return wrap;
+}
+
+function createLabelCell(item,opts){
+ const cell=document.createElement("div");
+ cell.className="label-cell"+(opts.cut&&opts.index>0?" cut-top":"");
+
+ const content=opts.content;
+ const layout=opts.layout;
+ const font=opts.font;
+ const size=opts.size;
+
+ const po=document.createElement("div");
+ po.className="po-box "+borderClass(opts.poBorder);
+ po.textContent=item.po;
+ po.style.fontFamily=font;
+ po.style.fontSize=(size)+"px";
+ po.style.fontWeight=fontWeight;
+ po.style.fontStyle=fontStyle;
+ po.style.textDecoration=textDecoration;
+
+ const box=document.createElement("div");
+ box.className="box-box "+borderClass(opts.boxBorder);
+ box.textContent=(opts.boxPrefix||"BOX")+" NO. "+item.box;
+ box.style.fontFamily=font;
+ box.style.fontSize=Math.max(18,size*.68)+"px";
+ box.style.fontWeight="900";
+
+ /* No barcode placeholder is created when OFF. */
+ const addBarcodeIfNeeded=()=>{
+  if(!opts.barcode)return;
+  const b=makeBarcode(item.po);
+  if(b&&b.querySelector("svg"))cell.appendChild(b);
+ };
+
+ if(content==="po"){
+  if(opts.barcode && opts.barPos==="top")addBarcodeIfNeeded();
+  cell.appendChild(po);
+  if(opts.barcode && opts.barPos!=="top")addBarcodeIfNeeded();
+ }else if(content==="box"){
+  cell.appendChild(box);
+ }else{
+  if(opts.barcode && opts.barPos==="top")addBarcodeIfNeeded();
+  if(layout==="same"){
+   const row=document.createElement("div");row.className="same-line";row.append(po,box);cell.appendChild(row);
+  }else{
+   cell.append(po,box);
+  }
+  if(opts.barcode && opts.barPos!=="top")addBarcodeIfNeeded();
+ }
+ return cell;
+}
+
+function itemsFromPOs(pos,start,end,prefix){
+ const out=[];
+ pos.forEach(po=>{
+  for(let n=start;n<=end;n++)out.push({po:(prefix||"")+po,box:n});
+ });
+ return out;
+}
+
+function gridFor(per,size){
+ if(size==="4x6")return[1,per];
+ if(per<=1)return[1,1];
+ if(per<=4)return[2,2];
+ if(per<=6)return[3,2];
+ if(per<=8)return[4,2];
+ if(per<=12)return[4,3];
+ return[5,4];
+}
+
+function applyFlow(page,per,size,flow){
+ const [cols,rows]=gridFor(per,size);
+ page.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+ page.style.gridTemplateRows=`repeat(${rows},1fr)`;
+ return {cols,rows};
+}
+
+/* Exact preview renderer */
+function renderPageDOM(items,opts,pageIndex=0){
+ const page=document.createElement("div");
+ page.className=`label-page ${opts.sizeClass} ${pageBorderClass(opts.pageBorder)}`;
+ const {cols,rows}=applyFlow(page,opts.per,opts.size,opts.flow);
+
+ for(let i=0;i<opts.per;i++){
+  const item=items[i];
+  if(!item){
+   const blank=document.createElement("div");blank.className="label-cell";blank.style.visibility="hidden";page.appendChild(blank);continue;
+  }
+  const cell=createLabelCell(item,{...opts,index:i});
+  page.appendChild(cell);
+ }
+ return page;
+}
+
 function renderCoco(){
  const page=$("previewPage");
- const start=Number($("startBox").value);
- const end=Number($("endBox").value);
  const pos=getPOs();
- const warn=Number.isFinite(start)&&Number.isFinite(end)&&start>end;
- $("rangeWarning").classList.toggle("hidden",!warn);
+ const start=Number($("startBox").value),end=Number($("endBox").value);
+ const invalid=pos.length===0||!Number.isFinite(start)||!Number.isFinite(end)||start>end;
+ $("rangeWarning").classList.toggle("hidden",!(!Number.isNaN(start)&&!Number.isNaN(end)&&start>end));
 
- page.className="label-page "+pageClass();
- page.style.gridTemplateColumns="";
- page.style.gridTemplateRows="";
- page.style.padding=($("padValue")?.value||0)+"px";
-
- if(pageSize==="4x6"){
-  page.style.gridTemplateColumns="1fr";
-  page.style.gridTemplateRows=`repeat(${labelsPerPage},1fr)`;
- }else{
-  const cols=labelsPerPage<=1?1:labelsPerPage<=4?2:3;
-  const rows=Math.ceil(labelsPerPage/cols);
-  page.style.gridTemplateColumns=`repeat(${cols},1fr)`;
-  page.style.gridTemplateRows=`repeat(${rows},1fr)`;
- }
-
- const pb=$("pageBorder").value;
- page.style.border=pb==="none"?"0":pb==="double"?"6px double #000":`4px ${pb} #000`;
-
+ page.className=`label-page ${cssSizeClass()} ${pageBorderClass($("pageBorder").value)}`;
  page.innerHTML="";
+ const [cols,rows]=applyFlow(page,labelsPerPage,pageSize,$("flowType").value);
 
- if(!pos.length||!Number.isFinite(start)||!Number.isFinite(end)||warn){
-  page.innerHTML='<div style="grid-column:1/-1;display:grid;place-items:center;color:#64748b;font-size:12px;padding:25px;text-align:center">Enter PO number(s) and a valid Box range.<br>Example: PO = BW123 • Start Box = 1 • End Box = 2</div>';
+ if(invalid){
+  page.innerHTML=`<div style="grid-column:1/-1;display:grid;place-items:center;color:#64748b;font-size:12px;text-align:center;padding:30px">
+  Enter PO number(s) and a valid Box range.<br><br>
+  Example: <b>108827080887274</b> + Box 1–2
+  </div>`;
   $("previewInfo").textContent="Preview waiting for valid PO and Box range.";
   return;
  }
 
- const content=$("contentType").value;
- const layout=$("layoutType").value;
- const flow=$("flowType").value;
- const boxPrefix=$("boxPrefix").value||"BOX";
- const poPrefix=$("poPrefix").value||"";
- const font=$("fontFamily").value;
- const size=Number($("fontSize").value)||32;
-
- const items=[];
- pos.forEach(po=>{
-  for(let box=start;box<=end;box++)items.push({po:poPrefix+po,box});
- });
-
- const visible=items.slice(0,labelsPerPage);
-
- visible.forEach((item,index)=>{
-  const cell=document.createElement("div");
-  cell.className="label-cell";
-  cell.style.padding="14px";
-
-  if(cuttingEnabled&&index>0){
-   cell.classList.add("cut");
-   const line=document.createElement("span");line.className="cutline";
-   const scissors=document.createElement("span");scissors.className="scissor";scissors.textContent="✂";
-   cell.append(line,scissors);
-  }
-
-  const po=document.createElement("div");
-  po.className="po-text "+borderClass($("poBorder").value);
-  po.textContent=item.po;
-  po.style.fontFamily=font;po.style.fontSize=size+"px";po.style.fontWeight=fontWeight;po.style.fontStyle=fontStyle;po.style.textDecoration=textDecoration;
-
-  const box=document.createElement("div");
-  box.className="box-text "+borderClass($("boxBorder").value);
-  box.textContent=boxPrefix+" NO. "+item.box;
-  box.style.fontFamily=font;box.style.fontSize=Math.max(18,size*.68)+"px";box.style.fontWeight="900";
-
-  const bar=barcodeEnabled?makeBarcodeElement(item.po):null;
-  const bp=$("barcodePosition").value;
-
-  if(content==="po"){
-   if(bar&&bp==="top")cell.appendChild(bar);
-   cell.appendChild(po);
-   if(bar&&bp!=="top")cell.appendChild(bar);
-  }else if(content==="box"){
-   cell.appendChild(box);
-  }else{
-   if(bar&&bp==="top")cell.appendChild(bar);
-   if(layout==="same"){
-    const row=document.createElement("div");row.className="same-line";row.append(po,box);cell.appendChild(row);
-   }else{
-    cell.append(po,box);
-   }
-   if(bar&&bp!=="top")cell.appendChild(bar);
-  }
-
-  page.appendChild(cell);
- });
-
- $("previewInfo").textContent=`${visible.length} label(s) shown • ${flow==="top-bottom"?"Top → Bottom":"Left → Right"} • Barcode ${barcodeEnabled?"ON":"OFF"}`;
+ const items=itemsFromPOs(pos,start,end,$("poPrefix").value);
+ const opts={
+  per:labelsPerPage,size:pageSize,sizeClass:cssSizeClass(),
+  pageBorder:$("pageBorder").value,poBorder:$("poBorder").value,boxBorder:$("boxBorder").value,
+  content:$("contentType").value,layout:$("layoutType").value,flow:$("flowType").value,
+  barcode:barcodeEnabled,barPos:$("barcodePosition").value,cut:cuttingEnabled,
+  boxPrefix:$("boxPrefix").value||"BOX",font:$("fontFamily").value,size:Number($("fontSize").value)||32
+ };
+ const fresh=renderPageDOM(items.slice(0,labelsPerPage),opts);
+ page.replaceChildren(...Array.from(fresh.childNodes).map(n=>n.cloneNode(true)));
+ $("previewInfo").textContent=`${Math.min(items.length,labelsPerPage)} label(s) shown • ${opts.flow==="top-bottom"?"Top → Bottom":"Left → Right"} • PO Barcode ${barcodeEnabled?"ON":"OFF"}`;
 }
 
-/* ---------- PDF ---------- */
-function pdfAvailable(){return !!(window.jspdf&&window.jspdf.jsPDF)}
-function newPDF(size){
- const [w,h]=size;
- return new jspdf.jsPDF({unit:"mm",format:[w,h],orientation:w>h?"landscape":"portrait"});
-}
-function buildCocoPDF(){
- if(!pdfAvailable()){toast("PDF engine not loaded. Refresh once with internet enabled.",true);return null}
+/* ---------- SAME PREVIEW -> PDF ---------- */
+async function createCocoPDF(){
+ if(!window.jspdf||!window.html2canvas){toast("PDF libraries are not loaded. Check internet connection and refresh.",true);return null}
  const pos=getPOs(),start=Number($("startBox").value),end=Number($("endBox").value);
  if(!pos.length){toast("Enter at least one PO number.",true);return null}
- if(!Number.isFinite(start)||!Number.isFinite(end)||start>end){toast("Enter a valid Box range.",true);return null}
+ if(!Number.isFinite(start)||!Number.isFinite(end)||start>end){toast("Invalid Box range.",true);return null}
 
- const [W,H]=pageMM();
- const pdf=newPDF([W,H]);
- const per=labelsPerPage;
- const cols=pageSize==="4x6"?1:(per<=1?1:per<=4?2:3);
- const rows=pageSize==="4x6"?per:Math.ceil(per/cols);
- const cw=W/cols,ch=H/rows;
- const content=$("contentType").value;
- const layout=$("layoutType").value;
- const flow=$("flowType").value;
- const boxPrefix=$("boxPrefix").value||"BOX";
- const poPrefix=$("poPrefix").value||"";
- const fontSize=Number($("fontSize").value)||32;
- const fontStylePDF=fontStyle==="italic"?"italic":fontWeight==="900"?"bold":"normal";
+ const items=itemsFromPOs(pos,start,end,$("poPrefix").value);
+ const opts={
+  per:labelsPerPage,size:pageSize,sizeClass:cssSizeClass(),
+  pageBorder:$("pageBorder").value,poBorder:$("poBorder").value,boxBorder:$("boxBorder").value,
+  content:$("contentType").value,layout:$("layoutType").value,flow:$("flowType").value,
+  barcode:barcodeEnabled,barPos:$("barcodePosition").value,cut:cuttingEnabled,
+  boxPrefix:$("boxPrefix").value||"BOX",font:$("fontFamily").value,size:Number($("fontSize").value)||32
+ };
+ const [W,H]=pageSizeMM();
+ const pdf=new jspdf.jsPDF({unit:"mm",format:[W,H],orientation:W>H?"landscape":"portrait",compress:true});
+ const host=$("pdfRenderHost");
+ host.innerHTML="";
 
- const items=[];
- pos.forEach(po=>{for(let b=start;b<=end;b++)items.push({po:poPrefix+po,box:b})});
+ for(let startIndex=0;startIndex<items.length;startIndex+=opts.per){
+  const page=renderPageDOM(items.slice(startIndex,startIndex+opts.per),opts);
+  page.classList.add("capture","pdf-page-copy");
+  host.appendChild(page);
 
- for(let base=0;base<items.length;base+=per){
-  if(base>0)pdf.addPage([W,H]);
-  const pageItems=items.slice(base,base+per);
+  /* wait for barcode SVG/layout/fonts */
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
 
-  borderPdf(pdf,$("pageBorder").value,.8,.8,W-1.6,H-1.6);
-
-  pageItems.forEach((item,i)=>{
-   let row,col;
-   if(pageSize==="4x6"){
-    row=i;col=0;
-   }else if(flow==="top-bottom"){
-    row=i%rows;col=Math.floor(i/rows);
-    if(col>=cols){row=Math.floor(i/cols);col=i%cols}
-   }else{
-    row=Math.floor(i/cols);col=i%cols;
-   }
-
-   const x=col*cw,y=row*ch,pad=3;
-   if($("poBorder").value!=="none")borderPdf(pdf,$("poBorder").value,x+pad,y+pad,cw-2*pad,ch-2*pad);
-
-   pdf.setTextColor(0,0,0);
-   pdf.setFont("helvetica",fontStylePDF);
-   pdf.setFontSize(Math.max(10,fontSize*.55));
-
-   if(content==="po"){
-    pdf.text(item.po,x+cw/2,y+ch*.36,{align:"center"});
-   }else if(content==="box"){
-    pdf.setFont("helvetica","bold");pdf.setFontSize(Math.max(11,fontSize*.50));
-    pdf.text(boxPrefix+" NO. "+item.box,x+cw/2,y+ch*.46,{align:"center"});
-   }else{
-    if(layout==="same"){
-     pdf.setFontSize(Math.max(10,fontSize*.48));
-     pdf.text(item.po+"     "+boxPrefix+" NO. "+item.box,x+cw/2,y+ch*.40,{align:"center"});
-    }else{
-     pdf.text(item.po,x+cw/2,y+ch*.34,{align:"center"});
-     pdf.setFont("helvetica","bold");pdf.setFontSize(Math.max(11,fontSize*.50));
-     pdf.text(boxPrefix+" NO. "+item.box,x+cw/2,y+ch*.56,{align:"center"});
-    }
-   }
-
-   if($("boxBorder").value!=="none"){
-    borderPdf(pdf,$("boxBorder").value,x+cw*.18,y+ch*.61,cw*.64,ch*.20);
-   }
-
-   /* Barcode is ONLY drawn when enabled. No placeholder is drawn when disabled. */
-   if(barcodeEnabled && content!=="box"){
-    try{
-     const img=barcodeData(item.po);
-     const bw=Math.min(cw*.76,80),bh=Math.min(ch*.22,24);
-     let by=y+ch*.72;
-     if($("barcodePosition").value==="top")by=y+ch*.07;
-     if($("barcodePosition").value==="middle")by=y+ch*.63;
-     pdf.addImage(img,"PNG",x+(cw-bw)/2,by,bw,bh);
-    }catch(err){console.warn("Barcode skipped",err)}
-   }
-
-   if(cuttingEnabled&&i>0){
-    pdf.setLineWidth(.45);pdf.setLineDashPattern([3,2],0);
-    pdf.line(x+3,y,x+cw-3,y);pdf.setLineDashPattern([],0);
-    pdf.setFont("helvetica","normal");pdf.setFontSize(9);pdf.text("✂",x+cw/2,y+2,{align:"center"});
-   }
+  const canvas=await html2canvas(page,{
+   backgroundColor:"#fff",
+   scale:2,
+   useCORS:true,
+   logging:false,
+   width:page.offsetWidth,
+   height:page.offsetHeight
   });
+
+  const img=canvas.toDataURL("image/png",1.0);
+  if(startIndex>0)pdf.addPage([W,H],W>H?"landscape":"portrait");
+  pdf.addImage(img,"PNG",0,0,W,H,undefined,"FAST");
+  page.remove();
  }
- return pdf;
-}
-function openPDF(pdf){
- const blob=pdf.output("blob"),url=URL.createObjectURL(blob),w=window.open(url,"_blank");
- if(!w){toast("Popup blocked. Allow popups for PDF.",true);return}
- toast("PDF generated successfully.");
-}
-function downloadPDF(pdf,name){
- const blob=pdf.output("blob"),url=URL.createObjectURL(blob),a=document.createElement("a");
- a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
- setTimeout(()=>URL.revokeObjectURL(url),3000);toast("PDF downloaded.");
-}
-function printPDF(pdf){
- const blob=pdf.output("blob"),url=URL.createObjectURL(blob);
- const iframe=document.createElement("iframe");
- iframe.style.position="fixed";iframe.style.width="1px";iframe.style.height="1px";iframe.style.opacity="0";iframe.src=url;
- document.body.appendChild(iframe);
- iframe.onload=()=>setTimeout(()=>{
-  try{iframe.contentWindow.focus();iframe.contentWindow.print();toast("Print dialog opened.")}
-  catch(e){const w=window.open(url,"_blank");if(w)w.onload=()=>w.print()}
- },800);
- setTimeout(()=>{iframe.remove();URL.revokeObjectURL(url)},60000);
-}
-function simplePDF(type){
- if(!pdfAvailable()){toast("PDF engine not loaded.",true);return null}
- let W=101.6,H=152.4;
- const pdf=newPDF([W,H]);
- if(type==="other"){
-  const po=$("otherPO").value.trim();if(!po){toast("Enter Other PO number.",true);return null}
-  pdf.setFont("helvetica","bold");pdf.setFontSize(24);pdf.text(po,W/2,45,{align:"center"});
- }
- if(type==="isbn"){
-  const v=$("isbnInput").value.trim();if(!v){toast("Enter ISBN.",true);return null}
-  pdf.setFont("helvetica","bold");pdf.setFontSize(20);pdf.text(v,W/2,42,{align:"center"});
-  if($("isbnBarYes").classList.contains("on")){
-   try{pdf.addImage(barcodeData(v.replace(/[^0-9Xx]/g,"")),"PNG",W*.14,58,W*.72,28)}catch(e){}
-  }
- }
- if(type==="address"){
-  const from=$("fromAddress").value.trim(),to=$("toAddress").value.trim();
-  if(!from||!to){$("addressWarning").classList.remove("hidden");toast("From and To are required.",true);return null}
-  $("addressWarning").classList.add("hidden");
-  pdf.setFont("helvetica","bold");pdf.setFontSize(10);pdf.text("FROM",9,16);pdf.setFont("helvetica","normal");pdf.setFontSize(13);pdf.text(pdf.splitTextToSize(from,W-18),9,25);
-  pdf.line(9,75,W-9,75);pdf.setFont("helvetica","bold");pdf.setFontSize(10);pdf.text("TO",9,88);pdf.setFont("helvetica","normal");pdf.setFontSize(15);pdf.text(pdf.splitTextToSize(to,W-18),9,98);
- }
+ host.innerHTML="";
  return pdf;
 }
 
-/* ---------- buttons ---------- */
-$("generateBtn").onclick=()=>{const p=buildCocoPDF();if(p)openPDF(p)};
-$("downloadBtn").onclick=()=>{const p=buildCocoPDF();if(p)downloadPDF(p,"BooksWagon_CocoBlu_Labels.pdf")};
-$("printBtn").onclick=()=>{const p=buildCocoPDF();if(p)printPDF(p)};
+function openGeneratedPDF(pdf){
+ const blob=pdf.output("blob");
+ const url=URL.createObjectURL(blob);
+ const win=window.open(url,"_blank");
+ if(!win){toast("Popup blocked. Allow popups for this site.",true);URL.revokeObjectURL(url);return}
+ toast("PDF generated successfully.");
+ setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+function downloadGeneratedPDF(pdf,name){
+ const blob=pdf.output("blob"),url=URL.createObjectURL(blob);
+ const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),5000);toast("PDF downloaded successfully.");
+}
+function printGeneratedPDF(pdf){
+ const blob=pdf.output("blob"),url=URL.createObjectURL(blob);
+ const win=window.open(url,"_blank");
+ if(!win){toast("Popup blocked. Allow popups for print.",true);return}
+ win.onload=()=>setTimeout(()=>{try{win.focus();win.print()}catch(e){}},900);
+ toast("Print dialog opening...");
+}
+
+/* Generate = open generated PDF; Download = save generated PDF; Print = print generated PDF */
+$("generateBtn").onclick=async()=>{
+ try{toast("Generating PDF...");const pdf=await createCocoPDF();if(pdf)openGeneratedPDF(pdf)}catch(e){console.error(e);toast("PDF generation failed: "+e.message,true)}
+};
+$("downloadBtn").onclick=async()=>{
+ try{toast("Preparing PDF download...");const pdf=await createCocoPDF();if(pdf)downloadGeneratedPDF(pdf,"BooksWagon_CocoBlu_Labels.pdf")}catch(e){console.error(e);toast("PDF download failed: "+e.message,true)}
+};
+$("printBtn").onclick=async()=>{
+ try{toast("Preparing print PDF...");const pdf=await createCocoPDF();if(pdf)printGeneratedPDF(pdf)}catch(e){console.error(e);toast("Print PDF failed: "+e.message,true)}
+};
 $("clearBtn").onclick=()=>{
- $$(".poInput").forEach(i=>i.value="");$("bulkInput").value="";$("startBox").value=1;$("endBox").value=2;excelPO=[];renderCoco();toast("CocoBlu form cleared");
+ $$(".poInput").forEach(i=>i.value="");$("bulkInput").value="";excelPO=[];
+ $("startBox").value=1;$("endBox").value=2;renderCoco();toast("CocoBlu form cleared");
 };
 
-/* Other */
+/* ---------- Other PO ---------- */
+let otherBarcode=true;
 function renderOther(){
- const p=$("otherPreview");p.className="label-page page-4x6";p.innerHTML="";
+ const p=$("otherPreview");p.innerHTML="";p.className="label-page size-4x6 page-border-solid";
  const po=$("otherPO").value.trim(),s=Number($("otherStart").value),e=Number($("otherEnd").value);
- if(!po){p.innerHTML='<div style="display:grid;place-items:center;color:#64748b">Enter Other PO</div>';return}
- const b=document.createElement("div");b.className="label-cell";
- const x=document.createElement("div");x.className="po-text";x.style.fontSize="40px";x.textContent=po;b.appendChild(x);
- const bx=document.createElement("div");bx.className="box-text";bx.textContent="BOX NO. "+(Number.isFinite(s)&&Number.isFinite(e)?s+" - "+e:"");b.appendChild(bx);p.appendChild(b);
+ if(!po){p.innerHTML='<div style="display:grid;place-items:center;color:#64748b">Enter Other PO Number</div>';return}
+ const items=[];for(let b=s;b<=e;b++)items.push({po,box:b});
+ const opts={per:2,size:"4x6",sizeClass:"size-4x6",pageBorder:"solid",poBorder:"solid",boxBorder:"solid",content:"both",layout:"separate",flow:"top-bottom",barcode:otherBarcode,barPos:"bottom",cut:true,boxPrefix:"BOX",font:"Arial",size:32};
+ const fresh=renderPageDOM(items.slice(0,2),opts);p.replaceChildren(...Array.from(fresh.childNodes).map(n=>n.cloneNode(true)));
 }
-["otherPO","otherStart","otherEnd"].forEach(id=>$(id).addEventListener("input",renderOther));
-$("otherGenerate").onclick=()=>{const p=simplePDF("other");if(p)openPDF(p)};
-$("otherDownload").onclick=()=>{const p=simplePDF("other");if(p)downloadPDF(p,"BooksWagon_Other_PO.pdf")};
-$("otherPrint").onclick=()=>{const p=simplePDF("other");if(p)printPDF(p)};
+$("otherPO").oninput=renderOther;$("otherStart").oninput=renderOther;$("otherEnd").oninput=renderOther;
+$("otherBarYes").onclick=()=>{otherBarcode=true;$("otherBarYes").classList.add("on");$("otherBarNo").classList.remove("off");renderOther()};
+$("otherBarNo").onclick=()=>{otherBarcode=false;$("otherBarNo").classList.add("off");$("otherBarYes").classList.remove("on");renderOther()};
 
-/* ISBN */
+async function simpleTypePDF(type){
+ if(!window.jspdf||!window.html2canvas){toast("PDF libraries not loaded.",true);return null}
+ let items=[],opts;
+ if(type==="other"){
+  const po=$("otherPO").value.trim();const s=Number($("otherStart").value),e=Number($("otherEnd").value);
+  if(!po||s>e){toast("Enter valid Other PO and Box range.",true);return null}
+  for(let b=s;b<=e;b++)items.push({po,box:b});
+  opts={per:2,size:"4x6",sizeClass:"size-4x6",pageBorder:"solid",poBorder:"solid",boxBorder:"solid",content:"both",layout:"separate",flow:"top-bottom",barcode:otherBarcode,barPos:"bottom",cut:true,boxPrefix:"BOX",font:"Arial",size:32};
+ }
+ if(type==="isbn"){
+  const isbn=$("isbnInput").value.trim();if(!isbn){toast("Enter ISBN.",true);return null}
+  items=[{po:isbn,box:""}];
+  opts={per:1,size:"4x6",sizeClass:"size-4x6",pageBorder:"solid",poBorder:"solid",boxBorder:"none",content:"po",layout:"separate",flow:"top-bottom",barcode:$("isbnBarYes").classList.contains("on"),barPos:"bottom",cut:false,boxPrefix:"",font:"Arial",size:30};
+ }
+ const [W,H]=type==="other"?[101.6,152.4]:[101.6,152.4];
+ const pdf=new jspdf.jsPDF({unit:"mm",format:[W,H],orientation:"portrait"});
+ const host=$("pdfRenderHost");host.innerHTML="";
+ const page=renderPageDOM(items.slice(0,opts.per),opts);page.classList.add("capture");host.appendChild(page);
+ await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+ const canvas=await html2canvas(page,{backgroundColor:"#fff",scale:2,useCORS:true,logging:false});
+ pdf.addImage(canvas.toDataURL("image/png",1),"PNG",0,0,W,H,"","FAST");
+ host.innerHTML="";return pdf;
+}
+$("otherGenerate").onclick=async()=>{try{const p=await simpleTypePDF("other");if(p)openGeneratedPDF(p)}catch(e){console.error(e);toast(e.message,true)}};
+$("otherDownload").onclick=async()=>{try{const p=await simpleTypePDF("other");if(p)downloadGeneratedPDF(p,"BooksWagon_Other_PO.pdf")}catch(e){console.error(e);toast(e.message,true)}};
+$("otherPrint").onclick=async()=>{try{const p=await simpleTypePDF("other");if(p)printGeneratedPDF(p)}catch(e){console.error(e);toast(e.message,true)}};
+
+/* ---------- ISBN ---------- */
 function renderISBN(){
- const p=$("isbnPreview");p.innerHTML="";
- const v=$("isbnInput").value.trim();if(!v){p.innerHTML='<div style="display:grid;place-items:center;color:#64748b">Enter ISBN</div>';return}
- const cell=document.createElement("div");cell.className="label-cell";
- const t=document.createElement("div");t.className="po-text";t.style.fontSize="25px";t.textContent=v;cell.appendChild(t);
- if($("isbnBarYes").classList.contains("on"))cell.appendChild(makeBarcodeElement(v));
- p.appendChild(cell);
+ const p=$("isbnPreview");p.innerHTML="";p.className="label-page size-4x6 page-border-solid";
+ const v=$("isbnInput").value.trim();
+ if(!v){p.innerHTML='<div style="display:grid;place-items:center;color:#64748b">Enter ISBN</div>';return}
+ const opts={per:1,size:"4x6",sizeClass:"size-4x6",pageBorder:"solid",poBorder:"solid",boxBorder:"none",content:"po",layout:"separate",flow:"top-bottom",barcode:$("isbnBarYes").classList.contains("on"),barPos:"bottom",cut:false,boxPrefix:"",font:"Arial",size:30};
+ const fresh=renderPageDOM([{po:v,box:""}],opts);p.replaceChildren(...Array.from(fresh.childNodes).map(n=>n.cloneNode(true)));
 }
 $("isbnInput").oninput=renderISBN;
 $("isbnBarYes").onclick=()=>{$("isbnBarYes").classList.add("on");$("isbnBarNo").classList.remove("off");renderISBN()};
 $("isbnBarNo").onclick=()=>{$("isbnBarNo").classList.add("off");$("isbnBarYes").classList.remove("on");renderISBN()};
-$("isbnGenerate").onclick=()=>{const p=simplePDF("isbn");if(p)openPDF(p)};
-$("isbnDownload").onclick=()=>{const p=simplePDF("isbn");if(p)downloadPDF(p,"BooksWagon_ISBN.pdf")};
-$("isbnPrint").onclick=()=>{const p=simplePDF("isbn");if(p)printPDF(p)};
+$("isbnGenerate").onclick=async()=>{try{const p=await simpleTypePDF("isbn");if(p)openGeneratedPDF(p)}catch(e){toast(e.message,true)}};
+$("isbnDownload").onclick=async()=>{try{const p=await simpleTypePDF("isbn");if(p)downloadGeneratedPDF(p,"BooksWagon_ISBN.pdf")}catch(e){toast(e.message,true)}};
+$("isbnPrint").onclick=async()=>{try{const p=await simpleTypePDF("isbn");if(p)printGeneratedPDF(p)}catch(e){toast(e.message,true)}};
 
-/* Address */
+/* ---------- Address ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function renderAddress(){
- const p=$("addressPreview");p.innerHTML="";
+ const p=$("addressPreview");p.innerHTML="";p.className="label-page size-4x6 page-border-solid";
  const from=$("fromAddress").value.trim(),to=$("toAddress").value.trim();
  if(!from&&!to){p.innerHTML='<div style="display:grid;place-items:center;color:#64748b">Enter From and To</div>';return}
- const cell=document.createElement("div");cell.className="label-cell";cell.style.alignItems="flex-start";cell.style.textAlign="left";
- cell.innerHTML="<b>FROM</b><div style='margin:5px 0 20px'>"+escapeHTML(from)+"</div><hr style='width:100%'><b>TO</b><div style='margin-top:5px'>"+escapeHTML(to)+"</div>";
+ const cell=document.createElement("div");cell.className="label-cell";cell.style.padding="35px";cell.style.alignItems="stretch";cell.style.textAlign="left";
+ cell.innerHTML=`<div class="address-card"><h4>FROM</h4><div class="from">${esc(from)}</div><hr><h4>TO</h4><div class="to">${esc(to)}</div></div>`;
  p.appendChild(cell);
 }
-function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 $("fromAddress").oninput=renderAddress;$("toAddress").oninput=renderAddress;
-$("addressGenerate").onclick=()=>{const p=simplePDF("address");if(p)openPDF(p)};
-$("addressDownload").onclick=()=>{const p=simplePDF("address");if(p)downloadPDF(p,"BooksWagon_Address.pdf")};
-$("addressPrint").onclick=()=>{const p=simplePDF("address");if(p)printPDF(p)};
 
-/* ---------- live listeners ---------- */
+async function addressPDF(){
+ const from=$("fromAddress").value.trim(),to=$("toAddress").value.trim();
+ if(!from||!to){$("addressWarning").classList.remove("hidden");toast("From and To are required.",true);return null}
+ $("addressWarning").classList.add("hidden");
+ const W=101.6,H=152.4,pdf=new jspdf.jsPDF({unit:"mm",format:[W,H],orientation:"portrait"});
+ const host=$("pdfRenderHost");host.innerHTML="";
+ const page=document.createElement("div");page.className="label-page size-4x6 page-border-solid";
+ const cell=document.createElement("div");cell.className="label-cell";cell.style.padding="35px";cell.style.alignItems="stretch";cell.style.textAlign="left";
+ cell.innerHTML=`<div class="address-card"><h4>FROM</h4><div class="from">${esc(from)}</div><hr><h4>TO</h4><div class="to">${esc(to)}</div></div>`;
+ page.appendChild(cell);host.appendChild(page);
+ await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+ const canvas=await html2canvas(page,{backgroundColor:"#fff",scale:2,useCORS:true,logging:false});
+ pdf.addImage(canvas.toDataURL("image/png",1),"PNG",0,0,W,H,"","FAST");
+ host.innerHTML="";return pdf;
+}
+$("addressGenerate").onclick=async()=>{try{const p=await addressPDF();if(p)openGeneratedPDF(p)}catch(e){toast(e.message,true)}};
+$("addressDownload").onclick=async()=>{try{const p=await addressPDF();if(p)downloadGeneratedPDF(p,"BooksWagon_Address.pdf")}catch(e){toast(e.message,true)}};
+$("addressPrint").onclick=async()=>{try{const p=await addressPDF();if(p)printGeneratedPDF(p)}catch(e){toast(e.message,true)}};
+
+/* live controls */
 $$(".controls input,.controls select,.controls textarea").forEach(el=>{
- el.addEventListener("input",()=>{if(el.id==="bulkInput")return;renderCoco()});
- el.addEventListener("change",renderCoco);
+ el.addEventListener("input",()=>{if(el.id==="fromAddress"||el.id==="toAddress")renderAddress();else if(el.closest("#other"))renderOther();else if(el.closest("#isbn"))renderISBN();else renderCoco()});
+ el.addEventListener("change",()=>{if(el.closest("#other"))renderOther();else if(el.closest("#isbn"))renderISBN();else renderCoco()});
 });
 
-/* ---------- initial state ---------- */
-$("pdfStatus").textContent=(window.jspdf&&window.jspdf.jsPDF)?"PDF READY":"PDF CHECKING";
-renderCoco();
-renderOther();
-renderISBN();
-renderAddress();
+/* Initial */
+$("pdfStatus").textContent=(window.jspdf&&window.html2canvas)?"PDF READY":"PDF LIBRARY ERROR";
+renderCoco();renderOther();renderISBN();renderAddress();
 </script>
 </body>
 </html>
